@@ -1,0 +1,271 @@
+﻿@model Application.Queries.GetAdminDashBoardStat.GetAdminDashBoardStatResponse
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<link rel="stylesheet" href="~/css/adminDashboard.css" asp-append-version="true">
+<header class="header">
+    <h1 class="welcome-text">WELCOME, ADE (ADMIN)</h1>
+    <div class="header-right">
+        <div class="search-box">
+            <input type="text" placeholder="Search...">
+            <img src="~/lib/images/search.svg" class="icon" alt="Search">
+        </div>
+        <img src="~/lib/images/notifications-outline.svg" class="icon" alt="Notification">
+
+        <div class="profile-details" onclick="toggleProfileMenu(event)">
+            <img src="~/lib/images/user-solid-full.svg" class="profile-img" alt="Profile">
+
+            <img src="~/lib/images/chevron-down-outline.svg" class="icon arrow" id="chevronArrow" alt="More" />
+
+            <ul id="profileDropdown" class="profile-dropdown-menu">
+                <img src="~/lib/images/user-solid-full.svg" class="profile-image" alt="Profile">
+                <li><a href="@Url.Action("Profile", "Admin")">My Profile</a></li>
+                <li><a href="@Url.Action("Settings", "Admin")">Account Settings</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a href="@Url.Action("Logout", "Account")" class="logout-link">Log Out</a></li>
+            </ul>
+        </div>
+    </div>
+</header>
+<div class="dashboard-grid">
+
+    <div class="item-1 metrics-card-style">
+        <p class="card-label">TOTAL LIBRARIES</p>
+        <h2>@Model.TotalLibrary</h2>
+    </div>
+    <div class="item-2 metrics-card-style">
+        <p class="card-label">ACTIVE SUBSCRIBERS</p>
+        <h2>1,240</h2>
+    </div>
+    <div class="item-3 metrics-card-style">
+        <p class="card-label">NEW SIGN-UPS</p>
+        <h2>17</h2>
+    </div>
+    <div class="item-4 metrics-card-style">
+        <p class="card-label">PENDING REPORTS</p>
+        <h2>0</h2>
+    </div>
+
+    <div class="item-5 chart-card-padding">
+        <div class="chart-title-container">
+            <h3>SUBSCRIPTION GROWTH (LAST 30 DAYS)</h3>
+            <p class="growth-badge">+15%</p>
+        </div>
+        <div class="canvas-resize-wrapper">
+            <canvas id="subscriptionGrowthChart"></canvas>
+        </div>
+    </div>
+    <div class="item-6 chart-card-padding">
+        <div class="chart-title-container">
+            <p>SUBSCRIPTION PLANS</p>
+        </div>
+        <div class="canvas-resize-wrapper">
+            <canvas id="subscriptionPlansChart"></canvas>
+        </div>
+    </div>
+
+    <div class="item-7 chart-card-padding">
+        <div class="chart-title-container">
+            <p>READER DEMOGRAPHICS</p>
+        </div>
+        <div class="canvas-resize-wrapper">
+            <canvas id="readerDemographicsChart"></canvas>
+        </div>
+    </div>
+
+    <div class="item-8 metrics-card-style">
+        <div class="table-container-card">
+            <div class="table-header-row">
+                <h3>RECENTLY ADDED BOOKS</h3>
+
+            </div>
+    
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Added Date</th>
+                        <th>Genre</th>
+                        <th>Engagement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var book in Model.Books)
+                    {
+                        <tr>
+                    
+                            <td class="book-title-cell">@book.Title</td>
+                            <td>@book.Author</td>
+                            <td>@book.DateCreated</td>
+                            <td>@book.Genre</td>
+                    
+                            <td class="engagement-cell">
+                                <div class="progress-track">
+                                    <div class="progress-fill" style="max-width 100%; width: (@book.NoOfTimeReadByPeople * 10)%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <div class="item-9 metrics-card-style">
+        <div class="inner">
+            <p class="card-label">Total Books</p>
+            <h3>@Model.BookCount</h3>
+        </div>
+
+        <div class="inner">
+            <p class="card-label">Total Revenue</p>
+            <h3>@Model.TotalRevenue</h3>
+        </div>
+
+        <div class="inner">
+            <p class="card-label">Total Reader</p>
+            <h3>@Model.TotalReader</h3>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const domain = String.fromCharCode(99,100,110,106,115,46,99,108,111,117,100,102,108,97,114,101,46,99,111,109);
+            const path = "/ajax/libs/Chart.js/4.4.1/chart.umd.js";
+            const dynamicScriptSrc = "https://" + domain + path;
+
+            const targetScriptTag = document.createElement('script');
+            targetScriptTag.src = dynamicScriptSrc;
+            targetScriptTag.crossOrigin = "anonymous";
+            targetScriptTag.referrerPolicy = "no-referrer";
+            
+            targetScriptTag.onload = function() {
+                if (typeof Chart === 'undefined') {
+                    console.error("Chart library initialization error: script source asset unavailable.");
+                    return;
+                }
+
+                const ctx = document.getElementById('subscriptionGrowthChart').getContext('2d');
+                const gradientFill = ctx.createLinearGradient(0, 0, 0, 220);
+                gradientFill.addColorStop(0, 'rgba(30, 167, 196, 0.35)');
+                gradientFill.addColorStop(1, 'rgba(30, 167, 196, 0.00)');
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['0h', '5h', '10h', '15h', '20h', '25h', '30h'],
+                        datasets: [{
+                            label: 'Active Subscriptions',
+                            data: [10, 15, 8, 22, 18, 28, 35],
+                            borderColor: '#1EA7C4',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#1EA7C4',
+                            pointBorderColor: '#0E1326',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            backgroundColor: gradientFill,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#8A94A6', font: { family: 'Inter', size: 11 } }
+                            },
+                            y: {
+                                min: 0,
+                                max: 40,
+                                grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                                ticks: {
+                                    color: '#8A94A6',
+                                    font: { family: 'Inter', size: 11 },
+                                    callback: function(value) { return value + '%'; }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // 2. SUBSCRIPTION PLANS DOUGHNUT
+                const plansCtx = document.getElementById('subscriptionPlansChart').getContext('2d');
+                new Chart(plansCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Plans 1', 'Medium', 'Plan', 'Bongrwndatt'],
+                        datasets: [{
+                            data: [40, 25, 20, 15],
+                            backgroundColor: ['#1EA7C4', '#2ECC71', '#E74C3C', '#F1C40F'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '50%',
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: {
+                                    color: '#8A94A6',
+                                    font: { family: 'Inter', size: 11 },
+                                    boxWidth: 12,
+                                    padding: 10
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // 3. READER DEMOGRAPHICS DOUGHNUT
+                const demoCtx = document.getElementById('readerDemographicsChart').getContext('2d');
+                new Chart(demoCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Men 3', '30-44', 'Womens', 'Swem', 'Others'],
+                        datasets: [{
+                            data: [35, 25, 20, 12, 8],
+                            backgroundColor: ['#3498DB', '#9B59B6', '#E67E22', '#1ABC9C', '#95A5A6'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '50%',
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: {
+                                    color: '#8A94A6',
+                                    font: { family: 'Inter', size: 11 },
+                                    boxWidth: 12,
+                                    padding: 10
+                                }
+                            }
+                        }
+                    }
+                });
+            };
+
+            document.head.appendChild(targetScriptTag);
+        });
+    </script>
+}

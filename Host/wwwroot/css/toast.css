@@ -1,0 +1,48 @@
+﻿/* ==========================================================================
+   Toast notification — enters from the top, stacks, auto-dismisses
+   Does NOT block the page; user can keep interacting with content behind it
+   ========================================================================== */
+
+.toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    z-index: 9999;
+    pointer-events: none; /* clicks pass through the container itself */
+}
+
+.toast {
+    background: var(--notify-bg);
+    border: 0.5px solid var(--notify-border);
+    border-radius: var(--notify-radius);
+    padding: 14px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: translateY(-16px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+    pointer-events: auto; /* but the toast card itself is interactive */
+}
+
+    .toast.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .toast.is-leaving {
+        opacity: 0;
+        transform: translateY(-16px);
+    }
+
+.toast-body {
+    flex: 1;
+    min-width: 0;
+}

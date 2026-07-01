@@ -1,0 +1,370 @@
+﻿<link href="~/css/getSubscription.css" rel="stylesheet" />
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Get Subscription";
+}
+<body>
+
+    <h3>Subscription Details</h3>
+    <small>Manage and monitor this subscription.</small>
+    <div class="details-grid">
+        <!-- Stats -->
+        <div class="card subscription-id">
+            <div class="for-image blue">
+                <img src="~/lib/images/subscription.png" alt="Alternate Text" />
+            </div>
+            <div>
+                <small>Subscription Id</small><br />
+                <strong> Value</strong>
+            </div>
+        </div>
+        <div class="card current-plan">
+            <div class="for-image green">
+                <img src="~/lib/images/menu.png" alt="Alternate Text" />
+            </div>
+            <div>
+                <small>Current Plan</small><br />
+                <strong>Value</strong>
+            </div>
+        </div>
+        <div class="card monthly-revenue">
+            <div class="for-image purple">
+                <img src="~/lib/images/coin.png" alt="Alternate Text" />
+            </div>
+            <div>
+                <small>Monthly Revenue</small><br />
+                <strong>Value</strong>
+            </div>
+        </div>
+        <div class="card status">
+            <div class="for-image teal">
+                <img src="~/lib/images/circle.png" alt="Alternate Text" />
+            </div>
+            <div>
+                <small>Status</small><br />
+                <strong>Value</strong>
+            </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="card subscription-info">
+            Subscription Information
+            <div class="camped">
+                <div class="img-name">
+                    <img src="~/lib/images/prepared.png" alt="Alternate Text" />
+                    <small>Plan Name</small>
+                </div>
+                <div class="value">
+                    <small> : </small>
+                    @{
+                        Random random = new Random();
+                        int generated = random.Next(100, 10000);
+                    }
+                    <small>SUB-@generated</small>
+                </div>
+            </div>
+            <div class="camped">
+                <div class="img-name">
+                    <img src="~/lib/images/restart.png" alt="Alternate Text" />
+                    <small>Billing Cycle</small>
+                </div>
+                <div class="value">
+                    <small> : </small>
+                    <small>SUB-@generated</small>
+                </div>
+            </div>
+
+            <div class="camped">
+
+                <div class="img-name">
+                    <img src="~/lib/images/coin.png" alt="Alternate Text" />
+                    <small>Price</small>
+                </div>
+                <div class="value">
+                    <small> : </small>
+                    <small>SUB-@generated</small>
+                </div>
+            </div>
+            <div class="camped">
+                <div class="img-name">
+                    <img src="~/lib/images/calendar.png" alt="Alternate Text" />
+                    <small>Date Started</small>
+                </div>
+                <div class="value">
+                    <small> : </small>
+                    <small>SUB-@generated</small>
+                </div>
+            </div>
+            <div class="camped">
+                <div class="img-name">
+                    <img src="~/lib/images/restart.png" alt="Alternate Text" />
+                    <small>Renewal Date</small>
+                </div>
+                <div class="value">
+                    <small> : </small>
+                    <small>SUB-@generated</small>
+                </div>
+            </div>
+        </div>
+        <div class="card customer-info">
+            Customer Information
+            <div class="pics">
+                <img src="~/lib/images/mypics.jpg" alt="Alternate Text" />
+                <p>Marcus Thuram</p>
+            </div>
+            <div class="others-infos">
+                <div class="camped">
+                    <div class="img-name">
+                        <img src="~/lib/images/view message.png" alt="Alternate Text" />
+                        <small>Email</small>
+                    </div>
+                    <div class="value">
+                        <small> : </small>
+                        <small>me@gmail.com</small>
+                    </div>
+                </div>
+
+                <div class="camped">
+                    <div class="img-name">
+                        <img src="~/lib/images/Callicon.png" alt="Alternate Text" />
+                        <small>Phone </small>
+                    </div>
+                    <div class="value">
+                        <small> : </small>
+                        <small>0909909009</small>
+                    </div>
+                </div>
+
+                <div class="camped">
+                    <div class="img-name">
+                        <img src="~/lib/images/calendar.png" alt="Alternate Text" />
+                        <small>Member since</small>
+                    </div>
+                    <div class="value">
+                        <small> : </small>
+                        <small>June 30</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card timeline">
+            Subscription Timeline
+            <div class="also-camp">
+                <div class="img-housing">
+                    <img src="~/lib/images/calendar.png" alt="Alternate Text" />
+                </div>
+
+                <div class="timeline">
+                    <small style="color: white; font-size: 10px; font-weight: 300;">Subscription Created</small><br />
+                    <small>@DateTime.UtcNow</small>
+                </div>
+            </div>
+
+            <div class="also-camp">
+                <div class="img-housing">
+                    <img src="~/lib/images/payment-method.png" alt="Alternate Text" />
+                </div>
+
+                <div class="timeline">
+                    <small style="color: white; font-size: 10px; font-weight: 300;">Payment Recieved</small><br />
+                    <small>@DateTime.UtcNow</small>
+                </div>
+            </div>
+
+            
+            <div class="also-camp">
+                <div class="img-housing">
+                    <img src="~/lib/images/circle.png" alt="Alternate Text" />
+                </div>
+
+                <div class="timeline">
+                    <small style="color: white; font-size: 10px; font-weight: 300;">Plan Renewed</small><br />
+                    <small>@DateTime.UtcNow</small>
+                </div>
+            </div>
+
+            
+            <div class="also-camp">
+                <div class="img-housing">
+                    <img src="~/lib/images/restart.png" alt="Alternate Text" />
+                </div>
+
+                <div class="timeline">
+                    <small style="color: white; font-size: 10px; font-weight: 300;">Next Renewal</small><br />
+                    <small>@DateTime.UtcNow</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="card payment-history">
+            Payment History
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Invoice Id</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SUB-@generated</td>
+                        <td>$1500</td>
+                        <td>@DateTime.UtcNow</td>
+                        <td>Card</td>
+                        <td>Paid</td>
+
+                        <td>
+
+                            <a href="#"
+                               class="action-link details">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <a href="#" class="action-link">View All</a>
+        </div>
+        <div class="card usage">
+            Subscription Usage
+            <small>(Last 30 Days)</small>
+
+            <div class="contains">
+                <div class="item">
+                    <div class="conatin-img">
+                        <img src="~/lib/images/open-book.png" alt="Alternate Text" />
+                    </div>
+                    <div class="property">
+                        <small style="font-size: 10px; font-weight: 300;">Book Borrowed</small>
+                        <p>28</p>
+                        <small class="percent">+12%</small><br />
+                        <small style="font-size: 10px; font-weight: 300;">for last 30 days</small>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="conatin-img">
+                        <img src="~/lib/images/clock.png" alt="Alternate Text" />
+                    </div>
+                    <div class="property">
+                        <small style ="font-size: 10px; font-weight: 300;">Reading Time</small>
+                        <p>12h 45m</p>
+                        <small class="percent">+12%</small><br />
+                        <small style="font-size: 10px; font-weight: 300;">for last 30 days</small>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="conatin-img">
+                        <img src="~/lib/images/restart.png" alt="Alternate Text" />
+                    </div>
+                    <div class="property">
+                        <small style="font-size: 10px; font-weight: 300;">Renewal</small>
+                        <p>2</p>
+                        <small class="percent">+0%</small><br />
+                        <small style="font-size: 10px; font-weight: 300;">for last 30 days</small>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="conatin-img">
+                        <img src="~/lib/images/graph-analysis.png" alt="Alternate Text" />
+                    </div>
+                    <div class="property">
+                        <small>Login Sessions</small>
+                        <p>18</p>
+                        <small class="percent">+20%</small><br />
+                        <small style="font-size: 10px; font-weight: 300;">for last 30 days</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card summary">
+            Subscription Summary
+            <div class="summaries">
+                <div class="use">
+                    <img src="~/lib/images/pay.png" alt="Alternate Text" />
+                    <small>Total Payments</small>
+                </div>
+                <small>$96.00</small>
+            </div>
+
+            <div class="summaries">
+                <div class="use">
+                    <img src="~/lib/images/restart.png" alt="Alternate Text" />
+                    <small>Pending Amount</small>
+                </div>
+                <small>0.00</small>
+            </div>
+
+            <div class="summaries">
+                <div class="use">
+                    <img src="~/lib/images/failed.png" alt="Alternate Text" />
+                    <small>Failed Payments</small>
+                </div>
+                <small>0</small>
+            </div>
+
+            <div class="summaries">
+                <div class="use">
+                    <img src="~/lib/images/pay.png" alt="Alternate Text" />
+                    <small>Last Payments</small>
+                </div>
+                <small>@TimeOnly.FromDateTime(DateTime.UtcNow)</small>
+            </div>
+
+            <div class="summaries">
+                <div class="use">
+                    <img src="~/lib/images/bill.png" alt="Alternate Text" />
+                    <small>Next billing</small>
+                </div>
+                <small>@TimeOnly.FromDateTime(DateTime.UtcNow.AddDays(3))</small>
+            </div>
+            </div>
+
+        <!-- Row 4 -->
+        <div class="card admin-notes">
+            Admin Notes
+            <div class="for one">
+                <span></span>
+                <div class="inside">
+                    <small>Subcription manually upgraded to Pro Monthly</small><br />
+                    <small style="color : green; font-size: 12px; font-weight: 300">Admin  .  <small>@DateTime.UtcNow.ToString("MMM dd, yyyy")</small></small>
+                </div>
+            </div>
+
+            <div class="for two">
+            </div>
+
+            <div class="for three">
+            </div>
+        </div>
+        <div class="danger-zone">
+            Danger Zone<br />
+            <small>These actions are irreversible. Please proceed with caution !</small>
+            <div class="actions">
+                <a href="#"
+                   class="action-link"
+                   onclick="return confirm('Remove this book from library catalog records?')">
+                    Cancel Subscription
+                </a>
+                <a href="#"
+                   class="action-link"
+                   onclick="return confirm('Remove this book from library catalog records?')">
+                    Refund Last Payment
+                </a>
+                <a href="#"
+                   class="action-link"
+                   onclick="return confirm('Remove this book from library catalog records?')">
+                    Delete Subscription
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+</body>

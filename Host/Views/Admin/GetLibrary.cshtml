@@ -1,0 +1,85 @@
+﻿@using static Application.Queries.GetLibraryById
+@model GetLibraryByIdResponse
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Get Library";
+}
+<link rel="stylesheet" href="~/css/getCategory.css">
+
+<div class="category-container">
+    <div class="header-note">
+        <h3>LIBRARY PREVIEW</h3>
+        <p style="color: #8A94A6;">View more infos about this particular category</p>
+    </div>
+    <div class="category-info">
+        <div class="datas">
+            <h2>@Model.Name</h2>
+            <div class="combine">
+                <div class="img-data">
+                    @if (Model.ImageUrl == "none")
+                    {
+                        <img src="~/lib/images/user-solid-full.svg" alt="icon">
+                        <p>Library Profile(@Model.UserName)</p>
+                    }
+                </div>
+                <div class="properties">
+                    <div class="infos">
+                        <label for="DateCreated">Email: </label>
+                        <input type="text" value="@Model.Email">
+                    </div>
+                    <div class="infos">
+                        <label for="DateCreated">Phone Number: </label>
+                        <input type="text" value="@Model.PhoneNumber">
+                    </div>
+                    <div class="infos">
+                        <label for="DateCreated">Ref Number: </label>
+                        <input type="text" value="@Model.RefNumber">
+                    </div>
+                    <div class="infos">
+                        <label for="DateCreated">Added On: </label>
+                        <input type="text" value="@Model.DateCreated">
+                    </div>
+                </div>
+            </div>
+            <div class="description">
+                <label for="description">Valuable details</label>
+                <div class="details">
+                    <p>Acquisition records confirm that the @Model.Name (@Model.UserName) successfully integrated
+                        book of total count by @Model.Books.Count() into its permanent inventory as at on @DateTime.UtcNow. 
+                        The publication has completed all necessary classification formatting 
+                        and is currently accessible to all active library cardholders for reference 
+                        or standard circulation.</p>
+                </div>
+            </div>
+        </div>
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Added Date</th>
+                        <th>Genre</th>
+                        <th>Engagement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Books)
+                    {
+                        <tr>
+                            <td><img src="@item.BookCoverUrl" alt="Alternate Text" /> @item.Title</td>
+                            <td>@item.Author</td>
+                            <td>@item.DateCreated</td>
+                            <td>@item.Genre</td>
+                            <td class="engagement-cell">
+                                <div class="progress-track">
+                                    <div class="progress-fill" style="max-width: 100%; width: @(item.NoOfTimeReadByPeople * 10)%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

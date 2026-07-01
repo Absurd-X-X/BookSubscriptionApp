@@ -1,0 +1,374 @@
+﻿@{
+    Layout = "~/Views/Shared/_LibraryLayout.cshtml";
+    ViewData["Title"] = "Library Revenue";
+}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <link href="~/css/revenue.css" rel="stylesheet" />
+
+    <main class="dash">
+
+        <!-- PAGE HEADER -->
+        <div class="ph">
+            <div class="ph-left">
+                <h1>Earnings Overview</h1>
+                <p>Track your library's earnings and monthly payouts from Super Admin.</p>
+            </div>
+            <div class="ph-right">
+                <div class="date-btn">
+                    <i class="ti ti-calendar"></i> May 1 – May 31, 2024
+                </div>
+                <button class="dl-btn">
+                    <i class="ti ti-download"></i> Download Report <i class="ti ti-chevron-down"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="stats">
+            <div class="sc">
+                <div>
+                    <div class="si-label">Total Earnings <span class="info-i">ⓘ</span></div>
+                    <div class="si-val">₦425,000</div>
+                    <div class="si-sub pos">▲ 12% <span class="si-gray">vs Apr 1 – Apr 30</span></div>
+                </div>
+                <div class="sic"><i class="ti ti-briefcase"></i></div>
+            </div>
+            <div class="sc">
+                <div>
+                    <div class="si-label">Pending Payout <span class="info-i">ⓘ</span></div>
+                    <div class="si-val">₦95,000</div>
+                    <div class="si-sub warn">Payment expected on Jul 1, 2024</div>
+                </div>
+                <div class="sic"><i class="ti ti-hourglass"></i></div>
+            </div>
+            <div class="sc">
+                <div>
+                    <div class="si-label">Last Payout <span class="info-i">ⓘ</span></div>
+                    <div class="si-val">₦120,000</div>
+                    <div class="si-sub paid-c">Paid on Jun 1, 2024</div>
+                </div>
+                <div class="sic"><i class="ti ti-circle-check"></i></div>
+            </div>
+            <div class="sc">
+                <div>
+                    <div class="si-label">Books Sold (This Month) <span class="info-i">ⓘ</span></div>
+                    <div class="si-val">1,248</div>
+                    <div class="si-sub pos">▲ 8% <span class="si-gray">vs Apr 1 – Apr 30</span></div>
+                </div>
+                <div class="sic"><i class="ti ti-books"></i></div>
+            </div>
+        </div>
+
+        <!-- MID ROW: CHART + SUMMARY -->
+        <div class="mid">
+            <div class="card">
+                <div class="ch">
+                    <span class="ct">Monthly Earnings Trend <span class="info-i">ⓘ</span></span>
+                    <div class="tabs">
+                        <button class="tab on">6 Months</button>
+                        <button class="tab">1 Year</button>
+                        <button class="tab">All Time</button>
+                        <button class="tab"><i class="ti ti-adjustments-horizontal"></i></button>
+                    </div>
+                </div>
+                <div class="chart-wrap">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="ch"><span class="ct">Earnings Summary <span class="info-i">ⓘ</span></span></div>
+                <div class="sum-items">
+                    <div class="sum-item">
+                        <div class="sum-ico ico-b"><i class="ti ti-calendar"></i></div>
+                        <div>
+                            <span class="sl">Current Month Earnings</span>
+                            <span class="sv">₦95,000</span>
+                            <span class="ss">May 1 – May 31, 2024</span>
+                        </div>
+                    </div>
+                    <div class="sum-item">
+                        <div class="sum-ico ico-t"><i class="ti ti-clock"></i></div>
+                        <div>
+                            <span class="sl">Expected Payout Date</span>
+                            <span class="sv">Jul 1, 2024</span>
+                            <span class="ss">Estimated payment from Super Admin</span>
+                        </div>
+                    </div>
+                    <div class="sum-item">
+                        <div class="sum-ico ico-g"><i class="ti ti-star"></i></div>
+                        <div>
+                            <span class="sl">Best Performing Book</span>
+                            <span class="sv">Atomic Habits</span>
+                            <span class="ss">₦85,000 earned this month</span>
+                        </div>
+                    </div>
+                    <div class="sum-item">
+                        <div class="sum-ico ico-gr"><i class="ti ti-trending-up"></i></div>
+                        <div>
+                            <span class="sl">Growth Rate</span>
+                            <span class="sv pos">▲ 12%</span>
+                            <span class="ss">vs Apr 1 – Apr 30, 2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM ROW: BREAKDOWN + TOP BOOKS + QUICK ACTIONS -->
+        <div class="bot">
+
+            <div class="card">
+                <div class="ch"><span class="ct">Earnings Breakdown <span class="info-i">ⓘ</span></span></div>
+                <div class="donut-wrap">
+                    <canvas id="donutChart" width="250" height="250"></canvas>
+                    <div class="leg">
+                        <div class="li">
+                            <span class="ld" style="background:#7c3aed"></span>
+                            <div>
+                                <span class="ll">Book Sales Share</span>
+                                <span class="lp">50%</span>
+                                <span class="la">₦361,250</span>
+                            </div>
+                        </div>
+                        <div class="li">
+                            <span class="ld" style="background:#06b6d4"></span>
+                            <div>
+                                <span class="ll">Premium Reads Share</span>
+                                <span class="lp">30%</span>
+                                <span class="la">₦42,500</span>
+                            </div>
+                        </div>
+                        <div class="li">
+                            <span class="ld" style="background:#22c55e"></span>
+                            <div>
+                                <span class="ll">Bonuses / Others</span>
+                                <span class="lp">20%</span>
+                                <span class="la">₦21,250</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="vl">View full breakdown →</a>
+            </div>
+
+            <div class="card">
+                <div class="va">
+                    <span class="ct">Top Earning Books <span class="info-i">ⓘ</span></span>
+                    <a href="#" class="vl">View All →</a>
+                </div>
+                <table class="btbl">
+                    <thead>
+                        <tr><th>Book</th><th>Earnings</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><div class="bcell"><div class="bcov" style="background:#f97316">AH</div>Atomic Habits</div></td>
+                            <td>₦85,000</td>
+                        </tr>
+                        <tr>
+                            <td><div class="bcell"><div class="bcov" style="background:#3b82f6">DW</div>Deep Work</div></td>
+                            <td>₦60,000</td>
+                        </tr>
+                        <tr>
+                            <td><div class="bcell"><div class="bcov" style="background:#22c55e">RD</div>Rich Dad Poor Dad</div></td>
+                            <td>₦55,000</td>
+                        </tr>
+                        <tr>
+                            <td><div class="bcell"><div class="bcov" style="background:#a855f7">TG</div>Think and Grow Rich</div></td>
+                            <td>₦42,000</td>
+                        </tr>
+                        <tr>
+                            <td><div class="bcell"><div class="bcov" style="background:#ef4444">5A</div>The 5 AM Club</div></td>
+                            <td>₦38,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="ch"><span class="ct">Quick Actions</span></div>
+                <div class="qa-list">
+                    <button class="ai">
+                        <div class="ai-ico"><i class="ti ti-calendar"></i></div>
+                        View Payout History
+                        <i class="ti ti-chevron-right ai-chev"></i>
+                    </button>
+                    <button class="ai">
+                        <div class="ai-ico"><i class="ti ti-download"></i></div>
+                        Download Earnings Report
+                        <i class="ti ti-chevron-right ai-chev"></i>
+                    </button>
+                    <button class="ai">
+                        <div class="ai-ico"><i class="ti ti-chart-bar"></i></div>
+                        View Top Books
+                        <i class="ti ti-chevron-right ai-chev"></i>
+                    </button>
+                    <button class="ai">
+                        <div class="ai-ico"><i class="ti ti-headset"></i></div>
+                        Contact Super Admin (Support)
+                        <i class="ti ti-chevron-right ai-chev"></i>
+                    </button>
+                </div>
+                <div class="sup-ban">
+                    <div class="sup-icon"><i class="ti ti-gift"></i></div>
+                    <p>Have questions about your earnings?</p>
+                    <small>Create a support ticket and the Super Admin will get back to you.</small>
+                    <button class="btn-tkt">Create Support Ticket</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- PAYOUT HISTORY TABLE -->
+        <div class="card">
+            <div class="va">
+                <span class="ct">Payout History <span class="info-i">ⓘ</span></span>
+                <a href="#" class="vl">View All Payouts →</a>
+            </div>
+            <table class="ptbl">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Payment Date</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>May 2024</td>
+                        <td>₦120,000</td>
+                        <td><span class="badge-paid">Paid</span></td>
+                        <td>Jun 1, 2024</td>
+                        <td>Monthly payout for May 2024</td>
+                    </tr>
+                    <tr>
+                        <td>Apr 2024</td>
+                        <td>₦98,000</td>
+                        <td><span class="badge-paid">Paid</span></td>
+                        <td>May 1, 2024</td>
+                        <td>Monthly payout for Apr 2024</td>
+                    </tr>
+                    <tr>
+                        <td>Mar 2024</td>
+                        <td>₦85,000</td>
+                        <td><span class="badge-paid">Paid</span></td>
+                        <td>Apr 1, 2024</td>
+                        <td>Monthly payout for Mar 2024</td>
+                    </tr>
+                    <tr>
+                        <td>Feb 2024</td>
+                        <td>₦72,000</td>
+                        <td><span class="badge-paid">Paid</span></td>
+                        <td>Mar 1, 2024</td>
+                        <td>Monthly payout for Feb 2024</td>
+                    </tr>
+                    <tr>
+                        <td>Jan 2024</td>
+                        <td>₦65,000</td>
+                        <td><span class="badge-paid">Paid</span></td>
+                        <td>Feb 1, 2024</td>
+                        <td>Monthly payout for Jan 2024</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <script>
+        new Chart(document.getElementById('trendChart'), {
+        type: 'line',
+        data: {
+        labels: ['Dec 2023', 'Jan 2024', 'Feb 2024', 'Mar 2024', 'Apr 2024', 'May 2024'],
+        datasets: [{
+        label: 'Earnings',
+        data: [35000, 88000, 63000, 118000, 130000, 95000],
+        borderColor: '#7c3aed',
+        backgroundColor: 'rgba(124,58,237,0.12)',
+        borderWidth: 2.5,
+        pointBackgroundColor: '#7c3aed',
+        pointBorderColor: '#0d0b1e',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        fill: true,
+        tension: 0.35
+        }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+        legend: { display: false },
+        tooltip: {
+        backgroundColor: '#1e1b4b',
+        titleColor: '#a5b4fc',
+        bodyColor: '#ffffff',
+        padding: 10,
+        cornerRadius: 8,
+        callbacks: {
+        label: ctx => '₦' + ctx.parsed.y.toLocaleString()
+        }
+        }
+        },
+        scales: {
+        x: {
+        grid: { color: 'rgba(255,255,255,0.05)' },
+        ticks: { color: '#6b7280', font: { size: 11 } }
+        },
+        y: {
+        grid: { color: 'rgba(255,255,255,0.05)' },
+        ticks: {
+        color: '#6b7280',
+        font: { size: 11 },
+        callback: v => '₦' + (v / 1000).toFixed(0) + 'k'
+        },
+        min: 0,
+        max: 150000
+        }
+        }
+        }
+        });
+
+        /* ── DONUT CHART ── */
+        new Chart(document.getElementById('donutChart'), {
+        type: 'doughnut',
+        data: {
+        labels: ['Book Sales Share', 'Premium Reads Share', 'Bonuses / Others'],
+        datasets: [{
+        data: [50, 30, 20],
+        backgroundColor: ['#7c3aed', '#06b6d4', '#22c55e'],
+        borderColor: '#13102a',
+        borderWidth: 3,
+        hoverOffset: 5
+        }]
+        },
+        options: {
+        responsive: false,
+        cutout: '50%',
+        plugins: {
+        legend: { display: false },
+        tooltip: {
+        backgroundColor: '#1e1b4b',
+        titleColor: '#a5b4fc',
+        bodyColor: '#ffffff',
+        callbacks: {
+        label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + '%'
+        }
+        }
+        }
+        }
+        });
+
+        /* ── TAB SWITCHER ── */
+        document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+        tab.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+        tab.classList.add('on');
+        });
+        });
+    </script>

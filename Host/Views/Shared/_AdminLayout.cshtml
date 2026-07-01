@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SoulShelf Admin</title>
+    <link rel="preconnect" href="googleapis.com">
+    <link rel="preconnect" href="gstatic.com" crossorigin>
+    <link href="googleapis.com" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/css/adminLayout.css" asp-append-version="true" />
+    <link href="~/css/toast.css" rel="stylesheet" />
+    <link href="~/css/notify.css" rel="stylesheet" />
+    <link href="~/css/modal.css" rel="stylesheet" />
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                SOUL<span>SHELF</span>
+            </div>
+            <nav class="nav-links">
+
+                @{
+                    string controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+                    string action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+                }
+
+                <a href="@Url.Action("Index", "Admin")"
+                   class="nav-item @(controller == "Admin" && action == "Index" ? "active" : "")">
+                    <img src="~/lib/images/dashbord.png" alt="">DASHBOARD
+                </a>
+
+                <a href="@Url.Action("GetUsers", "Admin")" 
+                   class="nav-item @(controller == "Admin" && (action == "GetUsers" || action == "GetUserDetails") ? "active" : "")">
+                    <img src="~/lib/images/members.png" alt="Users">USERS
+                </a>
+
+                <a href="@Url.Action("GetCategories", "Admin")"
+                   class="nav-item @(controller == "Admin" && (action == "GetCategories" || action == "GetCategory") ? "active" : "")">
+                    <img src="~/lib/images/layer-group-solid-full.svg" alt="">CATEGORY MGT
+                </a>
+
+                <a href="@Url.Action("GetBooks", "Admin")"
+                   class="nav-item @(controller == "Admin" && action == "GetBooks" ? "active" : "")">
+                    <img src="~/lib/images/book-outline.svg" alt="">BOOKS
+                </a>
+
+                <a href="@Url.Action("GetSubscriptions" , "Admin")" 
+                   class="nav-item @(controller == "Admin" && (action == "GetSubscriptions" || action == "GetUserSubscription" || action == "GetInvoices") ? "active" : "")">
+                    <img src="~/lib/images/sub.png" alt="">SUBSCRIPTIONS
+                </a>
+
+                <a href="@Url.Action("GetLibraries", "Admin")"
+                   class="nav-item @(controller == "Admin" && (action == "GetLibraries" || action == "AddLibrary") ? "active" : "")">
+                    <img src="~/lib/images/libmgt.png" alt="">LIBRARY CONTENT
+                </a>
+
+                <a href="@Url.Action("GetConversations", "Admin")"
+                   class="nav-item @(controller == "Admin" && action == "GetConversations" ? "active" : "")">
+                    <img src="~/lib/images/view message.png" alt="">MESSAGES
+                </a>
+
+                <a href="@Url.Action("ActivityLogs", "Admin")" 
+                   class="nav-item @(controller == "Admin" && action == "ActivityLogs" ? "active" : "")">
+                    <img src="~/lib/images/report.png" alt="">ACTIVITY
+                </a>
+
+                <a href="@Url.Action("GetWallet", "Admin")"
+                   class="nav-item @(controller == "Admin" && action == "GetWallet" ? "active" : "")">
+                    <img src="~/lib/images/pay.png" alt="">WALLET
+                </a>
+
+                <a href="@Url.Action("GetTransactions", "Admin")" 
+                class="nav-item @(controller == "Admin" && (action == "GetTransactions" || action == "GetTransaction") ? "active" : "")">
+                    <img src="~/lib/images/payment-method.png" alt="">TRANSACTIONS
+                </a>
+
+                <a href="@Url.Action("Settings", "Admin")" 
+                class="nav-item @(controller == "Admin" && action == "Settings" ? "active" : "")">
+                    <img src="~/lib/images/settings.png" alt="">SETTINGS
+                </a>
+            </nav>
+            <div class="profile-again">
+                <div class="role">
+                    <p>CEO</p>
+                    <small>Administrator</small>
+                </div>
+                <div class="profile-details dropup-style" onclick="toggleBottomMenu(event)">
+                    <img src="~/lib/images/user-solid-full.svg" class="profile-img" alt="Profile">
+                    <img src="~/lib/images/chevron-down-outline.svg" class="icon arrow" id="bottomChevronArrow" alt="More" />
+
+                    <ul id="bottomProfileDropdown" class="profile-dropdown-menu">
+                        <li><a href="@Url.Action("Profile", "Admin")">My Profile</a></li>
+                        <li><a href="@Url.Action("Settings", "Admin")">Account Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a href="@Url.Action("Logout", "Account")" class="logout-link">Log Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            @RenderBody()
+        </main>
+        <script src="~/js/toast.js"></script>
+        <script src="~/js/modal.js"></script>
+    </div>
+
+    <script>
+        function toggleProfileMenu(event) {
+        event.stopPropagation();
+        const menu = document.getElementById("profileDropdown");
+        const arrow = document.getElementById("chevronArrow");
+        menu.classList.toggle("show");
+        arrow.classList.toggle("rotate");
+        }
+
+        window.addEventListener("click", function () {
+        const menu = document.getElementById("profileDropdown");
+        const arrow = document.getElementById("chevronArrow");
+        if (menu && menu.classList.contains("show")) {
+        menu.classList.remove("show");
+        arrow.classList.remove("rotate");
+        }
+        });
+
+
+        function toggleBottomMenu(event) {
+        event.stopPropagation();
+        const menu = document.getElementById("bottomProfileDropdown");
+        const arrow = document.getElementById("bottomChevronArrow");
+
+        menu.classList.toggle("show");
+        arrow.classList.toggle("rotate");
+        }
+
+        window.addEventListener("click", function () {
+        const bottomMenu = document.getElementById("bottomProfileDropdown");
+        const bottomArrow = document.getElementById("bottomChevronArrow");
+        if (bottomMenu && bottomMenu.classList.contains("show")) {
+        bottomMenu.classList.remove("show");
+        bottomArrow.classList.remove("rotate");
+        }
+        });
+
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

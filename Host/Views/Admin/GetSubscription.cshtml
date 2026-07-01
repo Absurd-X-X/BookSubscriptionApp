@@ -1,0 +1,300 @@
+﻿@using static Application.Queries.GetSubscriptionByUserId
+@model GetSubscriptionByUserIdResponse
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Get Subscription";
+}
+<link href="~/css/getSubscription.css" rel="stylesheet" />
+<link href="~/css/notify.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/modal.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/toast.css" rel="stylesheet" asp-append-version="true" />
+<div class="sub-cont">
+    <h3>Subscription Details</h3>
+    <small>Manage and monitor this subscription.</small>
+    @{
+        int Method()
+        {
+            Random random = new Random();
+            int generated = random.Next(100, 10000);
+            return generated;
+        }
+    }
+    <div class="details-grid">
+        <!-- Stats -->
+        <div class="card subscription-id">
+            <div class="for-image blue">
+                <img src="~/lib/images/subscription.png" alt="Alternate Text" />
+            </div>
+            <small>Subscription Id</small>
+            <p>SUB-@Method()</p>
+        </div>
+        <div class="card current-plan">
+            <div class="for-image green">
+                <img src="~/lib/images/menu.png" alt="Alternate Text" />
+            </div>
+            <small>Current Plan</small>
+            <p>@Model.CurrentPlan</p>
+        </div>
+        <div class="card monthly-revenue">
+            <div class="for-image purple">
+                <img src="~/lib/images/coin.png" alt="Alternate Text" />
+            </div>
+            <small>Monthly Revenue</small>
+            <p>@Model.Cost</p>
+        </div>
+        <div class="card status">
+            <div class="for-image teal">
+                <img src="~/lib/images/circle.png" alt="Alternate Text" />
+            </div>
+            <small>Status</small>
+            <p>@Model.IsActive</p>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="card subscription-info">
+            Subscription Information
+            <div class="camped">
+                <div class="img-name">
+                    <i class="ti ti-lock"></i>
+                    <small>Subscription ID</small>
+                </div>
+                <div class="value">
+                    <small> : </small>
+                    <small>SUB-@Method()</small>
+                </div>
+            </div>
+            <div class="camped">
+                <div class="img-name">
+                    <i class="ti ti-lock"></i>
+                    <small>Subscription ID</small>
+                </div>
+                <div class="value">
+                    <small> : </small>
+                    <small>SUB-@Method()</small>
+                </div>
+            </div>
+
+            <div class="camped">
+
+                <div class="img-name">
+                    <i class="ti ti-lock"></i>
+                    <small>Subscription ID</small>
+                </div>
+                <div class="value">
+                    <small> : </small>
+                    <small>SUB-@Method()</small>
+                </div>
+            </div>
+            <div class="camped">
+                <div class="img-name">
+                    <i class="ti ti-lock"></i>
+                    <small>Subscription ID</small>
+                </div>
+                <div class="value">
+                    <small> : </small>
+                    <small>SUB-@Method()</small>
+                </div>
+            </div>
+            <div class="camped">
+                <div class="img-name">
+                    <i class="ti ti-lock"></i>
+                    <small>Subscription ID</small>
+                </div>
+                <div class="value">
+                    <small> : </small>
+                    <small>SUB-@Method()</small>
+                </div>
+            </div>
+        </div>
+        <div class="card customer-info">
+            Customer Information
+            <div class="pics">
+                <img src="~/lib/images/mypics.jpg" alt="Alternate Text" />
+                <p>Marcus Thuram</p>
+            </div>
+            <div class="others-infos">
+                <div class="camped">
+                    <div class="img-name">
+                        <i class="ti ti-lock"></i>
+                        <small>Email</small>
+                    </div>
+                    <div class="value">
+                        <small> : </small>
+                        <small>@Model.ReaderEmail</small>
+                    </div>
+                </div>
+
+                <div class="camped">
+                    <div class="img-name">
+                        <i class="ti ti-lock"></i>
+                        <small>Phone </small>
+                    </div>
+                    <div class="value">
+                        <small> : </small>
+                        <small>0909909009</small>
+                    </div>
+                </div>
+
+                <div class="camped">
+                    <div class="img-name">
+                        <i class="ti ti-lock"></i>
+                        <small>Member since</small>
+                    </div>
+                    <div class="value">
+                        <small> : </small>
+                        <small>@Model.ReaderAddedDate</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card timeline">
+            Subscription Timeline
+            <div class="also-camp">
+                <img src="#" alt="icon" />
+
+                <div class="timeline">
+                    <small style="color: white">Subscription Created</small><br />
+                    <small>@Model.SubcriptionDate</small>
+                </div>
+            </div>
+
+            <div class="also-camp">
+                <img src="#" alt="icon" />
+
+                <div class="timeline">
+                    <small style="color: white">Payment Recieved</small><br />
+                    <small>@Model.SubcriptionDate</small>
+                </div>
+            </div>
+
+            
+            <div class="also-camp">
+                <img src="#" alt="icon" />
+
+                <div class="timeline">
+                    <small style="color: white">Plan Renewed</small><br />
+                    <small>@Model.SubcriptionDate</small>
+                </div>
+            </div>
+
+            
+            <div class="also-camp">
+                <img src="#" alt="icon" />
+
+                <div class="timeline">
+                    <small style="color: white">Next Renewal</small><br />
+                    <small>@Model.ExpiryDate</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="card payment-history">
+            Payment History
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Invoice Id</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SUB-@Method()</td>
+                        <td>$1500</td>
+                        <td>@DateTime.UtcNow</td>
+                        <td>Card</td>
+                        <td>Paid</td>
+
+                        <td>
+
+                            <a href="#"
+                               class="action-link details">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <div class="card usage">
+            Subscription Usage
+            <small>(Last 30 Days)</small>
+
+            <div class="contains">
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+                <div class="item">
+                </div>
+            </div>
+        </div>
+        <div class="card summary">Subscription Summary</div>
+
+        <!-- Row 4 -->
+        <div class="card admin-notes">
+            Admin Notes
+            <div class="for one">
+                <span></span>
+                <div class="inside">
+                    <small>Subcription manually upgraded to Pro Monthly</small><br />
+                    <small style="color : green; font-size: 12px; font-weight: 300">Admin  .  <small>@DateTime.UtcNow.ToString("MMM dd, yyyy")</small></small>
+                </div>
+            </div>
+
+            <div class="for two">
+            </div>
+
+            <div class="for three">
+            </div>
+        </div>
+        <div class="danger-zone">
+            Danger Zone<br />
+            <small>These actions are irreversible. Please proceed with caution !</small>
+            <div class="actions">
+                <a href="javascript:void(0)"
+                   class="action-link delete"
+                   onclick="confirmDeleteAction('@Url.Action("DeleteSub", "Admin", new { id = Model.Id })')">
+                    Cancel SubScription
+                </a>
+                <a href="#"
+                   class="action-link"
+                   onclick="return confirm('Remove this book from library catalog records?')">
+                    Refund Last Payment
+                </a>
+                <a href="#"
+                   class="action-link"
+                   onclick="return confirm('Remove this book from library catalog records?')">
+                    Delete Subscription
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+    <script src="~/js/modal.js"></script>
+    <script src="~/js/toast.js"></script>
+</div>
+
+<script>
+        function confirmDeleteAction(actionUrl) {
+        Modal.show('confirmDelete', {
+            title: 'Remove from catalog',
+            message: 'This will permanently remove this book from the library catalog records. This cannot be undone.',
+            requiredText: 'DELETE',
+            confirmLabel: 'Delete',
+            formAction: actionUrl,
+            formMethod: 'post'
+        });
+    }
+</script>
+    

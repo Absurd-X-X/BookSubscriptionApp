@@ -1,0 +1,203 @@
+﻿@using static Application.Queries.GetUsers
+@model Application.Common.Pagenation.PagenatedList<GetUsersResponse>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Get Users";
+}
+
+<link href="~/css/getUsers.css" rel="stylesheet" />
+<link href="~/css/notify.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/modal.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/toast.css" rel="stylesheet" asp-append-version="true" />
+
+<section class="main-container">
+    <h2>System User Management</h2>
+    <div class="sub-main">
+        <div class="for-total">
+            <img src="~/lib/images/members.png" alt="Alternate Text" />
+
+            <div class="more-info">
+                <small>Total Members</small>
+                <h3>20000+</h3>
+            </div>
+        </div>
+
+        <div class="for-active">
+            <img src="~/lib/images/add-friend.png" alt="Alternate Text" />
+
+            <div class="more-info">
+                <small>Active User</small>
+                <h3>20000+</h3>
+            </div>
+        </div>
+
+        <div class="for-readers">
+            <img src="~/lib/images/add-friend.png" alt="Alternate Text" />
+
+            <div class="more-info">
+                <small>Libraries</small>
+                <h3>20000+</h3>
+            </div>
+        </div>
+
+        <div class="for-today">
+            <img src="~/lib/images/calendar.png" alt="Alternate Text" />
+
+            <div class="more-info">
+                <small>New Today</small>
+                <h3>20000+</h3>
+            </div>
+        </div>
+
+        <div class="users-table">
+            <div class="actions">
+                <h3>User Directory</h3>
+
+                <div class="real-actions">
+
+                    <div class="search-box">
+                        <input type="text" placeholder="Search...">
+                        <img src="~/lib/images/search.svg" class="icon" alt="Search">
+                    </div>
+
+                    <select name="filter-action" id="filter-action">
+                        <option value="" disabled selected>Filter By Role</option>
+                        <option value="library">Libarians</option>
+                        <option value="Readers">Libarians</option>
+                        <option value="Others">Libarians</option>
+                    </select>
+
+                    <a href="#" class="button">+ Add User</a>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User Avatar</th>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Date Joined</th>
+                        <th>Status</th>
+                        <th style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Items)
+                    {
+                        <tr>
+                            <td class="user-image">
+                                <img src="@((user.ImageUrl.ToLower() == "none")
+                                                         ? Url.Content("~/lib/images/mypics.jpg")
+                                                         : user.ImageUrl)"
+                                     alt="" />
+                            </td>
+
+                            <td class="user-name">@(user.UserName ?? "User")</td>
+                            <td>@(user.FullName ?? "User")</td>
+                            <td>@user.Email</td>
+                            <td>
+                                @{
+                                    string roleClass = user.Role?.ToLower() switch
+                                    {
+                                        "admin" => "badge-admin",
+                                        "library" => "badge-moderator",
+                                        "reader" => "badge-subscriber",
+                                        _ => "badge-default"
+                                    };
+                                }
+                                <span class="role-badge @roleClass">@user.Role</span>
+                            </td>
+
+                            <td>@user.DateJoined</td>
+
+                            
+
+                            <td>
+                                @{
+                                    string status = user.Status ? "badge-moderator" : "badge-subscriber";
+                                }
+                                <span class="role-badge @status">@(user.Status ? "Suspended" : "Active")</span>
+                                </td>
+
+                            <td style="text-align: right; padding-right: 16px; white-space: nowrap;">
+                                <a href="@Url.Action("EditBook", "Admin", new { id = user.UserId })"
+                                   class="action-link edit">
+                                    Edit
+                                </a>
+
+                                <a href="@Url.Action("GetUserDetails", "Admin", new { userId = user.UserId })"
+                                   class="action-link details">
+                                    View Details
+                                </a>
+
+                                <a href="javascript:void(0)"
+                                   class="action-link delete"
+                                   onclick="confirmDeleteAction('@Url.Action("DeleteUser", "Admin", new { id = user.UserId })')">
+                                    Ban
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+
+@{
+    string isFirstDisabled = (Model.Page <= 1) ? "disabled" : "";
+    string isLastDisabled = (Model.Page >= Model.PageCount) ? "disabled" : "";
+}
+
+<div class="table-pagination-container">
+    
+    <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="1" asp-route-pageSize="@Model.PageSize" 
+       class="page-item page-icon @isFirstDisabled">
+        &#124;&lt;
+    </a>
+
+    <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="@(Model.Page - 1)" asp-route-pageSize="@Model.PageSize" 
+       class="page-item page-icon @isFirstDisabled">
+        &lt;
+    </a>
+
+    @for (int i = 1; i <= Model.PageCount; i++)
+    {
+        string isActive = (i == Model.Page) ? "active" : "";
+
+        <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="@i" asp-route-pageSize="@Model.PageSize" 
+           class="page-item page-number @isActive">
+            @i
+        </a>
+    }
+
+    <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="@(Model.Page + 1)" asp-route-pageSize="@Model.PageSize" 
+       class="page-item page-icon @isLastDisabled">
+        &gt;
+    </a>
+
+    <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="@Model.PageCount" asp-route-pageSize="@Model.PageSize" 
+       class="page-item page-icon @isLastDisabled">
+        &gt;&#124;
+    </a>
+
+</div>
+        </div>
+    </div>
+    <script src="~/js/modal.js"></script>
+    <script src="~/js/toast.js"></script>
+</section>
+
+<script>
+        function confirmDeleteAction(actionUrl) {
+        Modal.show('confirmDelete', {
+            title: 'Remove from catalog',
+            message: 'This will permanently remove this book from the library catalog records. This cannot be undone.',
+            requiredText: 'DELETE',
+            confirmLabel: 'Delete',
+            formAction: actionUrl,
+            formMethod: 'post'
+        });
+    }
+</script>

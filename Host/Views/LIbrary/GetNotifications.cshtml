@@ -1,0 +1,1005 @@
+﻿@{
+    Layout = "~/Views/Shared/_LibraryLayout.cshtml";
+    ViewData["Title"] = "Notifications";
+}
+
+<link href="~/css/notifications.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+
+
+<main class="main-content">
+
+    <!-- ============ Page header ============ -->
+    <div class="page-header">
+        <div>
+            <h1>Notifications</h1>
+            <p>Stay updated with important alerts and activities across your library.</p>
+        </div>
+        <div class="header-actions">
+            <button class="date-range-btn">
+                May 1 – May 31, 2024
+                <svg class="icon" viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </button>
+            <button class="btn-primary" id="markAllBtn">
+                <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Mark All as Read
+            </button>
+            <div class="dropdown bell-wrap">
+                <button class="bell-btn" data-toggle>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="badge-count" id="bellCount">15</span>
+                </button>
+                <div class="dropdown-menu bell-menu">
+                    <div class="bell-menu-header">
+                        <span>Notifications</span>
+                        <button class="bell-mark-all-btn" id="bellMarkAllBtn">Mark all as read</button>
+                    </div>
+                    <div class="bell-menu-list" id="bellMenuList">
+                        <div class="bell-item" data-id="ntf-1" data-action="bell-toggle-read">
+                            <div class="bell-item-icon icon-circle purple">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                            </div>
+                            <div class="bell-item-text">
+                                <div class="bell-item-title"><span class="bell-dot"></span>New review received</div>
+                                <div class="bell-item-desc">A new review has been submitted for "Atomic Habits".</div>
+                                <div class="bell-item-time">2 mins ago</div>
+                            </div>
+                        </div>
+                        <div class="bell-item" data-id="ntf-2" data-action="bell-toggle-read">
+                            <div class="bell-item-icon icon-circle green">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" /></svg>
+                            </div>
+                            <div class="bell-item-text">
+                                <div class="bell-item-title"><span class="bell-dot"></span>New reader registered</div>
+                                <div class="bell-item-desc">Emily Johnson has created a new account.</div>
+                                <div class="bell-item-time">10 mins ago</div>
+                            </div>
+                        </div>
+                        <div class="bell-item" data-id="ntf-3" data-action="bell-toggle-read">
+                            <div class="bell-item-icon icon-circle orange">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+                            </div>
+                            <div class="bell-item-text">
+                                <div class="bell-item-title"><span class="bell-dot"></span>Payment received</div>
+                                <div class="bell-item-desc">Payment of $49.00 received from Michael Chen.</div>
+                                <div class="bell-item-time">45 mins ago</div>
+                            </div>
+                        </div>
+                        <div class="bell-item" data-id="ntf-4" data-action="bell-toggle-read">
+                            <div class="bell-item-icon icon-circle blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                            </div>
+                            <div class="bell-item-text">
+                                <div class="bell-item-title">Ticket response received</div>
+                                <div class="bell-item-desc">Super Admin replied to ticket #TIC-2024-125.</div>
+                                <div class="bell-item-time">1 hour ago</div>
+                            </div>
+                        </div>
+                        <div class="bell-item" data-id="ntf-5" data-action="bell-toggle-read">
+                            <div class="bell-item-icon icon-circle purple">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>
+                            </div>
+                            <div class="bell-item-text">
+                                <div class="bell-item-title">Book updated</div>
+                                <div class="bell-item-desc">The book "Deep Work" has been updated.</div>
+                                <div class="bell-item-time">2 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bell-menu-footer">
+                        <a href="#" id="bellViewAllLink">View all notifications</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ Stat cards ============ -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="icon-circle purple">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+            </div>
+            <div class="stat-top">
+                <span class="stat-label">Total Notifications</span>
+                <div class="stat-value">128</div>
+                <div class="stat-change up">↑ 12.4% <span>vs Apr 1 – Apr 30</span></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="icon-circle blue">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                    <path d="m3 7 9 6 9-6"></path>
+                </svg>
+            </div>
+            <div class="stat-top">
+                <span class="stat-label">Unread Notifications</span>
+                <div class="stat-value" id="unreadStat">15</div>
+                <div class="stat-change up">↑ 25% <span>vs Apr 1 – Apr 30</span></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="icon-circle orange">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12" y2="17.01"></line>
+                </svg>
+            </div>
+            <div class="stat-top">
+                <span class="stat-label">Action Required</span>
+                <div class="stat-value">7</div>
+                <div class="stat-change up">↑ 16.7% <span>vs Apr 1 – Apr 30</span></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="icon-circle green">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="m9 12 2 2 4-4"></path>
+                </svg>
+            </div>
+            <div class="stat-top">
+                <span class="stat-label">Resolved Today</span>
+                <div class="stat-value">12</div>
+                <div class="stat-change down">↓ 7.7% <span>vs Apr 1 – Apr 30</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ Content grid ============ -->
+    <div class="content-grid">
+
+        <!-- LEFT: toolbar + table -->
+        <div class="left-col">
+            <div class="toolbar">
+                <div class="search-box">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search notifications...">
+                </div>
+                <div class="select-box">
+                    <select id="categoryFilter">
+                        <option value="all">All Categories</option>
+                        <option value="reviews">Reviews</option>
+                        <option value="readers">Readers</option>
+                        <option value="earnings">Earnings</option>
+                        <option value="support">Support</option>
+                        <option value="books">Books</option>
+                        <option value="reports">Reports</option>
+                        <option value="system">System</option>
+                    </select>
+                </div>
+                <div class="select-box">
+                    <select id="statusFilter">
+                        <option value="all">All Status</option>
+                        <option value="unread">Unread</option>
+                        <option value="read">Read</option>
+                    </select>
+                </div>
+                <div class="select-box">
+                    <svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px;">
+                        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <select id="dateFilter">
+                        <option>Last 30 Days</option>
+                        <option>Last 7 Days</option>
+                        <option>Today</option>
+                        <option>All Time</option>
+                    </select>
+                </div>
+                <button class="filters-btn">
+                    <svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px;">
+                        <line x1="4" y1="21" x2="4" y2="14"></line>
+                        <line x1="4" y1="10" x2="4" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12" y2="3"></line>
+                        <line x1="20" y1="21" x2="20" y2="16"></line>
+                        <line x1="20" y1="12" x2="20" y2="3"></line>
+                        <line x1="1" y1="14" x2="7" y2="14"></line>
+                        <line x1="9" y1="8" x2="15" y2="8"></line>
+                        <line x1="17" y1="16" x2="23" y2="16"></line>
+                    </svg>
+                    Filters
+                </button>
+            </div>
+
+            <div class="table-card">
+                <table class="ntable">
+                    <thead>
+                        <tr>
+                            <th>Notification</th>
+                            <th>Category</th>
+                            <th>Date &amp; Time</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr data-id="ntf-1" data-cat="reviews" data-status="unread">
+                            <td>
+                                <div class="notif-cell">
+                                    <span class="unread-dot"></span>
+                                    <div class="notif-icon-wrap icon-circle purple">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                                    </div>
+                                    <div class="notif-text">
+                                        <span class="notif-title">New review received</span>
+                                        <span class="notif-desc">A new review has been submitted for "Atomic Habits".</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-reviews">Reviews</span></td>
+                            <td class="date-cell">2 mins ago</td>
+                            <td><span class="status status-unread">Unread</span></td>
+                            <td>
+                                <div class="action-cell">
+                                    <a href="@Url.Action("GetNotification", "Library")" class="btn-view">View</a>
+                                    <div class="dropdown">
+                                        <button class="btn-more" data-toggle>
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <button data-action="toggle-status">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                                <span class="action-label">Mark as Read</span>
+                                            </button>
+                                            <button data-action="archive">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" /></svg>
+                                                Archive
+                                            </button>
+                                            <div class="divider"></div>
+                                            <button class="danger" data-action="delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr data-id="ntf-2" data-cat="readers" data-status="unread">
+                            <td>
+                                <div class="notif-cell">
+                                    <span class="unread-dot"></span>
+                                    <div class="notif-icon-wrap icon-circle green">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" /></svg>
+                                    </div>
+                                    <div class="notif-text">
+                                        <span class="notif-title">New reader registered</span>
+                                        <span class="notif-desc">Emily Johnson has created a new account.</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-readers">Readers</span></td>
+                            <td class="date-cell">10 mins ago</td>
+                            <td><span class="status status-unread">Unread</span></td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-view">View</button>
+                                    <div class="dropdown">
+                                        <button class="btn-more" data-toggle>
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <button data-action="toggle-status">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                                <span class="action-label">Mark as Read</span>
+                                            </button>
+                                            <button data-action="archive">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" /></svg>
+                                                Archive
+                                            </button>
+                                            <div class="divider"></div>
+                                            <button class="danger" data-action="delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr data-id="ntf-3" data-cat="earnings" data-status="unread">
+                            <td>
+                                <div class="notif-cell">
+                                    <span class="unread-dot"></span>
+                                    <div class="notif-icon-wrap icon-circle orange">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+                                    </div>
+                                    <div class="notif-text">
+                                        <span class="notif-title">Payment received</span>
+                                        <span class="notif-desc">Payment of $49.00 received from Michael Chen.</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-earnings">Earnings</span></td>
+                            <td class="date-cell">45 mins ago</td>
+                            <td><span class="status status-unread">Unread</span></td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-view">View</button>
+                                    <div class="dropdown">
+                                        <button class="btn-more" data-toggle>
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <button data-action="toggle-status">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                                <span class="action-label">Mark as Read</span>
+                                            </button>
+                                            <button data-action="archive">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" /></svg>
+                                                Archive
+                                            </button>
+                                            <div class="divider"></div>
+                                            <button class="danger" data-action="delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr data-id="ntf-4" data-cat="support" data-status="read">
+                            <td>
+                                <div class="notif-cell">
+                                    <span class="unread-dot hidden"></span>
+                                    <div class="notif-icon-wrap icon-circle blue">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                                    </div>
+                                    <div class="notif-text">
+                                        <span class="notif-title">Ticket response received</span>
+                                        <span class="notif-desc">Super Admin replied to ticket #TIC-2024-125.</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-support">Support</span></td>
+                            <td class="date-cell">1 hour ago</td>
+                            <td><span class="status status-read">Read</span></td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-view">View</button>
+                                    <div class="dropdown">
+                                        <button class="btn-more" data-toggle>
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <button data-action="toggle-status">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                                <span class="action-label">Mark as Unread</span>
+                                            </button>
+                                            <button data-action="archive">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" /></svg>
+                                                Archive
+                                            </button>
+                                            <div class="divider"></div>
+                                            <button class="danger" data-action="delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr data-id="ntf-5" data-cat="books" data-status="read">
+                            <td>
+                                <div class="notif-cell">
+                                    <span class="unread-dot hidden"></span>
+                                    <div class="notif-icon-wrap icon-circle purple">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>
+                                    </div>
+                                    <div class="notif-text">
+                                        <span class="notif-title">Book updated</span>
+                                        <span class="notif-desc">The book "Deep Work" has been updated.</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-books">Books</span></td>
+                            <td class="date-cell">2 hours ago</td>
+                            <td><span class="status status-read">Read</span></td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-view">View</button>
+                                    <div class="dropdown">
+                                        <button class="btn-more" data-toggle>
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <button data-action="toggle-status">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                                <span class="action-label">Mark as Unread</span>
+                                            </button>
+                                            <button data-action="archive">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" /></svg>
+                                                Archive
+                                            </button>
+                                            <div class="divider"></div>
+                                            <button class="danger" data-action="delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr data-id="ntf-6" data-cat="reports" data-status="read">
+                            <td>
+                                <div class="notif-cell">
+                                    <span class="unread-dot hidden"></span>
+                                    <div class="notif-icon-wrap icon-circle orange">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="8" y1="13" x2="16" y2="13" /><line x1="8" y1="17" x2="16" y2="17" /></svg>
+                                    </div>
+                                    <div class="notif-text">
+                                        <span class="notif-title">Monthly report generated</span>
+                                        <span class="notif-desc">April 2024 analytics report is ready to download.</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-reports">Reports</span></td>
+                            <td class="date-cell">3 hours ago</td>
+                            <td><span class="status status-read">Read</span></td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-view">View</button>
+                                    <div class="dropdown">
+                                        <button class="btn-more" data-toggle>
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <button data-action="toggle-status">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                                <span class="action-label">Mark as Unread</span>
+                                            </button>
+                                            <button data-action="archive">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" /></svg>
+                                                Archive
+                                            </button>
+                                            <div class="divider"></div>
+                                            <button class="danger" data-action="delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr data-id="ntf-7" data-cat="system" data-status="read">
+                            <td>
+                                <div class="notif-cell">
+                                    <span class="unread-dot hidden"></span>
+                                    <div class="notif-icon-wrap icon-circle gray">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>
+                                    </div>
+                                    <div class="notif-text">
+                                        <span class="notif-title">Subscription expires in 7 days</span>
+                                        <span class="notif-desc">Your library subscription will expire on Jun 7, 2024.</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-system">System</span></td>
+                            <td class="date-cell">5 hours ago</td>
+                            <td><span class="status status-read">Read</span></td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-view">View</button>
+                                    <div class="dropdown">
+                                        <button class="btn-more" data-toggle>
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <button data-action="toggle-status">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                                <span class="action-label">Mark as Unread</span>
+                                            </button>
+                                            <button data-action="archive">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" /></svg>
+                                                Archive
+                                            </button>
+                                            <div class="divider"></div>
+                                            <button class="danger" data-action="delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr data-id="ntf-8" data-cat="readers" data-status="read">
+                            <td>
+                                <div class="notif-cell">
+                                    <span class="unread-dot hidden"></span>
+                                    <div class="notif-icon-wrap icon-circle green">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" /></svg>
+                                    </div>
+                                    <div class="notif-text">
+                                        <span class="notif-title">Reader exceeded borrowing limit</span>
+                                        <span class="notif-desc">David Wilson has exceeded the borrowing limit.</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-readers">Readers</span></td>
+                            <td class="date-cell">Yesterday, 9:15 PM</td>
+                            <td><span class="status status-read">Read</span></td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-view">View</button>
+                                    <div class="dropdown">
+                                        <button class="btn-more" data-toggle>
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <button data-action="toggle-status">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                                <span class="action-label">Mark as Unread</span>
+                                            </button>
+                                            <button data-action="archive">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" /></svg>
+                                                Archive
+                                            </button>
+                                            <div class="divider"></div>
+                                            <button class="danger" data-action="delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr data-id="ntf-9" data-cat="reviews" data-status="read">
+                            <td>
+                                <div class="notif-cell">
+                                    <span class="unread-dot hidden"></span>
+                                    <div class="notif-icon-wrap icon-circle purple">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                                    </div>
+                                    <div class="notif-text">
+                                        <span class="notif-title">Review requires moderation</span>
+                                        <span class="notif-desc">A review for "Rich Dad Poor Dad" has been reported.</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-reviews">Reviews</span></td>
+                            <td class="date-cell">Yesterday, 6:40 PM</td>
+                            <td><span class="status status-read">Read</span></td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-view">View</button>
+                                    <div class="dropdown">
+                                        <button class="btn-more" data-toggle>
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <button data-action="toggle-status">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                                <span class="action-label">Mark as Unread</span>
+                                            </button>
+                                            <button data-action="archive">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" /></svg>
+                                                Archive
+                                            </button>
+                                            <div class="divider"></div>
+                                            <button class="danger" data-action="delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr data-id="ntf-10" data-cat="support" data-status="read">
+                            <td>
+                                <div class="notif-cell">
+                                    <span class="unread-dot hidden"></span>
+                                    <div class="notif-icon-wrap icon-circle blue">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                                    </div>
+                                    <div class="notif-text">
+                                        <span class="notif-title">New support ticket received</span>
+                                        <span class="notif-desc">New ticket #TIC-2024-126 created by Sarah Johnson.</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-support">Support</span></td>
+                            <td class="date-cell">Yesterday, 3:22 PM</td>
+                            <td><span class="status status-read">Read</span></td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="btn-view">View</button>
+                                    <div class="dropdown">
+                                        <button class="btn-more" data-toggle>
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></svg>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <button data-action="toggle-status">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                                <span class="action-label">Mark as Unread</span>
+                                            </button>
+                                            <button data-action="archive">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" /></svg>
+                                                Archive
+                                            </button>
+                                            <div class="divider"></div>
+                                            <button class="danger" data-action="delete">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <span class="pagination-info">Showing 1 to 10 of 128 notifications</span>
+                    <div class="pagination-controls">
+                        <button class="page-btn" id="prevPage" disabled>‹</button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <span class="page-btn dots">…</span>
+                        <button class="page-btn">13</button>
+                        <button class="page-btn" id="nextPage">›</button>
+                    </div>
+                    <div class="per-page">
+                        <select>
+                            <option>10 per page</option>
+                            <option>25 per page</option>
+                            <option>50 per page</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: quick actions / summary / help -->
+        <aside class="right-col">
+            <div class="side-card">
+                <h3>Quick Actions</h3>
+                <div class="quick-action" id="qaMarkAll">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Mark All as Read
+                </div>
+                <div class="quick-action" id="qaClearRead">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                        <path d="M10 11v6"></path>
+                        <path d="M14 11v6"></path>
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+                    </svg>
+                    Clear Read Notifications
+                </div>
+                <div class="quick-action">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
+                    </svg>
+                    Notification Settings
+                </div>
+                <div class="quick-action">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export Notifications
+                </div>
+            </div>
+
+            <div class="side-card">
+                <h3>Notification Summary</h3>
+                <div class="donut-wrap">
+                    <div class="donut" style="background: conic-gradient(from 0deg,
+                        #3b82f6 0% 27%,
+                        #22c55e 27% 46%,
+                        #f59e0b 46% 62%,
+                        #06b6d4 62% 76%,
+                        #a855f7 76% 87%,
+                        #ef4444 87% 95%,
+                        #94a3b8 95% 100%);">
+                        <div class="donut-center">
+                            <span class="num">128</span>
+                            <span class="lbl">Total</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="legend">
+                    <div class="legend-row">
+                        <div class="legend-left"><span class="legend-dot" style="background:#3b82f6;"></span>Reviews</div><span class="legend-val">34 (27%)</span>
+                    </div>
+                    <div class="legend-row">
+                        <div class="legend-left"><span class="legend-dot" style="background:#22c55e;"></span>Readers</div><span class="legend-val">24 (19%)</span>
+                    </div>
+                    <div class="legend-row">
+                        <div class="legend-left"><span class="legend-dot" style="background:#f59e0b;"></span>Earnings</div><span class="legend-val">20 (16%)</span>
+                    </div>
+                    <div class="legend-row">
+                        <div class="legend-left"><span class="legend-dot" style="background:#06b6d4;"></span>Support</div><span class="legend-val">18 (14%)</span>
+                    </div>
+                    <div class="legend-row">
+                        <div class="legend-left"><span class="legend-dot" style="background:#a855f7;"></span>Books</div><span class="legend-val">14 (11%)</span>
+                    </div>
+                    <div class="legend-row">
+                        <div class="legend-left"><span class="legend-dot" style="background:#ef4444;"></span>Reports</div><span class="legend-val">10 (8%)</span>
+                    </div>
+                    <div class="legend-row">
+                        <div class="legend-left"><span class="legend-dot" style="background:#94a3b8;"></span>System</div><span class="legend-val">8 (5%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="side-card help-card">
+                <div class="help-icon">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                        <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z">
+                        </path>
+                    </svg>
+                </div>
+                <h3>Need Help?</h3>
+                <p>If you need assistance, contact <a href="#">Super Admin</a> or raise a support ticket.</p>
+                <button class="btn-help">Create Support Ticket</button>
+            </div>
+        </aside>
+
+    </div>
+</main>
+
+<script>
+    (function () {
+
+      // -----------------------------------------------------------
+      // No data model here on purpose: the rows in #tableBody and
+      // the items in #bellMenuList are real markup (rendered by
+      // your MVC view / partial). This script only reacts to
+      // clicks on the DOM that's already there — it never builds
+      // or rebuilds rows itself, so it stays out of the way of
+      // server-side pagination, filtering, etc.
+      // -----------------------------------------------------------
+
+      const tbody = document.getElementById('tableBody');
+      const unreadStatEl = document.getElementById('unreadStat');
+      const bellCountEl = document.getElementById('bellCount');
+      const bellMenuList = document.getElementById('bellMenuList');
+      const bellMarkAllBtn = document.getElementById('bellMarkAllBtn');
+
+      // ---------- counts ----------
+      function updateUnreadCount() {
+        const n = tbody.querySelectorAll('tr[data-status="unread"]').length;
+        if (unreadStatEl) unreadStatEl.textContent = n;
+        if (bellCountEl) {
+          bellCountEl.textContent = n;
+          bellCountEl.style.display = n > 0 ? 'flex' : 'none';
+        }
+        if (bellMarkAllBtn) bellMarkAllBtn.disabled = n === 0;
+      }
+
+      // ---------- keep a single row's UI (badge, dot, menu label) in sync ----------
+      function setRowStatus(row, status) {
+        row.dataset.status = status;
+        const statusEl = row.querySelector('.status');
+        const dotEl = row.querySelector('.unread-dot');
+        const labelEl = row.querySelector('[data-action="toggle-status"] .action-label');
+
+        if (status === 'unread') {
+          statusEl.textContent = 'Unread';
+          statusEl.classList.remove('status-read');
+          statusEl.classList.add('status-unread');
+          if (dotEl) dotEl.classList.remove('hidden');
+          if (labelEl) labelEl.textContent = 'Mark as Read';
+        } else {
+          statusEl.textContent = 'Read';
+          statusEl.classList.remove('status-unread');
+          statusEl.classList.add('status-read');
+          if (dotEl) dotEl.classList.add('hidden');
+          if (labelEl) labelEl.textContent = 'Mark as Unread';
+        }
+
+        syncBellItem(row.dataset.id, status);
+      }
+
+      // ---------- keep the bell preview's dot in sync with the table row ----------
+      function syncBellItem(id, status) {
+        if (!bellMenuList) return;
+        const bellItem = bellMenuList.querySelector(`.bell-item[data-id="${id}"]`);
+        if (!bellItem) return;
+        const titleEl = bellItem.querySelector('.bell-item-title');
+        const existingDot = titleEl.querySelector('.bell-dot');
+        if (status === 'unread' && !existingDot) {
+          titleEl.insertAdjacentHTML('afterbegin', '<span class="bell-dot"></span>');
+        } else if (status === 'read' && existingDot) {
+          existingDot.remove();
+        }
+      }
+
+      function showEmptyStateIfNeeded() {
+        if (bellMenuList && bellMenuList.querySelectorAll('.bell-item').length === 0) {
+          bellMenuList.innerHTML = '<div class="bell-empty">You\'re all caught up!</div>';
+        }
+      }
+
+      // ---------- dropdown open/close ----------
+      function closeAllDropdowns(except) {
+        document.querySelectorAll('.dropdown.open').forEach(d => {
+          if (d !== except) d.classList.remove('open');
+        });
+      }
+
+      document.addEventListener('click', function (e) {
+        const toggleBtn = e.target.closest('[data-toggle]');
+        if (toggleBtn) {
+          const dropdown = toggleBtn.closest('.dropdown');
+          const wasOpen = dropdown.classList.contains('open');
+          closeAllDropdowns();
+          dropdown.classList.toggle('open', !wasOpen);
+          return;
+        }
+
+        const actionBtn = e.target.closest('[data-action]');
+        if (actionBtn) {
+          const action = actionBtn.dataset.action;
+
+          // clicking a row in the bell preview panel
+          if (action === 'bell-toggle-read') {
+            const id = actionBtn.dataset.id;
+            const row = tbody.querySelector(`tr[data-id="${id}"]`);
+            if (row) setRowStatus(row, row.dataset.status === 'unread' ? 'read' : 'unread');
+            updateUnreadCount();
+            closeAllDropdowns();
+            return;
+          }
+
+          // table row kebab menu actions
+          const row = actionBtn.closest('tr');
+          if (row) {
+            if (action === 'toggle-status') {
+              setRowStatus(row, row.dataset.status === 'unread' ? 'read' : 'unread');
+              updateUnreadCount();
+            } else if (action === 'delete' || action === 'archive') {
+              const id = row.dataset.id;
+              row.style.transition = 'opacity .2s ease';
+              row.style.opacity = '0';
+              setTimeout(() => {
+                row.remove();
+                if (bellMenuList) {
+                  const bellItem = bellMenuList.querySelector(`.bell-item[data-id="${id}"]`);
+                  if (bellItem) bellItem.remove();
+                }
+                updateUnreadCount();
+                showEmptyStateIfNeeded();
+              }, 150);
+            }
+          }
+          closeAllDropdowns();
+          return;
+        }
+
+        if (!e.target.closest('.dropdown-menu')) {
+          closeAllDropdowns();
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeAllDropdowns();
+      });
+
+      // ---------- search + filters (read straight from the rendered DOM) ----------
+      const searchInput = document.getElementById('searchInput');
+      const categoryFilter = document.getElementById('categoryFilter');
+      const statusFilter = document.getElementById('statusFilter');
+
+      function applyFilters() {
+        const q = searchInput.value.trim().toLowerCase();
+        const cat = categoryFilter.value;
+        const status = statusFilter.value;
+
+        tbody.querySelectorAll('tr').forEach(row => {
+          const titleEl = row.querySelector('.notif-title');
+          const descEl = row.querySelector('.notif-desc');
+          const title = titleEl ? titleEl.textContent.toLowerCase() : '';
+          const desc = descEl ? descEl.textContent.toLowerCase() : '';
+          const matchesText = !q || title.includes(q) || desc.includes(q);
+          const matchesCat = cat === 'all' || row.dataset.cat === cat;
+          const matchesStatus = status === 'all' || row.dataset.status === status;
+          row.classList.toggle('row-hidden', !(matchesText && matchesCat && matchesStatus));
+        });
+      }
+
+      searchInput.addEventListener('input', applyFilters);
+      categoryFilter.addEventListener('change', applyFilters);
+      statusFilter.addEventListener('change', applyFilters);
+
+      // ---------- mark all as read ----------
+      function markAllRead() {
+        tbody.querySelectorAll('tr[data-status="unread"]').forEach(row => setRowStatus(row, 'read'));
+        updateUnreadCount();
+      }
+      document.getElementById('markAllBtn').addEventListener('click', markAllRead);
+      document.getElementById('qaMarkAll').addEventListener('click', markAllRead);
+
+      if (bellMarkAllBtn) {
+        bellMarkAllBtn.addEventListener('click', function () {
+          markAllRead();
+          closeAllDropdowns();
+        });
+      }
+      const bellViewAllLink = document.getElementById('bellViewAllLink');
+      if (bellViewAllLink) {
+        bellViewAllLink.addEventListener('click', function (e) {
+          e.preventDefault();
+          closeAllDropdowns();
+          // hook this up to your real "all notifications" route
+        });
+      }
+
+      // ---------- clear read notifications ----------
+      document.getElementById('qaClearRead').addEventListener('click', function () {
+        tbody.querySelectorAll('tr[data-status="read"]').forEach(row => {
+          const id = row.dataset.id;
+          row.remove();
+          if (bellMenuList) {
+            const bellItem = bellMenuList.querySelector(`.bell-item[data-id="${id}"]`);
+            if (bellItem) bellItem.remove();
+          }
+        });
+        updateUnreadCount();
+        showEmptyStateIfNeeded();
+      });
+
+      // ---------- pagination (visual only — wire to your real paging) ----------
+      document.querySelectorAll('.pagination-controls .page-btn:not(.dots)').forEach(btn => {
+        btn.addEventListener('click', function () {
+          if (this.id === 'prevPage' || this.id === 'nextPage') return;
+          document.querySelectorAll('.pagination-controls .page-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+
+      updateUnreadCount();
+
+    })();
+</script>

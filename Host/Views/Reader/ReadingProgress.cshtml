@@ -1,0 +1,605 @@
+﻿@{
+    ViewData["Title"] = "My Reading";
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+}
+<link href="~/css/readingProgress.css" rel="stylesheet" />
+
+<div class="page-header">
+    <h1>My Reading</h1>
+    <p>Track your journey and keep growing.</p>
+</div>
+
+<div class="reading-page">
+
+    <!-- LEFT: Main content -->
+    <div class="reading-main">
+
+        <!-- Currently Reading -->
+        <section class="page-section" id="section-currently-reading">
+            <div class="section-header">
+                <h2>Currently Reading</h2>
+                <a href="#" class="view-all">View all</a>
+            </div>
+            <div class="card">
+                <div class="currently-reading-card">
+
+                    <!-- Book Cover -->
+                    <div class="book-cover-placeholder">
+                        <div class="book-subtitle">Tiny Changes,<br>Remarkable Results</div>
+                        <div class="book-title-text">Atomic Habits</div>
+                        <div class="book-desc">An Easy & Proven Way to Build Good Habits & Break Bad Ones.</div>
+                        <div class="book-author-cover">James Clear</div>
+                    </div>
+
+                    <!-- Book Info -->
+                    <div class="book-info">
+                        <div class="book-title">Atomic Habits</div>
+                        <div class="book-author">James Clear</div>
+                        <div class="book-desc-text">An Easy & Proven Way to Build Good Habits<br>& Break Bad Ones.</div>
+                        <div class="reading-progress-bar-wrap">
+                            <div class="progress-label">67% complete</div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill" style="width: 67%"></div>
+                            </div>
+                        </div>
+                        <div class="time-left">
+                            <i class="ti ti-clock"></i> 9h 24min left to finish
+                        </div>
+                        <div class="book-actions">
+                            <a href="#" class="btn-primary"><i class="ti ti-player-play"></i> Continue Reading</a>
+                            <a href="#" class="btn-secondary">Details</a>
+                        </div>
+                    </div>
+
+                    <!-- Progress Panel -->
+                    <div class="progress-panel">
+                        <div class="progress-panel-header">
+                            <span>Your Progress</span>
+                            <button class="progress-panel-close"><i class="ti ti-x"></i></button>
+                        </div>
+                        <div class="donut-wrap">
+                            <div class="donut-chart">
+                                <svg width="90" height="90" viewBox="0 0 90 90">
+                                    <circle cx="45" cy="45" r="35" fill="none" stroke="#1C2541" stroke-width="8" />
+                                    <circle cx="45" cy="45" r="35" fill="none" stroke="url(#donutGrad)" stroke-width="8"
+                                            stroke-dasharray="219.9" stroke-dashoffset="72.6" stroke-linecap="round" />
+                                    <defs>
+                                        <linearGradient id="donutGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#7C6AFF" />
+                                            <stop offset="100%" stop-color="#A78BFA" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <div class="donut-center">
+                                    <span class="donut-pct">67%</span>
+                                    <span class="donut-label">Completed</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-stats">
+                            <div class="progress-stat-row">
+                                <span class="stat-label">Pages Read</span>
+                                <span class="stat-val">184 / 272</span>
+                            </div>
+                            <div class="progress-stat-row">
+                                <span class="stat-label">Chapters</span>
+                                <span class="stat-val">12 / 20</span>
+                            </div>
+                            <div class="progress-stat-row">
+                                <span class="stat-label">Time Read</span>
+                                <span class="stat-val">6h 35m</span>
+                            </div>
+                            <div class="progress-stat-row">
+                                <span class="stat-label">Last Read</span>
+                                <span class="stat-val">Today, 7:45 PM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Completed Books -->
+        <section class="page-section" id="section-completed-books">
+            <div class="section-header">
+                <h2>Completed Books</h2>
+                <a href="#" class="view-all">View all</a>
+            </div>
+            <div class="card">
+                <div class="books-carousel">
+
+                    <!-- Book 1 -->
+                    <div class="completed-book-card">
+                        <div class="completed-book-cover cover-1"><span>THE POWER OF HABIT</span></div>
+                        <div class="completed-book-title">The Power of Habit</div>
+                        <div class="completed-book-author">Charles Duhigg</div>
+                        <div class="star-rating">
+                            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                            <i class="ti ti-star-half-filled"></i>
+                            <span>4.6</span>
+                        </div>
+                        <div class="completed-badge"><i class="ti ti-circle-check-filled"></i> Completed</div>
+                        <div class="completed-date"><i class="ti ti-calendar"></i> May 12, 2024</div>
+                    </div>
+
+                    <!-- Book 2 -->
+                    <div class="completed-book-card">
+                        <div class="completed-book-cover cover-2"><span>MAKE YOUR BED</span></div>
+                        <div class="completed-book-title">Make Your Bed</div>
+                        <div class="completed-book-author">William H. McRaven</div>
+                        <div class="star-rating">
+                            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                            <i class="ti ti-star-half-filled"></i>
+                            <span>4.7</span>
+                        </div>
+                        <div class="completed-badge"><i class="ti ti-circle-check-filled"></i> Completed</div>
+                        <div class="completed-date"><i class="ti ti-calendar"></i> May 7, 2024</div>
+                    </div>
+
+                    <!-- Book 3 -->
+                    <div class="completed-book-card">
+                        <div class="completed-book-cover cover-3"><span>MINDSET</span></div>
+                        <div class="completed-book-title">Mindset</div>
+                        <div class="completed-book-author">Carol S. Dweck</div>
+                        <div class="star-rating">
+                            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                            <i class="ti ti-star-half-filled"></i>
+                            <span>4.6</span>
+                        </div>
+                        <div class="completed-badge"><i class="ti ti-circle-check-filled"></i> Completed</div>
+                        <div class="completed-date"><i class="ti ti-calendar"></i> Apr 28, 2024</div>
+                    </div>
+
+                    <!-- Book 4 -->
+                    <div class="completed-book-card">
+                        <div class="completed-book-cover cover-4"><span>DEEP WORK</span></div>
+                        <div class="completed-book-title">Deep Work</div>
+                        <div class="completed-book-author">Cal Newport</div>
+                        <div class="star-rating">
+                            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                            <i class="ti ti-star-half-filled"></i>
+                            <span>4.3</span>
+                        </div>
+                        <div class="completed-badge"><i class="ti ti-circle-check-filled"></i> Completed</div>
+                        <div class="completed-date"><i class="ti ti-calendar"></i> Apr 18, 2024</div>
+                    </div>
+
+                    <!-- Book 5 -->
+                    <div class="completed-book-card">
+                        <div class="completed-book-cover cover-5"><span>THE 5 AM CLUB</span></div>
+                        <div class="completed-book-title">The 5 AM Club</div>
+                        <div class="completed-book-author">Robin Sharma</div>
+                        <div class="star-rating">
+                            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                            <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                            <i class="ti ti-star-half-filled"></i>
+                            <span>4.7</span>
+                        </div>
+                        <div class="completed-badge"><i class="ti ti-circle-check-filled"></i> Completed</div>
+                        <div class="completed-date"><i class="ti ti-calendar"></i> Apr 5, 2024</div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Reading History -->
+        <section class="page-section" id="section-reading-history">
+            <div class="section-header">
+                <h2>Reading History</h2>
+                <a href="#" class="view-all">View all</a>
+            </div>
+            <div class="card">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Author</th>
+                            <th>Last Read</th>
+                            <th>Progress</th>
+                            <th>Time Spent</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="history-book-cell">
+                                    <div class="history-book-thumb" style="background:linear-gradient(135deg,#e8630a,#c0392b)">Never<br>Enough</div>
+                                    <div>
+                                        <div class="history-book-name">Never Enough</div>
+                                        <div class="history-book-sub">Jennifer Breheny Wallace</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Jennifer Breheny Wallace</td>
+                            <td>Today<br>7:45 PM</td>
+                            <td>
+                                <div class="history-progress-bar">
+                                    <div class="history-bar-track"><div class="history-bar-fill" style="width:67%"></div></div>
+                                    <span>67%</span>
+                                </div>
+                            </td>
+                            <td>3h 24m</td>
+                            <td><button class="dots-btn"><i class="ti ti-dots-vertical"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="history-book-cell">
+                                    <div class="history-book-thumb" style="background:linear-gradient(135deg,#6c3483,#4a235a)">The<br>Creative<br>Act</div>
+                                    <div>
+                                        <div class="history-book-name">The Creative Act</div>
+                                        <div class="history-book-sub">Rick Rubin</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Rick Rubin</td>
+                            <td>Yesterday<br>9:15 PM</td>
+                            <td>
+                                <div class="history-progress-bar">
+                                    <div class="history-bar-track"><div class="history-bar-fill" style="width:34%"></div></div>
+                                    <span>34%</span>
+                                </div>
+                            </td>
+                            <td>1h 08m</td>
+                            <td><button class="dots-btn"><i class="ti ti-dots-vertical"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="history-book-cell">
+                                    <div class="history-book-thumb" style="background:linear-gradient(135deg,#1a5276,#0d2137)">Let<br>Them<br>Theory</div>
+                                    <div>
+                                        <div class="history-book-name">The Let Them Theory</div>
+                                        <div class="history-book-sub">Mel Robbins</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Mel Robbins</td>
+                            <td>May 13, 2024<br>10:30 PM</td>
+                            <td>
+                                <div class="history-progress-bar">
+                                    <div class="history-bar-track"><div class="history-bar-fill" style="width:28%"></div></div>
+                                    <span>28%</span>
+                                </div>
+                            </td>
+                            <td>55m</td>
+                            <td><button class="dots-btn"><i class="ti ti-dots-vertical"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="history-book-cell">
+                                    <div class="history-book-thumb" style="background:linear-gradient(135deg,#1e8449,#0b5345)">The<br>Compound<br>Effect</div>
+                                    <div>
+                                        <div class="history-book-name">The Compound Effect</div>
+                                        <div class="history-book-sub">Darren Hardy</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Darren Hardy</td>
+                            <td>May 12, 2024<br>8:20 PM</td>
+                            <td>
+                                <div class="history-progress-bar">
+                                    <div class="history-bar-track"><div class="history-bar-fill complete" style="width:100%"></div></div>
+                                    <span>100%</span>
+                                </div>
+                            </td>
+                            <td>5h 10m</td>
+                            <td><button class="dots-btn"><i class="ti ti-dots-vertical"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="history-book-cell">
+                                    <div class="history-book-thumb" style="background:linear-gradient(135deg,#7d6608,#5d4e03)">Thinking<br>Fast<br>& Slow</div>
+                                    <div>
+                                        <div class="history-book-name">Thinking, Fast and Slow</div>
+                                        <div class="history-book-sub">Daniel Kahneman</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Daniel Kahneman</td>
+                            <td>May 11, 2024<br>6:40 PM</td>
+                            <td>
+                                <div class="history-progress-bar">
+                                    <div class="history-bar-track"><div class="history-bar-fill complete" style="width:100%"></div></div>
+                                    <span>100%</span>
+                                </div>
+                            </td>
+                            <td>7h 15m</td>
+                            <td><button class="dots-btn"><i class="ti ti-dots-vertical"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <a href="#" class="view-history-btn">View full reading history</a>
+            </div>
+        </section>
+
+        <!-- Reading Progress -->
+        <section class="page-section" id="section-reading-progress">
+            <div class="section-header">
+                <h2>Reading Progress</h2>
+                <a href="#" class="view-all">View all</a>
+            </div>
+
+            <div class="progress-stats-grid">
+                <div class="progress-stat-card">
+                    <div class="stat-icon-label"><i class="ti ti-books"></i> Books Read</div>
+                    <div class="big-number purple">24</div>
+                    <div class="stat-sub">of 50 books</div>
+                    <div class="mini-bar-track"><div class="mini-bar-fill" style="width:48%"></div></div>
+                </div>
+                <div class="progress-stat-card">
+                    <div class="stat-icon-label"><i class="ti ti-file-text"></i> Pages Read</div>
+                    <div class="big-number">3,240</div>
+                    <div class="stat-sub">of 6,500 pages</div>
+                    <div class="mini-bar-track"><div class="mini-bar-fill" style="width:50%"></div></div>
+                </div>
+                <div class="progress-stat-card">
+                    <div class="stat-icon-label"><i class="ti ti-clock"></i> Hours Read</div>
+                    <div class="big-number" style="font-size:22px">128h 45m</div>
+                    <div class="stat-sub">of 200 hours</div>
+                    <div class="mini-bar-track"><div class="mini-bar-fill" style="width:64%"></div></div>
+                </div>
+                <div class="progress-stat-card">
+                    <div class="stat-icon-label"><i class="ti ti-star-filled star"></i> Avg. Rating</div>
+                    <div class="big-number">4.6</div>
+                    <div class="stat-sub">out of 5</div>
+                    <div class="mini-bar-track"><div class="mini-bar-fill" style="width:92%"></div></div>
+                </div>
+            </div>
+
+            <!-- Reading Journey Chart -->
+            <div class="journey-card">
+                <div class="journey-header">
+                    <div>
+                        <h3>Your Reading Journey</h3>
+                        <div class="journey-sub">Hours Read</div>
+                    </div>
+                    <div class="period-select">Last 30 days <i class="ti ti-chevron-down"></i></div>
+                </div>
+                <div style="display:flex; gap: 0;">
+                    <div class="chart-y-labels">
+                        <span>8h</span>
+                        <span>6h</span>
+                        <span>4h</span>
+                        <span>2h</span>
+                        <span>0</span>
+                    </div>
+                    <div style="flex:1;">
+                        <div class="chart-wrap">
+                            <!-- bars Apr 15 week -->
+                            <div class="bar-group"><div class="bar" style="height:20%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:35%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:55%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:40%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:65%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:30%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:45%"></div></div>
+                            <!-- Apr 22 week -->
+                            <div class="bar-group"><div class="bar" style="height:60%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:50%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:70%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:40%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:55%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:75%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:35%"></div></div>
+                            <!-- Apr 29 week -->
+                            <div class="bar-group"><div class="bar" style="height:50%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:65%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:45%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:80%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:60%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:70%"></div></div>
+                            <div class="bar-group"><div class="bar" style="height:55%"></div></div>
+                            <!-- May 6 week -->
+                            <div class="bar-group"><div class="bar highlight" style="height:90%"></div></div>
+                            <div class="bar-group"><div class="bar highlight" style="height:75%"></div></div>
+                            <div class="bar-group"><div class="bar highlight" style="height:85%"></div></div>
+                            <div class="bar-group"><div class="bar highlight" style="height:95%"></div></div>
+                            <div class="bar-group"><div class="bar highlight" style="height:70%"></div></div>
+                            <div class="bar-group"><div class="bar highlight" style="height:80%"></div></div>
+                            <div class="bar-group"><div class="bar highlight" style="height:88%"></div></div>
+                            <!-- May 13 -->
+                            <div class="bar-group"><div class="bar highlight" style="height:72%"></div></div>
+                            <div class="bar-group"><div class="bar highlight" style="height:65%"></div></div>
+                            <div class="bar-group"><div class="bar highlight" style="height:78%"></div></div>
+                        </div>
+                        <div class="chart-x-labels">
+                            <span>Apr 15</span>
+                            <span>Apr 22</span>
+                            <span>Apr 29</span>
+                            <span>May 6</span>
+                            <span>May 13</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="reading-sidebar">
+
+        <!-- Reading Streak -->
+        <div class="streak-card">
+            <div class="streak-title">Reading Streak</div>
+            <div class="streak-count">
+                <span class="streak-fire">🔥</span>
+                <div>
+                    <div class="streak-number">12</div>
+                    <div class="streak-days">days in a row</div>
+                </div>
+            </div>
+            <div class="streak-calendar">
+                <div class="cal-days-header">
+                    <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+                </div>
+                <div class="cal-days">
+                    <div class="cal-day done"><i class="ti ti-check"></i></div>
+                    <div class="cal-day done"><i class="ti ti-check"></i></div>
+                    <div class="cal-day done"><i class="ti ti-check"></i></div>
+                    <div class="cal-day done"><i class="ti ti-check"></i></div>
+                    <div class="cal-day done"><i class="ti ti-check"></i></div>
+                    <div class="cal-day done"><i class="ti ti-check"></i></div>
+                    <div class="cal-day empty"></div>
+                </div>
+            </div>
+            <div class="streak-motto">Keep it up! 🔥</div>
+        </div>
+
+        <!-- This Month -->
+        <div class="this-month-card">
+            <div class="this-month-header">
+                <h3>This Month</h3>
+                <i class="ti ti-dots" style="color:#4D5670;cursor:pointer;font-size:16px;"></i>
+            </div>
+            <div class="month-stats">
+                <div class="month-stat-row">
+                    <div class="month-stat-label"><i class="ti ti-books"></i> Books Read</div>
+                    <div class="month-stat-val">3</div>
+                </div>
+                <div class="month-stat-row">
+                    <div class="month-stat-label"><i class="ti ti-clock"></i> Hours Read</div>
+                    <div class="month-stat-val">18h 42m</div>
+                </div>
+                <div class="month-stat-row">
+                    <div class="month-stat-label"><i class="ti ti-file-text"></i> Pages Read</div>
+                    <div class="month-stat-val">542</div>
+                </div>
+                <div class="month-stat-row">
+                    <div class="month-stat-label"><i class="ti ti-chart-bar"></i> Avg. Daily Read</div>
+                    <div class="month-stat-val">37m</div>
+                </div>
+            </div>
+            <a href="#" class="analytics-link">View full analytics</a>
+        </div>
+
+        <!-- Reading Goal -->
+        <div class="goal-card">
+            <div class="goal-header">
+                <h3>Reading Goal</h3>
+                <a href="#" class="edit-goal">Edit Goal</a>
+            </div>
+            <div class="on-track">You're on track!</div>
+            <div class="goal-count">24 of 50 books</div>
+            <div class="goal-bar-track">
+                <div class="goal-bar-fill" style="width:48%"></div>
+            </div>
+            <div class="goal-pct">48%</div>
+            <div class="goal-message">Great progress! Keep reading 🚀</div>
+        </div>
+
+        <!-- Top Genres -->
+        <div class="genres-card">
+            <div class="genres-title">Top Genres</div>
+            <div class="genres-sub">This Month</div>
+            <div class="donut-genres-wrap">
+                <svg width="110" height="110" viewBox="0 0 110 110">
+                    <circle cx="55" cy="55" r="40" fill="none" stroke="#1C2541" stroke-width="14" />
+                    <!-- Self-Help 44% -->
+                    <circle cx="55" cy="55" r="40" fill="none" stroke="#7C6AFF" stroke-width="14"
+                            stroke-dasharray="251.3" stroke-dashoffset="0"
+                            stroke-dasharray="110.6 251.3"
+                            transform="rotate(-90 55 55)" stroke-linecap="butt" />
+                    <!-- Productivity 28% -->
+                    <circle cx="55" cy="55" r="40" fill="none" stroke="#22C55E" stroke-width="14"
+                            stroke-dasharray="70.4 251.3"
+                            transform="rotate(68.4 55 55)" stroke-linecap="butt" />
+                    <!-- Mindset 17% -->
+                    <circle cx="55" cy="55" r="40" fill="none" stroke="#F59E0B" stroke-width="14"
+                            stroke-dasharray="42.7 251.3"
+                            transform="rotate(169 55 55)" stroke-linecap="butt" />
+                    <!-- Leadership 11% -->
+                    <circle cx="55" cy="55" r="40" fill="none" stroke="#3B82F6" stroke-width="14"
+                            stroke-dasharray="27.6 251.3"
+                            transform="rotate(230.1 55 55)" stroke-linecap="butt" />
+                </svg>
+                <div class="donut-genres-center">
+                    <span class="hours">18</span>
+                    <span class="hours-label">Hours</span>
+                </div>
+            </div>
+            <div class="genre-list">
+                <div class="genre-row">
+                    <div class="genre-dot" style="background:#7C6AFF"></div>
+                    <span class="genre-name">Self-Help</span>
+                    <span class="genre-pct">44%</span>
+                </div>
+                <div class="genre-row">
+                    <div class="genre-dot" style="background:#22C55E"></div>
+                    <span class="genre-name">Productivity</span>
+                    <span class="genre-pct">28%</span>
+                </div>
+                <div class="genre-row">
+                    <div class="genre-dot" style="background:#F59E0B"></div>
+                    <span class="genre-name">Mindset</span>
+                    <span class="genre-pct">17%</span>
+                </div>
+                <div class="genre-row">
+                    <div class="genre-dot" style="background:#3B82F6"></div>
+                    <span class="genre-name">Leadership</span>
+                    <span class="genre-pct">11%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quote Card -->
+        <div class="quote-card">
+            <span class="quote-icon">❝</span>
+            <div class="quote-text">"The more you read, the more things you will know. The more that you learn, the more places you'll go."</div>
+            <div class="quote-author">— Dr. Seuss</div>
+            <div class="quote-book-illus">📖</div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ── Scrollspy for this page ──
+        const sections = document.querySelectorAll('.page-section');
+        if (sections.length === 0) return;
+
+        function setActiveByHash(hash) {
+            document.querySelectorAll('.nav-item[data-hash]').forEach(function (link) {
+                link.classList.remove('active');
+            });
+            if (hash) {
+                var matched = document.querySelector('.nav-item[data-hash="' + hash + '"]');
+                if (matched) matched.classList.add('active');
+            } else {
+                var firstLink = document.querySelector('.nav-item[data-hash]');
+                if (firstLink) firstLink.classList.add('active');
+            }
+        }
+
+        setActiveByHash(window.location.hash);
+
+        window.addEventListener('hashchange', function () {
+            setActiveByHash(window.location.hash);
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    var hash = '#' + entry.target.id;
+                    history.replaceState(null, null, hash);
+                    setActiveByHash(hash);
+                }
+            });
+        }, {
+            threshold: 0,
+            rootMargin: '-50% 0px -50% 0px'
+        });
+
+        sections.forEach(section => observer.observe(section));
+
+    });
+</script>
+

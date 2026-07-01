@@ -1,0 +1,359 @@
+﻿@{
+    Layout = "~/Views/Shared/_LibraryLayout.cshtml";
+    ViewData["Title"] = " Library Analytics";
+}
+
+<link href="~/css/analysis.css" rel="stylesheet" />
+
+<div class="dash">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h2>Analytics Overview</h2>
+      <p>Track and analyze how readers engage with your books.</p>
+    </div>
+    <div class="topbar-right">
+      <div class="date-btn">📅 May 1 – May 31, 2024</div>
+      <button class="export-btn">⬇ Export Analytics ▾</button>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-icon si-blue">👥</div>
+      <div class="stat-info">
+        <p>Total Readers</p>
+        <h3>12,458</h3>
+        <div class="stat-badge up">▲ 14.2% <span style="color:#7878a0">vs Apr 1 – Apr 30</span></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon si-green">✅</div>
+      <div class="stat-info">
+        <p>Active Readers</p>
+        <h3>4,281</h3>
+        <div class="stat-badge up">▲ 10.6% <span style="color:#7878a0">vs Apr 1 – Apr 30</span></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon si-amber">⭐</div>
+      <div class="stat-info">
+        <p>Average Rating</p>
+        <h3>4.8 ★</h3>
+        <div class="stat-badge up">▲ 0.3 <span style="color:#7878a0">vs Apr 1 – Apr 30</span></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon si-purple">🔄</div>
+      <div class="stat-info">
+        <p>Average Completion Rate</p>
+        <h3>82%</h3>
+        <div class="stat-badge up">▲ 6% <span style="color:#7878a0">vs Apr 1 – Apr 30</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TREND CHART + SUMMARY -->
+  <div class="mid-section">
+    <div class="chart-card">
+      <div class="card-header">
+        <span class="card-title">Reader Activity Trend</span>
+        <div class="tab-group">
+          <div class="tab active">Daily</div>
+          <div class="tab">Weekly</div>
+          <div class="tab">Monthly</div>
+        </div>
+      </div>
+      <div class="chart-area">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="card-header"><span class="card-title">Analytics Summary</span></div>
+      <div class="summary-item">
+        <div class="sum-icon si-yellow">🏆</div>
+        <div>
+          <div class="sum-label">Best Performing Book</div>
+          <div class="sum-val">Atomic Habits</div>
+          <div class="sum-sub">1,250 reads • 92% completion</div>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="sum-icon si-cal">📅</div>
+        <div>
+          <div class="sum-label">Most Active Day</div>
+          <div class="sum-val">Saturday</div>
+          <div class="sum-sub">2,458 readers</div>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="sum-icon si-clk">🕐</div>
+        <div>
+          <div class="sum-label">Average Reading Time</div>
+          <div class="sum-val">1h 46m</div>
+          <div class="sum-sub up">▲ 12% vs Apr 1 – Apr 30</div>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="sum-icon si-org">📈</div>
+        <div>
+          <div class="sum-label">Fastest Growing Book</div>
+          <div class="sum-val">Deep Work</div>
+          <div class="sum-sub up">▲ 18% this month</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- READER INSIGHTS | READING TIME | FUNNEL -->
+  <div class="three-col">
+    <div class="chart-card">
+      <div class="card-header"><span class="card-title">Reader Insights</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+        <div style="background:#1a1a2e;border-radius:8px;padding:12px">
+          <p style="font-size:11px;color:#7878a0">Total Reads</p>
+          <h4 style="font-size:20px;font-weight:700;color:#fff;margin-top:2px">18,500</h4>
+          <div class="stat-badge up" style="font-size:10px">▲ 16.5%</div>
+        </div>
+        <div style="background:#1a1a2e;border-radius:8px;padding:12px">
+          <p style="font-size:11px;color:#7878a0">Completed Reads</p>
+          <h4 style="font-size:20px;font-weight:700;color:#fff;margin-top:2px">15,200</h4>
+          <div class="stat-badge up" style="font-size:10px">▲ 18.2%</div>
+        </div>
+        <div style="background:#1a1a2e;border-radius:8px;padding:12px">
+          <p style="font-size:11px;color:#7878a0">Abandoned Reads</p>
+          <h4 style="font-size:20px;font-weight:700;color:#fff;margin-top:2px">3,300</h4>
+          <div class="stat-badge down" style="font-size:10px">▼ 8.1%</div>
+        </div>
+        <div style="background:#1a1a2e;border-radius:8px;padding:12px">
+          <p style="font-size:11px;color:#7878a0">Completion Rate</p>
+          <h4 style="font-size:20px;font-weight:700;color:#fff;margin-top:2px">82%</h4>
+          <div class="stat-badge up" style="font-size:10px">▲ 6%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-header"><span class="card-title">Reading Time Distribution</span></div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="position:relative;width:100px;height:100px;flex-shrink:0">
+          <canvas id="donutChart"></canvas>
+        </div>
+        <div style="flex:1">
+          <div class="leg-item"><span style="display:flex;align-items:center"><span class="leg-dot" style="background:#6366f1"></span>&lt; 30 mins</span><span>18%</span></div>
+          <div class="leg-item"><span style="display:flex;align-items:center"><span class="leg-dot" style="background:#8b5cf6"></span>30 – 60 mins</span><span>32%</span></div>
+          <div class="leg-item"><span style="display:flex;align-items:center"><span class="leg-dot" style="background:#a78bfa"></span>1 – 2 hours</span><span>28%</span></div>
+          <div class="leg-item"><span style="display:flex;align-items:center"><span class="leg-dot" style="background:#f59e0b"></span>2 – 3 hours</span><span>14%</span></div>
+          <div class="leg-item"><span style="display:flex;align-items:center"><span class="leg-dot" style="background:#10b981"></span>&gt; 3 hours</span><span>8%</span></div>
+        </div>
+      </div>
+      <p style="text-align:center;font-size:11px;color:#7878a0;margin-top:10px">18,500 Total Reads</p>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-header"><span class="card-title">Reading Funnel</span></div>
+      <div class="funnel-bar">
+        <div class="funnel-row">
+          <span class="funnel-label">Book Opened</span>
+          <div class="funnel-track"><div class="funnel-fill" style="width:100%"></div></div>
+          <span class="funnel-val">18,500</span>
+        </div>
+        <div class="funnel-row">
+          <span class="funnel-label">Started Reading</span>
+          <div class="funnel-track"><div class="funnel-fill" style="width:92%"></div></div>
+          <span class="funnel-val">17,100 <span style="color:#7878a0">92%</span></span>
+        </div>
+        <div class="funnel-row">
+          <span class="funnel-label">Reached 50%</span>
+          <div class="funnel-track"><div class="funnel-fill" style="width:76%"></div></div>
+          <span class="funnel-val">14,200 <span style="color:#7878a0">76%</span></span>
+        </div>
+        <div class="funnel-row">
+          <span class="funnel-label">Reached 90%</span>
+          <div class="funnel-track"><div class="funnel-fill" style="width:59%"></div></div>
+          <span class="funnel-val">11,000 <span style="color:#7878a0">59%</span></span>
+        </div>
+        <div class="funnel-row">
+          <span class="funnel-label">Completed</span>
+          <div class="funnel-track"><div class="funnel-fill" style="width:53%"></div></div>
+          <span class="funnel-val">9,800 <span style="color:#7878a0">53%</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP BOOKS | DEMOGRAPHICS | DEVICES -->
+  <div class="three-col">
+    <div class="chart-card">
+      <div class="card-header">
+        <span class="card-title">Top Performing Books</span>
+        <a href="#" style="font-size:11px;color:#a78bfa;text-decoration:none">View All Books →</a>
+      </div>
+      <table class="books-table">
+        <thead>
+          <tr><th>Book</th><th>Reads</th><th>Completion</th><th>Rating</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Atomic Habits</td><td>1,250</td><td><div class="prog-bar"><div class="prog-fill" style="width:92%"></div></div></td><td>4.9 <span class="star">★</span></td></tr>
+          <tr><td>Deep Work</td><td>980</td><td><div class="prog-bar"><div class="prog-fill" style="width:89%"></div></div></td><td>4.8 <span class="star">★</span></td></tr>
+          <tr><td>Rich Dad Poor Dad</td><td>760</td><td><div class="prog-bar"><div class="prog-fill" style="width:86%"></div></div></td><td>4.7 <span class="star">★</span></td></tr>
+          <tr><td>Think and Grow Rich</td><td>640</td><td><div class="prog-bar"><div class="prog-fill" style="width:84%"></div></div></td><td>4.6 <span class="star">★</span></td></tr>
+          <tr><td>The 5 AM Club</td><td>520</td><td><div class="prog-bar"><div class="prog-fill" style="width:81%"></div></div></td><td>4.5 <span class="star">★</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-header"><span class="card-title">Reader Demographics</span></div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="width:90px;height:90px;flex-shrink:0">
+          <canvas id="demoChart"></canvas>
+        </div>
+        <div style="flex:1">
+          <div class="demo-row"><span style="color:#a0a0c0">18 – 24</span><div class="demo-bar"><div class="demo-fill" style="width:28%;background:#6366f1"></div></div><span>28%</span></div>
+          <div class="demo-row"><span style="color:#a0a0c0">25 – 34</span><div class="demo-bar"><div class="demo-fill" style="width:45%;background:#8b5cf6"></div></div><span>45%</span></div>
+          <div class="demo-row"><span style="color:#a0a0c0">35 – 44</span><div class="demo-bar"><div class="demo-fill" style="width:17%;background:#a78bfa"></div></div><span>17%</span></div>
+          <div class="demo-row"><span style="color:#a0a0c0">45+</span><div class="demo-bar"><div class="demo-fill" style="width:10%;background:#c4b5fd"></div></div><span>10%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-header"><span class="card-title">Reading Devices</span></div>
+      <div class="device-row">
+        <span style="color:#c0c0e0;min-width:70px">📱 Mobile</span>
+        <div class="device-bar"><div style="height:100%;background:#7c3aed;width:68%;border-radius:3px"></div></div>
+        <span style="color:#e0e0f0;font-weight:600">68%</span>
+      </div>
+      <div class="device-row">
+        <span style="color:#c0c0e0;min-width:70px">🖥 Desktop</span>
+        <div class="device-bar"><div style="height:100%;background:#60a5fa;width:22%;border-radius:3px"></div></div>
+        <span style="color:#e0e0f0;font-weight:600">22%</span>
+      </div>
+      <div class="device-row">
+        <span style="color:#c0c0e0;min-width:70px">📟 Tablet</span>
+        <div class="device-bar"><div style="height:100%;background:#34d399;width:10%;border-radius:3px"></div></div>
+        <span style="color:#e0e0f0;font-weight:600">10%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSIONS | RATINGS | LOCATIONS -->
+  <div class="bottom-row">
+    <div class="chart-card">
+      <div class="card-header"><span class="card-title">Reading Sessions</span></div>
+      <div class="session-stats">
+        <div class="sess-box">
+          <p>Avg. Session Time</p><h4>42 mins</h4>
+          <div class="stat-badge up" style="font-size:10px;justify-content:center">▲ 10%</div>
+        </div>
+        <div class="sess-box">
+          <p>Pages Per Session</p><h4>27</h4>
+          <div class="stat-badge up" style="font-size:10px;justify-content:center">▲ 6%</div>
+        </div>
+        <div class="sess-box">
+          <p>Avg. Daily Readers</p><h4>1,240</h4>
+          <div class="stat-badge up" style="font-size:10px;justify-content:center">▲ 11%</div>
+        </div>
+        <div class="sess-box">
+          <p>Return Reader Rate</p><h4>74%</h4>
+          <div class="stat-badge up" style="font-size:10px;justify-content:center">▲ 7%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-header"><span class="card-title">Ratings Distribution</span></div>
+      <div class="rating-row"><span class="rat-label"><span class="star">★</span> 5 Star</span><div class="rat-bar"><div class="rat-fill" style="width:68%"></div></div><span class="rat-val">68%</span></div>
+      <div class="rating-row"><span class="rat-label"><span class="star">★</span> 4 Star</span><div class="rat-bar"><div class="rat-fill" style="width:22%"></div></div><span class="rat-val">22%</span></div>
+      <div class="rating-row"><span class="rat-label"><span class="star">★</span> 3 Star</span><div class="rat-bar"><div class="rat-fill" style="width:7%"></div></div><span class="rat-val">7%</span></div>
+      <div class="rating-row"><span class="rat-label"><span class="star">★</span> 2 Star</span><div class="rat-bar"><div class="rat-fill" style="width:2%"></div></div><span class="rat-val">2%</span></div>
+      <div class="rating-row"><span class="rat-label"><span class="star">★</span> 1 Star</span><div class="rat-bar"><div class="rat-fill" style="width:1%"></div></div><span class="rat-val">1%</span></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-header"><span class="card-title">Top Reader Locations</span></div>
+      <div class="location-row"><div class="loc-name">🇳🇬 Nigeria</div><span class="loc-count">5,200</span><span class="loc-pct">41.8%</span></div>
+      <div class="location-row"><div class="loc-name">🇬🇭 Ghana</div><span class="loc-count">2,100</span><span class="loc-pct">16.9%</span></div>
+      <div class="location-row"><div class="loc-name">🇰🇪 Kenya</div><span class="loc-count">1,800</span><span class="loc-pct">14.5%</span></div>
+      <div class="location-row"><div class="loc-name">🇿🇦 South Africa</div><span class="loc-count">1,250</span><span class="loc-pct">10.0%</span></div>
+      <div class="location-row"><div class="loc-name">🇺🇸 United States</div><span class="loc-count">850</span><span class="loc-pct">6.8%</span></div>
+    </div>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+  /* ---- Trend Line Chart ---- */
+  const trendCtx = document.getElementById('trendChart').getContext('2d');
+  const dayLabels = Array.from({ length: 31 }, (_, i) => `May ${i + 1}`);
+  const trendData = [1200,1600,1900,1500,1800,2100,1950,2200,1700,2000,1400,1800,2050,1600,1900,2300,1750,2100,1500,1650,2000,1850,2250,1700,2100,2000,1800,1600,1900,2150,1950];
+  new Chart(trendCtx, {
+    type: 'line',
+    data: {
+      labels: dayLabels,
+      datasets: [{
+        data: trendData,
+        borderColor: '#7c3aed',
+        backgroundColor: 'rgba(124,58,237,0.15)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#a78bfa',
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#7878a0', font: { size: 10 }, maxTicksLimit: 7 }, grid: { color: '#1a1a2e' } },
+        y: { ticks: { color: '#7878a0', font: { size: 10 } }, grid: { color: '#1a1a2e' }, min: 0, max: 2500 }
+      }
+    }
+  });
+
+  /* ---- Reading Time Donut ---- */
+  const donutCtx = document.getElementById('donutChart').getContext('2d');
+  new Chart(donutCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['<30m', '30-60m', '1-2h', '2-3h', '>3h'],
+      datasets: [{
+        data: [18, 32, 28, 14, 8],
+        backgroundColor: ['#6366f1', '#8b5cf6', '#a78bfa', '#f59e0b', '#10b981'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      cutout: '70%'
+    }
+  });
+
+  /* ---- Demographics Donut ---- */
+  const demoCtx = document.getElementById('demoChart').getContext('2d');
+  new Chart(demoCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['18-24', '25-34', '35-44', '45+'],
+      datasets: [{
+        data: [28, 45, 17, 10],
+        backgroundColor: ['#6366f1', '#8b5cf6', '#a78bfa', '#c4b5fd'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      cutout: '65%'
+    }
+  });
+</script>
+</div>

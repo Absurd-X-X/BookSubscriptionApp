@@ -1,0 +1,51 @@
+﻿@using static Application.Queries.GetLibraryById
+@model GetLibraryByIdResponse
+
+@{
+
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewBag["Title"] = "Edit Library";
+}
+<link href="~/css/addCategory.css" rel="stylesheet" />
+<div class="category-page-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h2>Modify Library: @Model.Name</h2>
+            <p>Update the properties below to clean up your catalog classification rules.</p>
+        </div>
+
+        <form class="form" asp-controller="Admin" asp-action="EditLibrary" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" name="Id" value="@Model.Id" />
+
+            <div class="input-group">
+                <label for="Name">Library Name</label>
+                <input type="text" id="Name" name="Name"
+                     value="@Model.Name"  required autocomplete="off"/>
+            </div>
+
+            <div class="input-group">
+                <label for="Description">User Name (Optional)</label>
+                <input type="text" id="UserName" name="UserName" value="@Model.UserName">
+            </div>
+
+            <div class="input-group">
+                <label for="Email">Email</label>
+                <input type="text" id="Email" name="Email"
+                       value="@Model.Email" required autocomplete="off" />
+            </div>
+                
+
+            <div class="input-group">
+                <label for="PhoneNumber">Tel </label>
+                <input type="tel" id="PhoneNumber" name="PhoneNumber"
+                       value="@Model.PhoneNumber" required autocomplete="off"/>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="window.history.back()">Cancel</button>
+                <button type="submit" class="btn-primary">Save Library</button>
+            </div>
+        </form>
+    </div>
+</div>

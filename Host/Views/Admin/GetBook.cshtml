@@ -1,0 +1,80 @@
+﻿@using static Application.Queries.GetBookById
+@model GetBookByIdResponse
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "GetBook";
+}
+
+<link rel="stylesheet" href="~/css/getBook.css">
+
+<div class="book-details-wrapper">
+    <div class="details-header">
+        <div>
+            <span class="section-label">CONTENT MANAGEMENT</span>
+            <h2>BOOK PREVIEW</h2>
+        </div>
+        <div class="header-actions">
+            <button type="button" class="btn-secondary" onclick="window.history.back()">🔙 Back</button>
+            <a href="@Url.Action("DeleteBook", "Book", new { id = Model.BookId })" class="btn-primary">Remove Book</a>
+        </div>
+    </div>
+
+    <div class="profile-split-grid">
+
+        
+        <div class="profile-side-card">
+            <div class="cover-wrapper">
+                <img src="@Model.BookCoverUrl" alt="Book Cover" class="book-large-cover" />
+            </div>
+            <div class="side-meta-group">
+                <span class="meta-label">STATUS</span>
+                <span class="badge @(Model.IsActive ? "green" : "magenta")">
+                    @(Model.IsActive ? "Available" : "Restricted")
+                </span>
+            </div>
+            <div class="side-meta-group">
+                <span class="meta-label">TOTAL READS</span>
+                <h4 class="metric-value">500+</h4>
+            </div>
+        </div>
+
+        <div class="profile-main-card">
+            <div class="detail-section-header">
+                <h3>Core Catalog Metadata</h3>
+            </div>
+            
+            <div class="metadata-property-grid">
+                <div class="property-block">
+                    <span class="prop-label">Book Title</span>
+                    <p class="prop-value highlight">@Model.Title</p>
+                </div>
+                <div class="property-block">
+                    <span class="prop-label">Author Name</span>
+                    <p class="prop-value">@Model.Author</p>
+                </div>
+                <div class="property-block">
+                    <span class="prop-label">Category / Genre</span>
+                    <p class="prop-value">@Model.CategoryName</p>
+                </div>
+                <div class="property-block">
+                    <span class="prop-label">Date Published</span>
+                    <p class="prop-value">@Model.PublicationYear</p>
+                </div>
+
+                <div class="property-block">
+                    <span class="prop-label">Library</span>
+                    <p class="prop-value">@Model.PublicationYear</p>
+                </div>
+            </div>
+
+            <div class="detail-section-header" style="margin-top: 32px;">
+                <h3>Synopsis & Description</h3>
+            </div>
+            <div class="description-text-block">
+                <p>@Model.CategoryDescription</p>
+            </div>
+        </div>
+
+    </div>
+</div>

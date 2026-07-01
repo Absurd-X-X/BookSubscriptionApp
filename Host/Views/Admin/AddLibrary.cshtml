@@ -1,0 +1,134 @@
+﻿@using static Application.Command.AddLibrary
+@model AddLibraryCommand
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Add Library";
+}
+<link href="~/css/addCategory.css" rel="stylesheet" />
+<link href="~/css/notify.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/modal.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/toast.css" rel="stylesheet" asp-append-version="true" />
+
+<div id="toastNotification" class="toast-popup">
+        <div class="toast-icon-wrapper">
+
+            <svg id="toastSuccessIcon" class="toast-icon hidden" viewBox="0 0 24 24" fill="none" stroke="#24B35F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+
+            <svg id="toastErrorIcon" class="toast-icon hidden" viewBox="0 0 24 24" fill="none" stroke="#E74C3C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </div>
+        <span id="toastMessage"></span>
+    </div>
+
+<div class="category-page-container" style="border-top:1pc;">
+    <div class="form-card">
+        <div class="form-header">
+            <h2>Add New Library</h2>
+            <p>Create a library to facilitate users experience on your app</p>
+        </div>
+
+        <form class="form" id="loginForm" asp-action="AddLibrary" method="post">
+
+            <div class="input-group">
+                <label for="LibraryName">Library Name</label>
+                <input type="text" id="Name" name="Name"
+                       placeholder="e.g., Ade, Ola, Unilag" required />
+            </div>
+
+            <div class="input-group">
+                <label for="Description">User Name (Optional)</label>
+                <input type="text" id="UserName" name="UserName" placeholder="shorter name required">
+            </div>
+
+            <div class="input-group">
+                <label for="Email">Email</label>
+                <input type="text" id="Email" name="Email"
+                       placeholder="input a valid email" required />
+            </div>
+                
+            <div class="input-group">
+                <label asp-for="Password">Password</label>
+                <div class="password-wrapper">
+                    <input asp-for="Password" type="password" id="passwordInput" placeholder="Your password here..." required>
+                    <button type="button" id="togglePasswordBtn" class="toggle-password-btn" aria-label="Toggle password visibility">
+                        <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="#8A94A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                <span asp-validation-for="Password" class="validation-span"></span>
+            </div>
+
+            <div class="input-group">
+                <label for="PhoneNumber">Tel </label>
+                <input type="tel" id="PhoneNumber" name="PhoneNumber"
+                       placeholder="input valid tel" required />
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="window.history.back()">Cancel</button>
+                <button type="submit" class="btn-primary">Save Library</button>
+            </div>
+        </form>
+    </div>
+    <script src="~/js/toast.js"></script>
+    <script src="~/js/modal.js"></script>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+    const passwordInput = document.getElementById('passwordInput');
+    const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    togglePasswordBtn.addEventListener('click', function () {
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+
+        if (isPassword) {
+            eyeIcon.innerHTML = `
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+            `;
+        } else {
+            eyeIcon.innerHTML = `
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+            `;
+        }
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    Modal.show('loading', { title: 'Logging in...', message: 'Please wait.' });
+
+    try {
+    const response = await fetch('@Url.Action("AddLibrary", "Admin")', { method: 'POST', body: formData });
+    const data = await response.json();
+
+    if (data.success) {
+    Modal.show('success', { title: 'Welcome back!', message: 'You are now logged in.' });
+    setTimeout(() => window.location.href = data.redirectUrl, 1200);
+
+    } else if (data.redirectUrl) {
+    // e.g. "not verified" case — redirect instead of just showing an error
+    window.location.href = data.redirectUrl;
+    }
+
+    else {
+    Modal.show('error', { title: 'Login failed', message: data.message });
+    }
+    } catch (err) {
+    Modal.show('error', { title: 'Network error', message: 'Could not reach the server.' });
+    }
+    });
+</script>

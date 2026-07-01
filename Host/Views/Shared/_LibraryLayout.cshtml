@@ -1,0 +1,209 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SoulShelf Library</title>
+    <link rel="preconnect" href="googleapis.com">
+    <link rel="preconnect" href="gstatic.com" crossorigin>
+    <link href="googleapis.com" rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <link rel="stylesheet" href="~/css/libraryLayout.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo-opt">
+                <div class="logo-img">
+                    <img src="~/lib/images/mypics.jpg" alt="Alternate Text" />
+                </div>
+                <div class="contains-name">
+                    <p style="font-size: 14px; font-weight: 400;">Unilag Library</p>
+                    <small style="font-size: 11px; font-weight: 300; color : #cccecf">Library Admin </small>
+                </div>
+
+                <div class="chevron" onclick="toggleProfileMenu(event)">
+
+                    <img src="~/lib/images/chevron-down-outline.svg" class="icon arrow" id="chevronArrow" alt="More" />
+
+                    <ul id="profileDropdown" class="profile-dropdown-menu">
+                        <img src="~/lib/images/user-solid-full.svg" class="profile-image" alt="Profile">
+                        <li><a href="@Url.Action("Profile", "Admin")">My Profile</a></li>
+                        <li><a href="@Url.Action("Settings", "Admin")">Account Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a href="@Url.Action("Logout", "Account")" class="logout-link">Log Out</a></li>
+                    </ul>
+                </div>
+            </div>
+            <nav class="nav-links">
+
+                @{
+                    string controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+                    string action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+                }
+
+                <a href="@Url.Action("LibraryDashboard", "Library")"
+                   class="nav-item @(controller == "Library" && action == "LibraryDashboard" ? "active" : "")">
+                    <img src="~/lib/images/dashbord.png" alt="">DASHBOARD
+                </a>
+
+                <a href="@Url.Action("GetLibraryBooks", "Library")"
+                   class="nav-item @(controller == "Library" && (action == "GetLibraryBooks" || action == "AddBook" || action == "EditBook" || action == "GetLibraryBook") ? "active" : "")">
+                    <img src="~/lib/images/members.png" alt="Users">BOOKS
+                </a>
+
+                <a href="@Url.Action("GetCategories", "Admin")"
+                   class="nav-item @(controller == "Admin" && (action == "GetCategories" || action == "GetCategory") ? "active" : "")">
+                    <img src="~/lib/images/layer-group-solid-full.svg" alt="">CATEGORY MGT
+                </a>
+
+                <a href="@Url.Action("GetRevenue", "Library")"
+                   class="nav-item @(controller == "Library" && action == "GetRevenue" ? "active" : "")">
+                    <img src="~/lib/images/book-outline.svg" alt="">REVENUE
+                </a>
+
+                <a href="@Url.Action("Analysis", "Library")"
+                   class="nav-item @(controller == "Library" && action == "Analysis" ? "active" : "")">
+                    <img src="~/lib/images/sub.png" alt="">ANALYSIS
+                </a>
+
+                <a href="@Url.Action("GetReviews", "Library")"
+                   class="nav-item @(controller == "Library" && (action == "GetReviews" || action == "GetReview") ? "active" : "")">
+                    <img src="~/lib/images/libmgt.png" alt="">REVIEWS
+                </a>
+
+                <a href="@Url.Action("GetConversations", "Library")"
+                   class="nav-item @(controller == "Library" && action == "GetConversations" ? "active" : "")">
+                    <img src="~/lib/images/view message.png" alt="">MESSAGES
+                </a>
+
+                <a href="@Url.Action("GetNotifications", "Library")"
+                   class="nav-item @(controller == "Library" && action == "GetNotifications" ? "active" : "")">
+                    <img src="~/lib/images/view message.png" alt="">NOTIFICATIONS
+                </a>
+
+                <a href="@Url.Action("GetActivity", "Library")"
+                   class="nav-item @(controller == "Library" && action == "GetActivity" ? "active" : "")">
+                    <img src="~/lib/images/report.png" alt="">ACTIVITY
+                </a>
+
+                <a href="@Url.Action("GetWallet", "Library")"
+                   class="nav-item @(controller == "Library" && action == "GetWallet" ? "active" : "")">
+                    <img src="~/lib/images/pay.png" alt="">WALLET
+                </a>
+
+                <a href="@Url.Action("LibrarySettings", "Library")"
+                   class="nav-item @(controller == "Library" && action == "LibrarySettings" ? "active" : "")">
+                    <img src="~/lib/images/settings.png" alt="">SETTINGS
+                </a>
+            </nav>
+            <div class="under">
+                <div class="need-help">
+                    <div help-img>
+                        <img src="~/lib/images/user-solid-full.svg" class="icon" alt="Alternate Text" />
+                    </div>
+                    <div class="help">
+                        <p>Need Help?</p>
+                        <small>Contact Support</small>
+                    </div>
+                </div>
+
+                <div class="profile-again">
+                    <div class="role">
+                        <p>CEO</p>
+                        <small>Administrator</small>
+                    </div>
+                    <div class="profile-details dropup-style" onclick="toggleBottomMenu(event)">
+                        <img src="~/lib/images/user-solid-full.svg" class="profile-img" alt="Profile">
+                        <img src="~/lib/images/chevron-down-outline.svg" class="icon arrow" id="bottomChevronArrow" alt="More" />
+
+                        <ul id="bottomProfileDropdown" class="profile-dropdown-menu">
+                            <li><a href="@Url.Action("Profile", "Admin")">My Profile</a></li>
+                            <li><a href="@Url.Action("Settings", "Admin")">Account Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a href="@Url.Action("Logout", "Account")" class="logout-link">Log Out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        @* <header class="header">
+            <div>
+
+                <p class="welcome-text">Welcome back, Unilag Library 👋<p>
+                    <small>Here's what's happening with your library today.</small>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="text" placeholder="Search...">
+                    <img src="~/lib/images/search.svg" class="icon" alt="Search">
+                </div>
+                <img src="~/lib/images/notifications-outline.svg" class="icon" alt="Notification">
+
+                <div class="profile-details" onclick="toggleProfileMenu(event)">
+                    <img src="~/lib/images/user-solid-full.svg" class="profile-img icon" alt="Profile">
+
+                    <img src="~/lib/images/chevron-down-outline.svg" class="icon arrow" id="chevronArrow" alt="More" />
+
+                    <ul id="profileDropdown" class="profile-dropdown-menu">
+                        <img src="~/lib/images/user-solid-full.svg" class="profile-image" alt="Profile">
+                        <li><a href="@Url.Action("Profile", "Admin")">My Profile</a></li>
+                        <li><a href="@Url.Action("Settings", "Admin")">Account Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a href="@Url.Action("Logout", "Account")" class="logout-link">Log Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header> *@
+
+        <main class="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script>
+        function toggleProfileMenu(event) {
+        event.stopPropagation();
+        const menu = document.getElementById("profileDropdown");
+        const arrow = document.getElementById("chevronArrow");
+        menu.classList.toggle("show");
+        arrow.classList.toggle("rotate");
+        }
+
+        window.addEventListener("click", function () {
+        const menu = document.getElementById("profileDropdown");
+        const arrow = document.getElementById("chevronArrow");
+        if (menu && menu.classList.contains("show")) {
+        menu.classList.remove("show");
+        arrow.classList.remove("rotate");
+        }
+        });
+
+
+        function toggleBottomMenu(event) {
+        event.stopPropagation();
+        const menu = document.getElementById("bottomProfileDropdown");
+        const arrow = document.getElementById("bottomChevronArrow");
+
+        menu.classList.toggle("show");
+        arrow.classList.toggle("rotate");
+        }
+
+        window.addEventListener("click", function () {
+        const bottomMenu = document.getElementById("bottomProfileDropdown");
+        const bottomArrow = document.getElementById("bottomChevronArrow");
+        if (bottomMenu && bottomMenu.classList.contains("show")) {
+        bottomMenu.classList.remove("show");
+        bottomArrow.classList.remove("rotate");
+        }
+        });
+
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

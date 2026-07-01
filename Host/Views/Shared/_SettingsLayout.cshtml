@@ -1,0 +1,54 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<link rel="stylesheet" href="~/css/systemSettings.css" asp-append-version="true" />
+    <div class="setting-container">
+
+                @{
+                    string controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+                    string action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+                }
+
+            <!-- PAGE HEADER -->
+            <div class="page-header">
+                <div class="page-header-left">
+                    <h1>System Settings</h1>
+                    <p>Configure system-wide settings and platform preferences</p>
+                </div>
+                <div class="page-header-right">
+                    <div class="search-bar">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                        <input type="text" placeholder="Search settings..." />
+                    </div>
+                    <button class="btn-reset">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 .49-3.32" /></svg>
+                        Reset to Default
+                    </button>
+                    <button class="btn-save">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><polyline points="17 21 17 13 7 13 7 21" /><polyline points="7 3 7 8 15 8" /></svg>
+                        Save All Changes
+                    </button>
+                </div>
+            </div>
+
+        <main class="main">
+        <!-- TABS -->
+            <div class="tabs-wrap">
+                <div class="tabs">
+                    <a href="@Url.Action("Settings", "Admin")" 
+                    class="tab @(controller == "Admin" && action == "Settings" ? "active" : "")" style="text-decoration: none;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" /></svg>
+                        General
+                    </a>
+                    <a href="@Url.Action("SystemSettings", "Admin")" 
+                    class="tab @(controller == "Admin" && action == "SystemSettings" ? "active" : "")" style="text-decoration: none;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" /></svg>
+                        System
+                    </a>
+                </div>
+            </div>
+            @RenderBody()
+        </main>
+    </div>

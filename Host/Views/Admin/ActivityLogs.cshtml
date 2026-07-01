@@ -1,0 +1,323 @@
+﻿@using static Application.Queries.GetAllAuditLog
+@model Application.Common.Pagenation.PagenatedList<GetAllAuditLogResponse>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Activity";
+}
+<link href="~/css/activityLogs.css" rel="stylesheet" />
+<main class="main">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h1>Activity</h1>
+        <p>Monitor system activity, audit events and support tickets.</p>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-icon icon-blue">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>
+            </div>
+            <div>
+                <p class="stat-label">Total Activities</p>
+                <div class="stat-value-row"><span class="stat-value">1,245</span><span class="stat-change up">↑ 12.4%</span></div>
+                <p class="stat-sub">vs last 7 days</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-purple">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+            </div>
+            <div>
+                <p class="stat-label">Audit Events</p>
+                <div class="stat-value-row"><span class="stat-value">342</span><span class="stat-change up">↑ 8.7%</span></div>
+                <p class="stat-sub">vs last 7 days</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-amber">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg>
+            </div>
+            <div>
+                <p class="stat-label">Open Tickets</p>
+                <div class="stat-value-row"><span class="stat-value">28</span><span class="stat-change down">↓ 5.3%</span></div>
+                <p class="stat-sub">vs last 7 days</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-green">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+            </div>
+            <div>
+                <p class="stat-label">Resolved Tickets</p>
+                <div class="stat-value-row"><span class="stat-value">156</span><span class="stat-change up">↑ 15.8%</span></div>
+                <p class="stat-sub">vs last 7 days</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('activity', this)">Activity Logs</button>
+        <button class="tab" onclick="switchTab('audit', this)">Audit Logs</button>
+        <button class="tab" onclick="switchTab('support', this)">Support Tickets</button>
+    </div>
+
+    <!-- ══ ACTIVITY LOGS TAB ══ -->
+    <div id="tab-activity" class="tab-content">
+        <div class="filter-bar">
+            <div class="search-wrap">
+                <svg class="s-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                <input type="text" placeholder="Search activities..." />
+            </div>
+            <select class="f-select"><option>All Actions</option><option>Borrowed Book</option><option>Returned Book</option><option>Funded Wallet</option><option>Renewed Subscription</option><option>Paid Invoice</option></select>
+            <select class="f-select"><option>All Users</option><option>John Doe</option><option>Sarah Miller</option></select>
+            <select class="f-select"><option>All Libraries</option><option>Central Library</option><option>City Library</option><option>Westside Library</option></select>
+            <button class="date-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                Jun 2, 2025 – Jun 8, 2025
+            </button>
+            <button class="export-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                Export
+            </button>
+        </div>
+
+        <div class="table-card">
+            <table class="act-table">
+                <thead>
+                    <tr>
+                        <th style="width:44px;"></th>
+                        <th>Date &amp; Time</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Details</th>
+                        <th>Library</th>
+                        <th>IP Address</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in Model.Items)
+                    {
+                        <tr>
+                            <td><div class="act-icon icon-green"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg></div></td>
+                            <td><div class="dt-date">@log.Timestamp.ToString("MMM dd, yyyy")</div><div class="dt-time">@log.Timestamp.ToString("hh:mm tt")</div></td>
+                            @{
+                                string[] strings = { "jd", "sm", "la", "mt", "aw" };
+
+                                Random rand = new Random();
+
+                                string userInitials = strings[rand.Next(0, strings.Length)];
+
+                                string name = log.UserName;
+                                string[] nameParts = name.Split(' ');
+
+                                char firstInitial;
+                                char secondInitial;
+
+                                if (nameParts.Length < 2)
+                                {
+                                    firstInitial = nameParts[0][0];
+                                    secondInitial = nameParts[0][nameParts.Length - 1];
+                                }
+                                else
+                                {
+                                    firstInitial = nameParts[0][0];
+                                    secondInitial = nameParts[1][0];
+                                }
+                            }
+                            <td><div class="user-cell"><div class="user-avatar avatar-@userInitials">@firstInitial@secondInitial</div><div><div class="user-name">@name</div><div class="user-role">@log.Role</div></div></div></td>
+                            <td><span class="act-badge badge-borrowed">@log.ActionType</span></td>
+                            <td><div class="det-main">@log.Description</div><div class="det-sub">Due: @log.Timestamp.AddDays(14).ToString("MMM dd, yyyy")</div></td>
+                            <td><div class="lib-name">Soul Shelf</div><span class="lib-branch">Main Branch</span></td>
+                            <td><span class="ip-addr">197.159.112.45</span></td>
+                            <td><a href="@Url.Action("GetActivity", "Admin", new { id = log.Id })" class="view-btn" style="text-decoration: none;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg> View
+                            </a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @{
+                string isFirstDisabled = (Model.Page <= 1) ? "disabled" : "";
+                string isLastDisabled = (Model.Page >= Model.PageCount) ? "disabled" : "";
+            }
+
+            <div class="table-pagination-container">
+
+                <a asp-controller="Admin" asp-action="AuditLogs" asp-route-page="1" asp-route-pageSize="@Model.PageSize"
+                   class="page-item page-icon @isFirstDisabled">
+                    &#124;&lt;
+                </a>
+
+                <a asp-controller="Admin" asp-action="AuditLogs" asp-route-page="@(Model.Page - 1)" asp-route-pageSize="@Model.PageSize"
+                   class="page-item page-icon @isFirstDisabled">
+                    &lt;
+                </a>
+
+                @for (int i = 1; i <= Model.PageCount; i++)
+                {
+                    string isActive = (i == Model.Page) ? "active" : "";
+
+                    <a asp-controller="Admin" asp-action="AuditLogs" asp-route-page="@i" asp-route-pageSize="@Model.PageSize"
+                       class="page-item page-number @isActive">
+                        @i
+                    </a>
+                }
+
+                <a asp-controller="Admin" asp-action="AuditLogs" asp-route-page="@(Model.Page + 1)" asp-route-pageSize="@Model.PageSize"
+                   class="page-item page-icon @isLastDisabled">
+                    &gt;
+                </a>
+
+                <a asp-controller="Admin" asp-action="AuditLogs" asp-route-page="@Model.PageCount" asp-route-pageSize="@Model.PageSize"
+                   class="page-item page-icon @isLastDisabled">
+                    &gt;&#124;
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ AUDIT LOGS TAB ══ -->
+    <div id="tab-audit" class="tab-content" style="display:none;">
+        <div class="filter-bar">
+            <div class="search-wrap">
+                <svg class="s-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                <input type="text" placeholder="Search audit logs..." />
+            </div>
+            <select class="f-select"><option>All Actions</option><option>UPDATE</option><option>CREATE</option><option>DELETE</option><option>LOGIN</option></select>
+            <select class="f-select"><option>All Users</option><option>John Doe</option><option>Sarah Miller</option><option>Library Admin</option></select>
+            <select class="f-select"><option>All Libraries</option><option>Central Library</option><option>City Library</option><option>Westside Library</option></select>
+            <button class="date-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                Jun 2, 2025 – Jun 8, 2025
+            </button>
+            <button class="export-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                Export
+            </button>
+        </div>
+
+        <div class="table-card">
+            <table class="act-table">
+                <thead>
+                    <tr>
+                        <th>Date &amp; Time</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Module</th>
+                        <th>Entity</th>
+                        <th>Entity ID</th>
+                        <th>Details</th>
+                        <th>IP Address</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in Model.Items)
+                    {
+                        <tr>
+                            <td><div class="dt-date">@log.Timestamp.ToString("MMM dd, yyyy")</div><div class="dt-time">@log.Timestamp.ToString("hh:mm tt")</div></td>
+                            @{
+                                string[] strings = { "jd", "sm", "la", "mt", "aw" };
+
+                                Random rand = new Random();
+
+                                string userInitials = strings[rand.Next(0, strings.Length)];
+
+                                string name = log.UserName;
+                                string[] nameParts = name.Split(' ');
+
+                                char firstInitial;
+                                char secondInitial;
+
+                                if (nameParts.Length < 2)
+                                {
+                                    firstInitial = nameParts[0][0];
+                                    secondInitial = nameParts[0][nameParts.Length - 1];
+                                }
+
+                                else
+                                {
+
+                                    firstInitial = nameParts[0][0];
+                                    secondInitial = nameParts[1][0];
+                                }
+
+                            }
+                            <td><div class="user-cell"><div class="user-avatar avatar-@userInitials">@(firstInitial)@(secondInitial)</div><div><div class="user-name">@(log.UserName)</div><div class="user-role">@(log.UserRole)</div></div></div></td>
+                            <td><span class="audit-badge badge-create">CREATE</span></td>
+                            <td><div class="module-cell"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg> Support</div></td>
+                            <td>@log.ActionType</td>
+                            <td><span class="entity-id">TKT-2025-00231</span></td>
+                            <td><div class="det-main">@log.Description</div></td>
+                            <td><span class="ip-addr">197.159.112.48</span></td>
+                            <td><button class="view-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg> View</button></td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+
+            <div class="table-pagination-container">
+
+                <a asp-controller="Admin" asp-action="ActivityLogs" asp-route-page="1" asp-route-pageSize="@Model.PageSize"
+                   class="page-item page-icon @isFirstDisabled">
+                    &#124;&lt;
+                </a>
+
+                <a asp-controller="Admin" asp-action="ActivityLogs" asp-route-page="@(Model.Page - 1)" asp-route-pageSize="@Model.PageSize"
+                   class="page-item page-icon @isFirstDisabled">
+                    &lt;
+                </a>
+
+                @for (int i = 1; i <= Model.PageCount; i++)
+                {
+                    string isActive = (i == Model.Page) ? "active" : "";
+
+                    <a asp-controller="Admin" asp-action="ActivityLogs" asp-route-page="@i" asp-route-pageSize="@Model.PageSize"
+                       class="page-item page-number @isActive">
+                        @i
+                    </a>
+                }
+
+                <a asp-controller="Admin" asp-action="ActivityLogs" asp-route-page="@(Model.Page + 1)" asp-route-pageSize="@Model.PageSize"
+                   class="page-item page-icon @isLastDisabled">
+                    &gt;
+                </a>
+
+                <a asp-controller="Admin" asp-action="ActivityLogs" asp-route-page="@Model.PageCount" asp-route-pageSize="@Model.PageSize"
+                   class="page-item page-icon @isLastDisabled">
+                    &gt;&#124;
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ SUPPORT TICKETS TAB ══ -->
+    <div id="tab-support" class="tab-content" style="display:none;">
+        <div class="table-card">
+            <div class="empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                <p>Support Tickets coming soon</p>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + name).style.display = 'block';
+      btn.classList.add('active');
+    }
+</script>

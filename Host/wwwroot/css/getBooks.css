@@ -1,0 +1,71 @@
+﻿* {
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.table-container-card {
+    background-color: #0E1326;
+    border: 1px solid #161D33;
+    border-radius: 8px;
+    padding: 2pc;
+    width: 100%;
+}
+
+.table-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+    .table-header-row a {
+        padding: 10px 1pc;
+        background-color: #12182E;
+        text-decoration:none;
+    }
+    .dashboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #12182E;
+    }
+
+    .dashboard-table thead th {
+        color: #D2D6DC;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 12px;
+        border-bottom: 1px solid #777a83;
+    }
+
+    .dashboard-table tbody td {
+        padding: 16px 12px;
+        color: #D2D6DC;
+        font-size: 13px;
+        border-bottom: 1px solid #777a83;
+    }
+
+        .dashboard-table tbody td:last-child,
+        .dashboard-table thead th:last-child {
+            border-right: none;
+        }
+
+.book-title-cell {
+    color: #60A5FA !important;
+    font-weight: 500;
+}
+
+.engagement-cell {
+    width: 160px;
+}
+
+.progress-track {
+    background-color: #12182E;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.progress-fill {
+    background-color: #1EA7C4;
+    height: 100%;
+}

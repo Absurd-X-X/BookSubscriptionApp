@@ -1,0 +1,541 @@
+﻿@{
+    ViewData["Title"] = "My Collection";
+    ViewData["ScrollPage"] = "mycollection";
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+}
+<link href="~/css/readerCollection.css" rel="stylesheet" />
+
+<div class="page-header">
+    <h1>My Collection</h1>
+    <p>All the books you've saved and want to read.</p>
+</div>
+
+<!-- Favorites -->
+<section class="page-section" id="section-favorites" data-hash="#section-favorites" data-page="mycollection">
+    <div class="section-header-row">
+        <div>
+            <div class="section-heading">
+                <i class="ti ti-heart-filled" style="color:#FF5C8A"></i>
+                <h2>Favorites</h2>
+            </div>
+            <div class="section-sub">Books you love and want to read again.</div>
+        </div>
+        <div class="section-header-right">
+            <a href="#" class="view-all">View all</a>
+            <span class="section-count-pill">24 books</span>
+            <div class="carousel-nav" data-carousel-controls="favorites-grid">
+                <button class="carousel-nav-btn" data-carousel-prev="favorites-grid"><i class="ti ti-chevron-left"></i></button>
+                <button class="carousel-nav-btn" data-carousel-next="favorites-grid"><i class="ti ti-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="book-grid" data-carousel="favorites-grid">
+
+            <!-- Book 1 -->
+            <div class="collection-book-card">
+                <div class="collection-book-cover-wrap">
+                    <img class="collection-book-cover" src="" alt="Atomic Habits cover" />
+                    <button class="collection-cover-badge filled" data-favorite-toggle aria-label="Toggle favorite"><i class="ti ti-heart-filled"></i></button>
+                </div>
+                <div class="collection-book-title">Atomic Habits</div>
+                <div class="collection-book-author">James Clear</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.8</span>
+                </div>
+            </div>
+
+            <!-- Book 2 -->
+            <div class="collection-book-card">
+                <div class="collection-book-cover-wrap">
+                    <img class="collection-book-cover" src="" alt="The Power of Habit cover" />
+                    <button class="collection-cover-badge filled" data-favorite-toggle aria-label="Toggle favorite"><i class="ti ti-heart-filled"></i></button>
+                </div>
+                <div class="collection-book-title">The Power of Habit</div>
+                <div class="collection-book-author">Charles Duhigg</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.6</span>
+                </div>
+            </div>
+
+            <!-- Book 3 -->
+            <div class="collection-book-card">
+                <div class="collection-book-cover-wrap">
+                    <img class="collection-book-cover" src="" alt="Make Your Bed cover" />
+                    <button class="collection-cover-badge filled" data-favorite-toggle aria-label="Toggle favorite"><i class="ti ti-heart-filled"></i></button>
+                </div>
+                <div class="collection-book-title">Make Your Bed</div>
+                <div class="collection-book-author">William H. McRaven</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.7</span>
+                </div>
+            </div>
+
+            <!-- Book 4 -->
+            <div class="collection-book-card">
+                <div class="collection-book-cover-wrap">
+                    <img class="collection-book-cover" src="" alt="Mindset cover" />
+                    <button class="collection-cover-badge filled" data-favorite-toggle aria-label="Toggle favorite"><i class="ti ti-heart-filled"></i></button>
+                </div>
+                <div class="collection-book-title">Mindset</div>
+                <div class="collection-book-author">Carol S. Dweck</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.6</span>
+                </div>
+            </div>
+
+            <!-- Book 5 -->
+            <div class="collection-book-card">
+                <div class="collection-book-cover-wrap">
+                    <img class="collection-book-cover" src="" alt="Deep Work cover" />
+                    <button class="collection-cover-badge filled" data-favorite-toggle aria-label="Toggle favorite"><i class="ti ti-heart-filled"></i></button>
+                </div>
+                <div class="collection-book-title">Deep Work</div>
+                <div class="collection-book-author">Cal Newport</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.3</span>
+                </div>
+            </div>
+
+            <!-- Book 6 -->
+            <div class="collection-book-card">
+                <div class="collection-book-cover-wrap">
+                    <img class="collection-book-cover" src="" alt="The Creative Act cover" />
+                    <button class="collection-cover-badge filled" data-favorite-toggle aria-label="Toggle favorite"><i class="ti ti-heart-filled"></i></button>
+                </div>
+                <div class="collection-book-title">The Creative Act</div>
+                <div class="collection-book-author">Rick Rubin</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.7</span>
+                </div>
+            </div>
+
+            <div class="collection-book-card">
+                <div class="collection-book-cover-wrap">
+                    <img class="collection-book-cover" src="" alt="The Creative Act cover" />
+                    <button class="collection-cover-badge filled" data-favorite-toggle aria-label="Toggle favorite"><i class="ti ti-heart-filled"></i></button>
+                </div>
+                <div class="collection-book-title">The Creative Act</div>
+                <div class="collection-book-author">Rick Rubin</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.7</span>
+                </div>
+            </div>
+
+             <div class="collection-book-card">
+                <div class="collection-book-cover-wrap">
+                    <img class="collection-book-cover" src="" alt="The Creative Act cover" />
+                    <button class="collection-cover-badge filled" data-favorite-toggle aria-label="Toggle favorite"><i class="ti ti-heart-filled"></i></button>
+                </div>
+                <div class="collection-book-title">The Creative Act</div>
+                <div class="collection-book-author">Rick Rubin</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.7</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Bookmarks -->
+<section class="page-section" id="section-bookmarks" data-hash="#section-bookmarks" data-page="mycollection">
+    <div class="section-header-row">
+        <div>
+            <div class="section-heading">
+                <i class="ti ti-bookmark-filled" style="color:#7C6AFF"></i>
+                <h2>Bookmarks</h2>
+            </div>
+            <div class="section-sub">Important pages and passages you've saved.</div>
+        </div>
+        <div class="section-header-right">
+            <a href="#" class="view-all">View all</a>
+            <span class="section-count-pill">32 bookmarks</span>
+            <div class="carousel-nav" data-carousel-controls="bookmarks-table">
+                <button class="carousel-nav-btn" data-carousel-prev="bookmarks-table"><i class="ti ti-chevron-left"></i></button>
+                <button class="carousel-nav-btn" data-carousel-next="bookmarks-table"><i class="ti ti-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="bookmarks-table-wrap" data-carousel="bookmarks-table">
+            <table class="bookmarks-table">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Bookmark</th>
+                        <th>Note</th>
+                        <th>Date Added</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="bookmark-book-cell">
+                                <img class="bookmark-book-thumb" src="" alt="Atomic Habits cover" />
+                                <div>
+                                    <div class="bookmark-book-name">Atomic Habits</div>
+                                    <div class="bookmark-book-author">James Clear</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="bookmark-page-cell"><i class="ti ti-bookmark-filled"></i> Page 45</div>
+                            <div class="bookmark-quote">"You do not rise to the level of your goals. You fall to the level of your systems."</div>
+                        </td>
+                        <td><span class="bookmark-note-tag">Core reminder</span></td>
+                        <td><div class="bookmark-date">May 12, 2024<br>10:30 AM</div></td>
+                        <td>
+                            <div class="dots-menu-wrap">
+                                <button class="dots-btn" data-dots-toggle><i class="ti ti-dots-vertical"></i></button>
+                                <ul class="dots-menu">
+                                    <li><a href="#"><i class="ti ti-edit"></i>Edit Note</a></li>
+                                    <li><a href="#"><i class="ti ti-share"></i>Share</a></li>
+                                    <li class="danger"><button type="button"><i class="ti ti-trash"></i>Remove</button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="bookmark-book-cell">
+                                <img class="bookmark-book-thumb" src="" alt="The 5 AM Club cover" />
+                                <div>
+                                    <div class="bookmark-book-name">The 5 AM Club</div>
+                                    <div class="bookmark-book-author">Robin Sharma</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="bookmark-page-cell"><i class="ti ti-bookmark-filled"></i> Page 112</div>
+                            <div class="bookmark-quote">"Own your morning. Elevate your life."</div>
+                        </td>
+                        <td><span class="bookmark-note-tag">Morning routine</span></td>
+                        <td><div class="bookmark-date">May 11, 2024<br>8:15 AM</div></td>
+                        <td>
+                            <div class="dots-menu-wrap">
+                                <button class="dots-btn" data-dots-toggle><i class="ti ti-dots-vertical"></i></button>
+                                <ul class="dots-menu">
+                                    <li><a href="#"><i class="ti ti-edit"></i>Edit Note</a></li>
+                                    <li><a href="#"><i class="ti ti-share"></i>Share</a></li>
+                                    <li class="danger"><button type="button"><i class="ti ti-trash"></i>Remove</button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="bookmark-book-cell">
+                                <img class="bookmark-book-thumb" src="" alt="Think Again cover" />
+                                <div>
+                                    <div class="bookmark-book-name">Think Again</div>
+                                    <div class="bookmark-book-author">Adam Grant</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="bookmark-page-cell"><i class="ti ti-bookmark-filled"></i> Page 167</div>
+                            <div class="bookmark-quote">"The mark of a thoughtful mind is not how much you know, but how open you are to reconsidering what you believe."</div>
+                        </td>
+                        <td><span class="bookmark-note-tag">Mindset</span></td>
+                        <td><div class="bookmark-date">May 10, 2024<br>6:40 PM</div></td>
+                        <td>
+                            <div class="dots-menu-wrap">
+                                <button class="dots-btn" data-dots-toggle><i class="ti ti-dots-vertical"></i></button>
+                                <ul class="dots-menu">
+                                    <li><a href="#"><i class="ti ti-edit"></i>Edit Note</a></li>
+                                    <li><a href="#"><i class="ti ti-share"></i>Share</a></li>
+                                    <li class="danger"><button type="button"><i class="ti ti-trash"></i>Remove</button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="bookmark-book-cell">
+                                <img class="bookmark-book-thumb" src="" alt="The Subtle Art of Not Giving a F*ck cover" />
+                                <div>
+                                    <div class="bookmark-book-name">The Subtle Art of Not Giving a F*ck</div>
+                                    <div class="bookmark-book-author">Mark Manson</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="bookmark-page-cell"><i class="ti ti-bookmark-filled"></i> Page 23</div>
+                            <div class="bookmark-quote">"You can't be happy all the time. But you can be rational."</div>
+                        </td>
+                        <td><span class="bookmark-note-tag">Perspective</span></td>
+                        <td><div class="bookmark-date">May 8, 2024<br>9:20 AM</div></td>
+                        <td>
+                            <div class="dots-menu-wrap">
+                                <button class="dots-btn" data-dots-toggle><i class="ti ti-dots-vertical"></i></button>
+                                <ul class="dots-menu">
+                                    <li><a href="#"><i class="ti ti-edit"></i>Edit Note</a></li>
+                                    <li><a href="#"><i class="ti ti-share"></i>Share</a></li>
+                                    <li class="danger"><button type="button"><i class="ti ti-trash"></i>Remove</button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <a href="#" class="view-more-btn">View all bookmarks</a>
+    </div>
+</section>
+
+<!-- Reading List -->
+<section class="page-section" id="section-reading-list" data-hash="#section-reading-list" data-page="mycollection">
+    <div class="section-header-row">
+        <div>
+            <div class="section-heading">
+                <i class="ti ti-list" style="color:#7C6AFF"></i>
+                <h2>Reading List</h2>
+            </div>
+            <div class="section-sub">Books you want to read later.</div>
+        </div>
+        <div class="section-header-right">
+            <a href="#" class="view-all">View all</a>
+            <span class="section-count-pill">18 books</span>
+            <div class="carousel-nav" data-carousel-controls="readinglist-grid">
+                <button class="carousel-nav-btn" data-carousel-prev="readinglist-grid"><i class="ti ti-chevron-left"></i></button>
+                <button class="carousel-nav-btn" data-carousel-next="readinglist-grid"><i class="ti ti-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="readinglist-grid" data-carousel="readinglist-grid">
+
+            <!-- Book 1 -->
+            <div class="readinglist-book-card">
+                <img class="readinglist-book-cover" src="" alt="Sapiens cover" />
+                <div class="readinglist-book-title">Sapiens</div>
+                <div class="readinglist-book-author">Yuval Noah Harari</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.7</span>
+                </div>
+                <button class="btn-add-list" data-add-to-list><i class="ti ti-plus"></i> Add to List</button>
+            </div>
+
+            <!-- Book 2 -->
+            <div class="readinglist-book-card">
+                <img class="readinglist-book-cover" src="" alt="The Psychology of Money cover" />
+                <div class="readinglist-book-title">The Psychology of Money</div>
+                <div class="readinglist-book-author">Morgan Housel</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.6</span>
+                </div>
+                <button class="btn-add-list" data-add-to-list><i class="ti ti-plus"></i> Add to List</button>
+            </div>
+
+            <!-- Book 3 -->
+            <div class="readinglist-book-card">
+                <img class="readinglist-book-cover" src="" alt="The 48 Laws of Power cover" />
+                <div class="readinglist-book-title">The 48 Laws of Power</div>
+                <div class="readinglist-book-author">Robert Greene</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.6</span>
+                </div>
+                <button class="btn-add-list" data-add-to-list><i class="ti ti-plus"></i> Add to List</button>
+            </div>
+
+            <!-- Book 4 -->
+            <div class="readinglist-book-card">
+                <img class="readinglist-book-cover" src="" alt="Thinking, Fast and Slow cover" />
+                <div class="readinglist-book-title">Thinking, Fast and Slow</div>
+                <div class="readinglist-book-author">Daniel Kahneman</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.6</span>
+                </div>
+                <button class="btn-add-list" data-add-to-list><i class="ti ti-plus"></i> Add to List</button>
+            </div>
+
+            <!-- Book 5 -->
+            <div class="readinglist-book-card">
+                <img class="readinglist-book-cover" src="" alt="The One Thing cover" />
+                <div class="readinglist-book-title">The One Thing</div>
+                <div class="readinglist-book-author">Gary Keller</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.5</span>
+                </div>
+                <button class="btn-add-list" data-add-to-list><i class="ti ti-plus"></i> Add to List</button>
+            </div>
+
+            <!-- Book 6 -->
+            <div class="readinglist-book-card">
+                <img class="readinglist-book-cover" src="" alt="Tools of Titans cover" />
+                <div class="readinglist-book-title">Tools of Titans</div>
+                <div class="readinglist-book-author">Tim Ferriss</div>
+                <div class="star-rating">
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i>
+                    <i class="ti ti-star-half-filled"></i>
+                    <span>4.6</span>
+                </div>
+                <button class="btn-add-list" data-add-to-list><i class="ti ti-plus"></i> Add to List</button>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Quote Banner -->
+<section class="page-section" id="section-quote" data-hash="#section-quote" data-page="mycollection">
+    <div class="collection-quote-banner">
+        <i class="ti ti-sparkles collection-quote-star"></i>
+        <div>
+            <div class="collection-quote-text">"A room without books is like a body without a soul."</div>
+            <div class="collection-quote-author">— Marcus Tullius Cicero</div>
+        </div>
+        <div class="collection-quote-illus">📖</div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ── Carousel arrows: scroll the matching [data-carousel] track ──
+        function initCarousels() {
+            document.querySelectorAll('[data-carousel]').forEach(function (track) {
+                var key = track.getAttribute('data-carousel');
+                var prevBtn = document.querySelector('[data-carousel-prev="' + key + '"]');
+                var nextBtn = document.querySelector('[data-carousel-next="' + key + '"]');
+                if (!prevBtn || !nextBtn) return;
+
+                function step() {
+                    // Scroll by roughly one card/column width (falls back to 75% of visible width)
+                    var firstChild = track.children[0];
+                    return firstChild ? firstChild.getBoundingClientRect().width + 18 : track.clientWidth * 0.75;
+                }
+
+                function updateButtons() {
+                    var maxScroll = track.scrollWidth - track.clientWidth;
+                    prevBtn.disabled = track.scrollLeft <= 2;
+                    nextBtn.disabled = track.scrollLeft >= maxScroll - 2;
+                }
+
+                prevBtn.addEventListener('click', function () {
+                    track.scrollBy({ left: -step(), behavior: 'smooth' });
+                });
+                nextBtn.addEventListener('click', function () {
+                    track.scrollBy({ left: step(), behavior: 'smooth' });
+                });
+                track.addEventListener('scroll', updateButtons);
+                window.addEventListener('resize', updateButtons);
+
+                updateButtons();
+            });
+        }
+
+        // ── Favorite heart toggle on book covers ──
+        function initFavoriteToggles() {
+            document.querySelectorAll('[data-favorite-toggle]').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    btn.classList.toggle('filled');
+                    var icon = btn.querySelector('i');
+                    if (icon) {
+                        icon.classList.toggle('ti-heart-filled');
+                        icon.classList.toggle('ti-heart');
+                    }
+                });
+            });
+        }
+
+        // ── Add to List toggle ──
+        function initAddToList() {
+            document.querySelectorAll('[data-add-to-list]').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var added = btn.classList.toggle('added');
+                    var icon = btn.querySelector('i');
+                    if (added) {
+                        if (icon) icon.className = 'ti ti-check';
+                        btn.lastChild.textContent = ' Added';
+                    } else {
+                        if (icon) icon.className = 'ti ti-plus';
+                        btn.lastChild.textContent = ' Add to List';
+                    }
+                });
+            });
+        }
+
+        // ── Dots dropdown menus (bookmarks rows) ──
+        function initDotsMenus() {
+            var openMenu = null;
+
+            function closeOpenMenu() {
+                if (openMenu) {
+                    openMenu.classList.remove('show');
+                    openMenu = null;
+                }
+            }
+
+            document.querySelectorAll('[data-dots-toggle]').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    var menu = btn.parentElement.querySelector('.dots-menu');
+                    if (!menu) return;
+                    var isOpen = menu.classList.contains('show');
+                    closeOpenMenu();
+                    if (!isOpen) {
+                        menu.classList.add('show');
+                        openMenu = menu;
+                    }
+                });
+            });
+
+            window.addEventListener('click', closeOpenMenu);
+        }
+
+        initCarousels();
+        initFavoriteToggles();
+        initAddToList();
+        initDotsMenus();
+    });
+</script>
+
+

@@ -1,0 +1,332 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SoulShelf - Reader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    <link href="~/css/readerLayout.css" rel="stylesheet" />
+
+</head>
+<body>
+    @{
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+        var scrollPage = ViewData["ScrollPage"]?.ToString() ?? "";
+
+        string IsActive(string action, string controller = "Reader")
+            => (currentAction == action && currentController == controller) ? "active" : "";
+    }
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                Atomic Habits
+                <span>Reader</span>
+            </div>
+
+            <nav class="nav-links">
+
+                <a href="@Url.Action("ReaderDashboard", "Reader")" class="nav-item @IsActive("ReaderDashboard")">
+                    <i class="ti ti-layout-dashboard" aria-hidden="true"></i>DASHBOARD
+                </a>
+
+                <!-- BOOKS group -->
+                <button type="button" class="nav-group-toggle" data-group="books" aria-expanded="true">
+                    <span class="nav-group-title">BOOKS</span>
+                    <i class="ti ti-chevron-down group-arrow" aria-hidden="true"></i>
+                </button>
+                <div class="nav-group" data-group-panel="books">
+                    <div class="nav-group-inner">
+                        <a href="@Url.Action("ReaderBooks", "Reader")#section-hero"
+                           class="nav-item nav-subitem @IsActive("ReaderBooks")" data-hash="#section-hero" data-page="books">
+                            <i class="ti ti-books" aria-hidden="true"></i>Library
+                        </a>
+                        <a href="@Url.Action("ReaderBooks", "Reader")#section-categories" class="nav-item nav-subitem" data-hash="#section-categories" data-page="books">
+                            <i class="ti ti-category" aria-hidden="true"></i>Categories
+                        </a>
+                        <a href="@Url.Action("ReaderBooks", "Reader")#section-new-arrivals" class="nav-item nav-subitem" data-hash="#section-new-arrivals" data-page="books">
+                            <i class="ti ti-sparkles" aria-hidden="true"></i>New Arrivals
+                        </a>
+                        <a href="@Url.Action("ReaderBooks", "Reader")#section-recommended" class="nav-item nav-subitem" data-hash="#section-recommended" data-page="books">
+                            <i class="ti ti-thumb-up" aria-hidden="true"></i>Recommended
+                        </a>
+                        <a href="@Url.Action("ReaderBooks", "Reader")#section-popular" class="nav-item nav-subitem" data-hash="#section-popular" data-page="books">
+                            <i class="ti ti-trending-up" aria-hidden="true"></i>Popular
+                        </a>
+                    </div>
+                </div>
+
+                <!-- MY READING group -->
+                <button type="button" class="nav-group-toggle" data-group="myreading" aria-expanded="true">
+                    <span class="nav-group-title">MY READING</span>
+                    <i class="ti ti-chevron-down group-arrow" aria-hidden="true"></i>
+                </button>
+                <div class="nav-group" data-group-panel="myreading">
+                    <div class="nav-group-inner">
+                        <a href="@Url.Action("ReadingProgress", "Reader")#section-currently-reading" class="nav-item nav-subitem @IsActive("ReadingProgress ")" data-hash="#section-currently-reading" data-page="myreading">
+                            <i class="ti ti-book-2" aria-hidden="true"></i>Currently Reading
+                        </a>
+                        <a href="@Url.Action("ReadingProgress", "Reader")#section-completed-books" class="nav-item nav-subitem" data-hash="#section-completed-books" data-page="myreading">
+                            <i class="ti ti-circle-check" aria-hidden="true"></i>Completed Books
+                        </a>
+                        <a href="@Url.Action("ReadingProgress", "Reader")#section-reading-history" class="nav-item nav-subitem" data-hash="#section-reading-history" data-page="myreading">
+                            <i class="ti ti-history" aria-hidden="true"></i>Reading History
+                        </a>
+                        <a href="@Url.Action("ReadingProgress", "Reader")#section-reading-progress" class="nav-item nav-subitem" data-hash="#section-reading-progress" data-page="myreading">
+                            <i class="ti ti-progress" aria-hidden="true"></i>Reading Progress
+                        </a>
+                    </div>
+                </div>
+
+                <!-- MY COLLECTION group -->
+                <button type="button" class="nav-group-toggle" data-group="mycollection" aria-expanded="true">
+                    <span class="nav-group-title">MY COLLECTION</span>
+                    <i class="ti ti-chevron-down group-arrow" aria-hidden="true"></i>
+                </button>
+                <div class="nav-group" data-group-panel="mycollection">
+                    <div class="nav-group-inner">
+                        <a href="@Url.Action("ReaderCollection", "Reader")#section-favorites" class="nav-item nav-subitem @IsActive("ReaderCollection")" data-hash="#section-favorites" data-page="mycollection">
+                            <i class="ti ti-heart" aria-hidden="true"></i>Favorites
+                        </a>
+                        <a href="@Url.Action("ReaderCollection", "Reader")#section-bookmarks" class="nav-item nav-subitem" data-hash="#section-bookmarks" data-page="mycollection">
+                            <i class="ti ti-bookmark" aria-hidden="true"></i>Bookmarks
+                        </a>
+                        <a href="@Url.Action("ReaderCollection", "Reader")#section-reading-list" class="nav-item nav-subitem" data-hash="#section-reading-list" data-page="mycollection">
+                            <i class="ti ti-list" aria-hidden="true"></i>Reading List
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ENGAGEMENT group -->
+                <button type="button" class="nav-group-toggle" data-group="engagement" aria-expanded="true">
+                    <span class="nav-group-title">ENGAGEMENT</span>
+                    <i class="ti ti-chevron-down group-arrow" aria-hidden="true"></i>
+                </button>
+                <div class="nav-group" data-group-panel="engagement">
+                    <div class="nav-group-inner">
+                        <a href="@Url.Action("ReaderEngagement", "Reader")#section-reviews" class="nav-item nav-subitem @IsActive("ReaderEngagement")" data-hash="#section-reviews" data-page="myengagement">
+                            <i class="ti ti-star" aria-hidden="true"></i>Reviews
+                        </a>
+                        <a href="@Url.Action("ReaderEngagement", "Reader")#section-notifications" class="nav-item nav-subitem nav-subitem-badge" data-hash="#section-notifications" data-page="myengagement">
+                            <i class="ti ti-bell" aria-hidden="true"></i>Notifications
+                            <span class="badge">8</span>
+                        </a>
+                        <a href="@Url.Action("ReaderEngagement", "Reader")#section-analytics" class="nav-item nav-subitem" data-hash="#section-analytics" data-page="myengagement">
+                            <i class="ti ti-chart-bar" aria-hidden="true"></i>Analytics
+                        </a>
+                        <a href="@Url.Action("ReaderEngagement", "Reader")#section-reviews" class="nav-item nav-subitem" data-hash="#section-reviews" data-page="myengagement">
+                            <i class="ti ti-headset" aria-hidden="true"></i>Support
+                        </a>
+                    </div>
+                </div>
+
+                <!-- BILLING group -->
+                <button type="button" class="nav-group-toggle" data-group="billing" aria-expanded="true">
+                    <span class="nav-group-title">BILLING</span>
+                    <i class="ti ti-chevron-down group-arrow" aria-hidden="true"></i>
+                </button>
+                <div class="nav-group" data-group-panel="billing">
+                    <div class="nav-group-inner">
+                        <a href="@Url.Action("ReaderBilling", "Reader")#section-wallet" class="nav-item nav-subitem @IsActive("ReaderBilling")" data-hash="#section-wallet" data-page="billing">
+                            <i class="ti ti-wallet" aria-hidden="true"></i>Wallet
+                        </a>
+                        <a href="@Url.Action("ReaderBilling", "Reader")#section-subscription" class="nav-item nav-subitem" data-hash="#section-subscription" data-page="billing">
+                            <i class="ti ti-credit-card" aria-hidden="true"></i>Subscription
+                        </a>
+                    </div>
+                </div>
+
+                <!-- PERSONAL group -->
+                <button type="button" class="nav-group-toggle" data-group="personal" aria-expanded="true">
+                    <span class="nav-group-title">PERSONAL</span>
+                    <i class="ti ti-chevron-down group-arrow" aria-hidden="true"></i>
+                </button>
+                <div class="nav-group" data-group-panel="personal">
+                    <div class="nav-group-inner">
+                        <a href="@Url.Action("ReaderPersonal", "Reader")#section-profile" class="nav-item nav-subitem @IsActive("ReaderPersonal")" data-hash="#section-profile" data-page="personal">
+                            <i class="ti ti-user" aria-hidden="true"></i>Profile
+                        </a>
+                        <a href="@Url.Action("ReaderPersonal", "Reader")#section-preferences" class="nav-item nav-subitem" data-hash="#section-preferences" data-page="personal">
+                            <i class="ti ti-settings" aria-hidden="true"></i>Settings
+                        </a>
+                        <a href="#" class="nav-item nav-subitem logout-link">
+                            <i class="ti ti-logout" aria-hidden="true"></i>Logout
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+        </aside>
+
+        @* <header class="header">
+            <div class="search-box">
+                <i class="ti ti-search" aria-hidden="true"></i>
+                <input type="text" placeholder="Search books, authors, categories...">
+            </div>
+            <div class="header-right">
+                <div class="notif-wrap">
+                    <i class="ti ti-bell" aria-hidden="true"></i>
+                    <span class="notif-badge">8</span>
+                </div>
+
+                <div class="profile-details" onclick="toggleProfileMenu(event)">
+                    <div class="profile-avatar">
+                        <i class="ti ti-user" aria-hidden="true"></i>
+                    </div>
+                    <span class="profile-name">John Doe</span>
+                    <i class="ti ti-chevron-down chevron-arrow" id="chevronArrow" aria-hidden="true"></i>
+
+                    <ul id="profileDropdown" class="profile-dropdown-menu">
+                        <li><a href="#">My Profile</a></li>
+                        <li><a href="#">Account Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a href="#" class="logout-link">Log Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header> *@
+
+        <main class="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script>
+            (function () {
+                const STORAGE_KEY = "sidebarGroupState";
+
+                function readState() {
+                    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+                    catch (e) { return {}; }
+                }
+
+                function writeState(state) {
+                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+                    catch (e) {}
+                }
+
+                function setGroupOpen(toggleBtn, panel, isOpen) {
+                    toggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+                    panel.classList.toggle("open", isOpen);
+                }
+
+                document.addEventListener("DOMContentLoaded", function () {
+                    const toggles = document.querySelectorAll(".nav-group-toggle");
+                    const state = readState();
+
+                    toggles.forEach(function (toggle) {
+                        const groupName = toggle.getAttribute("data-group");
+                        const panel = document.querySelector('[data-group-panel="' + groupName + '"]');
+                        if (!panel) return;
+
+                        const isActiveGroup = toggle.classList.contains("active");
+                        let isOpen;
+                        if (isActiveGroup) {
+                            isOpen = true;
+                        } else if (Object.prototype.hasOwnProperty.call(state, groupName)) {
+                            isOpen = state[groupName];
+                        } else {
+                            isOpen = true;
+                        }
+
+                        setGroupOpen(toggle, panel, isOpen);
+
+                        toggle.addEventListener("click", function () {
+                            const currentlyOpen = panel.classList.contains("open");
+                            const nextOpen = !currentlyOpen;
+                            setGroupOpen(toggle, panel, nextOpen);
+
+                            const newState = readState();
+                            newState[groupName] = nextOpen;
+                            writeState(newState);
+                        });
+                    });
+                });
+            })();
+
+            function toggleProfileMenu(event) {
+                event.stopPropagation();
+                const menu = document.getElementById("profileDropdown");
+                const arrow = document.getElementById("chevronArrow");
+                menu.classList.toggle("show");
+                arrow.classList.toggle("rotate");
+            }
+
+            window.addEventListener("click", function () {
+                const menu = document.getElementById("profileDropdown");
+                const arrow = document.getElementById("chevronArrow");
+                if (menu && menu.classList.contains("show")) {
+                    menu.classList.remove("show");
+                    arrow.classList.remove("rotate");
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+
+                // ── Scrollspy smooth scroll ──
+                document.querySelectorAll('.scrollspy-link').forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        const targetId = this.getAttribute('href');
+                        if (!targetId.startsWith('#')) return;
+                        const target = document.querySelector(targetId);
+                        if (!target) return;
+                        e.preventDefault();
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                });
+
+                // ── Hash-based active highlight (only runs on pages with .page-section) ──
+                const sections = document.querySelectorAll('.page-section');
+                if (sections.length === 0) return;
+
+                // currentPage is set by each view via ViewData["ScrollPage"]
+                const currentPage = '@scrollPage';
+                const pageHashLinks = document.querySelectorAll('.nav-item[data-hash][data-page="' + currentPage + '"]');
+
+                function setActiveByHash(hash) {
+                    // Only clear links belonging to this page
+                    pageHashLinks.forEach(function (link) {
+                        link.classList.remove('active');
+                    });
+                    if (hash) {
+                        var matched = document.querySelector('.nav-item[data-hash="' + hash + '"][data-page="' + currentPage + '"]');
+                        if (matched) matched.classList.add('active');
+                    } else {
+                        // Default to first link of this page
+                        if (pageHashLinks[0]) pageHashLinks[0].classList.add('active');
+                    }
+                }
+
+                // Set on page load
+                setActiveByHash(window.location.hash);
+
+                // Update on hash change
+                window.addEventListener('hashchange', function () {
+                    setActiveByHash(window.location.hash);
+                });
+
+                // ── Scrollspy observer — center-of-viewport to avoid mixing ──
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            var hash = '#' + entry.target.id;
+                            history.replaceState(null, null, hash);
+                            setActiveByHash(hash);
+                        }
+                    });
+                }, {
+                    threshold: 0,
+                    rootMargin: '-50% 0px -50% 0px'
+                });
+
+                sections.forEach(section => observer.observe(section));
+
+            });
+    </script>
+</body>
+</html>
+

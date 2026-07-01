@@ -1,0 +1,37 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Add LIbrary";
+}
+
+<link href="~/css/addCategory.css" rel="stylesheet" />
+
+<div class="category-page-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h2>Add New Book Category</h2>
+            <p>Create a catalog group to organize your content library.</p>
+        </div>
+
+        <form class="form" id="loginForm" asp-controller="Admin" asp-action="AddCategory" method="post">
+            @Html.AntiForgeryToken()
+            <div class="input-group">
+                <label for="CategoryName">Category Name</label>
+                <input type="text" id="CategoryName" name="Name" placeholder="e.g., Fiction, Science, Biography" required />
+            </div>
+
+            <div class="input-group">
+                <label for="Description">Description (Optional)</label>
+                <textarea id="Description" name="Description" rows="4" placeholder="Brief details about this genre..."></textarea>
+            </div>
+
+
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="window.history.back()">Cancel</button>
+                <button type="submit" class="btn-primary">Save Category</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+

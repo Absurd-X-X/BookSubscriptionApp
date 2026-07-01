@@ -1,0 +1,527 @@
+﻿@{
+    ViewData["Title"] = "My Activities";
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+}
+<link href="~/css/readerActivities.css" rel="stylesheet" />
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <button class="tb-back" id="btn-back" title="Go back">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
+        </button>
+
+        <div class="tb-search">
+            <span class="tb-search-ic">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+            </span>
+            <input type="text" id="search-input" placeholder="Search books, authors…" autocomplete="off" />
+        </div>
+
+        <div class="tb-right">
+            <!-- Notification button + panel -->
+            <div class="dd-wrap" id="notif-wrap" style="position:relative">
+                <button class="tb-notif" id="btn-notif">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
+                    <span class="tb-badge" id="notif-count">8</span>
+                </button>
+                <div class="notif-panel" id="notif-panel">
+                    <div class="notif-head">
+                        <span class="notif-head-title">Notifications</span>
+                        <span class="notif-mark" id="notif-mark-all">Mark all read</span>
+                    </div>
+                    <div class="notif-list" id="notif-list"></div>
+                </div>
+            </div>
+
+            <div class="tb-avatar">
+                <div class="tb-av">JD</div>
+                <svg width="14" height="14" fill="none" stroke="#6b6990" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="ac-content">
+        <div class="ac-header">
+            <h1 class="ac-title">All Activity</h1>
+            <p class="ac-sub">A complete history of your reading activity and account updates.</p>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="ac-toolbar">
+            <div class="tb-left">
+                <span class="tb-lbl">Filter by</span>
+                <div class="dd-wrap" id="filter-wrap">
+                    <div class="dd-trigger" id="filter-trigger">
+                        <span id="filter-label">All Activities</span>
+                        <svg class="dd-caret" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+                    </div>
+                    <div class="dd-menu" id="filter-menu">
+                        <div class="dd-section-label">Activity type</div>
+                        <div class="dd-item is-active" data-val="all" data-label="All Activities">
+                            <span class="dd-item-icon">📋</span> All Activities
+                            <svg class="dd-check" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+                        </div>
+                        <div class="dd-item" data-val="reading" data-label="Reading Sessions">
+                            <span class="dd-item-icon">📖</span> Reading Sessions
+                            <svg class="dd-check" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+                        </div>
+                        <div class="dd-item" data-val="completed" data-label="Completed Books">
+                            <span class="dd-item-icon">✅</span> Completed Books
+                            <svg class="dd-check" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+                        </div>
+                        <div class="dd-item" data-val="reviews" data-label="Reviews">
+                            <span class="dd-item-icon">⭐</span> Reviews
+                            <svg class="dd-check" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+                        </div>
+                        <div class="dd-item" data-val="streak" data-label="Streaks & Achievements">
+                            <span class="dd-item-icon">🔥</span> Streaks & Achievements
+                            <svg class="dd-check" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+                        </div>
+                        <div class="dd-item" data-val="favorites" data-label="Favorites">
+                            <span class="dd-item-icon">❤️</span> Favorites
+                            <svg class="dd-check" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+                        </div>
+                        <div class="dd-sep"></div>
+                        <div class="dd-item" data-val="subscription" data-label="Subscription">
+                            <span class="dd-item-icon">💳</span> Subscription
+                            <svg class="dd-check" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+                        </div>
+                        <div class="dd-item" data-val="downloads" data-label="Downloads">
+                            <span class="dd-item-icon">⬇️</span> Downloads
+                            <svg class="dd-check" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date range -->
+            <div class="dd-wrap" id="date-wrap">
+                <div class="dd-trigger" id="date-trigger">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                    <span id="date-label">May 14 – May 15, 2024</span>
+                    <svg class="dd-caret" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+                </div>
+                <div class="date-panel" id="date-panel">
+                    <div class="date-panel-title">Select date range</div>
+                    <div id="date-presets">
+                        <div class="date-preset" data-label="Today" data-range="Today">
+                            <span class="date-preset-name">Today</span>
+                            <span class="date-preset-range">Jun 28, 2026</span>
+                        </div>
+                        <div class="date-preset" data-label="Yesterday" data-range="Yesterday">
+                            <span class="date-preset-name">Yesterday</span>
+                            <span class="date-preset-range">Jun 27, 2026</span>
+                        </div>
+                        <div class="date-preset" data-label="Last 7 days" data-range="Jun 21 – Jun 28, 2026">
+                            <span class="date-preset-name">Last 7 days</span>
+                            <span class="date-preset-range">Jun 21 – Jun 28</span>
+                        </div>
+                        <div class="date-preset" data-label="Last 30 days" data-range="May 29 – Jun 28, 2026">
+                            <span class="date-preset-name">Last 30 days</span>
+                            <span class="date-preset-range">May 29 – Jun 28</span>
+                        </div>
+                        <div class="date-preset is-active" data-label="May 14 – May 15, 2024" data-range="May 14 – May 15, 2024">
+                            <span class="date-preset-name">May 14 – May 15, 2024</span>
+                            <span class="date-preset-range">Custom</span>
+                        </div>
+                    </div>
+                    <div class="date-sep"></div>
+                    <div class="date-custom-lbl">Custom range</div>
+                    <div class="date-row">
+                        <input type="date" id="date-from" value="2024-05-14" />
+                        <span class="date-row-sep">→</span>
+                        <input type="date" id="date-to" value="2024-05-15" />
+                    </div>
+                    <button class="date-apply-btn" id="date-apply">Apply range</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="ac-table-wrap">
+            <div class="ac-thead">
+                <div class="ac-th">Activity</div>
+                <div class="ac-th">Details</div>
+                <div class="ac-th">Date &amp; Time</div>
+            </div>
+            <div id="activity-list"></div>
+            <div class="ac-empty" id="ac-empty">
+                <div class="ac-empty-emoji">🔍</div>
+                <h3>No activities found</h3>
+                <p>Try adjusting your search or filter.</p>
+                <button class="ac-empty-reset" id="btn-reset">Clear filters</button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="ac-footer">
+            <span class="ac-showing" id="ac-showing"></span>
+            <div class="pg-row" id="pg-row"></div>
+        </div>
+    </div>
+
+    <!-- Toast root -->
+    <div id="toast-root"></div>
+
+    <script>
+            (function(){
+            'use strict';
+
+            /* ══════════════════════════════════════════
+               DATA
+            ══════════════════════════════════════════ */
+            const ACTIVITIES = [
+              {type:'reading',    icon:'📖',cls:'c-purple',title:'You finished reading Deep Work',              sub:'Great job! You earned 50 points',            details:[{t:'Progress:',v:'100%',c:'green'},{t:'Time spent:',v:'4h 32m'}],link:{l:'View book',h:'#'},             date:'Today',        time:'6:30 PM'},
+              {type:'reviews',    icon:'⭐',cls:'c-gold',  title:'You left a review for Atomic Habits',        sub:'Thank you for your feedback!',               details:[{t:'Rating:',v:'5 stars',c:'gold'}],                             link:{l:'Read review',h:'#'},          date:'Yesterday',    time:'9:15 PM'},
+              {type:'reading',    icon:'🔖',cls:'c-green', title:'You added The 5 AM Club to your Reading List',sub:'Keep building your collection',             details:[{t:'Status:',v:'Added',c:'green'}],                              link:{l:'Go to Reading List',h:'#'},   date:'May 14, 2024', time:'4:20 PM'},
+              {type:'streak',     icon:'🏆',cls:'c-blue',  title:'You achieved a 12-day reading streak!',      sub:"Keep it up! You're doing amazing",            details:[{t:'Streak:',v:'12 days',c:'orange'}],                           link:{l:'View your progress',h:'#'},   date:'May 14, 2024', time:'12:00 PM'},
+              {type:'favorites',  icon:'❤️',cls:'c-pink',  title:'You favorited Deep Work',                    sub:'Added to your favorites',                    details:[],                                                               link:{l:'Go to Favorites',h:'#'},      date:'May 12, 2024', time:'8:45 PM'},
+              {type:'streak',     icon:'🔥',cls:'c-orange',title:'Your reading streak reached 10 days',        sub:"You're on fire! 🔥",                          details:[{t:'Streak:',v:'10 days',c:'orange'}],                           link:{l:'View your progress',h:'#'},   date:'May 10, 2024', time:'7:30 PM'},
+              {type:'reading',    icon:'📖',cls:'c-purple',title:'You started reading Mindset',                sub:"Great choice! Let's keep going",              details:[{t:'Progress:',v:'10%',c:'purple'},{t:'Time spent:',v:'20m'}],   link:null,                             date:'May 9, 2024',  time:'6:10 PM'},
+              {type:'completed',  icon:'✅',cls:'c-teal',  title:'You completed Thinking, Fast and Slow',      sub:'Congratulations on finishing another book!',  details:[{t:'Time spent:',v:'6h 15m'}],                                   link:{l:'Rate this book',h:'#'},       date:'May 8, 2024',  time:'9:05 PM'},
+              {type:'subscription',icon:'📅',cls:'c-indigo',title:'Subscription renewed',                      sub:'Your Premium plan has been renewed',          details:[{t:'Plan:',v:'Premium',c:'purple'},{t:'Next billing:',v:'Jun 15, 2024'}],link:null,                  date:'May 8, 2024',  time:'9:00 AM'},
+              {type:'downloads',  icon:'⬇️',cls:'c-blue',  title:'You downloaded Atomic Habits',              sub:'Book downloaded for offline reading',          details:[{t:'Format:',v:'EPUB'}],                                         link:{l:'Go to Library',h:'#'},        date:'May 7, 2024',  time:'5:40 PM'},
+              {type:'reading',    icon:'📖',cls:'c-purple',title:'You resumed reading Deep Work',              sub:'Back on track!',                              details:[{t:'Progress:',v:'78%',c:'purple'},{t:'Time spent:',v:'1h 10m'}],link:null,                             date:'May 7, 2024',  time:'3:20 PM'},
+              {type:'reviews',    icon:'⭐',cls:'c-gold',  title:'You reviewed The 5 AM Club',                sub:'Your review was published',                   details:[{t:'Rating:',v:'4 stars',c:'gold'}],                             link:{l:'Read review',h:'#'},          date:'May 6, 2024',  time:'8:00 PM'},
+              {type:'favorites',  icon:'❤️',cls:'c-pink',  title:'You favorited Mindset',                     sub:'Added to your favorites',                    details:[],                                                               link:{l:'Go to Favorites',h:'#'},      date:'May 6, 2024',  time:'5:30 PM'},
+              {type:'reading',    icon:'📖',cls:'c-purple',title:'You started reading The 5 AM Club',         sub:'Morning reading session!',                    details:[{t:'Progress:',v:'5%',c:'purple'},{t:'Time spent:',v:'15m'}],    link:null,                             date:'May 5, 2024',  time:'5:45 AM'},
+              {type:'completed',  icon:'✅',cls:'c-teal',  title:'You completed Atomic Habits',               sub:'Amazing achievement!',                        details:[{t:'Time spent:',v:'9h 24m'}],                                   link:{l:'Rate this book',h:'#'},       date:'May 5, 2024',  time:'11:00 PM'},
+              {type:'streak',     icon:'🔥',cls:'c-orange',title:'7-day streak unlocked!',                    sub:'One week of consistent reading!',             details:[{t:'Streak:',v:'7 days',c:'orange'}],                            link:{l:'View progress',h:'#'},        date:'May 4, 2024',  time:'9:00 PM'},
+              {type:'downloads',  icon:'⬇️',cls:'c-blue',  title:'You downloaded Deep Work',                  sub:'Saved for offline reading',                   details:[{t:'Format:',v:'PDF'}],                                          link:{l:'Go to Library',h:'#'},        date:'May 3, 2024',  time:'7:15 PM'},
+              {type:'reading',    icon:'📖',cls:'c-purple',title:'You read Thinking, Fast and Slow',          sub:'2-hour deep reading session',                 details:[{t:'Progress:',v:'60%',c:'purple'},{t:'Time spent:',v:'2h 05m'}],link:null,                             date:'May 2, 2024',  time:'9:30 PM'},
+              {type:'subscription',icon:'📅',cls:'c-indigo',title:'Upgraded to Premium',                      sub:'Welcome to Premium!',                         details:[{t:'Plan:',v:'Premium',c:'purple'},{t:'Billing:',v:'Monthly'}],  link:null,                             date:'May 1, 2024',  time:'10:00 AM'},
+              {type:'reading',    icon:'📖',cls:'c-purple',title:'You started reading Atomic Habits',         sub:'Great pick! Enjoy the journey.',              details:[{t:'Progress:',v:'1%',c:'purple'},{t:'Time spent:',v:'5m'}],     link:null,                             date:'Apr 30, 2024', time:'8:00 PM'},
+              {type:'reviews',    icon:'⭐',cls:'c-gold',  title:'You reviewed Deep Work',                    sub:'Review published successfully',               details:[{t:'Rating:',v:'5 stars',c:'gold'}],                             link:{l:'Read review',h:'#'},          date:'Apr 29, 2024', time:'7:45 PM'},
+              {type:'completed',  icon:'✅',cls:'c-teal',  title:"You completed Man's Search for Meaning",   sub:'A life-changing read!',                       details:[{t:'Time spent:',v:'4h 50m'}],                                   link:{l:'Rate this book',h:'#'},       date:'Apr 28, 2024', time:'10:20 PM'},
+              {type:'favorites',  icon:'❤️',cls:'c-pink',  title:'You favorited Thinking, Fast and Slow',    sub:'Added to your favorites',                    details:[],                                                               link:{l:'Go to Favorites',h:'#'},      date:'Apr 27, 2024', time:'6:10 PM'},
+              {type:'streak',     icon:'🔥',cls:'c-orange',title:'5-day streak achieved!',                   sub:'Keep the momentum going!',                   details:[{t:'Streak:',v:'5 days',c:'orange'}],                            link:{l:'View progress',h:'#'},        date:'Apr 26, 2024', time:'9:00 PM'},
+              {type:'reading',    icon:'📖',cls:'c-purple',title:"You started reading Man's Search for Meaning",sub:'Powerful choice.',                         details:[{t:'Progress:',v:'8%',c:'purple'},{t:'Time spent:',v:'30m'}],    link:null,                             date:'Apr 25, 2024', time:'7:00 PM'},
+              {type:'downloads',  icon:'⬇️',cls:'c-blue',  title:'You downloaded Mindset',                   sub:'Ready for offline reading',                   details:[{t:'Format:',v:'EPUB'}],                                         link:{l:'Go to Library',h:'#'},        date:'Apr 24, 2024', time:'4:00 PM'},
+              {type:'reading',    icon:'📖',cls:'c-purple',title:'Reading session — Atomic Habits',          sub:'Consistent progress!',                        details:[{t:'Progress:',v:'45%',c:'purple'},{t:'Time spent:',v:'1h 20m'}],link:null,                             date:'Apr 23, 2024', time:'8:30 PM'},
+              {type:'reviews',    icon:'⭐',cls:'c-gold',  title:'You reviewed Mindset',                     sub:'Your thoughts were appreciated',              details:[{t:'Rating:',v:'4 stars',c:'gold'}],                             link:{l:'Read review',h:'#'},          date:'Apr 22, 2024', time:'9:00 PM'},
+              {type:'favorites',  icon:'❤️',cls:'c-pink',  title:'You favorited Atomic Habits',              sub:'Added to favorites',                         details:[],                                                               link:{l:'Go to Favorites',h:'#'},      date:'Apr 20, 2024', time:'5:00 PM'},
+              {type:'reading',    icon:'📖',cls:'c-purple',title:'You started reading Thinking, Fast and Slow',sub:'Another great choice!',                    details:[{t:'Progress:',v:'2%',c:'purple'},{t:'Time spent:',v:'10m'}],    link:null,                             date:'Apr 19, 2024', time:'6:30 PM'},
+              {type:'streak',     icon:'🔥',cls:'c-orange',title:'3-day streak!',                            sub:"You're building a habit!",                   details:[{t:'Streak:',v:'3 days',c:'orange'}],                            link:{l:'View progress',h:'#'},        date:'Apr 18, 2024', time:'9:00 PM'},
+              {type:'downloads',  icon:'⬇️',cls:'c-blue',  title:'You downloaded Thinking, Fast and Slow',   sub:'Offline reading enabled',                    details:[{t:'Format:',v:'PDF'}],                                          link:{l:'Go to Library',h:'#'},        date:'Apr 17, 2024', time:'2:00 PM'},
+              {type:'completed',  icon:'✅',cls:'c-teal',  title:'You completed The Lean Startup',           sub:'Congratulations!',                           details:[{t:'Time spent:',v:'8h 10m'}],                                   link:{l:'Rate this book',h:'#'},       date:'Apr 15, 2024', time:'10:45 PM'},
+              {type:'reading',    icon:'📖',cls:'c-purple',title:'Reading session — The Lean Startup',       sub:'Final chapters!',                            details:[{t:'Progress:',v:'90%',c:'purple'},{t:'Time spent:',v:'2h 30m'}],link:null,                             date:'Apr 14, 2024', time:'8:00 PM'},
+              {type:'subscription',icon:'📅',cls:'c-indigo',title:'Payment processed',                       sub:'Monthly subscription payment',               details:[{t:'Amount:',v:'$9.99'},{t:'Status:',v:'Paid',c:'green'}],       link:null,                             date:'Apr 1, 2024',  time:'12:00 AM'},
+              {type:'favorites',  icon:'❤️',cls:'c-pink',  title:'You favorited The Lean Startup',           sub:'Added to your favorites',                   details:[],                                                               link:{l:'Go to Favorites',h:'#'},      date:'Mar 30, 2024', time:'7:00 PM'},
+              {type:'reading',    icon:'📖',cls:'c-purple',title:'You started reading The Lean Startup',     sub:'Innovation awaits!',                         details:[{t:'Progress:',v:'3%',c:'purple'},{t:'Time spent:',v:'20m'}],    link:null,                             date:'Mar 28, 2024', time:'6:00 PM'},
+              {type:'downloads',  icon:'⬇️',cls:'c-blue',  title:'You downloaded The Lean Startup',          sub:'Ready for offline reading',                  details:[{t:'Format:',v:'EPUB'}],                                         link:{l:'Go to Library',h:'#'},        date:'Mar 27, 2024', time:'3:30 PM'},
+              {type:'reviews',    icon:'⭐',cls:'c-gold',  title:'You reviewed The Lean Startup',            sub:'Your review was published',                  details:[{t:'Rating:',v:'5 stars',c:'gold'}],                             link:{l:'Read review',h:'#'},          date:'Mar 25, 2024', time:'8:45 PM'},
+              {type:'streak',     icon:'🔥',cls:'c-orange',title:'First streak! 1 day',                     sub:'The journey begins!',                        details:[{t:'Streak:',v:'1 day',c:'orange'}],                             link:{l:'View progress',h:'#'},        date:'Mar 20, 2024', time:'9:00 PM'},
+              {type:'reading',    icon:'📖',cls:'c-purple',title:'Account created',                         sub:'Welcome to your reading journey!',           details:[{t:'Status:',v:'Active',c:'green'}],                             link:null,                             date:'Mar 15, 2024', time:'10:00 AM'},
+              {type:'downloads',  icon:'⬇️',cls:'c-blue',  title:'First book downloaded',                   sub:'Your first book is ready to read!',          details:[{t:'Format:',v:'EPUB'}],                                         link:{l:'Go to Library',h:'#'},        date:'Mar 15, 2024', time:'10:05 AM'},
+            ];
+
+            const NOTIFS = [
+              {icon:'📖',bg:'rgba(124,92,252,.2)', title:'Reading goal reached!',   text:'You hit 2 hours today. Great job!',            time:'2 min ago',  unread:true},
+              {icon:'🔥',bg:'rgba(249,115,22,.15)',title:'12-day streak!',           text:"Keep it up — you're on fire.",                 time:'1 hr ago',   unread:true},
+              {icon:'📚',bg:'rgba(52,211,153,.12)',title:'New recommendation',       text:'"The Power of Now" matches your taste.',       time:'3 hrs ago',  unread:true},
+              {icon:'✅',bg:'rgba(52,211,153,.12)',title:'Book completed',            text:"You finished \"Can't Hurt Me\".",              time:'Yesterday',  unread:false},
+              {icon:'💡',bg:'rgba(99,179,237,.12)',title:'Reading tip',               text:'Try reading before bed for better recall.',   time:'2 days ago', unread:false},
+              {icon:'⭐',bg:'rgba(234,179,8,.15)', title:'Review liked',             text:'5 people liked your Atomic Habits review.',   time:'3 days ago', unread:false},
+              {icon:'🎯',bg:'rgba(124,92,252,.18)',title:'Goal set',                 text:'Weekly goal: 5 hours. You got this!',          time:'4 days ago', unread:false},
+              {icon:'📅',bg:'rgba(99,102,241,.18)',title:'Subscription renews soon', text:'Your Premium renews in 3 days.',               time:'5 days ago', unread:false},
+            ];
+
+            /* ══════════════════════════════════════════
+               STATE
+            ══════════════════════════════════════════ */
+            let filtered    = [...ACTIVITIES];
+            let activeFilter = 'all';
+            let searchQuery  = '';
+            let currentPage  = 1;
+            const PER_PAGE   = 10;
+
+            /* ══════════════════════════════════════════
+               TOAST
+            ══════════════════════════════════════════ */
+            function toast(msg, type='info', icon='✦'){
+              const root = document.getElementById('toast-root');
+              const el = document.createElement('div');
+              el.className = 'toast';
+              el.innerHTML = `<div class="toast-ic ${type}">${icon}</div><span class="toast-msg">${msg}</span>`;
+              root.appendChild(el);
+              setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(), 300); }, 2800);
+            }
+
+            /* ══════════════════════════════════════════
+               RENDER
+            ══════════════════════════════════════════ */
+            function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+            function hl(text){
+              if(!searchQuery) return text;
+              return text.replace(new RegExp(`(${escRe(searchQuery)})`,'gi'),'<mark>$1</mark>');
+            }
+
+            function buildRow(a){
+              const dets = a.details.map(d=>`<div class="ac-dline">${d.t} <span class="hl ${d.c||''}">${d.v}</span></div>`).join('');
+              const lnk  = a.link ? `<a class="ac-link" href="${a.link.h}" onclick="return false">${a.link.l}</a>` : '';
+              return `
+            <div class="ac-row">
+              <div class="ac-cell-act">
+                <div class="ac-icon ${a.cls}">${a.icon}</div>
+                <div class="ac-text"><strong>${hl(a.title)}</strong><span>${a.sub}</span></div>
+              </div>
+              <div class="ac-cell-det">${dets}${lnk}</div>
+              <div class="ac-cell-date">
+                <div class="ac-date-main">${a.date}</div>
+                <div class="ac-date-time">${a.time}</div>
+              </div>
+            </div>`;
+            }
+
+            function applyFilters(){
+              const q = searchQuery.toLowerCase();
+              filtered = ACTIVITIES.filter(a=>{
+                const typeOk   = activeFilter==='all' || a.type===activeFilter;
+                const searchOk = !q || a.title.toLowerCase().includes(q) || a.sub.toLowerCase().includes(q);
+                return typeOk && searchOk;
+              });
+              currentPage = 1;
+              render();
+            }
+
+            function render(){
+              const list  = document.getElementById('activity-list');
+              const empty = document.getElementById('ac-empty');
+              const total = filtered.length;
+              const start = (currentPage-1)*PER_PAGE;
+              const slice = filtered.slice(start, start+PER_PAGE);
+
+              if(!slice.length){
+                list.innerHTML='';
+                empty.classList.add('show');
+              } else {
+                empty.classList.remove('show');
+                list.innerHTML = slice.map(buildRow).join('');
+                // wire ac-link clicks
+                list.querySelectorAll('.ac-link').forEach(a=>{
+                  a.addEventListener('click', e=>{
+                    e.preventDefault();
+                    toast(`Opening: ${a.textContent}`, 'info', '🔗');
+                  });
+                });
+              }
+
+              const end = Math.min(start+slice.length, total);
+              document.getElementById('ac-showing').textContent =
+                total ? `Showing ${start+1} to ${end} of ${total} activities` : 'No activities found';
+
+              renderPagination(total);
+            }
+
+            function renderPagination(total){
+              const pages = Math.ceil(total/PER_PAGE)||1;
+              const pg = document.getElementById('pg-row');
+              pg.innerHTML='';
+
+              function mkBtn(html, page, cls=''){
+                const b=document.createElement('button');
+                b.className='pg-btn '+cls;
+                b.innerHTML=html;
+                if(page!==null){
+                  b.addEventListener('click',()=>{ currentPage=page; render(); window.scrollTo({top:0,behavior:'smooth'}); });
+                }
+                return b;
+              }
+
+              // Prev
+              const prev = mkBtn('<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Prev', currentPage-1);
+              if(currentPage===1) prev.disabled=true;
+              pg.appendChild(prev);
+
+              // Pages with ellipsis
+              const nums=[];
+              for(let i=1;i<=pages;i++){
+                if(i===1||i===pages||Math.abs(i-currentPage)<=1) nums.push(i);
+                else if(nums[nums.length-1]!=='…') nums.push('…');
+              }
+              nums.forEach(n=>{
+                if(n==='…'){
+                  const s=document.createElement('button');
+                  s.className='pg-btn'; s.textContent='…'; s.disabled=true;
+                  pg.appendChild(s);
+                } else {
+                  pg.appendChild(mkBtn(n, n, n===currentPage?'is-active':''));
+                }
+              });
+
+              // Next
+              const next = mkBtn('Next <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>', currentPage+1);
+              if(currentPage===pages) next.disabled=true;
+              pg.appendChild(next);
+            }
+
+            /* ══════════════════════════════════════════
+               DROPDOWNS — generic open/close
+            ══════════════════════════════════════════ */
+            const allDropdowns = []; // [{trigger, panel}]
+
+            function registerDropdown(triggerId, panelId, onOpen){
+              const trigger = document.getElementById(triggerId);
+              const panel   = document.getElementById(panelId);
+              if(!trigger||!panel) return;
+              allDropdowns.push({trigger, panel});
+
+              trigger.addEventListener('click', e=>{
+                e.stopPropagation();
+                const isOpen = panel.classList.contains('is-open');
+                closeAllDropdowns();
+                if(!isOpen){
+                  panel.classList.add('is-open');
+                  trigger.classList.add('is-open');
+                  if(onOpen) onOpen();
+                }
+              });
+
+              panel.addEventListener('click', e=>e.stopPropagation());
+            }
+
+            function closeAllDropdowns(){
+              allDropdowns.forEach(({trigger,panel})=>{
+                panel.classList.remove('is-open');
+                trigger.classList.remove('is-open');
+              });
+            }
+
+            document.addEventListener('click', closeAllDropdowns);
+
+            /* ══════════════════════════════════════════
+               FILTER DROPDOWN
+            ══════════════════════════════════════════ */
+            registerDropdown('filter-trigger','filter-menu');
+
+            document.getElementById('filter-menu').querySelectorAll('.dd-item').forEach(item=>{
+              item.addEventListener('click', e=>{
+                e.stopPropagation();
+                document.querySelectorAll('#filter-menu .dd-item').forEach(i=>i.classList.remove('is-active'));
+                item.classList.add('is-active');
+                activeFilter = item.dataset.val;
+                document.getElementById('filter-label').textContent = item.dataset.label;
+                closeAllDropdowns();
+                applyFilters();
+                toast(`Filter: ${item.dataset.label}`, 'info', '🔎');
+              });
+            });
+
+            /* ══════════════════════════════════════════
+               DATE RANGE PICKER
+            ══════════════════════════════════════════ */
+            registerDropdown('date-trigger','date-panel');
+
+            document.querySelectorAll('.date-preset').forEach(p=>{
+              p.addEventListener('click', e=>{
+                e.stopPropagation();
+                document.querySelectorAll('.date-preset').forEach(x=>x.classList.remove('is-active'));
+                p.classList.add('is-active');
+                document.getElementById('date-label').textContent = p.dataset.label;
+                toast(`Date: ${p.dataset.label}`, 'info', '📅');
+              });
+            });
+
+            document.getElementById('date-apply').addEventListener('click', e=>{
+              e.stopPropagation();
+              const from = document.getElementById('date-from').value;
+              const to   = document.getElementById('date-to').value;
+              if(!from||!to){ toast('Please select both dates','warn','⚠️'); return; }
+              if(from>to){ toast('Start date must be before end date','warn','⚠️'); return; }
+              const fmt = d=>{ const [y,m,day]=d.split('-'); return new Date(y,m-1,day).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
+              const label = `${fmt(from)} – ${fmt(to)}`;
+              document.getElementById('date-label').textContent = label;
+              document.querySelectorAll('.date-preset').forEach(x=>x.classList.remove('is-active'));
+              closeAllDropdowns();
+              toast(`Range applied: ${label}`, 'success', '✓');
+            });
+
+            /* ══════════════════════════════════════════
+               SEARCH
+            ══════════════════════════════════════════ */
+            const searchInput = document.getElementById('search-input');
+            let searchDebounce;
+            searchInput.addEventListener('input', ()=>{
+              clearTimeout(searchDebounce);
+              searchDebounce = setTimeout(()=>{
+                searchQuery = searchInput.value.trim();
+                applyFilters();
+              }, 200);
+            });
+            searchInput.addEventListener('keydown', e=>{
+              if(e.key==='Escape'){ searchInput.value=''; searchQuery=''; applyFilters(); }
+            });
+
+            /* ══════════════════════════════════════════
+               NOTIFICATION PANEL
+            ══════════════════════════════════════════ */
+            registerDropdown('btn-notif','notif-panel');
+
+            // Render notifications
+            const notifList = document.getElementById('notif-list');
+            notifList.innerHTML = NOTIFS.map(n=>`
+              <div class="notif-row${n.unread?' unread':''}">
+                <div class="notif-dot ${n.unread?'on':'off'}"></div>
+                <div class="notif-icon" style="background:${n.bg}">${n.icon}</div>
+                <div class="notif-body">
+                  <strong>${n.title}</strong>
+                  <p>${n.text}</p>
+                  <span class="notif-time">${n.time}</span>
+                </div>
+              </div>`).join('');
+
+            // Click individual notification
+            notifList.querySelectorAll('.notif-row').forEach(row=>{
+              row.addEventListener('click', ()=>{
+                row.classList.remove('unread');
+                row.querySelector('.notif-dot').className='notif-dot off';
+                updateBadge();
+              });
+            });
+
+            // Mark all read
+            document.getElementById('notif-mark-all').addEventListener('click', e=>{
+              e.stopPropagation();
+              notifList.querySelectorAll('.notif-row').forEach(r=>{
+                r.classList.remove('unread');
+                r.querySelector('.notif-dot').className='notif-dot off';
+              });
+              updateBadge();
+              toast('All notifications marked as read','success','✓');
+            });
+
+            function updateBadge(){
+              const count = notifList.querySelectorAll('.notif-row.unread').length;
+              const badge = document.getElementById('notif-count');
+              badge.textContent = count;
+              badge.style.display = count ? '' : 'none';
+            }
+
+            /* ══════════════════════════════════════════
+               BACK BUTTON
+            ══════════════════════════════════════════ */
+            document.getElementById('btn-back').addEventListener('click', ()=>{
+              toast('Going back…', 'info', '←');
+              // history.back();
+            });
+
+            /* ══════════════════════════════════════════
+               RESET (empty state button)
+            ══════════════════════════════════════════ */
+            document.getElementById('btn-reset').addEventListener('click', ()=>{
+              searchInput.value='';
+              searchQuery='';
+              activeFilter='all';
+              document.querySelectorAll('#filter-menu .dd-item').forEach(i=>i.classList.toggle('is-active', i.dataset.val==='all'));
+              document.getElementById('filter-label').textContent='All Activities';
+              applyFilters();
+            });
+
+            /* ══════════════════════════════════════════
+               INIT
+            ══════════════════════════════════════════ */
+            render();
+
+            })();
+    </script>

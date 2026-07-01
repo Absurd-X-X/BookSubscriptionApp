@@ -1,0 +1,307 @@
+﻿@{
+    ViewData["Title"] = "Subscription Management";
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+}
+
+<link href="~/css/manageSub.css" rel="stylesheet" />
+
+<div class="content-wrap">
+    <div class="main sub-page">
+
+        <nav class="breadcrumb">
+            <a href="#">Dashboard</a>
+            <span class="sep">&gt;</span>
+            <span class="current">Subscription</span>
+        </nav>
+
+        <div class="page-header">
+            <h1>Subscription Management</h1>
+            <p>Manage your plan, billing, and payment preferences.</p>
+        </div>
+
+        <div class="sub-grid">
+
+            <div class="sub-col sub-col--left">
+
+                <!-- Current Plan -->
+                <section class="card current-plan-card">
+                    <h2 class="card-title">Current Plan</h2>
+
+                    <div class="plan-row">
+                        <div class="plan-id">
+                            <div class="plan-icon plan-icon--premium">
+                                <i class="fa-solid fa-crown"></i>
+                            </div>
+                            <div>
+                                <div class="plan-name">Premium Plan</div>
+                                <div class="plan-price"><span class="amount">$49.00</span> / month</div>
+                            </div>
+                        </div>
+
+                        <div class="plan-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">Status</div>
+                                <span class="badge badge--active">Active</span>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Renewal Date</div>
+                                <div class="meta-value">Jun 15, 2024</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Auto-Renew</div>
+                                <div class="meta-value meta-value--accent">Enabled</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Payment Method</div>
+                                <div class="meta-value meta-value--card">
+                                    <i class="fa-brands fa-mastercard card-brand-icon"></i>
+                                    <span>&bull;&bull;&bull;&bull; 4242</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="feature-list">
+                        <li><i class="fa-solid fa-square-check"></i> Unlimited access to books</li>
+                        <li><i class="fa-solid fa-square-check"></i> Audiobooks included</li>
+                        <li><i class="fa-solid fa-square-check"></i> Offline reading</li>
+                        <li><i class="fa-solid fa-square-check"></i> Early access to new releases</li>
+                        <li><i class="fa-solid fa-square-check"></i> Cancel anytime</li>
+                    </ul>
+
+                    <div class="plan-actions">
+                        <button type="button" class="btn btn-primary">Upgrade Plan</button>
+                        <button type="button" class="btn btn-outline">Cancel Subscription</button>
+                    </div>
+
+                    <div class="notice-row">
+                        <i class="fa-regular fa-circle-info"></i>
+                        Your plan will renew automatically on Jun 15, 2024.
+                    </div>
+                </section>
+
+                <!-- Payment Method -->
+                <section class="card payment-card">
+                    <h2 class="card-title">Payment Method</h2>
+
+                    <div class="payment-row">
+                        <div class="payment-row-left">
+                            <i class="fa-brands fa-mastercard card-brand-icon card-brand-icon--lg"></i>
+                            <div>
+                                <div class="payment-row-top">
+                                    <span class="card-number">&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242</span>
+                                    <span class="badge badge--default">Default</span>
+                                </div>
+                                <div class="payment-row-sub">Expires 12/26</div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline">Update</button>
+                    </div>
+
+                    <button type="button" class="add-payment-link">
+                        <i class="fa-solid fa-plus"></i> Add Payment Method
+                    </button>
+
+                    <div class="notice-row notice-row--secure">
+                        <i class="fa-solid fa-lock"></i>
+                        Your payment information is secure and encrypted.
+                    </div>
+                </section>
+
+            </div>
+
+            <div class="sub-col sub-col--right">
+
+                <!-- Choose Your Plan -->
+                <section class="card choose-plan-card">
+                    <div class="choose-plan-head">
+                        <h2 class="card-title">Choose Your Plan</h2>
+                        <div class="billing-toggle">
+                            <button type="button" class="toggle-btn is-active">Monthly</button>
+                            <button type="button" class="toggle-btn">Yearly</button>
+                            <span class="save-badge">Save 20%</span>
+                        </div>
+                    </div>
+
+                    <div class="plans-grid">
+                        <!-- Basic -->
+                        <div class="plan-tile">
+                            <div class="plan-tile-icon plan-tile-icon--basic">
+                                <i class="fa-solid fa-book"></i>
+                            </div>
+                            <div class="plan-tile-name">Basic</div>
+                            <div class="plan-tile-price"><span class="amount">$19.00</span> / month</div>
+                            <p class="plan-tile-desc">Perfect for getting started with your reading journey.</p>
+                            <ul class="plan-tile-features">
+                                <li><i class="fa-solid fa-check"></i> Access to library</li>
+                                <li><i class="fa-solid fa-check"></i> Basic features</li>
+                                <li><i class="fa-solid fa-check"></i> Community access</li>
+                            </ul>
+                            <button type="button" class="btn btn-outline btn-block">Choose Plan</button>
+                        </div>
+
+                        <!-- Premium -->
+                        <div class="plan-tile plan-tile--current">
+                            <span class="popular-badge">Most Popular</span>
+                            <div class="plan-tile-icon plan-tile-icon--premium">
+                                <i class="fa-solid fa-crown"></i>
+                            </div>
+                            <div class="plan-tile-name">Premium</div>
+                            <div class="plan-tile-price"><span class="amount">$49.00</span> / month</div>
+                            <p class="plan-tile-desc">The best experience for passionate readers.</p>
+                            <ul class="plan-tile-features">
+                                <li><i class="fa-solid fa-check"></i> Everything in Basic</li>
+                                <li><i class="fa-solid fa-check"></i> Audiobooks included</li>
+                                <li><i class="fa-solid fa-check"></i> Offline reading</li>
+                                <li><i class="fa-solid fa-check"></i> Early access</li>
+                                <li><i class="fa-solid fa-check"></i> Premium support</li>
+                            </ul>
+                            <button type="button" class="btn btn-primary btn-block" disabled>Current Plan</button>
+                        </div>
+
+                        <!-- Family -->
+                        <div class="plan-tile">
+                            <div class="plan-tile-icon plan-tile-icon--family">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div class="plan-tile-name">Family</div>
+                            <div class="plan-tile-price"><span class="amount">$79.00</span> / month</div>
+                            <p class="plan-tile-desc">Share your love of reading with your family.</p>
+                            <ul class="plan-tile-features">
+                                <li><i class="fa-solid fa-check"></i> Everything in Premium</li>
+                                <li><i class="fa-solid fa-check"></i> Up to 6 accounts</li>
+                                <li><i class="fa-solid fa-check"></i> Family library</li>
+                                <li><i class="fa-solid fa-check"></i> Parental controls</li>
+                                <li><i class="fa-solid fa-check"></i> Priority support</li>
+                            </ul>
+                            <button type="button" class="btn btn-outline btn-block">Choose Plan</button>
+                        </div>
+                    </div>
+
+                    <div class="plans-footnote">All plans include a 7-day free trial. Cancel anytime.</div>
+                </section>
+
+                <!-- Billing History -->
+                <section class="card billing-card">
+                    <div class="card-head-row">
+                        <h2 class="card-title">Billing History</h2>
+                        <a href="#" class="view-all-link">View all</a>
+                    </div>
+
+                    <table class="billing-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>May 15, 2024</td>
+                                <td>Premium Plan &ndash; Monthly</td>
+                                <td>$49.00</td>
+                                <td><span class="badge badge--paid">Paid</span></td>
+                                <td><i class="fa-regular fa-eye invoice-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Apr 15, 2024</td>
+                                <td>Premium Plan &ndash; Monthly</td>
+                                <td>$49.00</td>
+                                <td><span class="badge badge--paid">Paid</span></td>
+                                <td><i class="fa-regular fa-eye invoice-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Mar 15, 2024</td>
+                                <td>Premium Plan &ndash; Monthly</td>
+                                <td>$49.00</td>
+                                <td><span class="badge badge--paid">Paid</span></td>
+                                <td><i class="fa-regular fa-eye invoice-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Feb 15, 2024</td>
+                                <td>Premium Plan &ndash; Monthly</td>
+                                <td>$49.00</td>
+                                <td><span class="badge badge--paid">Paid</span></td>
+                                <td><i class="fa-regular fa-eye invoice-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Jan 15, 2024</td>
+                                <td>Premium Plan &ndash; Monthly</td>
+                                <td>$49.00</td>
+                                <td><span class="badge badge--paid">Paid</span></td>
+                                <td><i class="fa-regular fa-eye invoice-icon"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="billing-table-footer">
+                        <a href="#" class="view-history-link">View full billing history <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+
+        <!-- Premium Benefits -->
+        <section class="card benefits-card">
+            <h2 class="card-title">Your Premium Benefits</h2>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fa-solid fa-book-open"></i></div>
+                    <div>
+                        <div class="benefit-title">Unlimited Reading</div>
+                        <div class="benefit-desc">Access thousands of books</div>
+                    </div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fa-solid fa-headphones"></i></div>
+                    <div>
+                        <div class="benefit-title">Audiobooks</div>
+                        <div class="benefit-desc">Listen on the go</div>
+                    </div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+                    <div>
+                        <div class="benefit-title">Offline Access</div>
+                        <div class="benefit-desc">Download and read anytime</div>
+                    </div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fa-solid fa-bolt"></i></div>
+                    <div>
+                        <div class="benefit-title">Early Access</div>
+                        <div class="benefit-desc">Get new books first</div>
+                    </div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fa-solid fa-headset"></i></div>
+                    <div>
+                        <div class="benefit-title">Premium Support</div>
+                        <div class="benefit-desc">We're here to help</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Help Banner -->
+        <section class="help-banner">
+            <div class="help-banner-left">
+                <div class="help-banner-icon"><i class="fa-regular fa-comment-dots"></i></div>
+                <div>
+                    <div class="help-banner-title">Need help with your subscription?</div>
+                    <div class="help-banner-sub">Visit our <a href="#">Help Center</a> or contact our support team.</div>
+                </div>
+            </div>
+            <a href="#" class="btn btn-primary help-banner-btn">
+                Visit Help Center <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+        </section>
+
+    </div>
+</div>
+

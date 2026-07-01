@@ -1,0 +1,618 @@
+﻿@{
+    Layout = "~/Views/Shared/_LibraryLayout.cshtml";
+    ViewData["Title"] = "Library Book Reviews";
+}
+
+<link href="~/css/reviews.css" rel="stylesheet" />
+
+<div class="reviews-page">
+
+    <!-- Header -->
+    <div class="reviews-header">
+        <div>
+            <h1 class="reviews-title">Reviews</h1>
+            <p class="reviews-subtitle">Manage and moderate reader reviews for all books in your library.</p>
+        </div>
+        <div class="header-actions">
+            <button class="date-range-btn">&#128197; May 1 – May 31, 2024</button>
+            <button class="export-btn">&#11015; Export Reviews &#9662;</button>
+        </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon purple">&#9733;</div>
+            <div class="help-hold">
+                <div class="stat-label">Total Reviews</div>
+                <div class="stat-value">2,845</div>
+                <div class="stat-delta"><span class="up">&#8593; 18.7%</span> vs Apr 1 – Apr 30</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green">&#128197;</div>
+            <div class="help-hold">
+                <div class="stat-label">Approved Reviews</div>
+                <div class="stat-value">2,412</div>
+                <div class="stat-delta"><span class="up">&#8593; 16.3%</span> vs Apr 1 – Apr 30</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon amber">&#128336;</div>
+            <div class="help-hold">
+                <div class="stat-label">Pending Reviews</div>
+                <div class="stat-value">128</div>
+                <div class="stat-delta"><span class="up">&#8593; 8.4%</span> vs Apr 1 – Apr 30</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon red">&#128683;</div>
+            <div class="help-hold">
+                <div class="stat-label">Rejected Reviews</div>
+                <div class="stat-value">305</div>
+                <div class="stat-delta"><span class="up">&#8593; 21.5%</span> vs Apr 1 – Apr 30</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon blue">&#11088;</div>
+            <div class="help-hold">
+                <div class="stat-label">Average Rating</div>
+                <div class="stat-value">4.6 <span class="of-five">/ 5</span></div>
+                <div class="stat-delta"><span class="up">&#8593; 0.2</span> vs Apr 1 – Apr 30</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+
+        <!-- Table -->
+        <div class="table-card">
+            <div class="table-controls">
+                <div class="search-input-wrap">
+                    <input type="text" placeholder="Search reviews by book title or reviewer..." />
+                    <span class="icon">&#128269;</span>
+                </div>
+                <select class="filter-select">
+                    <option>All Books</option>
+                </select>
+                <select class="filter-select">
+                    <option>All Ratings</option>
+                </select>
+                <select class="filter-select">
+                    <option>All Status</option>
+                </select>
+                <button class="filters-btn">&#9881; Filters</button>
+            </div>
+
+            <table class="reviews-table">
+                <thead>
+                    <tr>
+                        <th>Reviewer</th>
+                        <th>Book</th>
+                        <th>Rating</th>
+                        <th>Review</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="reviewer-cell">
+                                <div class="avatar" style="background:#7c3aed;">SJ</div>
+                                <div>
+                                    <div class="reviewer-name">Sarah Johnson</div>
+                                    <div class="reviewer-email">sarah.j@email.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="book-cell">
+                                <div class="book-cover"></div>
+                                <div>
+                                    <div class="book-title">Atomic Habits</div>
+                                    <div class="book-author">James Clear</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+                        <td><span class="review-text">Life-changing book! The small habits approach really works.</span></td>
+                        <td><span class="status-badge approved">Approved</span></td>
+                        <td><span class="date-cell">May 31, 2024<br>10:15 AM</span></td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="action-icon-btn">&#128065;</button>
+                                <button class="action-icon-btn">&#8942;</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="reviewer-cell">
+                                <div class="avatar" style="background:#0d9488;">MC</div>
+                                <div>
+                                    <div class="reviewer-name">Michael Chen</div>
+                                    <div class="reviewer-email">m.chen@email.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="book-cell">
+                                <div class="book-cover"></div>
+                                <div>
+                                    <div class="book-title">Deep Work</div>
+                                    <div class="book-author">Cal Newport</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+                        <td><span class="review-text">Excellent insights on focus and productivity. Highly recommended.</span></td>
+                        <td><span class="status-badge approved">Approved</span></td>
+                        <td><span class="date-cell">May 31, 2024<br>9:42 AM</span></td>
+                        <td>
+                            <div class="actions-cell">
+                                <a href="@Url.Action("GetReview", "Library")" class="action-icon-btn">&#128065;</a>
+                                <button class="action-icon-btn" aria-label="More">&#8942;</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="reviewer-cell">
+                                <div class="avatar"><img src="" alt="" style="background:#374151;"></div>
+                                <div>
+                                    <div class="reviewer-name">Emily Rodriguez</div>
+                                    <div class="reviewer-email">emily.r@email.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="book-cell">
+                                <div class="book-cover"></div>
+                                <div>
+                                    <div class="book-title">Rich Dad Poor Dad</div>
+                                    <div class="book-author">Robert Kiyosaki</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span></td>
+                        <td><span class="review-text">Great book about financial education. Very practical advice.</span></td>
+                        <td><span class="status-badge approved">Approved</span></td>
+                        <td><span class="date-cell">May 30, 2024<br>8:30 PM</span></td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="action-icon-btn">&#128065;</button>
+                                <button class="action-icon-btn" aria-label="More">&#8942;</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="reviewer-cell">
+                                <div class="avatar" style="background:#b45309;">DW</div>
+                                <div>
+                                    <div class="reviewer-name">David Wilson</div>
+                                    <div class="reviewer-email">david.w@email.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="book-cell">
+                                <div class="book-cover"></div>
+                                <div>
+                                    <div class="book-title">Think and Grow Rich</div>
+                                    <div class="book-author">Napoleon Hill</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span></td>
+                        <td><span class="review-text">Classic book with timeless principles. Worth reading.</span></td>
+                        <td><span class="status-badge pending">Pending</span></td>
+                        <td><span class="date-cell">May 30, 2024<br>6:20 PM</span></td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="action-icon-btn">&#128065;</button>
+                                <button class="action-icon-btn">&#8942;</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="reviewer-cell">
+                                <div class="avatar" style="background:#be123c;">LP</div>
+                                <div>
+                                    <div class="reviewer-name">Lisa Park</div>
+                                    <div class="reviewer-email">lisa.p@email.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="book-cell">
+                                <div class="book-cover"></div>
+                                <div>
+                                    <div class="book-title">The 5 AM Club</div>
+                                    <div class="book-author">Robin Sharma</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="stars">&#9733;&#9733;&#9733;&#9734;&#9734;</span></td>
+                        <td><span class="review-text">Good concepts but some parts felt repetitive.</span></td>
+                        <td><span class="status-badge pending">Pending</span></td>
+                        <td><span class="date-cell">May 30, 2024<br>5:15 PM</span></td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="action-icon-btn">&#128065;</button>
+                                <button class="action-icon-btn">&#8942;</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="reviewer-cell">
+                                <div class="avatar" style="background:#1d4ed8;">JT</div>
+                                <div>
+                                    <div class="reviewer-name">James Thompson</div>
+                                    <div class="reviewer-email">james.t@email.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="book-cell">
+                                <div class="book-cover"></div>
+                                <div>
+                                    <div class="book-title">Atomic Habits</div>
+                                    <div class="book-author">James Clear</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+                        <td><span class="review-text">Best book I've read this year! Transformed my daily routine.</span></td>
+                        <td><span class="status-badge approved">Approved</span></td>
+                        <td><span class="date-cell">May 29, 2024<br>3:45 PM</span></td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="action-icon-btn">&#128065;</button>
+                                <button class="action-icon-btn">&#8942;</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="reviewer-cell">
+                                <div class="avatar"><img src="" alt="" style="background:#374151;"></div>
+                                <div>
+                                    <div class="reviewer-name">Maria Garcia</div>
+                                    <div class="reviewer-email">maria.g@email.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="book-cell">
+                                <div class="book-cover"></div>
+                                <div>
+                                    <div class="book-title">Deep Work</div>
+                                    <div class="book-author">Cal Newport</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span></td>
+                        <td><span class="review-text">Very helpful for remote work. Improved my productivity.</span></td>
+                        <td><span class="status-badge rejected">Rejected</span></td>
+                        <td><span class="date-cell">May 29, 2024<br>2:10 PM</span></td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="action-icon-btn">&#128065;</button>
+                                <button class="action-icon-btn">&#8942;</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="reviewer-cell">
+                                <div class="avatar" style="background:#0e7490;">RB</div>
+                                <div>
+                                    <div class="reviewer-name">Robert Brown</div>
+                                    <div class="reviewer-email">robert.b@email.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="book-cell">
+                                <div class="book-cover"></div>
+                                <div>
+                                    <div class="book-title">Rich Dad Poor Dad</div>
+                                    <div class="book-author">Robert Kiyosaki</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span></td>
+                        <td><span class="review-text">Good financial advice for beginners.</span></td>
+                        <td><span class="status-badge approved">Approved</span></td>
+                        <td><span class="date-cell">May 28, 2024<br>11:30 AM</span></td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="action-icon-btn">&#128065;</button>
+                                <button class="action-icon-btn">&#8942;</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="table-footer">
+                <span class="showing-text">Showing 1 to 8 of 2,845 reviews</span>
+                <div class="pagination">
+                    <button class="page-btn">&#8249;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <span class="page-btn dots">...</span>
+                    <button class="page-btn">356</button>
+                    <button class="page-btn">&#8250;</button>
+                    <select class="per-page-select">
+                        <option>10 per page</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar-col">
+
+            <div class="side-card">
+                <div class="side-card-title">Rating Distribution</div>
+
+                <div class="rating-row">
+                    <span class="rating-label">5 Stars</span>
+                    <div class="rating-bar-track">
+                        <div class="rating-bar-fill" style="width:57%;"></div>
+                    </div>
+                    <span class="rating-count">1,624 (57%)</span>
+                </div>
+                <div class="rating-row">
+                    <span class="rating-label">4 Stars</span>
+                    <div class="rating-bar-track">
+                        <div class="rating-bar-fill" style="width:25%;"></div>
+                    </div>
+                    <span class="rating-count">723 (25%)</span>
+                </div>
+                <div class="rating-row">
+                    <span class="rating-label">3 Stars</span>
+                    <div class="rating-bar-track">
+                        <div class="rating-bar-fill" style="width:10%;"></div>
+                    </div>
+                    <span class="rating-count">285 (10%)</span>
+                </div>
+                <div class="rating-row">
+                    <span class="rating-label">2 Stars</span>
+                    <div class="rating-bar-track">
+                        <div class="rating-bar-fill" style="width:5%;"></div>
+                    </div>
+                    <span class="rating-count">142 (5%)</span>
+                </div>
+                <div class="rating-row">
+                    <span class="rating-label">1 Star</span>
+                    <div class="rating-bar-track">
+                        <div class="rating-bar-fill" style="width:3%;"></div>
+                    </div>
+                    <span class="rating-count">71 (3%)</span>
+                </div>
+
+                <div class="rating-total">
+                    <span>Total</span>
+                    <strong>2,845</strong>
+                </div>
+            </div>
+
+            <div class="side-card">
+                <div class="side-card-title">Top Reviewed Books</div>
+
+                <div class="top-book-row">
+                    <div class="book-cover"></div>
+                    <div class="top-book-info">
+                        <div class="top-book-title">Atomic Habits</div>
+                        <div class="top-book-sub">892 reviews</div>
+                    </div>
+                    <div class="top-book-stats">
+                        <div class="top-book-count">892</div>
+                        <div class="top-book-rating">&#9733; 4.8</div>
+                    </div>
+                </div>
+                <div class="top-book-row">
+                    <div class="book-cover"></div>
+                    <div class="top-book-info">
+                        <div class="top-book-title">Deep Work</div>
+                        <div class="top-book-sub">654 reviews</div>
+                    </div>
+                    <div class="top-book-stats">
+                        <div class="top-book-count">654</div>
+                        <div class="top-book-rating">&#9733; 4.6</div>
+                    </div>
+                </div>
+                <div class="top-book-row">
+                    <div class="book-cover"></div>
+                    <div class="top-book-info">
+                        <div class="top-book-title">Rich Dad Poor Dad</div>
+                        <div class="top-book-sub">489 reviews</div>
+                    </div>
+                    <div class="top-book-stats">
+                        <div class="top-book-count">489</div>
+                        <div class="top-book-rating">&#9733; 4.4</div>
+                    </div>
+                </div>
+                <div class="top-book-row">
+                    <div class="book-cover"></div>
+                    <div class="top-book-info">
+                        <div class="top-book-title">Think and Grow Rich</div>
+                        <div class="top-book-sub">421 reviews</div>
+                    </div>
+                    <div class="top-book-stats">
+                        <div class="top-book-count">421</div>
+                        <div class="top-book-rating">&#9733; 4.5</div>
+                    </div>
+                </div>
+                <div class="top-book-row">
+                    <div class="book-cover"></div>
+                    <div class="top-book-info">
+                        <div class="top-book-title">The 5 AM Club</div>
+                        <div class="top-book-sub">389 reviews</div>
+                    </div>
+                    <div class="top-book-stats">
+                        <div class="top-book-count">389</div>
+                        <div class="top-book-rating">&#9733; 4.3</div>
+                    </div>
+                </div>
+
+                <button class="view-all-btn">View All Books</button>
+            </div>
+
+            <div class="side-card">
+                <div class="side-card-title">Review Moderation Tips</div>
+
+                <div class="tip-row">
+                    <span class="tip-icon approve">&#10003;</span>
+                    <div>
+                        <div class="tip-title">Approve</div>
+                        <div class="tip-desc">Reviews that are helpful and respectful</div>
+                    </div>
+                </div>
+                <div class="tip-row">
+                    <span class="tip-icon reject">&#10005;</span>
+                    <div>
+                        <div class="tip-title">Reject</div>
+                        <div class="tip-desc">Reviews that contain spam or abuse</div>
+                    </div>
+                </div>
+                <div class="tip-row">
+                    <span class="tip-icon edit">&#9998;</span>
+                    <div>
+                        <div class="tip-title">Edit</div>
+                        <div class="tip-desc">You can edit reviews to fix minor issues</div>
+                    </div>
+                </div>
+
+                <a class="guidelines-link" href="#">View Moderation Guidelines &#8250;</a>
+            </div>
+
+        </div>
+    </div>
+    <script>
+               var MENU_HTML =
+              '<button type="button" role="menuitem" class="kebab-item" data-action="edit">✎ Edit Book</button>' +
+              '<button type="button" role="menuitem" class="kebab-item" data-action="upload">⤓ Upload New Version</button>' +
+              '<button type="button" role="menuitem" class="kebab-item" data-action="duplicate">⧉ Duplicate Book</button>' +
+              '<button type="button" role="menuitem" class="kebab-item" data-action="share">↗ Share Link</button>' +
+              '<div class="kebab-sep"></div>' +
+              '<button type="button" role="menuitem" class="kebab-item" data-action="archive">🗄 Archive Book</button>' +
+              '<button type="button" role="menuitem" class="kebab-item danger" data-action="delete">🗑 Delete Book</button>';
+
+            function attachMenu(trigger, alignClass) {
+              // Wrap the trigger in a positioned container and attach a menu
+              var wrap = document.createElement("div");
+              wrap.className = "kebab-wrap";
+              trigger.parentNode.insertBefore(wrap, trigger);
+              wrap.appendChild(trigger);
+
+              var menu = document.createElement("div");
+              menu.className = "kebab-menu" + (alignClass ? " " + alignClass : "");
+              menu.setAttribute("role", "menu");
+              menu.innerHTML = MENU_HTML;
+              wrap.appendChild(menu);
+
+              trigger.addEventListener("click", function (e) {
+                e.stopPropagation();
+                var isOpen = wrap.classList.contains("open");
+                // Close any other open menus first
+                document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
+                  w.classList.remove("open");
+                });
+                if (!isOpen) wrap.classList.add("open");
+              });
+
+              menu.querySelectorAll(".kebab-item").forEach(function (item) {
+                item.addEventListener("click", function (e) {
+                  e.stopPropagation();
+                  wrap.classList.remove("open");
+                  var card = trigger.closest(".book-card");
+                  var title = card ? card.querySelector(".b-title").textContent : "";
+                  var action = item.getAttribute("data-action");
+                  console.log("[v0]", action, "clicked for:", title);
+                });
+              });
+            }
+
+            // Vertical kebab (top-right of each card) — menu opens downward to the right edge
+            document.querySelectorAll(".kebab").forEach(function (kebab) {
+              attachMenu(kebab, "");
+            });
+
+            // Horizontal "More" button (bottom action row) — menu opens upward
+            document.querySelectorAll('.b-actions button[aria-label="More"]').forEach(function (more) {
+              attachMenu(more, "menu-up");
+            });
+
+            // Close menus when clicking anywhere else
+            document.addEventListener("click", function () {
+              document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
+                w.classList.remove("open");
+              });
+            });
+
+                const modal =
+                    document.getElementById("paymentModal");
+
+                const openBtn =
+                    document.getElementById("openPaymentModal");
+
+                const closeBtn =
+                    document.getElementById("closePaymentModal");
+
+                const cancelBtn =
+                    document.getElementById("cancelPaymentModal");
+
+                /* Open */
+
+                openBtn.addEventListener("click", () => {
+
+                    modal.classList.add("show");
+
+                });
+
+                /* Close Button */
+
+                closeBtn.addEventListener("click", () => {
+
+                    modal.classList.remove("show");
+
+                });
+
+                /* Cancel Button */
+
+                cancelBtn.addEventListener("click", () => {
+
+                    modal.classList.remove("show");
+
+                });
+
+                /* Click Outside */
+
+                modal.addEventListener("click", (e) => {
+
+                    if (e.target === modal) {
+
+                        modal.classList.remove("show");
+
+                    }
+
+                });
+    </script>
+</div>

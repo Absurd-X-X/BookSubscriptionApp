@@ -1,0 +1,379 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Soul Shelf - Register";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+
+    <link href="~/css/register.css" rel="stylesheet" />
+    <link href="~/css/notify.css" rel="stylesheet" />
+    <link href="~/css/modal.css" rel="stylesheet" />
+    <link href="~/css/toast.css" rel="stylesheet" />
+</head>
+<body>
+
+    <div class="shell">
+
+        <!-- ============ LEFT PANEL ============ -->
+        <div class="left">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 5.5C4 4.67 4.67 4 5.5 4H11V20H5.5C4.67 20 4 19.33 4 18.5V5.5Z" fill="white" fill-opacity="0.9" />
+                        <path d="M13 4H18.5C19.33 4 20 4.67 20 5.5V18.5C20 19.33 19.33 20 18.5 20H13V4Z" fill="white" fill-opacity="0.6" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="brand-name">Atomic Habits</div>
+                    <div class="brand-sub">Library</div>
+                </div>
+            </div>
+
+            <h1 class="headline">Your Journey to<br><span class="accent">Better Reading</span><br>Starts Here</h1>
+            <p class="subtext">Create your account and unlock a world of knowledge. Read, learn, and grow every day.</p>
+
+            <!-- Placeholder for your own artwork -->
+            <div class="hero-art">
+                <img src="~/lib/images/image_7101b659.png" alt="" style="height: 200px; width: 100%;">
+            </div>
+
+            <div class="stats-row">
+                <div class="stat">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+                    </div>
+                    <div class="stat-num">10,000+</div>
+                    <div class="stat-label">Readers</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18" /><path d="M5 21V7l8-4 8 4v14" /><path d="M9 9h1" /><path d="M9 13h1" /><path d="M14 9h1" /><path d="M14 13h1" /></svg>
+                    </div>
+                    <div class="stat-num">500+</div>
+                    <div class="stat-label">Libraries</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z" /><path d="M22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z" /></svg>
+                    </div>
+                    <div class="stat-num">50,000+</div>
+                    <div class="stat-label">Books</div>
+                </div>
+            </div>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z" /><path d="M22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z" /></svg>
+                    </div>
+                    <div>
+                        <div class="feature-title">Access Thousands of Books</div>
+                        <div class="feature-desc">Explore books, audiobooks, and resources across every genre.</div>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 6l-9.5 9.5-5-5L1 18" /><path d="M17 6h6v6" /></svg>
+                    </div>
+                    <div>
+                        <div class="feature-title">Track Your Progress</div>
+                        <div class="feature-desc">Set goals, track your reading, and build better habits.</div>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6" /><path d="M9 14l-3 7 6-3 6 3-3-7" /></svg>
+                    </div>
+                    <div>
+                        <div class="feature-title">Smart Recommendations</div>
+                        <div class="feature-desc">Get personalized book suggestions tailored to your interests.</div>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+                    </div>
+                    <div>
+                        <div class="feature-title">Join Reading Communities</div>
+                        <div class="feature-desc">Connect with fellow readers and grow together.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quote">
+                <div class="quote-mark">&ldquo;</div>
+                <div>
+                    <div class="quote-text">Books are a uniquely portable magic.</div>
+                    <div class="quote-author">— Stephen King</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ RIGHT PANEL ============ -->
+        <div class="right">
+            <div class="right-head">
+                <h1>Create Your Account</h1>
+                <p>Join thousands of readers today. Already have an account? <a href="#" class="signin-link" id="signinLink">Sign in</a></p>
+            </div>
+
+            <div class="oauth-row">
+                <button class="oauth-btn" id="googleBtn" type="button">
+                    <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.3 29.3 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l6-6C34.6 4.1 29.6 2 24 2 12 2 2 12 2 24s10 22 22 22 22-10 22-22c0-1.2-.1-2.4-.4-3.5z" /><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3.1 0 5.9 1.2 8 3.1l6-6C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" /><path fill="#4CAF50" d="M24 44c5.5 0 10.4-2 13.9-5.4l-6.4-5.4C29.6 35 27 36 24 36c-5.3 0-9.7-3.6-11.3-8.4l-6.6 5.1C9.5 39.6 16.1 44 24 44z" /><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1 2.8-2.8 5.1-5.1 6.6l6.4 5.4C40.6 36.8 44 31 44 24c0-1.2-.1-2.4-.4-3.5z" /></svg>
+                    Continue with Google
+                </button>
+                <button class="oauth-btn" id="msBtn" type="button">
+                    <svg viewBox="0 0 23 23"><rect x="1" y="1" width="10" height="10" fill="#F25022" /><rect x="12" y="1" width="10" height="10" fill="#7FBA00" /><rect x="1" y="12" width="10" height="10" fill="#00A4EF" /><rect x="12" y="12" width="10" height="10" fill="#FFB900" /></svg>
+                    Continue with Microsoft
+                </button>
+            </div>
+
+            <div class="divider">or sign up with email</div>
+
+            <form asp-controller="Auth" asp-action="Register" method="post" id="signupForm" novalidate>
+
+                <!-- Single role; kept as a hidden field so model binding still receives Role -->
+                <input type="hidden" name="Role" value="reader">
+
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label" for="fullName">Full Name</label>
+                        <div class="input-wrap">
+                            <svg class="leading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                            <input type="text" id="fullName" name="Name" placeholder="Enter your full name" autocomplete="name">
+                        </div>
+                        <div class="error" id="fullNameError"></div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="UserName">Username <span class="optional">(Optional)</span></label>
+                        <div class="input-wrap">
+                            <svg class="leading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                            <input type="text" id="UserName" name="UserName" placeholder="Enter your preferred username" autocomplete="username">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="email">Email Address</label>
+                    <div class="input-wrap">
+                        <svg class="leading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
+                        <input type="email" id="email" name="Email" placeholder="Enter your email address" autocomplete="email">
+                    </div>
+                    <div class="error" id="emailError"></div>
+                </div>
+
+                <div class="field-row">
+                    <div class="field-group">
+                        <label class="field-label" for="password">Password</label>
+                        <div class="input-wrap">
+                            <svg class="leading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                            <input type="password" id="password" name="Password" placeholder="Create a password" autocomplete="new-password">
+                            <button type="button" class="toggle-eye" data-target="password">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>
+                            </button>
+                        </div>
+                        <div class="pw-meta">
+                            <span>Password strength:</span>
+                            <div class="pw-bars" id="pwBars">
+                                <div class="pw-bar"></div><div class="pw-bar"></div><div class="pw-bar"></div><div class="pw-bar"></div>
+                            </div>
+                            <span class="pw-strength-label" id="pwStrengthLabel"></span>
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="confirmPassword">Confirm Password</label>
+                        <div class="input-wrap">
+                            <svg class="leading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                            <input type="password" id="confirmPassword" name="ConfirmPassword" placeholder="Confirm your password" autocomplete="new-password">
+                            <button type="button" class="toggle-eye" data-target="confirmPassword">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>
+                            </button>
+                        </div>
+                        <div class="pw-hint">Use 8+ characters with a mix of letters, numbers &amp; symbols</div>
+                        <div class="error" id="confirmError"></div>
+                    </div>
+                </div>
+
+                <div class="terms-row">
+                    <div class="checkbox checked" id="termsCheckbox">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12" /></svg>
+                    </div>
+                    <div>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Create Account</button>
+
+                <div class="verify-note">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                    Email verification required to activate your account.
+                </div>
+
+                <div class="foot-divider"></div>
+
+                <div class="secure-note">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                    Your data is secure and will never be shared with third parties.
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <script src="~/js/modal.js"></script>
+    <script src="~/js/toast.js"></script>
+
+    <script>
+        // ----- Password show/hide toggle -----
+        document.querySelectorAll('.toggle-eye').forEach(btn => {
+        btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.target);
+        input.type = input.type === 'password' ? 'text' : 'password';
+        });
+        });
+
+        // ----- Password strength meter -----
+        const passwordInput = document.getElementById('password');
+        const pwBars = document.querySelectorAll('.pw-bar');
+        const pwStrengthLabel = document.getElementById('pwStrengthLabel');
+
+        function scorePassword(pw) {
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+        if (/\d/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+        return score; // 0-4
+        }
+
+        function updateStrength() {
+        const pw = passwordInput.value;
+        const score = pw.length === 0 ? 0 : scorePassword(pw);
+
+        pwBars.forEach((bar, i) => bar.classList.toggle('filled', i < score));
+
+        let label = '';
+        pwStrengthLabel.classList.remove('strong');
+        if (pw.length === 0) {
+        label = '';
+        } else if (score <= 1) {
+        label = 'Weak';
+        } else if (score === 2) {
+        label = 'Fair';
+        } else if (score === 3) {
+        label = 'Good';
+        } else {
+        label = 'Strong';
+        pwStrengthLabel.classList.add('strong');
+        }
+        pwStrengthLabel.textContent = label;
+        }
+        passwordInput.addEventListener('input', updateStrength);
+
+        // ----- Terms checkbox -----
+        const termsCheckbox = document.getElementById('termsCheckbox');
+        let termsAgreed = true;
+        termsCheckbox.addEventListener('click', () => {
+        termsAgreed = !termsAgreed;
+        termsCheckbox.classList.toggle('checked', termsAgreed);
+        });
+
+        // ----- OAuth buttons (placeholder actions) -----
+        document.getElementById('googleBtn').addEventListener('click', () => {
+        alert('Continue with Google — hook this up to your auth provider.');
+        });
+        document.getElementById('msBtn').addEventListener('click', () => {
+        alert('Continue with Microsoft — hook this up to your auth provider.');
+        });
+
+        document.getElementById('signinLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('Navigate to your Sign in page here.');
+        });
+
+        // ----- Client-side validation, then real MVC POST -----
+        const form = document.getElementById('signupForm');
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+
+        const fullNameError = document.getElementById('fullNameError');
+        const emailError = document.getElementById('emailError');
+        const confirmError = document.getElementById('confirmError');
+
+        function isValidEmail(value) {
+        return /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(value);
+        }
+
+        // FIX 1: added async to the arrow function
+        form.addEventListener('submit', async (e) => {
+        // FIX 3: always prevent default first, then decide whether to proceed
+        e.preventDefault();
+
+        let valid = true;
+
+        fullNameError.textContent = '';
+        emailError.textContent = '';
+        confirmError.textContent = '';
+
+        if (fullNameInput.value.trim().length === 0) {
+        fullNameError.textContent = 'Please enter your full name.';
+        valid = false;
+        }
+
+        if (!isValidEmail(emailInput.value.trim())) {
+        emailError.textContent = 'Please enter a valid email address.';
+        valid = false;
+        }
+
+        if (passwordInput.value.length < 8) {
+        valid = false;
+        }
+
+        if (confirmPasswordInput.value !== passwordInput.value || passwordInput.value === '') {
+        confirmError.textContent = 'Passwords do not match.';
+        valid = false;
+        }
+
+        if (!termsAgreed) {
+        alert('You must agree to the Terms of Service and Privacy Policy.');
+        valid = false;
+        }
+
+        if (!valid) {
+        return;
+        }
+
+        // FIX 2: use form reference instead of this
+        const formData = new FormData(form);
+
+        Modal.show('loading', { title: 'Creating account...', message: 'Please wait.' });
+
+        try {
+        const response = await fetch('@Url.Action("Register", "Auth")', { method: 'POST', body: formData });
+        const data = await response.json();
+
+        if (data.success) {
+        Modal.show('success', { title: 'Account created!', message: 'Welcome aboard.' });
+        setTimeout(() => window.location.href = data.redirectUrl, 1200);
+
+        } else if (data.redirectUrl) {
+        // e.g. "not verified" case — redirect instead of just showing an error
+        window.location.href = data.redirectUrl;
+
+        } else {
+        Modal.show('error', { title: 'Registration failed', message: data.message });
+        }
+        } catch (err) {
+        Modal.show('error', { title: 'Network error', message: 'Could not reach the server.' });
+        }
+        });
+    </script>
+
+</body>
+
+</html>
+

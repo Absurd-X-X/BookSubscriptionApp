@@ -1,0 +1,212 @@
+﻿@{
+    Layout = "~/Views/Shared/_LibraryLayout.cshtml";
+    ViewData["Title"] = "Preview Book";
+}
+
+<link href="~/css/preview.css" rel="stylesheet" />
+<div class="reader-wrap">
+
+    <aside class="toc">
+        <div class="toc-header">
+            <span>Table of Contents</span>
+            <button class="toc-close" aria-label="Close">&#x2715;</button>
+        </div>
+        <div class="toc-list">
+            <div class="toc-item">
+                <span>Cover</span>
+                <span class="check">&#10003;</span>
+            </div>
+            <div class="toc-item">
+                <span>Title Page</span>
+                <span class="check">&#10003;</span>
+            </div>
+            <div class="toc-item">
+                <span>Copyright</span>
+                <span class="check">&#10003;</span>
+            </div>
+            <div class="toc-item">
+                <span>Dedication</span>
+                <span class="check">&#10003;</span>
+            </div>
+            <div class="toc-item">
+                <span>Introduction</span>
+                <span class="toc-pg">1</span>
+            </div>
+
+            <div class="toc-section">PART 1: The Fundamentals</div>
+            <div class="toc-item active">
+                <span>1. Why Small Changes Make a Big Difference</span>
+                <span class="toc-pg">9</span>
+            </div>
+            <div class="toc-item">
+                <span>2. How Your Habits Shape Your Identity</span>
+                <span class="toc-pg">25</span>
+            </div>
+            <div class="toc-item">
+                <span>3. How to Build Better Habits</span>
+                <span class="toc-pg">39</span>
+            </div>
+            <div class="toc-item">
+                <span>4. The Mantra of Behavior Change</span>
+                <span class="toc-pg">55</span>
+            </div>
+
+            <div class="toc-section">PART 2: The 1st Law — Make It Obvious</div>
+            <div class="toc-item">
+                <span>5. The Best Way to Start</span>
+                <span class="toc-pg">67</span>
+            </div>
+            <div class="toc-item">
+                <span>6. Motivation Is Overrated; Environment Often Matters More</span>
+                <span class="toc-pg">81</span>
+            </div>
+
+            <div class="toc-section">PART 3: The 2nd Law — Make It Attractive</div>
+            <div class="toc-item">
+                <span>7. How to Make a Habit Irresistible</span>
+                <span class="toc-pg">103</span>
+            </div>
+            <div class="toc-item">
+                <span>8. The Role of Family and Friends</span>
+                <span class="toc-pg">117</span>
+            </div>
+
+            <button class="show-more-btn">
+                &#x25BC; Show More Chapters
+            </button>
+        </div>
+    </aside>
+
+
+    <!-- CENTER: Book Content -->
+    <section class="book-content">
+
+        <!-- Toolbar -->
+        <div class="reader-toolbar">
+            <div class="toolbar-left">
+                <div class="search-wrap">
+                    <span class="search-icon">&#x1F50D;</span>
+                    <input class="tb-search" type="text" placeholder="Search in book..." />
+                    <span class="search-shortcut">Ctrl + F</span>
+                </div>
+                <button class="tb-icon-btn" title="Bookmark">&#128278;</button>
+                <button class="tb-icon-btn" title="Notes">&#128203;</button>
+                <button class="tb-icon-btn" title="More">&#8230;</button>
+            </div>
+
+            <div class="toolbar-right">
+                <div class="tb-group">
+                    <span class="tb-group-label">Theme</span>
+                    <button class="theme-btn active" title="Light">&#9728;</button>
+                    <button class="theme-btn" title="Dark">&#9790;</button>
+                </div>
+                <div class="tb-group">
+                    <span class="tb-group-label">Font</span>
+                    <button class="theme-btn" title="Decrease">&#x2212;</button>
+                    <span class="font-size-val">100%</span>
+                    <button class="theme-btn" title="Increase">&#x2B;</button>
+                </div>
+                <button class="tb-more-label">More &#8230;</button>
+                <button class="exit-reader-btn">&#8592; Exit Reader</button>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="page-area">
+            <div class="chapter-label">Chapter 1</div>
+            <h1 class="chapter-title">Why Small Changes<br>Make a Big Difference</h1>
+            <p class="chapter-quote">
+                "Success is the product of daily habits—<br>
+                not once-in-a-lifetime transformations."
+            </p>
+            <div class="chapter-divider"></div>
+
+            <p class="page-text">
+                Imagine that you're an average person. Now imagine that, each day, you get 1% better. Just <strong>1%</strong>.
+            </p>
+            <p class="page-text">
+                You might think, "That's not much—sometimes I don't even notice 1% change in a day."
+            </p>
+            <p class="page-text">
+                But here's the catch: It compounds. 1% better every day for one year. You'd end up
+                <span class="highlight">37 times</span> better by the time you're done.
+            </p>
+
+            <!-- Gains Diagram -->
+            <div class="gains-box">
+                <div class="gains-title">The Power of Tiny Gains</div>
+
+                <div class="gains-row">
+                    <span class="gains-label">1% better every day</span>
+                    <div class="gains-eq">
+                        <span class="gains-formula">1.01<sup>365</sup></span>
+                        <span class="gains-equals">=</span>
+                        <span class="gains-result positive">37.78</span>
+                    </div>
+                </div>
+
+                <div class="gains-row">
+                    <span class="gains-label">1% worse every day</span>
+                    <div class="gains-eq">
+                        <span class="gains-formula">0.99<sup>365</sup></span>
+                        <span class="gains-equals">=</span>
+                        <span class="gains-result negative">0.03</span>
+                    </div>
+                </div>
+
+                <div class="gains-chart">
+                    <svg viewBox="0 0 420 90" xmlns="http://www.w3.org/2000/svg">
+                        <text x="2" y="12" font-size="10" fill="#9ca3af">Improvement</text>
+                        <!-- Growth curve (1% better) -->
+                        <polyline points="30,80 80,75 130,68 180,56 230,42 280,26 330,10 390,4"
+                                  fill="none" stroke="#7c3aed" stroke-width="2"
+                                  stroke-linecap="round" stroke-linejoin="round" />
+                        <!-- Decline curve (1% worse) -->
+                        <polyline points="30,80 80,81 130,82 180,83 230,83 280,84 330,84 390,85"
+                                  fill="none" stroke="#d1d5db" stroke-width="1.5"
+                                  stroke-linecap="round" stroke-linejoin="round" />
+                        <text x="30" y="88" font-size="9" fill="#9ca3af">1</text>
+                        <text x="360" y="88" font-size="9" fill="#9ca3af">Time</text>
+                        <text x="310" y="8" font-size="9" fill="#7c3aed">1% better every day</text>
+                        <text x="310" y="82" font-size="9" fill="#9ca3af">1% worse every day</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <div class="reader-bottom-bar">
+            <button class="nav-btn">&#8592; Previous</button>
+
+            <div class="progress-wrap">
+                <div class="progress-track">
+                    <div class="progress-fill"></div>
+                    <div class="progress-thumb"></div>
+                </div>
+                <div class="progress-pct">35% Complete</div>
+            </div>
+
+            <span class="page-indicator">Page 24 of 320</span>
+            <button class="nav-btn">Next &#8594;</button>
+        </div>
+
+    </section>
+
+
+    <!-- RIGHT: Notes Panel -->
+    <aside class="notes-panel">
+        <div class="notes-tabs">
+            <button class="notes-tab active">Notes</button>
+            <button class="notes-tab">Bookmarks</button>
+            <button class="notes-tab">Highlights</button>
+        </div>
+
+        <div class="notes-empty">
+            <div class="notes-icon">&#128203;</div>
+            <p class="notes-empty-title">No notes yet</p>
+            <p class="notes-empty-sub">Start taking notes while reading this book.</p>
+            <button class="add-note-btn">&#x2B; Add Note</button>
+        </div>
+    </aside>
+
+</div>

@@ -1,0 +1,524 @@
+﻿@{
+    Layout = "~/Views/Shared/_LibraryLayout.cshtml";
+    ViewData["Title"] = "Library Wallet";
+}
+<link rel="stylesheet" href="~/css/getWallet.css">
+
+<main class="dashboard-container">
+
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">Wallet Management</h1>
+            <p class="page-subtitle">Monitor wallet balances, transactions, withdrawals, and system fund requests.</p>
+        </div>
+        <div class="action-group">
+            <button class="btn">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <p>Export Transactions</p>
+            </button>
+            <button class="btn btn-blue-text">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                Transfer Funds
+            </button>
+            <button class="btn btn-primary">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                Fund Wallet
+            </button>
+        </div>
+    </header>
+
+    <section class="metrics-grid">
+        <div class="card-metric">
+            <div class="icon-box icon-emerald">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+            </div>
+            <div class="metric-details">
+                <p>Total Wallet Balance</p>
+                <div class="metric-value">₦12,458,900</div>
+                <div class="metric-trend trend-up">↑ 8.5% this month</div>
+            </div>
+        </div>
+        <div class="card-metric">
+            <div class="icon-box icon-blue">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            </div>
+            <div class="metric-details">
+                <p>Funds Added</p>
+                <div class="metric-value">₦5,340,000</div>
+                <div class="metric-trend trend-neutral">156 global deposits</div>
+            </div>
+        </div>
+        <div class="card-metric">
+            <div class="icon-box icon-purple">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+            </div>
+            <div class="metric-details">
+                <p>Funds Spent</p>
+                <div class="metric-value">₦3,821,000</div>
+                <div class="metric-trend trend-neutral">247 transactions</div>
+            </div>
+        </div>
+        <div class="card-metric">
+            <div class="icon-box icon-amber">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div class="metric-details">
+                <p>Pending Withdrawals</p>
+                <div class="metric-value">₦210,000</div>
+                <div class="metric-trend trend-neutral" style="color: var(--color-amber);">8 active requests</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="workspace-grid">
+
+        <div>
+
+            <nav class="tab-nav">
+                <button class="tab-link active-tab" data-tab="wallet-transactions">Wallet Transactions</button>
+                <button class="tab-link" data-tab="funding-requests">Funding Requests</button>
+                <button class="tab-link" data-tab="withdrawals">Withdrawals</button>
+                <button class="tab-link" data-tab="transfers">Transfers</button>
+            </nav>
+
+            <div class="table-view-card">
+
+                <div class="filter-header-bar">
+                    <div class="search-container">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" id="tableSearch" placeholder="Search across target system logs...">
+                    </div>
+                    <select class="select-input">
+                        <option value="">All Statuses</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                    <select class="select-input">
+                        <option value="">Filter Method</option>
+                        <option value="card">Card Gateway</option>
+                        <option value="bank">Bank Transfer</option>
+                    </select>
+                    <button class="btn" style="padding: 7px 14px;">Filter</button>
+                </div>
+
+                <div id="pane-wallet-transactions" class="table-pane active-pane">
+                    <div class="responsive-scroller">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>User Profile</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Channel</th>
+                                    <th>Timestamp</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="color: var(--color-blue); font-weight: 500;">TXN-908123</td>
+                                    <td>
+                                        <div class="user-profile-cell">
+                                            <div class="avatar-ui" style="background-color: rgba(168, 85, 247, 0.2); color: var(--color-purple);">AM</div>
+                                            <div class="user-info">
+                                                <p class="user-name">Andrew Marcus</p>
+                                                <p class="user-sub">amarcus@example.com</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span style="color: var(--color-rose); font-weight: 500;">Debit</span></td>
+                                    <td style="color: var(--text-white); font-weight: 600;">₦12,500</td>
+                                    <td>API Checkout</td>
+                                    <td>
+                                        <p style="color: var(--text-white);">Jun 11, 2026</p>
+                                        <p style="font-size: 11px; color: var(--text-muted);">11:14 AM</p>
+                                    </td>
+                                    <td><span class="status-badge badge-success">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="color: var(--color-blue); font-weight: 500;">TXN-908122</td>
+                                    <td>
+                                        <div class="user-profile-cell">
+                                            <div class="avatar-ui" style="background-color: rgba(59, 130, 246, 0.2); color: var(--color-blue);">ON</div>
+                                            <div class="user-info">
+                                                <p class="user-name">Okon Nse</p>
+                                                <p class="user-sub">okon.nse@domain.com</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span style="color: var(--color-emerald); font-weight: 500;">Credit</span></td>
+                                    <td style="color: var(--text-white); font-weight: 600;">₦150,000</td>
+                                    <td>Wallet Load</td>
+                                    <td>
+                                        <p style="color: var(--text-white);">Jun 11, 2026</p>
+                                        <p style="font-size: 11px; color: var(--text-muted);">09:30 AM</p>
+                                    </td>
+                                    <td><span class="status-badge badge-success">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="color: var(--color-blue); font-weight: 500;">TXN-908121</td>
+                                    <td>
+                                        <div class="user-profile-cell">
+                                            <div class="avatar-ui" style="background-color: rgba(245, 158, 11, 0.2); color: var(--color-amber);">CE</div>
+                                            <div class="user-info">
+                                                <p class="user-name">Chidi Eze</p>
+                                                <p class="user-sub">chidi@eze.io</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span style="color: var(--color-rose); font-weight: 500;">Debit</span></td>
+                                    <td style="color: var(--text-white); font-weight: 600;">₦45,000</td>
+                                    <td>Payout Transfer</td>
+                                    <td>
+                                        <p style="color: var(--text-white);">Jun 10, 2026</p>
+                                        <p style="font-size: 11px; color: var(--text-muted);">04:15 PM</p>
+                                    </td>
+                                    <td><span class="status-badge badge-danger">Failed</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="pane-funding-requests" class="table-pane">
+                    <div class="responsive-scroller">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Request ID</th>
+                                    <th>User Account</th>
+                                    <th>Amount Requested</th>
+                                    <th>Payment Source</th>
+                                    <th>Submission Date</th>
+                                    <th>Status Badge</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="color: var(--color-blue); font-weight: 500;">FND-2026-0128</td>
+                                    <td>
+                                        <div class="user-profile-cell">
+                                            <div class="avatar-ui" style="background-color: rgba(16, 185, 129, 0.2); color: var(--color-emerald);">JD</div>
+                                            <div class="user-info">
+                                                <p class="user-name">John Doe</p>
+                                                <p class="user-sub">johndoe@web.com</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="color: var(--text-white); font-weight: 600;">₦10,000</td>
+                                    <td>Card Payment Gateway</td>
+                                    <td>
+                                        <p style="color: var(--text-white);">Jun 10, 2026</p>
+                                        <p style="font-size: 11px; color: var(--text-muted);">10:45 AM</p>
+                                    </td>
+                                    <td><span class="status-badge badge-pending">Pending Approval</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="color: var(--color-blue); font-weight: 500;">FND-2026-0127</td>
+                                    <td>
+                                        <div class="user-profile-cell">
+                                            <div class="avatar-ui" style="background-color: rgba(168, 85, 247, 0.2); color: var(--color-purple);">SM</div>
+                                            <div class="user-info">
+                                                <p class="user-name">Sarah Miller</p>
+                                                <p class="user-sub">smiller@cloud.com</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="color: var(--text-white); font-weight: 600;">₦250,000</td>
+                                    <td>Manual Bank Transfer</td>
+                                    <td>
+                                        <p style="color: var(--text-white);">Jun 10, 2026</p>
+                                        <p style="font-size: 11px; color: var(--text-muted);">09:12 AM</p>
+                                    </td>
+                                    <td><span class="status-badge badge-pending">Pending Approval</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="color: var(--color-blue); font-weight: 500;">FND-2026-0126</td>
+                                    <td>
+                                        <div class="user-profile-cell">
+                                            <div class="avatar-ui" style="background-color: rgba(59, 130, 246, 0.2); color: var(--color-blue);">KA</div>
+                                            <div class="user-info">
+                                                <p class="user-name">Kofi Adams</p>
+                                                <p class="user-sub">kofi.adams@corp.gh</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="color: var(--text-white); font-weight: 600;">₦85,000</td>
+                                    <td>USSD Channel</td>
+                                    <td>
+                                        <p style="color: var(--text-white);">Jun 09, 2026</p>
+                                        <p style="font-size: 11px; color: var(--text-muted);">11:20 PM</p>
+                                    </td>
+                                    <td><span class="status-badge badge-success">Approved</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="pane-withdrawals" class="table-pane">
+                    <div class="responsive-scroller">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Withdrawal ID</th>
+                                    <th>Beneficiary</th>
+                                    <th>Payout Value</th>
+                                    <th>Target Settlement Node</th>
+                                    <th>Processing Date</th>
+                                    <th>State</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="color: var(--color-blue); font-weight: 500;">WTH-44102</td>
+                                    <td>
+                                        <div class="user-profile-cell">
+                                            <div class="avatar-ui" style="background-color: rgba(245, 158, 11, 0.2); color: var(--color-amber);">FB</div>
+                                            <div class="user-info">
+                                                <p class="user-name">Festus Bello</p>
+                                                <p class="user-sub">fbello@hq.org</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="color: var(--text-white); font-weight: 600;">₦85,000</td>
+                                    <td>Access Bank (Acc: ****6791)</td>
+                                    <td>
+                                        <p style="color: var(--text-white);">Jun 09, 2026</p>
+                                        <p style="font-size: 11px; color: var(--text-muted);">04:12 PM</p>
+                                    </td>
+                                    <td><span class="status-badge badge-success">Disbursed</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="color: var(--color-blue); font-weight: 500;">WTH-44103</td>
+                                    <td>
+                                        <div class="user-profile-cell">
+                                            <div class="avatar-ui" style="background-color: rgba(16, 185, 129, 0.2); color: var(--color-emerald);">TA</div>
+                                            <div class="user-info">
+                                                <p class="user-name">Tunde Adeniran</p>
+                                                <p class="user-sub">tunde@adeniran.net</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="color: var(--text-white); font-weight: 600;">₦120,000</td>
+                                    <td>GTBank (Acc: ****3321)</td>
+                                    <td>
+                                        <p style="color: var(--text-white);">Jun 09, 2026</p>
+                                        <p style="font-size: 11px; color: var(--text-muted);">02:05 PM</p>
+                                    </td>
+                                    <td><span class="status-badge badge-pending">In Clearing Queue</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="color: var(--color-blue); font-weight: 500;">WTH-44104</td>
+                                    <td>
+                                        <div class="user-profile-cell">
+                                            <div class="avatar-ui" style="background-color: rgba(244, 63, 94, 0.2); color: var(--color-rose);">UI</div>
+                                            <div class="user-info">
+                                                <p class="user-name">Uche Ifeanyi</p>
+                                                <p class="user-sub">uche@ifeanyi.com</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="color: var(--text-white); font-weight: 600;">₦30,000</td>
+                                    <td>Zenith Bank (Acc: ****0043)</td>
+                                    <td>
+                                        <p style="color: var(--text-white);">Jun 08, 2026</p>
+                                        <p style="font-size: 11px; color: var(--text-muted);">09:00 AM</p>
+                                    </td>
+                                    <td><span class="status-badge badge-danger">Rejected</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="pane-transfers" class="table-pane">
+                    <div class="responsive-scroller">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Transfer Link ID</th>
+                                    <th>Originating Sender</th>
+                                    <th>Target Receiver</th>
+                                    <th>Transferred Sum</th>
+                                    <th>Execution Time</th>
+                                    <th>Process State</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="color: var(--color-blue); font-weight: 500;">TRF-77610</td>
+                                    <td>Alice Johnson (Internal)</td>
+                                    <td>Robert Smith (Internal)</td>
+                                    <td style="color: var(--text-white); font-weight: 600;">₦45,000</td>
+                                    <td>
+                                        <p style="color: var(--text-white);">Jun 08, 2026</p>
+                                        <p style="font-size: 11px; color: var(--text-muted);">02:00 PM</p>
+                                    </td>
+                                    <td><span class="status-badge badge-success">Settled</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="color: var(--color-blue); font-weight: 500;">TRF-77611</td>
+                                    <td>Emmanuel Adebayo</td>
+                                    <td>Grace Umar</td>
+                                    <td style="color: var(--text-white); font-weight: 600;">₦15,000</td>
+                                    <td>
+                                        <p style="color: var(--text-white);">Jun 07, 2026</p>
+                                        <p style="font-size: 11px; color: var(--text-muted);">05:44 PM</p>
+                                    </td>
+                                    <td><span class="status-badge badge-success">Settled</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="color: var(--color-blue); font-weight: 500;">TRF-77612</td>
+                                    <td>Mariam Musa</td>
+                                    <td>David Okeke</td>
+                                    <td style="color: var(--text-white); font-weight: 600;">₦60,000</td>
+                                    <td>
+                                        <p style="color: var(--text-white);">Jun 07, 2026</p>
+                                        <p style="font-size: 11px; color: var(--text-muted);">11:15 AM</p>
+                                    </td>
+                                    <td><span class="status-badge badge-success">Settled</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="pagination-footer">
+                    <div>Showing <span style="color: var(--text-white); font-weight: 500;">1 - 3</span> of <span style="color: var(--text-white); font-weight: 500;">24</span> log outputs</div>
+                    <div class="page-controls">
+                        <button class="page-number">&lt;</button>
+                        <button class="page-number active-page">1</button>
+                        <button class="page-number">2</button>
+                        <button class="page-number">3</button>
+                        <button class="page-number">&gt;</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bottom-action-container">
+                <div class="action-card">
+                    <div class="action-circle-icon icon-emerald">✓</div>
+                    <div>
+                        <h4>Approve Core Operations</h4>
+                        <p>Instantly review, authorize, and verify incoming platform balance request parameters.</p>
+                        <a href="#">Review Approval Queue &rarr;</a>
+                    </div>
+                </div>
+                <div class="action-card">
+                    <div class="action-circle-icon icon-rose">✕</div>
+                    <div>
+                        <h4>Decline / Flag Processes</h4>
+                        <p>Reject irregular activities immediately while dispatching systemic audit log trails.</p>
+                        <a href="#">Open System Logs &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <aside>
+
+            <div class="sidebar-block">
+                <h3>Wallet Balance Split</h3>
+
+                <div class="sidebar-stat-row">
+                    <div class="sidebar-mini-icon icon-blue">Inb</div>
+                    <div class="sidebar-stat-info">
+                        <p class="sidebar-stat-label">Total Inbound Requests</p>
+                        <p class="sidebar-stat-value">₦2,450,000</p>
+                    </div>
+                </div>
+
+                <div class="sidebar-stat-row">
+                    <div class="sidebar-mini-icon icon-emerald">Clr</div>
+                    <div class="sidebar-stat-info">
+                        <p class="sidebar-stat-label">Total Cleared Balances</p>
+                        <p class="sidebar-stat-value">₦1,680,000</p>
+                    </div>
+                </div>
+
+                <div class="sidebar-stat-row">
+                    <div class="sidebar-mini-icon icon-purple">Usd</div>
+                    <div class="sidebar-stat-info">
+                        <p class="sidebar-stat-label">Escrowed Holding Pools</p>
+                        <p class="sidebar-stat-value">₦770,000</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-block">
+                <h3>Live Ledger Signals</h3>
+                <div class="activity-stream">
+
+                    <div class="activity-row">
+                        <div class="activity-details">
+                            <p class="activity-title">Okon Nse Wallet Loaded</p>
+                            <p class="activity-time">Just now</p>
+                        </div>
+                        <div class="activity-amount" style="color: var(--color-emerald);">+₦150,000</div>
+                    </div>
+
+                    <div class="activity-row">
+                        <div class="activity-details">
+                            <p class="activity-title">Andrew Marcus Checkout</p>
+                            <p class="activity-time">14 mins ago</p>
+                        </div>
+                        <div class="activity-amount" style="color: var(--color-rose);">-₦12,500</div>
+                    </div>
+
+                    <div class="activity-row">
+                        <div class="activity-details">
+                            <p class="activity-title">John Doe FND Request</p>
+                            <p class="activity-time">1 hr ago</p>
+                        </div>
+                        <div class="activity-amount" style="color: var(--color-amber);">Pending</div>
+                    </div>
+
+                    <div class="activity-row">
+                        <div class="activity-details">
+                            <p class="activity-title">WTH-44104 Clearance</p>
+                            <p class="activity-time">4 hrs ago</p>
+                        </div>
+                        <div class="activity-amount" style="color: var(--color-rose);">Rejected</div>
+                    </div>
+
+                </div>
+            </div>
+
+        </aside>
+
+    </section>
+
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabLinks = document.querySelectorAll('.tab-link');
+        const tablePanes = document.querySelectorAll('.table-pane');
+
+        tabLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                // 1. Remove active state styling from previous tab menu links
+                tabLinks.forEach(item => item.classList.remove('active-tab'));
+
+                // 2. Map structural state indicator class to clicked tab element
+                link.classList.add('active-tab');
+
+                // 3. Clear visibility state on every active panel configuration framework
+                tablePanes.forEach(pane => pane.classList.remove('active-pane'));
+
+                // 4. Extract targeted element ID tag link pointer asset to open layout data windows
+                const targetTabId = 'pane-' + link.getAttribute('data-tab');
+                const selectedPane = document.getElementById(targetTabId);
+
+                if (selectedPane) {
+                    selectedPane.classList.add('active-pane');
+                }
+            });
+        });
+    });
+</script>

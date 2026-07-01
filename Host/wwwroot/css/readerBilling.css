@@ -1,0 +1,572 @@
+﻿/* ── Page Header ── */
+.page-header {
+    margin-bottom: 8px;
+}
+
+    .page-header h1 {
+        font-size: 26px;
+        font-weight: 700;
+        color: #FFFFFF;
+        margin-bottom: 4px;
+    }
+
+    .page-header p {
+        font-size: 13px;
+        color: #8A94A6;
+    }
+
+/* ── Cards ── */
+.card {
+    border: 1px solid #161D33;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+/* ── Section Header ── */
+.section-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.section-heading h2 {
+    font-size: 19px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 4px;
+}
+
+.section-sub {
+    font-size: 13px;
+    color: #8A94A6;
+}
+
+.btn-pill-primary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: #7C6AFF;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+    .btn-pill-primary:hover {
+        background: #6B59EE;
+        color: #FFFFFF;
+    }
+
+    .btn-pill-primary i {
+        font-size: 15px;
+    }
+
+/* ── Stat Tiles (Wallet top row) ── */
+.stat-tiles-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.stat-tile {
+    background: #13122a;
+    border: 1px solid #2d2b72;
+    border-radius: 7px;
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.stat-tile-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+    .stat-tile-icon i {
+        font-size: 17px;
+    }
+
+    .stat-tile-icon.purple {
+        background: rgba(124, 106, 255, 0.15);
+    }
+
+        .stat-tile-icon.purple i {
+            color: #7C6AFF;
+        }
+
+    .stat-tile-icon.blue {
+        background: rgba(59, 130, 246, 0.15);
+    }
+
+        .stat-tile-icon.blue i {
+            color: #3B82F6;
+        }
+
+    .stat-tile-icon.green {
+        background: rgba(34, 197, 94, 0.15);
+    }
+
+        .stat-tile-icon.green i {
+            color: #22C55E;
+        }
+
+    .stat-tile-icon.amber {
+        background: rgba(245, 166, 35, 0.15);
+    }
+
+        .stat-tile-icon.amber i {
+            color: #F5A623;
+        }
+
+.stat-tile-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-tile-label {
+    font-size: 12px;
+    color: #8A94A6;
+    margin-bottom: 4px;
+}
+
+.stat-tile-value {
+    font-size: 19px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 4px;
+    line-height: 1.1;
+}
+
+.stat-tile-sub {
+    font-size: 11.5px;
+    font-weight: 500;
+}
+
+    .stat-tile-sub.purple-text {
+        color: #A78BFA;
+    }
+
+    .stat-tile-sub.blue-text {
+        color: #60A5FA;
+    }
+
+    .stat-tile-sub.green-text {
+        color: #4ADE80;
+    }
+
+    .stat-tile-sub.amber-text {
+        color: #F5A623;
+    }
+
+/* ── Action Tiles (Fund/Withdraw/Transfer/Payment Methods row) ── */
+.action-tiles-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.action-tile {
+    background: #080B1A;
+    border: 1px solid #161D33;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    text-decoration: none;
+}
+
+    .action-tile:hover {
+        border-color: #7C6AFF;
+    }
+
+.action-tile-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+    .action-tile-icon i {
+        font-size: 16px;
+    }
+
+.action-tile-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-bottom: 2px;
+}
+
+.action-tile-sub {
+    font-size: 11.5px;
+    color: #8A94A6;
+}
+
+.action-tile-arrow {
+    margin-left: auto;
+    font-size: 16px;
+    color: #4D5670;
+    flex-shrink: 0;
+}
+
+/* ── Transaction / Subscription History Tables ── */
+.history-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+    .history-section-header h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #FFFFFF;
+    }
+
+.view-all-link {
+    font-size: 12.5px;
+    color: #7C6AFF;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+    .view-all-link:hover {
+        opacity: 0.8;
+    }
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .history-table th {
+        font-size: 11px;
+        font-weight: 600;
+        color: #4D5670;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0 12px 12px 12px;
+        text-align: left;
+        border-bottom: 1px solid #161D33;
+    }
+
+        .history-table th:first-child {
+            padding-left: 0;
+        }
+
+    .history-table td {
+        padding: 14px 12px;
+        font-size: 12.5px;
+        color: #8A94A6;
+        border-bottom: 1px solid #161D33;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+        .history-table td:first-child {
+            padding-left: 0;
+        }
+
+    .history-table tr:last-child td {
+        border-bottom: none;
+    }
+
+.txn-type-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #FFFFFF;
+    font-weight: 500;
+}
+
+.txn-type-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+    .txn-type-icon i {
+        font-size: 12px;
+    }
+
+    .txn-type-icon.green {
+        background: rgba(34, 197, 94, 0.15);
+    }
+
+        .txn-type-icon.green i {
+            color: #22C55E;
+        }
+
+    .txn-type-icon.purple {
+        background: rgba(124, 106, 255, 0.15);
+    }
+
+        .txn-type-icon.purple i {
+            color: #7C6AFF;
+        }
+
+    .txn-type-icon.amber {
+        background: rgba(245, 166, 35, 0.15);
+    }
+
+        .txn-type-icon.amber i {
+            color: #F5A623;
+        }
+
+.txn-desc {
+    color: #FFFFFF;
+    white-space: normal;
+}
+
+.txn-amount {
+    font-weight: 700;
+}
+
+    .txn-amount.positive {
+        color: #4ADE80;
+    }
+
+    .txn-amount.negative {
+        color: #FF6B6B;
+    }
+
+.status-pill {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 600;
+    border-radius: 99px;
+    padding: 4px 11px;
+}
+
+    .status-pill.success,
+    .status-pill.active {
+        color: #22C55E;
+        background: rgba(34, 197, 94, 0.12);
+        border: 1px solid rgba(34, 197, 94, 0.25);
+    }
+
+    .status-pill.completed {
+        color: #60A5FA;
+        background: rgba(59, 130, 246, 0.12);
+        border: 1px solid rgba(59, 130, 246, 0.25);
+    }
+
+.txn-reference {
+    font-family: 'Inter', monospace;
+    font-size: 11.5px;
+    color: #4D5670;
+}
+
+.view-more-row-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 18px;
+    padding: 10px;
+    border-top: 1px solid #161D33;
+    font-size: 13px;
+    font-weight: 500;
+    color: #7C6AFF;
+    text-decoration: none;
+}
+
+    .view-more-row-link:hover {
+        opacity: 0.8;
+    }
+
+    .view-more-row-link i {
+        font-size: 14px;
+    }
+
+/* ── Subscription summary tiles ── */
+.sub-tiles-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.sub-tile-label {
+    font-size: 12px;
+    color: #8A94A6;
+    margin-bottom: 4px;
+}
+
+.sub-tile-value {
+    font-size: 17px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.sub-tile-sub {
+    font-size: 11.5px;
+    font-weight: 500;
+}
+
+/* ── Payment method / quick action row (Subscription) ── */
+.sub-action-tiles-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.payment-method-tile {
+    background: #080B1A;
+    border: 1px solid #161D33;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    text-decoration: none;
+}
+
+    .payment-method-tile:hover {
+        border-color: #7C6AFF;
+    }
+
+.payment-method-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #EB4D4D, #F5A623);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+    .payment-method-icon i {
+        font-size: 16px;
+        color: #FFFFFF;
+    }
+
+.danger-tile {
+    color: #FF6B6B;
+}
+
+    .danger-tile .action-tile-icon {
+        background: rgba(255, 107, 107, 0.12);
+    }
+
+        .danger-tile .action-tile-icon i {
+            color: #FF6B6B;
+        }
+
+    .danger-tile .action-tile-title {
+        color: #FF6B6B;
+    }
+
+/* ── Help Banner ── */
+.help-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.help-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.help-banner-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(124, 106, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+    .help-banner-icon i {
+        font-size: 19px;
+        color: #7C6AFF;
+    }
+
+.help-banner-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 3px;
+}
+
+.help-banner-sub {
+    font-size: 12.5px;
+    color: #8A94A6;
+}
+
+    .help-banner-sub a {
+        color: #7C6AFF;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+        .help-banner-sub a:hover {
+            opacity: 0.8;
+        }
+
+.btn-help-center {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: transparent;
+    color: #FFFFFF;
+    border: 1px solid #1C2541;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+    .btn-help-center:hover {
+        border-color: #7C6AFF;
+    }
+
+    .btn-help-center i {
+        font-size: 14px;
+    }
+
+/* ── Sections for scrollspy ── */
+.page-section {
+    scroll-margin-top: 24px;
+}

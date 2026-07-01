@@ -1,0 +1,121 @@
+﻿* {
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.category-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px;
+    width: 100%;
+}
+
+.list-header-row a {
+    text-decoration: none;
+    background-color: #0E1326;
+    padding: 1pc;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s ease;
+}
+
+    .list-header-row a:hover {
+        opacity: 0.9;
+    }
+
+.list-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+
+.table-card {
+    background-color: #0E1326;
+    border: 1px solid #161D33;
+    border-radius: 8px;
+    padding: 24px;
+    margin: 10px;
+    color: #8A94A6;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    text-align: left;
+    padding: 16px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid #161D33;
+}
+
+th {
+    color: #8A94A6;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+td {
+    color: #D2D6DC;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* Data Utilities Components decoration */
+.bold-text {
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+.muted-text {
+    color: #8A94A6;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+    .badge.blue {
+        background-color: rgba(30, 167, 196, 0.15);
+        color: #1EA7C4;
+    }
+
+/* Interactive Utility Button elements */
+.action-link {
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 12px;
+    transition: opacity 0.2s ease;
+}
+
+    .action-link.edit {
+        color: #1EA7C4;
+    }
+
+    .action-link.delete {
+        color: #E63B60;
+    }
+
+    .action-link:hover {
+        opacity: 0.8;
+    }

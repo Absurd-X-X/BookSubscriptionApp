@@ -1,0 +1,434 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Settings";
+}
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+<link rel="stylesheet" href="~/css/settings.css" />
+
+<div class="shell">
+
+    <!-- SIDEBAR -->
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- TOPBAR: General -->
+        <div class="topbar">
+
+            <div class="topbar-left">
+                <h1>Settings</h1>
+                <p>Manage your application settings and preferences</p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="save-btn">
+                    <i class="ti ti-device-floppy"></i>
+                    Save All Changes
+                </button>
+            </div>
+
+        </div>
+
+    
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('general',this)"><i class="ti ti-settings"></i>General</button>
+            <button class="tab-btn" onclick="switchTab('business',this)"><i class="ti ti-building"></i>Business</button>
+            <button class="tab-btn" onclick="switchTab('payment',this)"><i class="ti ti-credit-card"></i>Payment</button>
+            <button class="tab-btn" onclick="switchTab('security',this)"><i class="ti ti-shield"></i>Security</button>
+            <button class="tab-btn" onclick="switchTab('notifications',this)"><i class="ti ti-bell"></i>Notifications</button>
+            <button class="tab-btn" onclick="switchTab('system-settings',this)"><i class="ti ti-server"></i>System</button>
+            <button class="tab-btn" onclick="switchTab('backup',this)"><i class="ti ti-cloud-upload"></i>Backup</button>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+
+            <!-- TAB: GENERAL -->
+            <div class="panel active" id="tab-general">
+
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-settings"></i>General Settings</h2>
+                        <p>Configure general application settings</p>
+                    </div>
+                    <div class="field"><div class="field-label">Application Name</div><div class="fake-input">SaaSAdmin</div></div>
+                    <div class="field"><div class="field-label">Application Tagline</div><div class="fake-input">Smart Library Management System</div></div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Default Currency</div><div class="fake-select">NGN – Nigerian Naira (₦)<i class="ti ti-chevron-down"></i></div></div>
+                        <div class="field"><div class="field-label">Default Language</div><div class="fake-select">English<i class="ti ti-chevron-down"></i></div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Date Format</div><div class="fake-select">June 8, 2025 (MMM d, yyyy)<i class="ti ti-chevron-down"></i></div></div>
+                        <div class="field"><div class="field-label">Time Zone</div><div class="fake-select">(UTC+01:00) West Africa Time<i class="ti ti-chevron-down"></i></div></div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Application Logo</div>
+                        <div class="logo-preview">
+                            <div class="logo-thumb"><i class="ti ti-building-store"></i></div>
+                            <div class="logo-meta"><div class="name">Current logo</div><div class="hint">PNG, JPG up to 2MB</div></div>
+                            <button class="change-logo-btn"><i class="ti ti-upload"></i>Change Logo</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-building"></i>Business Information</h2>
+                        <p>Manage your business details and contact information</p>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Business Name</div><div class="fake-input">SaaSAdmin Library System</div></div>
+                        <div class="field"><div class="field-label">Business Email</div><div class="fake-input">info@saasadmin.com</div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Business Phone</div><div class="fake-input">+234 801 234 5678</div></div>
+                        <div class="field"><div class="field-label">Business Address</div><div class="fake-input">123 Library Street, Ikeja, Lagos</div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Website</div><div class="fake-input">https://saasadmin.com</div></div>
+                        <div class="field"><div class="field-label">Reg. Number</div><div class="fake-input">RC1234567</div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Tax ID (TIN)</div><div class="fake-input">12345678-0001</div></div>
+                        <div class="field"><div class="field-label">Currency Symbol</div><div class="fake-select">₦<i class="ti ti-chevron-down"></i></div></div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-sliders"></i>System Preferences</h2>
+                        <p>Configure system-wide preferences and defaults</p>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-row-text"><div class="label">Allow New Registrations</div><div class="desc">Allow new libraries to register on the platform</div></div>
+                        <div class="toggle on" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-row-text"><div class="label">Email Verification Required</div><div class="desc">Require email verification for new accounts</div></div>
+                        <div class="toggle on" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-row-text"><div class="label">Auto Approve Libraries</div><div class="desc">Automatically approve new library registrations</div></div>
+                        <div class="toggle off" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-row-text"><div class="label">Maintenance Mode</div><div class="desc">Put the system in maintenance mode</div></div>
+                        <div class="toggle off" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    <div class="field" style="margin-top:12px">
+                        <div class="field-label">Items Per Page</div>
+                        <div class="field-desc">Number of items to display in lists</div>
+                        <div class="fake-select">10<i class="ti ti-chevron-down"></i></div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-credit-card"></i>Payment Settings</h2>
+                        <p>Configure payment gateway and processing settings</p>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Default Payment Gateway</div><div class="fake-select">Paystack<i class="ti ti-chevron-down"></i></div></div>
+                        <div class="field"><div class="field-label">Paystack Public Key</div><div class="secret-field"><span class="secret-value" data-value="pk_live_4f8c2a9b3d7e1f0a6c5b8d2e9f1a3c7b">••••••••••••••••••••</span><i class="ti ti-eye" onclick="toggleSecret(this)"></i></div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Paystack Secret Key</div><div class="secret-field"><span class="secret-value" data-value="sk_live_9a1b4c7d2e5f8a3b6c9d2e5f8a1b4c7d">••••••••••••••••••••</span><i class="ti ti-eye" onclick="toggleSecret(this)"></i></div></div>
+                        <div class="field"><div class="field-label">Payment Success URL</div><div class="fake-input">https://saasadmin.com/payment/success</div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Payment Cancel URL</div><div class="fake-input">https://saasadmin.com/payment/cancel</div></div>
+                        <div class="field"><div class="field-label">Webhook Secret</div><div class="secret-field"><span class="secret-value" data-value="whsec_3c7b9a1d4f8c2e5a9b3d7f1c4e8a2b6d">••••••••••••••••••••</span><i class="ti ti-eye" onclick="toggleSecret(this)"></i></div></div>
+                    </div>
+                </div>
+
+                <div class="section span2">
+                    <div class="section-head">
+                        <h2><i class="ti ti-shield"></i>Security Settings</h2>
+                        <p>Configure security and access control settings</p>
+                    </div>
+                    <div class="three-col" style="margin-bottom:12px">
+                        <div class="field"><div class="field-label">Session Timeout (minutes)</div><div class="fake-input">120</div></div>
+                        <div class="field"><div class="field-label">Password Min Length</div><div class="fake-input">8</div></div>
+                        <div class="field"><div class="field-label">Login Attempts Limit</div><div class="fake-input">5</div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="toggle-row" style="border:none;padding:0">
+                            <div class="toggle-row-text"><div class="label">Two-Factor Authentication</div><div class="desc">Require 2FA for admin accounts</div></div>
+                            <div class="toggle on" style="margin-left:16px" onclick="toggleSwitch(this)"></div>
+                        </div>
+                        <div class="field"><div class="field-label">Password Expiry (days)</div><div class="fake-input">90</div></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB: BUSINESS -->
+            <div class="panel full" id="tab-business">
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-building"></i>Business Information</h2>
+                        <p>Manage your business details and contact information</p>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Business Name</div><div class="fake-input">SaaSAdmin Library System</div></div>
+                        <div class="field"><div class="field-label">Business Email</div><div class="fake-input">info@saasadmin.com</div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Business Phone</div><div class="fake-input">+234 801 234 5678</div></div>
+                        <div class="field"><div class="field-label">Business Address</div><div class="fake-input">123 Library Street, Ikeja, Lagos State, Nigeria</div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Website</div><div class="fake-input">https://saasadmin.com</div></div>
+                        <div class="field"><div class="field-label">Business Registration Number</div><div class="fake-input">RC1234567</div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Tax Identification Number (TIN)</div><div class="fake-input">12345678-0001</div></div>
+                        <div class="field"><div class="field-label">Currency Symbol</div><div class="fake-select">₦<i class="ti ti-chevron-down"></i></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: PAYMENT -->
+            <div class="panel full" id="tab-payment">
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-credit-card"></i>Payment Settings</h2>
+                        <p>Configure payment gateway and processing settings</p>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Default Payment Gateway</div><div class="fake-select">Paystack<i class="ti ti-chevron-down"></i></div></div>
+                        <div class="field"><div class="field-label">Paystack Public Key</div><div class="secret-field"><span class="secret-value" data-value="pk_live_4f8c2a9b3d7e1f0a6c5b8d2e9f1a3c7b">••••••••••••••••••••</span><i class="ti ti-eye" onclick="toggleSecret(this)"></i></div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Paystack Secret Key</div><div class="secret-field"><span class="secret-value" data-value="sk_live_9a1b4c7d2e5f8a3b6c9d2e5f8a1b4c7d">••••••••••••••••••••</span><i class="ti ti-eye" onclick="toggleSecret(this)"></i></div></div>
+                        <div class="field"><div class="field-label">Payment Success URL</div><div class="fake-input">https://saasadmin.com/payment/success</div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Payment Cancel URL</div><div class="fake-input">https://saasadmin.com/payment/cancel</div></div>
+                        <div class="field"><div class="field-label">Webhook Secret</div><div class="secret-field"><span class="secret-value" data-value="whsec_3c7b9a1d4f8c2e5a9b3d7f1c4e8a2b6d">••••••••••••••••••••</span><i class="ti ti-eye" onclick="toggleSecret(this)"></i></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: SECURITY -->
+            <div class="panel full" id="tab-security">
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-shield"></i>Security Settings</h2>
+                        <p>Configure security and access control settings</p>
+                    </div>
+                    <div class="three-col" style="margin-bottom:12px">
+                        <div class="field"><div class="field-label">Session Timeout (minutes)</div><div class="fake-input">120</div></div>
+                        <div class="field"><div class="field-label">Password Min Length</div><div class="fake-input">8</div></div>
+                        <div class="field"><div class="field-label">Login Attempts Limit</div><div class="fake-input">5</div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="toggle-row" style="border:none;padding:0">
+                            <div class="toggle-row-text"><div class="label">Two-Factor Authentication</div><div class="desc">Require 2FA for admin accounts</div></div>
+                            <div class="toggle on" style="margin-left:16px" onclick="toggleSwitch(this)"></div>
+                        </div>
+                        <div class="field"><div class="field-label">Password Expiry (days)</div><div class="fake-input">90</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: NOTIFICATIONS -->
+            <div class="panel full" id="tab-notifications">
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-bell"></i>Notification Settings</h2>
+                        <p>Configure system notification preferences</p>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-row-text"><div class="label">Email Notifications</div><div class="desc">Send email alerts for important events</div></div>
+                        <div class="toggle on" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-row-text"><div class="label">New Subscription Alerts</div><div class="desc">Notify when a new subscription is created</div></div>
+                        <div class="toggle on" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-row-text"><div class="label">Payment Failed Alerts</div><div class="desc">Notify on failed payment attempts</div></div>
+                        <div class="toggle on" onclick="toggleSwitch(this)"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-row-text"><div class="label">System Maintenance Alerts</div><div class="desc">Send alerts before scheduled maintenance</div></div>
+                        <div class="toggle off" onclick="toggleSwitch(this)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: SYSTEM SETTINGS -->
+            <div class="panel" id="tab-system-settings">
+
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-adjustments"></i>Application Preferences</h2>
+                        <p>Configure general application behavior and defaults</p>
+                    </div>
+                    <div class="field"><div class="field-label">Default Items Per Page</div><div class="field-desc">Number of items to display in lists</div><div class="fake-select">10<i class="ti ti-chevron-down"></i></div></div>
+                    <div class="field"><div class="field-label">Default Dashboard View</div><div class="field-desc">Choose the default dashboard view</div><div class="fake-select">Overview<i class="ti ti-chevron-down"></i></div></div>
+                    <div class="toggle-row"><div class="toggle-row-text"><div class="label">Maintenance Mode</div><div class="desc">Put the system in maintenance mode</div></div><div class="toggle off" onclick="toggleSwitch(this)"></div></div>
+                    <div class="toggle-row"><div class="toggle-row-text"><div class="label">Allow New Registrations</div><div class="desc">Allow new users to register on the platform</div></div><div class="toggle on" onclick="toggleSwitch(this)"></div></div>
+                    <div class="toggle-row"><div class="toggle-row-text"><div class="label">Require Email Verification</div><div class="desc">Require email verification for new users</div></div><div class="toggle on" onclick="toggleSwitch(this)"></div></div>
+                    <div class="toggle-row"><div class="toggle-row-text"><div class="label">Email Verification for Admin Actions</div><div class="desc">Require email confirmation for sensitive admin actions</div></div><div class="toggle off" onclick="toggleSwitch(this)"></div></div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-clock"></i>Date &amp; Time Settings</h2>
+                        <p>Configure date, time and timezone preferences</p>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Default Time Zone</div><div class="fake-select">(UTC+01:00) West Africa Time (Lagos)<i class="ti ti-chevron-down"></i></div></div>
+                        <div class="field"><div class="field-label">Date Format</div><div class="fake-select">June 8, 2025 (MMMM d, yyyy)<i class="ti ti-chevron-down"></i></div></div>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Time Format</div><div class="fake-select">12 Hour (01:30 PM)<i class="ti ti-chevron-down"></i></div></div>
+                        <div class="field"><div class="field-label">First Day of Week</div><div class="fake-select">Monday<i class="ti ti-chevron-down"></i></div></div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-language"></i>System Language</h2>
+                        <p>Choose the default language for the system</p>
+                    </div>
+                    <div class="field"><div class="field-label">Default Language</div><div class="fake-select">English<i class="ti ti-chevron-down"></i></div></div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-bolt"></i>Cache &amp; Performance</h2>
+                        <p>Configure caching and performance optimization</p>
+                    </div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Cache Driver</div><div class="field-desc">Choose the cache storage driver</div><div class="fake-select">File<i class="ti ti-chevron-down"></i></div></div>
+                        <div class="field"><div class="field-label">Cache Duration</div><div class="field-desc">Default cache duration in minutes</div><div class="fake-input">60</div></div>
+                    </div>
+                    <div class="field"><div class="field-label">Clear Cache</div><div class="field-desc">Clear all application cache</div><button class="danger-btn"><i class="ti ti-trash"></i>Clear Cache</button></div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-file-upload"></i>File &amp; Media Settings</h2>
+                        <p>Configure file upload and media handling preferences</p>
+                    </div>
+                    <div class="field"><div class="field-label">Maximum Upload Size</div><div class="field-desc">Maximum file size for uploads</div><div class="fake-select">10 MB<i class="ti ti-chevron-down"></i></div></div>
+                    <div class="field"><div class="field-label">Allowed File Types</div><div class="field-desc">Restrict allowed file types for uploads</div><div class="fake-input">jpg, jpeg, png, pdf, doc, docx, xls, xlsx</div></div>
+                    <div class="two-col">
+                        <div class="field"><div class="field-label">Storage Disk</div><div class="field-desc">Choose where files are stored</div><div class="fake-select">Local Storage<i class="ti ti-chevron-down"></i></div></div>
+                        <div class="field"><div class="field-label">Image Quality (1-100)</div><div class="field-desc">Image compression quality</div><div class="fake-input">80</div></div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-terminal"></i>Logging Settings</h2>
+                        <p>Configure application logging preferences</p>
+                    </div>
+                    <div class="field"><div class="field-label">Log Level</div><div class="field-desc">Minimum level of logs to record</div><div class="fake-select">Info<i class="ti ti-chevron-down"></i></div></div>
+                    <div class="field"><div class="field-label">Log Retention Period</div><div class="field-desc">How long to keep log files</div><div class="fake-select">30 Days<i class="ti ti-chevron-down"></i></div></div>
+                    <div class="toggle-row"><div class="toggle-row-text"><div class="label">Enable Activity Logging</div><div class="desc">Log user activities and actions</div></div><div class="toggle on" onclick="toggleSwitch(this)"></div></div>
+                </div>
+
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-cloud-upload"></i>Backup Settings</h2>
+                        <p>Configure automated backup preferences</p>
+                    </div>
+                    <div class="toggle-row"><div class="toggle-row-text"><div class="label">Enable Automatic Backups</div><div class="desc">Automatically backup the system</div></div><div class="toggle on" onclick="toggleSwitch(this)"></div></div>
+                    <div class="two-col" style="margin-top:10px">
+                        <div class="field"><div class="field-label">Backup Frequency</div><div class="fake-select">Daily<i class="ti ti-chevron-down"></i></div></div>
+                        <div class="field"><div class="field-label">Backup Retention</div><div class="field-desc">How long to keep backups</div><div class="fake-select">30 Days<i class="ti ti-chevron-down"></i></div></div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Last Backup</div>
+                        <div class="field-desc">Date of the last successful backup</div>
+                        <div class="last-backup-row"><span>June 8, 2025  02:30 AM</span><span class="badge-success">Successful</span></div>
+                    </div>
+                </div>
+
+                <div class="info-banner">
+                    <i class="ti ti-info-circle"></i>
+                    These system settings affect the entire application. Please make changes carefully.
+                </div>
+
+            </div>
+
+            <!-- TAB: BACKUP -->
+            <div class="panel full" id="tab-backup">
+                <div class="section">
+                    <div class="section-head">
+                        <h2><i class="ti ti-cloud-upload"></i>Backup Settings</h2>
+                        <p>Configure automated backup preferences</p>
+                    </div>
+                    <div class="toggle-row"><div class="toggle-row-text"><div class="label">Enable Automatic Backups</div><div class="desc">Automatically backup the system</div></div><div class="toggle on" onclick="toggleSwitch(this)"></div></div>
+                    <div class="two-col" style="margin-top:12px">
+                        <div class="field"><div class="field-label">Backup Frequency</div><div class="fake-select">Daily<i class="ti ti-chevron-down"></i></div></div>
+                        <div class="field"><div class="field-label">Backup Retention</div><div class="fake-select">30 Days<i class="ti ti-chevron-down"></i></div></div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Last Backup</div>
+                        <div class="last-backup-row"><span>June 8, 2025  02:30 AM</span><span class="badge-success">Successful</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+</div><!-- /shell -->
+
+<script src="app.js"></script>
+
+<script>
+    const TABS = ['general','business','payment','security','notifications','system-settings','backup'];
+
+    function switchTab(name, btn) {
+
+    TABS.forEach(id => {
+    const panel = document.getElementById('tab-' + id);
+
+    if (panel)
+    panel.classList.remove('active');
+    });
+
+    document.querySelectorAll('.tab-btn')
+    .forEach(b => b.classList.remove('active'));
+
+    const target = document.getElementById('tab-' + name);
+
+    if (target)
+    target.classList.add('active');
+
+    if (btn)
+    btn.classList.add('active');
+    }
+
+    function toggleSwitch(el) {
+    el.classList.toggle('on');
+    el.classList.toggle('off');
+    }
+
+    function toggleSecret(iconEl) {
+    const field = iconEl.closest('.secret-field');
+    if (!field) return;
+    const valueEl = field.querySelector('.secret-value');
+    if (!valueEl) return;
+
+    const isHidden = iconEl.classList.contains('ti-eye');
+    if (isHidden) {
+    valueEl.textContent = valueEl.getAttribute('data-value');
+    iconEl.classList.remove('ti-eye');
+    iconEl.classList.add('ti-eye-off');
+    } else {
+    valueEl.textContent = '••••••••••••••••••••';
+    iconEl.classList.remove('ti-eye-off');
+    iconEl.classList.add('ti-eye');
+    }
+    }
+</script>
+

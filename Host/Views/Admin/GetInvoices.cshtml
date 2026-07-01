@@ -1,0 +1,365 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Get Invoices";
+}
+
+<link rel="stylesheet" href="~/css/getInvoices.css">
+<link href="~/css/modal.css" rel="stylesheet" />
+<link href="~/css/notify.css" rel="stylesheet" />
+<link href="~/css/toast.css" rel="stylesheet" />
+
+
+<main class="main">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div>
+            <h1>Subscription Payment Details</h1>
+            <p>View payment history, invoices, and manage payment methods</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-outline">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                Export
+            </button>
+            <button id="openPaymentModal" class="btn-primary button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                Record Manual Payment
+            </button>
+
+            <div id="paymentModal"
+                 class="modal-overlay">
+
+                <div class="modal-content"
+                     style="--modal-width:900px;">
+
+                    <div class="modal-header">
+
+                        <h2>Add New Library</h2>
+
+                        <button type="button"
+                                id="closePaymentModal"
+                                class="close-btn">
+
+                            &times;
+
+                        </button>
+
+                    </div>
+
+                    <form class="form" id="loginForm"
+                          asp-action="AddLibrary"
+                          method="post">
+
+                        <div class="modal-body" style="height: 80vh">
+
+                            <div class="form-group">
+                                <label>Payment Type</label>
+
+                                <select>
+                                    <option>Subscription Payment</option>
+                                    <option>Wallet Funding</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Library</label>
+
+                                <select>
+                                    <option>Select Library</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Amount (₦)</label>
+
+                                <input type="number"
+                                       placeholder="Enter amount" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Payment Method</label>
+
+                                <select>
+                                    <option>Bank Transfer</option>
+                                    <option>Cash</option>
+                                    <option>POS</option>
+                                    <option>Cheque</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Reference Number</label>
+
+                                <input type="text"
+                                       placeholder="TRF123456789" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Payment Date</label>
+
+                                <input type="date" />
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label>Notes</label>
+
+                                <textarea rows="4"
+                                          placeholder="Add any notes about this payment">
+                                </textarea>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+
+                            <button type="button"
+                                    id="cancelPaymentModal"
+                                    class="btn-cancel">
+
+                                Cancel
+
+                            </button>
+
+                            <button type="submit"
+                                    class="btn-save">
+                                Create Library
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-icon icon-blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8m-4-4v4" /></svg>
+            </div>
+            <p class="stat-label">Subscription ID</p>
+            <p class="stat-value">SUB-2024-00128</p>
+            <p class="stat-sub">Customer: Acme Corporation</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+            </div>
+            <p class="stat-label">Current Plan</p>
+            <p class="stat-value">Enterprise Plan</p>
+            <p class="stat-sub green">$299.00 / month</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+            </div>
+            <p class="stat-label">Payment Status</p>
+            <p class="stat-value"><span class="badge badge-green">Paid</span></p>
+            <p class="stat-sub">Next payment: Jun 15, 2024</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-amber">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+            </div>
+            <p class="stat-label">Outstanding Balance</p>
+            <p class="stat-value">$0.00</p>
+            <p class="stat-sub green">All payments up to date</p>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT GRID -->
+    <div class="content-grid">
+
+        <!-- LEFT COLUMN -->
+        <div class="left-col">
+
+            <!-- Payment History -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Payment History</span>
+                </div>
+                <table class="hist-table">
+                    <thead>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Method</th>
+                            <th style="text-align: center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>INV-2024-00128</td>
+                            <td style="color:var(--text-muted)">May 15, 2024</td>
+                            <td>$299.00</td>
+                            <td><span class="badge badge-green">Paid</span></td>
+                            <td>•••• 4242 <span class="visa-chip">VISA</span></td>
+                            <td style="padding-left: 40px;"><svg class="view-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg></td>
+                        </tr>
+                        <tr>
+                            <td>INV-2024-00095</td>
+                            <td style="color:var(--text-muted)">Apr 15, 2024</td>
+                            <td>$299.00</td>
+                            <td><span class="badge badge-green">Paid</span></td>
+                            <td>•••• 4242 <span class="visa-chip">VISA</span></td>
+                            <td style="padding-left: 40px;"><svg class="view-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg></td>
+                        </tr>
+                        <tr>
+                            <td>INV-2024-00062</td>
+                            <td style="color:var(--text-muted)">Mar 15, 2024</td>
+                            <td>$299.00</td>
+                            <td><span class="badge badge-green">Paid</span></td>
+                            <td>•••• 4242 <span class="visa-chip">VISA</span></td>
+                            <td style="padding-left: 40px;"><svg class="view-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg></td>
+                        </tr>
+                        <tr>
+                            <td>INV-2024-00029</td>
+                            <td style="color:var(--text-muted)">Feb 15, 2024</td>
+                            <td>$299.00</td>
+                            <td><span class="badge badge-green">Paid</span></td>
+                            <td>•••• 4242 <span class="visa-chip">VISA</span></td>
+                            <td style="padding-left: 40px;"><svg class="view-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg></td>
+                        </tr>
+                        <tr>
+                            <td>INV-2024-00001</td>
+                            <td style="color:var(--text-muted)">Jan 15, 2024</td>
+                            <td>$299.00</td>
+                            <td><span class="badge badge-green">Paid</span></td>
+                            <td>•••• 4242 <span class="visa-chip">VISA</span></td>
+                            <td style="padding-left: 40px;"><svg class="view-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="view-all-btn">View All Invoices</button>
+            </div>
+
+            <!-- Payment Method + Billing Summary -->
+            <div class="split-row">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Payment Method</span>
+                    </div>
+                    <div class="pm-inner">
+                        <span class="visa-logo">VISA</span>
+                        <div class="pm-details">
+                            <div class="pm-name">Visa ending in 4242 <span class="badge badge-blue">Primary</span></div>
+                            <div class="pm-sub">Expires 12/2026 · Added Jan 10, 2024</div>
+                        </div>
+                        <span class="pm-dots">⋯</span>
+                    </div>
+                    <button class="add-pm-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                        Add Payment Method
+                    </button>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Billing Summary</span>
+                    </div>
+                    <div class="bill-row"><span>Plan Amount</span><span>$299.00</span></div>
+                    <div class="bill-row"><span>Discount</span><span>$0.00</span></div>
+                    <div class="bill-row" style="border:none"><span>Tax (0%)</span><span>$0.00</span></div>
+                    <div class="bill-total"><span>Total</span><span class="green">$299.00 / month</span></div>
+                    <div class="bill-note">
+                        <svg class="bill-note-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                        Your next payment of <strong style="color:var(--text-primary); margin:0 3px;">$299.00</strong> will be charged on Jun 15, 2024
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="right-col">
+
+            <!-- Invoice Preview -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Invoice Preview</span>
+                    <button class="dl-btn">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                        Download Invoice
+                    </button>
+                </div>
+                <div class="inv-meta">
+                    <div>
+                        <div class="inv-field"><div class="inv-label">Invoice ID</div><div class="inv-val">INV-2024-00128</div></div>
+                        <div class="inv-field"><div class="inv-label">Issue Date</div><div class="inv-val">May 15, 2024</div></div>
+                        <div class="inv-field"><div class="inv-label">Due Date</div><div class="inv-val">May 15, 2024</div></div>
+                    </div>
+                    <div>
+                        <div class="inv-label">Billed To</div>
+                        <div class="inv-billed-name">Acme Corporation</div>
+                        <div class="inv-addr">billing@acmecorp.com<br>123 Business St.<br>New York, NY 10001</div>
+                    </div>
+                </div>
+                <table class="inv-table">
+                    <thead>
+                        <tr>
+                            <th style="width:50%">Item</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Enterprise Plan (Monthly)</td>
+                            <td style="text-align:right">1</td>
+                            <td style="text-align:right">$299.00</td>
+                            <td style="text-align:right">$299.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="inv-totals">
+                    <div class="inv-row"><span>Subtotal</span><span>$299.00</span></div>
+                    <div class="inv-row"><span>Tax (0%)</span><span>$0.00</span></div>
+                    <div class="inv-row bold"><span>Total</span><span class="green">$299.00</span></div>
+                    <hr class="inv-divider">
+                    <div class="inv-row"><span>Amount Paid</span><span>$299.00</span></div>
+                    <div class="inv-row"><span>Balance Due</span><span class="green">$0.00</span></div>
+                </div>
+            </div>
+
+            <!-- Payment Actions -->
+            <div class="card">
+                <span class="card-title">Payment Actions</span>
+                <div class="pa-grid">
+                    <div class="pa-item">
+                        <div class="pa-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                        </div>
+                        <p class="pa-title">Record Manual Payment</p>
+                        <p class="pa-sub">Add an offline payment</p>
+                    </div>
+                    <div class="pa-item">
+                        <div class="pa-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+                        </div>
+                        <p class="pa-title">Send Receipt</p>
+                        <p class="pa-sub">Email payment receipt</p>
+                    </div>
+                    <div class="pa-item">
+                        <div class="pa-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                        </div>
+                        <p class="pa-title">Update Billing Info</p>
+                        <p class="pa-sub">Update billing details</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="~/js/myJsFile.js"></script>
+    <script src="~/js/modal.js"></script>
+    <script src="~/js/toast.js"></script>
+
+</main>

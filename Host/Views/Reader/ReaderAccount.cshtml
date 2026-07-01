@@ -1,0 +1,379 @@
+﻿@{
+    ViewData["Title"] = "Account";
+    ViewData["ScrollPage"] = "account";
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+}
+<link href="~/css/readerAccount.css" rel="stylesheet" />
+
+<div class="page-header">
+    <h1>Account</h1>
+    <p>Manage your account, subscription and preferences.</p>
+</div>
+
+<div class="account-page">
+
+    <!-- LEFT: Main content -->
+    <div class="account-main">
+
+        <!-- Subscription -->
+        <section class="page-section" id="section-subscription" data-hash="#section-subscription" data-page="account">
+            <div class="card">
+                <div class="section-header-row">
+                    <div>
+                        <div class="section-heading">
+                            <i class="ti ti-crown" style="color:#F5A623"></i>
+                            <h2>Subscription</h2>
+                        </div>
+                        <div class="section-sub">Manage your plan and billing details.</div>
+                    </div>
+                    <a href="#" class="manage-link">Manage Plan <i class="ti ti-chevron-right"></i></a>
+                </div>
+
+                <div class="subscription-grid">
+
+                    <!-- Current Plan -->
+                    <div class="plan-box">
+                        <div class="plan-box-header">
+                            <span class="label">Current Plan</span>
+                            <span class="status-pill">Active</span>
+                        </div>
+                        <div class="plan-name"><i class="ti ti-crown"></i> Premium</div>
+                        <div class="plan-price">
+                            <span class="amount">$9.99</span>
+                            <span class="period">/ month</span>
+                        </div>
+                        <div class="plan-billed">Billed monthly</div>
+                        <div class="plan-features">
+                            <div class="plan-feature-row">
+                                <div class="plan-feature-check"><i class="ti ti-check"></i></div>
+                                Unlimited access to all books
+                            </div>
+                            <div class="plan-feature-row">
+                                <div class="plan-feature-check"><i class="ti ti-check"></i></div>
+                                Offline reading
+                            </div>
+                            <div class="plan-feature-row">
+                                <div class="plan-feature-check"><i class="ti ti-check"></i></div>
+                                Listen to audiobooks
+                            </div>
+                            <div class="plan-feature-row">
+                                <div class="plan-feature-check"><i class="ti ti-check"></i></div>
+                                Advanced reading insights
+                            </div>
+                            <div class="plan-feature-row">
+                                <div class="plan-feature-check"><i class="ti ti-check"></i></div>
+                                Family sharing (up to 5 members)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Billing Details -->
+                    <div class="plan-box">
+                        <div class="billing-block">
+                            <div class="billing-field-label">Next billing date</div>
+                            <div class="billing-field-value">
+                                <span class="value-text"><i class="ti ti-calendar field-icon"></i> June 12, 2024</span>
+                            </div>
+                        </div>
+
+                        <div class="billing-block">
+                            <div class="billing-field-label">Payment method</div>
+                            <div class="billing-field-value">
+                                <span class="value-text"><i class="ti ti-credit-card field-icon"></i> •••• •••• •••• 4242</span>
+                                <a href="#" class="update-link">Update</a>
+                            </div>
+                        </div>
+
+                        <div class="billing-block">
+                            <div class="billing-field-label">Billing history</div>
+                            <div class="billing-history-row">
+                                <a href="#" class="view-transactions-link">View all transactions</a>
+                                <i class="ti ti-chevron-right" style="color:#4D5670;font-size:14px;"></i>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-block-primary">Change Plan</button>
+                        <button type="button" class="btn-block-danger">Cancel Subscription</button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile -->
+        <section class="page-section" id="section-profile" data-hash="#section-profile" data-page="account">
+            <div class="card">
+                <div class="section-header-row">
+                    <div>
+                        <div class="section-heading">
+                            <i class="ti ti-user" style="color:#7C6AFF"></i>
+                            <h2>Profile</h2>
+                        </div>
+                        <div class="section-sub">Manage your personal information.</div>
+                    </div>
+                    <a href="#" class="manage-link">Edit Profile <i class="ti ti-chevron-right"></i></a>
+                </div>
+
+                <div class="profile-grid">
+                    <div class="profile-avatar-wrap">
+                        <img class="profile-avatar-img" src="" alt="Profile picture" />
+                        <button type="button" class="profile-avatar-edit" aria-label="Change profile picture"><i class="ti ti-camera"></i></button>
+                    </div>
+
+                    <div class="profile-fields">
+                        <div class="profile-field-row">
+                            <div class="profile-field-label">Name</div>
+                            <div class="profile-field-value">John Doe</div>
+                        </div>
+                        <div class="profile-field-row">
+                            <div class="profile-field-label">Email</div>
+                            <div class="profile-field-value">john.doe@email.com</div>
+                        </div>
+                        <div class="profile-field-row">
+                            <div class="profile-field-label">Username</div>
+                            <div class="profile-field-value">johndoe_reader</div>
+                        </div>
+                        <div class="profile-field-row">
+                            <div class="profile-field-label">Member Since</div>
+                            <div class="profile-field-value">Jan 15, 2024</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings -->
+        <section class="page-section" id="section-settings" data-hash="#section-settings" data-page="account">
+            <div class="card">
+                <div class="section-header-row">
+                    <div>
+                        <div class="section-heading">
+                            <i class="ti ti-settings" style="color:#7C6AFF"></i>
+                            <h2>Settings</h2>
+                        </div>
+                        <div class="section-sub">Customize your reading experience.</div>
+                    </div>
+                </div>
+
+                <div class="settings-list">
+
+                    <div class="settings-row">
+                        <div class="settings-icon"><i class="ti ti-device-tablet"></i></div>
+                        <div class="settings-row-text">
+                            <div class="settings-row-title">Reading Preferences</div>
+                            <div class="settings-row-sub">Set your default reading mode, font and more.</div>
+                        </div>
+                        <div class="settings-row-action">
+                            <button type="button" class="settings-link-btn"><i class="ti ti-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="settings-row">
+                        <div class="settings-icon"><i class="ti ti-bell"></i></div>
+                        <div class="settings-row-text">
+                            <div class="settings-row-title">Notifications</div>
+                            <div class="settings-row-sub">Manage what notifications you receive.</div>
+                        </div>
+                        <div class="settings-row-action">
+                            <button type="button" class="settings-link-btn"><i class="ti ti-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="settings-row">
+                        <div class="settings-icon"><i class="ti ti-shield-lock"></i></div>
+                        <div class="settings-row-text">
+                            <div class="settings-row-title">Privacy</div>
+                            <div class="settings-row-sub">Control your privacy and data settings.</div>
+                        </div>
+                        <div class="settings-row-action">
+                            <button type="button" class="settings-link-btn"><i class="ti ti-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="settings-row">
+                        <div class="settings-icon"><i class="ti ti-world"></i></div>
+                        <div class="settings-row-text">
+                            <div class="settings-row-title">Language</div>
+                            <div class="settings-row-sub">Choose your preferred language.</div>
+                        </div>
+                        <div class="settings-row-action">
+                            <div class="settings-select"><i class="ti ti-globe"></i> English <i class="ti ti-chevron-down"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="settings-row">
+                        <div class="settings-icon"><i class="ti ti-palette"></i></div>
+                        <div class="settings-row-text">
+                            <div class="settings-row-title">Theme</div>
+                            <div class="settings-row-sub">Choose your preferred theme.</div>
+                        </div>
+                        <div class="settings-row-action">
+                            <div class="settings-select"><i class="ti ti-moon theme-icon"></i> Dark <i class="ti ti-chevron-down"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="settings-row">
+                        <div class="settings-icon"><i class="ti ti-download"></i></div>
+                        <div class="settings-row-text">
+                            <div class="settings-row-title">Download Settings</div>
+                            <div class="settings-row-sub">Manage download quality and storage.</div>
+                        </div>
+                        <div class="settings-row-action">
+                            <button type="button" class="settings-link-btn"><i class="ti ti-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Logout -->
+        <section class="page-section" id="section-logout" data-hash="#section-logout" data-page="account">
+            <div class="card">
+                <div class="logout-card-row">
+                    <div class="logout-icon-box"><i class="ti ti-logout"></i></div>
+                    <div class="logout-row-text">
+                        <div class="logout-row-title">Logout</div>
+                        <div class="logout-row-sub">Sign out from your account on this device.</div>
+                    </div>
+                    <button type="button" class="btn-logout">Logout</button>
+                </div>
+                <div class="data-safe-note">
+                    <i class="ti ti-lock"></i> Your data is safe and your reading progress will be saved.
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="account-sidebar">
+
+        <!-- Account Summary -->
+        <div class="summary-card">
+            <div class="summary-title">Account Summary</div>
+            <div class="summary-donut-wrap">
+                <svg width="140" height="140" viewBox="0 0 140 140">
+                    <circle cx="70" cy="70" r="58" fill="none" stroke="#1C2541" stroke-width="10" />
+                    <circle cx="70" cy="70" r="58" fill="none" stroke="url(#summaryGrad)" stroke-width="10"
+                            stroke-dasharray="364.4" stroke-dashoffset="91.1" stroke-linecap="round"
+                            transform="rotate(-90 70 70)" />
+                    <defs>
+                        <linearGradient id="summaryGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#7C6AFF" />
+                            <stop offset="100%" stop-color="#A78BFA" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="summary-donut-center">
+                    <i class="ti ti-users"></i>
+                    <span class="summary-days">126</span>
+                    <span class="summary-days-label">Days with us</span>
+                </div>
+            </div>
+            <div class="summary-stats">
+                <div class="summary-stat-row">
+                    <span class="stat-label">Books Read</span>
+                    <span class="stat-val">24</span>
+                </div>
+                <div class="summary-stat-row">
+                    <span class="stat-label">Hours Read</span>
+                    <span class="stat-val">128h 45m</span>
+                </div>
+                <div class="summary-stat-row">
+                    <span class="stat-label">Pages Read</span>
+                    <span class="stat-val">3,240</span>
+                </div>
+                <div class="summary-stat-row">
+                    <span class="stat-label">Current Streak</span>
+                    <span class="stat-val flame">🔥 12 days</span>
+                </div>
+            </div>
+            <a href="#" class="view-analytics-btn">View full analytics →</a>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quickactions-card">
+            <div class="quickactions-title">Quick Actions</div>
+
+            <a href="#" class="quickaction-row">
+                <div class="quickaction-icon"><i class="ti ti-devices"></i></div>
+                <div class="quickaction-text">
+                    <div class="quickaction-title">Manage Devices</div>
+                    <div class="quickaction-sub">3 devices connected</div>
+                </div>
+                <i class="ti ti-chevron-right chevron"></i>
+            </a>
+
+            <a href="#" class="quickaction-row">
+                <div class="quickaction-icon"><i class="ti ti-download"></i></div>
+                <div class="quickaction-text">
+                    <div class="quickaction-title">Download History</div>
+                    <div class="quickaction-sub">View all downloads</div>
+                </div>
+                <i class="ti ti-chevron-right chevron"></i>
+            </a>
+
+            <a href="#" class="quickaction-row">
+                <div class="quickaction-icon"><i class="ti ti-shield-check"></i></div>
+                <div class="quickaction-text">
+                    <div class="quickaction-title">Privacy Center</div>
+                    <div class="quickaction-sub">Manage your data</div>
+                </div>
+                <i class="ti ti-chevron-right chevron"></i>
+            </a>
+
+            <a href="#" class="quickaction-row">
+                <div class="quickaction-icon"><i class="ti ti-gift"></i></div>
+                <div class="quickaction-text">
+                    <div class="quickaction-title">Refer &amp; Earn</div>
+                    <div class="quickaction-sub">Invite friends and earn rewards</div>
+                </div>
+                <i class="ti ti-chevron-right chevron"></i>
+            </a>
+        </div>
+
+        <!-- Upgrade Card -->
+        <div class="upgrade-card">
+            <i class="ti ti-diamond upgrade-icon"></i>
+            <div class="upgrade-title">Upgrade to</div>
+            <div class="upgrade-title-main">Premium Plus</div>
+            <div class="upgrade-features">
+                <div class="upgrade-feature-row"><i class="ti ti-check"></i> Access to new releases first</div>
+                <div class="upgrade-feature-row"><i class="ti ti-check"></i> Exclusive member content</div>
+                <div class="upgrade-feature-row"><i class="ti ti-check"></i> AI book summaries</div>
+                <div class="upgrade-feature-row"><i class="ti ti-check"></i> Priority customer support</div>
+                <div class="upgrade-feature-row"><i class="ti ti-check"></i> And much more!</div>
+            </div>
+            <button type="button" class="btn-upgrade">Upgrade Now</button>
+            <div class="upgrade-illus">📖</div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ── Settings select dropdowns (Language / Theme) — visual toggle only ──
+        document.querySelectorAll('.settings-select').forEach(function (select) {
+            select.addEventListener('click', function () {
+                // Placeholder hook: wire to a real dropdown/modal when backend is connected
+                select.classList.toggle('open');
+            });
+        });
+
+        // ── Logout button confirmation ──
+        document.querySelectorAll('.btn-logout').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var confirmed = window.confirm('Are you sure you want to logout?');
+                if (confirmed) {
+                    window.location.href = '@Url.Action("Logout", "Reader")';
+                }
+            });
+        });
+
+    });
+</script>
+

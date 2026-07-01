@@ -1,0 +1,302 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Get Transaction";
+}
+<link href="~/css/getTransaction.css" rel="stylesheet" />
+    <main class="main">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <div>
+                <h1>Transaction Details</h1>
+                <p>View complete transaction information and payment details</p>
+            </div>
+            <button class="back-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+                Back to Transactions
+            </button>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="stat-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon icon-blue">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8m-4-4v4" /></svg>
+                </div>
+                <div>
+                    <p class="stat-label">Transaction ID</p>
+                    <p class="stat-value">TXN-2025-00128</p>
+                    <div class="stat-ref">
+                        Reference: PS_8jk2mL92XK
+                        <button class="copy-btn">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-green">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><path d="M12 16h.01" /></svg>
+                </div>
+                <div>
+                    <p class="stat-label">Amount</p>
+                    <p class="stat-value">₦450,000</p>
+                    <span class="tag-pill">Annual Subscription</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-green">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                </div>
+                <div>
+                    <p class="stat-label">Status</p>
+                    <div class="badge-success">SUCCESS</div>
+                    <p class="stat-sub">Paid on Jun 8, 2025&nbsp; 10:25 AM</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-purple">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+                </div>
+                <div>
+                    <p class="stat-label">Payment Method</p>
+                    <p class="stat-value">Paystack</p>
+                    <span class="card-pay-tag">Card Payment</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MAIN CONTENT GRID -->
+        <div class="content-grid">
+
+            <!-- LEFT COLUMN -->
+            <div class="left-col">
+
+                <!-- Transaction Information -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-icon icon-blue">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                        </div>
+                        <span class="section-title">Transaction Information</span>
+                    </div>
+                    <div class="info-grid">
+                        <div>
+                            <p class="info-label">Transaction Type</p>
+                            <p class="info-val">Subscription Payment</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Gateway</p>
+                            <p class="info-val">Paystack</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Gateway Reference</p>
+                            <p class="info-val with-copy">
+                                PS_8jk2mL92XK
+                                <button class="copy-btn">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                                </button>
+                            </p>
+                        </div>
+                        <div>
+                            <p class="info-label">Date Created</p>
+                            <p class="info-val">Jun 8, 2025 10:20 AM</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Date Paid</p>
+                            <p class="info-val">Jun 8, 2025 10:25 AM</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Currency</p>
+                            <p class="info-val">NGN</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Information -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-icon icon-blue">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                        </div>
+                        <span class="section-title">Customer Information</span>
+                    </div>
+                    <div class="info-grid">
+                        <div>
+                            <p class="info-label">Customer Name</p>
+                            <p class="info-val">Acme Corporation</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Email Address</p>
+                            <p class="info-val">billing@acmecorp.com</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Phone Number</p>
+                            <p class="info-val">08012345678</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Library ID</p>
+                            <p class="info-val">LIB-2025-001</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Customer Type</p>
+                            <p class="info-val">Organization</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Account Status</p>
+                            <p class="info-val"><span class="dot-green"></span>Active</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subscription Information -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-icon icon-blue">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                        </div>
+                        <span class="section-title">Subscription Information</span>
+                    </div>
+                    <div class="info-grid">
+                        <div>
+                            <p class="info-label">Plan Name</p>
+                            <p class="info-val">Enterprise Plan</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Billing Cycle</p>
+                            <p class="info-val">Annual</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Plan Price</p>
+                            <p class="info-val">₦450,000</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Start Date</p>
+                            <p class="info-val">Jun 8, 2025</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Expiry Date</p>
+                            <p class="info-val">Jun 8, 2026</p>
+                        </div>
+                        <div>
+                            <p class="info-label">Next Billing Date</p>
+                            <p class="info-val">Jun 8, 2026</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="right-col">
+
+                <!-- Payment Timeline -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-icon icon-blue">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                        </div>
+                        <span class="section-title">Payment Timeline</span>
+                    </div>
+                    <div class="timeline">
+                        <div class="tl-item">
+                            <div class="tl-check">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                            </div>
+                            <div class="tl-body">
+                                <p class="tl-title">Transaction Created</p>
+                                <p class="tl-time">Jun 8, 2025 10:20 AM</p>
+                            </div>
+                            <span class="tl-completed">Completed</span>
+                        </div>
+                        <div class="tl-item">
+                            <div class="tl-check">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                            </div>
+                            <div class="tl-body">
+                                <p class="tl-title">Redirected to Paystack</p>
+                                <p class="tl-time">Jun 8, 2025 10:21 AM</p>
+                            </div>
+                            <span class="tl-completed">Completed</span>
+                        </div>
+                        <div class="tl-item">
+                            <div class="tl-check">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                            </div>
+                            <div class="tl-body">
+                                <p class="tl-title">Payment Completed</p>
+                                <p class="tl-time">Jun 8, 2025 10:25 AM</p>
+                            </div>
+                            <span class="tl-completed">Completed</span>
+                        </div>
+                        <div class="tl-item">
+                            <div class="tl-check">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                            </div>
+                            <div class="tl-body">
+                                <p class="tl-title">Verification Successful</p>
+                                <p class="tl-time">Jun 8, 2025 10:25 AM</p>
+                            </div>
+                            <span class="tl-completed">Completed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Metadata + Notes side by side -->
+                <div class="meta-notes-grid">
+
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-icon icon-blue">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                            </div>
+                            <span class="section-title">Payment Metadata</span>
+                        </div>
+                        <div class="meta-row"><span class="meta-key">IP Address</span><span class="meta-val">102.89.45.233</span></div>
+                        <div class="meta-row"><span class="meta-key">Channel</span><span class="meta-val">Card</span></div>
+                        <div class="meta-row"><span class="meta-key">Bank</span><span class="meta-val">GTBank</span></div>
+                        <div class="meta-row"><span class="meta-key">Last 4 Digits</span><span class="meta-val">4242</span></div>
+                        <div class="meta-row"><span class="meta-key">Country</span><span class="meta-val">Nigeria</span></div>
+                        <div class="meta-row"><span class="meta-key">Device</span><span class="meta-val">Desktop <span style="color:var(--text-muted); font-weight:400;">(Windows)</span></span></div>
+                    </div>
+
+                    <div class="section-card">
+                        <div class="section-header">
+                            <div class="section-icon icon-amber">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
+                            </div>
+                            <span class="section-title">Notes</span>
+                        </div>
+                        <p class="notes-text">Enterprise plan subscription payment for Acme Corporation.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM ACTION BAR -->
+        <div class="action-bar">
+            <button class="act-btn btn-dl">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                Download Receipt
+            </button>
+            <button class="act-btn btn-refund">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 .49-3.32" /></svg>
+                Refund Transaction
+            </button>
+            <button class="act-btn btn-mark-failed">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
+                Mark as Failed
+            </button>
+            <button class="act-btn btn-back2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+                Back to Transactions
+            </button>
+        </div>
+
+    </main>

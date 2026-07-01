@@ -1,0 +1,232 @@
+﻿@using static Application.Queries.GetSubscriptions
+@model Application.Common.Pagenation.PagenatedList<GetSubscriptionsResponse>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Get Subscriptions";
+}
+
+<link href="~/css/getUsers.css" rel="stylesheet" />
+
+<section class="main-container">
+    <h2>System Subscription Management</h2>
+    <div class="sub-main">
+        <div class="for-total">
+            <img src="~/lib/images/members.png" alt="Alternate Text" />
+
+            <div class="more-info">
+                <small>Total Active Subscriptions</small>
+                <h3>20000+</h3>
+            </div>
+        </div>
+
+        <div class="for-active">
+            <img src="~/lib/images/add-friend.png" alt="Alternate Text" />
+
+            <div class="more-info">
+                <small>Monthly Recurring Revenue</small>
+                <h3>20000+</h3>
+            </div>
+        </div>
+
+        <div class="for-readers">
+            <img src="~/lib/images/add-friend.png" alt="Alternate Text" />
+
+            <div class="more-info">
+                <small>New Subscription (30 days)</small>
+                <h3>20000+</h3>
+            </div>
+        </div>
+
+        <div class="for-today">
+            <img src="~/lib/images/calendar.png" alt="Alternate Text" />
+
+            <div class="more-info">
+                <small>New Today</small>
+                <h3>20000+</h3>
+            </div>
+        </div>
+        <div class="users-table">
+            <div class="actions">
+                <h3>Subscription Directory</h3>
+
+                <div class="real-actions">
+
+                    <div class="search-box">
+                        <input type="text" placeholder="Search...">
+                        <img src="~/lib/images/search.svg" class="icon" alt="Search">
+                    </div>
+
+                    <select name="filter-action" id="filter-action">
+                        <option value="" disabled selected>Filter By Plan</option>
+                        <option value="library">Libarians</option>
+                        <option value="Readers">Libarians</option>
+                        <option value="Others">Libarians</option>
+                    </select>
+                    <button id="openPaymentModal" class="btn-primary button">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+                        stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                        Add Sub Type
+                    </button>
+
+                    <div id="paymentModal" class="modal-overlay">
+
+                        <div class="payment-modal modal-content">
+
+                            <div class="modal-header">
+                                <h2>Add New Subscription Type</h2>
+
+                                <button id="closePaymentModal" class="close-btn">
+                                    &times;
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+
+                                <div class="form-group">
+                                    <label>Subscription Type Name</label>
+
+                                    <input type="text" 
+                                        placeholder="Type name e.g Pro, Beginner etc"/>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Billing cycle</label>
+
+                                    <select>
+                                        <option>Monthly</option>
+                                        <option>Annually</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Cost (₦)</label>
+
+                                    <input type="number"
+                                           placeholder="Enter the cost for this sub type" />
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+
+                                <button id="cancelPaymentModal"
+                                        class="btn-cancel">
+                                    Cancel
+                                </button>
+
+                                <button class="btn-save">
+                                    Add Type
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Plan Name</th>
+                        <th>Subscriber Email</th>
+                        <th>Plan Price</th>
+                        <th>Billing Cycle</th>
+                        <th>Status</th>
+                        <th>Date Started</th>
+                        <th style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var sub in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                @{
+                                    string roleClass = sub.BillingCycle?.ToLower() switch
+                                    {
+                                        "monthly" => "badge-admin",
+                                        "annual" => "badge-moderator",
+                                        _ => "badge-default"
+                                    };
+                                }
+                                <span class="role-badge @roleClass">@(sub.BillingCycle?.ToLower() == "monthly" ? "Starter" : "Pro(Annual)")</span>
+                                </td>
+                            <td>@(sub.ReaderEmail ?? "User")</td>
+                            <td>@sub.Cost</td>
+                            <td>@sub.BillingCycle</td>
+                            <td>
+                                @{
+                                    string status = sub.IsActive ? "badge-moderator" : "badge-subscriber";
+                                }
+                                <span class="role-badge @status">@(sub.IsActive ? "Active" : "Suspended")</span>
+                            </td>
+
+                            <td>@sub.SubcriptionDate.ToString("MMM dd, yyyy")</td>
+
+                            <td style="text-align: right; padding-right: 16px; white-space: nowrap;">
+
+                                <a href="@Url.Action("GetUserSubscription", "Admin", new { userId = sub.Id })"
+                                   class="action-link details">
+                                    Manage
+                                </a>
+
+                                <a href="@Url.Action("GetInvoices", "Admin", new { userId = sub.Id })"
+                                   class="action-link details">
+                                    Invoices
+                                </a>
+
+                                <a href="@Url.Action("", "Admin", new { id = sub.Id })"
+                                   class="action-link delete"
+                                   onclick="return confirm('Remove this book from library catalog records?')">
+                                    Cancel
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+
+            @{
+                string isFirstDisabled = (Model.Page <= 1) ? "disabled" : "";
+                string isLastDisabled = (Model.Page >= Model.PageCount) ? "disabled" : "";
+            }
+
+            <div class="table-pagination-container">
+
+                <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="1" asp-route-pageSize="@Model.PageSize"
+                   class="page-item page-icon @isFirstDisabled">
+                    &#124;&lt;
+                </a>
+
+                <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="@(Model.Page - 1)" asp-route-pageSize="@Model.PageSize"
+                   class="page-item page-icon @isFirstDisabled">
+                    &lt;
+                </a>
+
+                @for (int i = 1; i <= Model.PageCount; i++)
+                {
+                    string isActive = (i == Model.Page) ? "active" : "";
+
+                    <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="@i" asp-route-pageSize="@Model.PageSize"
+                       class="page-item page-number @isActive">
+                        @i
+                    </a>
+                }
+
+                <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="@(Model.Page + 1)" asp-route-pageSize="@Model.PageSize"
+                   class="page-item page-icon @isLastDisabled">
+                    &gt;
+                </a>
+
+                <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="@Model.PageCount" asp-route-pageSize="@Model.PageSize"
+                   class="page-item page-icon @isLastDisabled">
+                    &gt;&#124;
+                </a>
+
+            </div>
+        </div>
+    </div>
+    <script src="~/js/myJsFile.js"></script>
+
+</section>

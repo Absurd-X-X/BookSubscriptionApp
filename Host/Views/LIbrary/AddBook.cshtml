@@ -1,0 +1,579 @@
+﻿@{
+    Layout = "~/Views/Shared/_LibraryLayout.cshtml";
+    ViewData["Title"] = "Add New Book";
+}
+    <link rel="stylesheet" href="~/css/addBook.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
+    <div class="wrap">
+
+        <div class="topbar">
+            <div class="breadcrumb">
+                <a href="#">Books</a>
+                <span class="bc-sep">›</span>
+                <span id="bc-mid">Add New Book</span>
+                <span class="bc-sep" id="bc-sep2" style="display:none">›</span>
+                <span class="bc-cur" id="bc-cur"></span>
+            </div>
+            <div class="tbar-btns">
+                <button class="btn btn-ghost"><i class="ti ti-eye"></i> Preview Book</button>
+                <button class="btn btn-primary"><i class="ti ti-pencil"></i> Save Book</button>
+            </div>
+        </div>
+
+        <div class="page-hd">
+            <div>
+                <div class="page-title" id="page-title">Add New Book</div>
+                <div class="page-sub" id="page-sub">Fill in the details below to add a new book to your library.</div>
+            </div>
+            <button class="btn btn-ghost-sm">Save as Draft</button>
+        </div>
+
+        <div class="step-tabs">
+            <div class="step-tab active" onclick="goStep(1)">
+                <div class="step-circle" id="c1">1</div>
+                <span>Basic Information</span>
+                <div class="step-line"></div>
+            </div>
+            <div class="step-tab" onclick="goStep(2)">
+                <div class="step-circle" id="c2">2</div>
+                <span>Pricing &amp; Access</span>
+                <div class="step-line"></div>
+            </div>
+            <div class="step-tab" onclick="goStep(3)">
+                <div class="step-circle" id="c3">3</div>
+                <span>Files &amp; Versions</span>
+                <div class="step-line"></div>
+            </div>
+            <div class="step-tab" onclick="goStep(4)">
+                <div class="step-circle" id="c4">4</div>
+                <span>SEO &amp; Visibility</span>
+            </div>
+        </div>
+
+        <!-- STEP 1 -->
+        <div class="step-panel active" id="p1">
+            <div class="two-col">
+                <div class="form-col">
+                    <div class="card">
+                        <div class="card-title">Basic Details</div>
+                        <div class="card-sub">Enter the core information about this book.</div>
+                        <div class="frow">
+                            <div class="field"><label class="label">Title <span class="req">*</span></label><input type="text" class="input" placeholder="Enter book title"></div>
+                            <div class="field"><label class="label">Subtitle</label><input type="text" class="input" placeholder="Enter subtitle (optional)"></div>
+                        </div>
+                        <div class="frow">
+                            <div class="field"><label class="label">Author <span class="req">*</span></label><input type="text" class="input" placeholder="Enter author name"></div>
+                            <div class="field"><label class="label">Co-Author(s)</label><input type="text" class="input" placeholder="Enter co-author(s) (optional)"></div>
+                        </div>
+                        <div class="frow">
+                            <div class="field"><label class="label">Publisher <span class="req">*</span></label><input type="text" class="input" placeholder="Enter publisher name"></div>
+                            <div class="field"><label class="label">Publication Date <span class="req">*</span></label><input type="date" class="input"></div>
+                        </div>
+                        <div class="frow">
+                            <div class="field">
+                                <label class="label">Language <span class="req">*</span></label>
+                                <select class="input"><option value="">Select language</option><option>English</option><option>French</option><option>Yoruba</option><option>Igbo</option><option>Hausa</option></select>
+                            </div>
+                            <div class="field"><label class="label">ISBN</label><input type="text" class="input" placeholder="Enter ISBN (optional)"></div>
+                        </div>
+                        <div class="frow">
+                            <div class="field">
+                                <label class="label">Category <span class="req">*</span></label>
+                                <select class="input"><option value="">Select primary category</option><option>Self Help</option><option>Technology</option><option>Business</option><option>Finance</option></select>
+                            </div>
+                            <div class="field">
+                                <label class="label">Additional Categories</label>
+                                <select class="input"><option value="">Select additional categories</option><option>Personal Development</option><option>Psychology</option><option>Success</option></select>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Description <span class="req">*</span></label>
+                            <div class="rich-bar">
+                                <button class="rt-btn"><b>B</b></button>
+                                <button class="rt-btn"><i>I</i></button>
+                                <button class="rt-btn"><u>U</u></button>
+                                <button class="rt-btn"><i class="ti ti-list"></i></button>
+                                <button class="rt-btn"><i class="ti ti-list-numbers"></i></button>
+                            </div>
+                            <textarea class="input textarea" id="desc" placeholder="Write a short description about the book..." oninput="cc('desc','desc-cc',2000)"></textarea>
+                            <div class="char-count" id="desc-cc">0/2000</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Book Details</div>
+                        <div class="frow">
+                            <div class="field"><label class="label">Pages</label><input type="number" class="input" placeholder="Enter number of pages"></div>
+                            <div class="field"><label class="label">Edition</label><input type="text" class="input" placeholder="e.g. 1st Edition"></div>
+                        </div>
+                        <div class="frow">
+                            <div class="field">
+                                <label class="label">Book Format</label>
+                                <select class="input"><option value="">Select format</option><option>EPUB</option><option>PDF</option><option>Both</option></select>
+                            </div>
+                            <div class="field">
+                                <label class="label">Reading Age (Optional)</label>
+                                <select class="input"><option value="">Select reading age</option><option>Children (0–12)</option><option>Teen (13–17)</option><option>Adult (18+)</option><option>All Ages</option></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-col">
+                    <div class="card">
+                        <div class="card-title">Book Cover</div>
+                        <div class="card-sub">Upload a high-quality cover image.</div>
+                        <div class="dropzone">
+                            <i class="ti ti-cloud-upload drop-icon"></i>
+                            <div class="drop-txt">Drag &amp; drop image here</div>
+                            <div class="drop-or">or</div>
+                            <button class="btn btn-outline">Choose File</button>
+                        </div>
+                        <p class="hint">Recommended: 600×900px · JPG, PNG or WebP (Max 2MB)</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Upload Book File</div>
+                        <div class="card-sub">Upload the main file for this book.</div>
+                        <div class="dropzone">
+                            <i class="ti ti-file-upload drop-icon"></i>
+                            <div class="drop-txt">Drag &amp; drop file here</div>
+                            <div class="drop-or">or</div>
+                            <button class="btn btn-outline">Choose File</button>
+                        </div>
+                        <p class="hint">Supported: EPUB, PDF, MOBI, TXT · Max 100MB</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Book Status</div>
+                        <div class="card-sub">Set the current status of this book.</div>
+                        <div class="radio-group">
+                            <label class="radio-item">
+                                <input type="radio" name="status" checked>
+                                <div><div class="radio-lbl">Published</div><div class="radio-sub">Book will be visible to all readers</div></div>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="status">
+                                <div><div class="radio-lbl">Draft</div><div class="radio-sub">Book will be saved as draft</div></div>
+                            </label>
+                            <label class="radio-item">
+                                <input type="radio" name="status">
+                                <div><div class="radio-lbl">Archived</div><div class="radio-sub">Book will be hidden from readers</div></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="step-footer">
+                <button class="btn btn-ghost">Cancel</button>
+                <button class="btn btn-primary" onclick="goStep(2)">Next: Pricing &amp; Access <i class="ti ti-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="step-panel" id="p2">
+            <div class="two-col">
+                <div class="form-col">
+                    <div class="card">
+                        <div class="card-title">Pricing</div>
+                        <div class="card-sub">Choose how this book will be priced for readers.</div>
+                        <div class="pricing-cards">
+                            <div class="pc sel" onclick="selPc(this)"><div class="pc-title">Free Book</div><div class="pc-sub">This book is free for all readers.</div></div>
+                            <div class="pc" onclick="selPc(this)"><div class="pc-title">Paid Book</div><div class="pc-sub">Readers must pay once to access this book.</div></div>
+                            <div class="pc" onclick="selPc(this)"><div class="pc-title">Subscription Only</div><div class="pc-sub">Only accessible to active subscribers.</div></div>
+                        </div>
+                        <div class="frow">
+                            <div class="field">
+                                <label class="label">Price (NGN) <span class="req">*</span></label>
+                                <input type="number" class="input" value="2500.00">
+                                <div class="hint">Set the selling price for this book.</div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Discount (Optional)</label>
+                                <div class="input-suffix-wrap"><input type="number" class="input" value="0" style="padding-right:28px"><span class="input-suffix">%</span></div>
+                                <div class="hint">Set a discount percentage if applicable.</div>
+                            </div>
+                        </div>
+                        <div class="info-banner"><i class="ti ti-info-circle"></i> This book will be available for free.</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Access Rules</div>
+                        <div class="card-sub">Define who can access this book.</div>
+                        <div class="frow">
+                            <div class="field">
+                                <label class="label">Who can access? <span class="req">*</span></label>
+                                <select class="input"><option>Everyone</option><option>Subscribers Only</option><option>Premium Members</option></select>
+                            </div>
+                            <div class="field">
+                                <label class="label">Require Login?</label>
+                                <div class="toggle-wrap"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-lbl">Readers must be logged in to access this book.</span></div>
+                            </div>
+                        </div>
+                        <div class="frow">
+                            <div class="field">
+                                <label class="label">Subscription Plan (Optional)</label>
+                                <select class="input"><option value="">Select a plan</option><option>Basic</option><option>Premium</option></select>
+                            </div>
+                            <div class="field">
+                                <label class="label">Download Allowed?</label>
+                                <div class="toggle-wrap"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-lbl">Allow readers to download this book.</span></div>
+                            </div>
+                        </div>
+                        <div class="frow">
+                            <div class="field">
+                                <label class="label">Print Allowed?</label>
+                                <div class="toggle-wrap"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-lbl">Allow readers to print this book.</span></div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Copy &amp; Paste Allowed?</label>
+                                <div class="toggle-wrap"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-lbl">Allow readers to copy content from this book.</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Availability</div>
+                        <div class="card-sub">Control where and how this book is displayed.</div>
+                        <div class="cb-grid">
+                            <label class="cb-item"><input type="checkbox" checked><div><b>Publish Book</b><br><span>Make this book visible to readers.</span></div></label>
+                            <label class="cb-item"><input type="checkbox" checked><div><b>Show on Homepage</b><br><span>Display this book on the homepage.</span></div></label>
+                            <label class="cb-item"><input type="checkbox" checked><div><b>Include in Search</b><br><span>Allow this book to appear in search results.</span></div></label>
+                            <label class="cb-item"><input type="checkbox" checked><div><b>Featured Book</b><br><span>Highlight this book as a featured book.</span></div></label>
+                            <label class="cb-item"><input type="checkbox" checked><div><b>Show in Recommendations</b><br><span>Include in recommended books.</span></div></label>
+                            <label class="cb-item"><input type="checkbox" checked><div><b>Show in New Arrivals</b><br><span>Display in the new arrivals section.</span></div></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-col">
+                    <div class="card">
+                        <div class="card-title">Pricing &amp; Access Summary</div>
+                        <div class="card-sub">Review your pricing and access settings.</div>
+                        <div class="summary-list">
+                            <div class="sum-row"><span>Pricing Type</span><span class="badge badge-g">Free Book</span></div>
+                            <div class="sum-row"><span>Price</span><span>NGN 0.00</span></div>
+                            <div class="sum-row"><span>Discount</span><span>0%</span></div>
+                            <div class="sum-row"><span>Access</span><span>Everyone</span></div>
+                            <div class="sum-row"><span>Login Required</span><span>Yes</span></div>
+                            <div class="sum-row"><span>Download</span><span class="badge badge-r">Not Allowed</span></div>
+                            <div class="sum-row"><span>Print</span><span class="badge badge-r">Not Allowed</span></div>
+                            <div class="sum-row"><span>Copy &amp; Paste</span><span class="badge badge-r">Not Allowed</span></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Access Preview</div>
+                        <div class="card-sub">This is how readers will see this book.</div>
+                        <div class="preview-card">
+                            <div class="prev-book-row">
+                                <div class="prev-cover">Atomic<br>Habits</div>
+                                <div>
+                                    <div class="prev-title">Atomic Habits</div>
+                                    <div class="prev-author">by James Clear</div>
+                                    <span class="badge badge-g" style="margin-top:5px;display:inline-flex">FREE</span>
+                                    <div class="prev-sub">Free for everyone</div>
+                                </div>
+                            </div>
+                            <div class="prev-lock"><i class="ti ti-lock"></i> Login required to access this book</div>
+                            <button class="btn btn-primary" style="width:100%;justify-content:center">Read Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="step-footer">
+                <button class="btn btn-ghost" onclick="goStep(1)"><i class="ti ti-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goStep(3)">Next: Files &amp; Versions <i class="ti ti-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="step-panel" id="p3">
+            <div class="two-col">
+                <div class="form-col">
+                    <div class="card">
+                        <div class="card-hdr">
+                            <div class="card-title" style="display:flex;align-items:center;gap:8px">Current Version <span class="badge badge-g">Active</span></div>
+                            <button class="btn btn-outline"><i class="ti ti-upload"></i> Replace Current Version</button>
+                        </div>
+                        <div class="ver-cur">
+                            <div class="ver-icon"><i class="ti ti-file" style="font-size:24px;color:#7c3aed"></i><span class="ver-icon-lbl">EPUB</span></div>
+                            <div style="flex:1">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                                    <strong>Version 1.0 (Current)</strong>
+                                    <span class="badge badge-p">Current Version</span>
+                                </div>
+                                <div class="ver-meta-row">
+                                    <div><div class="meta-lbl">File Type</div><div class="meta-val">EPUB</div></div>
+                                    <div><div class="meta-lbl">Uploaded</div><div class="meta-val">May 20, 2025<br>10:30 AM</div></div>
+                                    <div><div class="meta-lbl">File Size</div><div class="meta-val">2.4 MB</div></div>
+                                    <div><div class="meta-lbl">Uploaded By</div><div class="meta-val">Unilag Library Admin</div></div>
+                                </div>
+                                <div class="rn-box"><div class="meta-lbl">Release Note</div>Initial version of the book.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Version History</div>
+                        <div class="card-sub">View and manage all previous versions of this book.</div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Version</th><th>File Type</th><th>Uploaded</th><th>File Size</th><th>Uploaded By</th><th>Release Note</th><th>Actions</th></tr></thead>
+                                <tbody>
+                                    <tr><td>1.0 <span class="badge badge-p">Current</span></td><td><span class="badge badge-g">EPUB</span></td><td>May 20, 2025<br><small>10:30 AM</small></td><td>2.4 MB</td><td>Unilag Library Admin</td><td>Initial version of the book.</td><td class="action-cell"><button class="icon-btn" onclick="toggleMenu(this)"><i class="ti ti-dots-vertical"></i></button><div class="vmenu"><div class="vm-item"><i class="ti ti-eye"></i> View Details</div><div class="vm-item"><i class="ti ti-download"></i> Download</div><div class="vm-item"><i class="ti ti-check"></i> Set as Current</div><div class="vm-item danger"><i class="ti ti-trash"></i> Delete Version</div></div></td></tr>
+                                    <tr><td>0.9</td><td><span class="badge badge-g">EPUB</span></td><td>May 18, 2025<br><small>04:15 PM</small></td><td>2.1 MB</td><td>Unilag Library Admin</td><td>Revised introduction and chapter 1.</td><td class="action-cell"><button class="icon-btn" onclick="toggleMenu(this)"><i class="ti ti-dots-vertical"></i></button><div class="vmenu"><div class="vm-item"><i class="ti ti-eye"></i> View Details</div><div class="vm-item"><i class="ti ti-download"></i> Download</div><div class="vm-item"><i class="ti ti-check"></i> Set as Current</div><div class="vm-item danger"><i class="ti ti-trash"></i> Delete Version</div></div></td></tr>
+                                    <tr><td>0.8</td><td><span class="badge badge-r">PDF</span></td><td>May 15, 2025<br><small>09:22 AM</small></td><td>3.7 MB</td><td>Unilag Library Admin</td><td>Converted from draft PDF.</td><td class="action-cell"><button class="icon-btn" onclick="toggleMenu(this)"><i class="ti ti-dots-vertical"></i></button><div class="vmenu"><div class="vm-item"><i class="ti ti-eye"></i> View Details</div><div class="vm-item"><i class="ti ti-download"></i> Download</div><div class="vm-item"><i class="ti ti-check"></i> Set as Current</div><div class="vm-item danger"><i class="ti ti-trash"></i> Delete Version</div></div></td></tr>
+                                    <tr><td>0.7</td><td><span class="badge badge-g">EPUB</span></td><td>May 10, 2025<br><small>11:05 AM</small></td><td>1.9 MB</td><td>Unilag Library Admin</td><td>Updated formatting and typos.</td><td class="action-cell"><button class="icon-btn" onclick="toggleMenu(this)"><i class="ti ti-dots-vertical"></i></button><div class="vmenu"><div class="vm-item"><i class="ti ti-eye"></i> View Details</div><div class="vm-item"><i class="ti ti-download"></i> Download</div><div class="vm-item"><i class="ti ti-check"></i> Set as Current</div><div class="vm-item danger"><i class="ti ti-trash"></i> Delete Version</div></div></td></tr>
+                                    <tr><td>0.6</td><td><span class="badge badge-b">DOCX</span></td><td>May 05, 2025<br><small>02:41 PM</small></td><td>1.5 MB</td><td>Unilag Library Admin</td><td>Original draft in Word.</td><td class="action-cell"><button class="icon-btn" onclick="toggleMenu(this)"><i class="ti ti-dots-vertical"></i></button><div class="vmenu"><div class="vm-item"><i class="ti ti-eye"></i> View Details</div><div class="vm-item"><i class="ti ti-download"></i> Download</div><div class="vm-item"><i class="ti ti-check"></i> Set as Current</div><div class="vm-item danger"><i class="ti ti-trash"></i> Delete Version</div></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tbl-footer">
+                            <span>Showing 1 to 5 of 5 versions</span>
+                            <div class="pagination"><button class="pg-btn">‹</button><button class="pg-btn active">1</button><button class="pg-btn">›</button></div>
+                        </div>
+                    </div>
+                    <div class="tip-box">
+                        <i class="ti ti-info-circle tip-icon"></i>
+                        <div>
+                            <strong>Version Management Tips</strong>
+                            <ul><li>The current version is the file readers will access.</li><li>You can replace the current version without losing history.</li><li>Previous versions can be restored anytime.</li><li>Supported formats: EPUB, PDF, TXT</li></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-col">
+                    <div class="card">
+                        <div class="card-title">Upload New Version</div>
+                        <div class="card-sub">Upload a new version to replace the current book file.</div>
+                        <div class="dropzone">
+                            <i class="ti ti-cloud-upload drop-icon"></i>
+                            <div class="drop-txt">Drag &amp; drop file here</div>
+                            <div class="drop-or">or</div>
+                            <button class="btn btn-outline">Choose File</button>
+                        </div>
+                        <p class="hint" style="margin-top:8px">Supported: EPUB, PDF, TXT · Max 100MB</p>
+                        <div class="field" style="margin-top:14px">
+                            <label class="label">Release Note (Optional)</label>
+                            <textarea class="input textarea" id="rn" placeholder="Describe what's new in this version..." style="min-height:80px" oninput="cc('rn','rn-cc',500)"></textarea>
+                            <div class="char-count" id="rn-cc">0/500</div>
+                        </div>
+                        <button class="btn btn-primary" style="width:100%;margin-top:10px;justify-content:center"><i class="ti ti-cloud-upload"></i> Upload &amp; Save Version</button>
+                    </div>
+                </div>
+            </div>
+            <div class="step-footer">
+                <button class="btn btn-ghost" onclick="goStep(2)"><i class="ti ti-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary" onclick="goStep(4)">Next: SEO &amp; Visibility <i class="ti ti-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="step-panel" id="p4">
+            <div class="two-col">
+                <div class="form-col">
+                    <div class="card">
+                        <div class="card-title">SEO Settings</div>
+                        <div class="card-sub">Optimize how your book appears in search engines and on Unilag Library.</div>
+                        <div class="field">
+                            <label class="label">SEO Title <span class="req">*</span></label>
+                            <input type="text" class="input" id="seo-t" value="Atomic Habits by James Clear | Unilag Library" oninput="liveSearch()">
+                            <div class="char-count" id="seo-tc">56/60 characters</div>
+                            <div class="hint">This is the title that search engines will display.</div>
+                        </div>
+                        <div class="field">
+                            <label class="label">SEO Description <span class="req">*</span></label>
+                            <textarea class="input textarea" id="seo-d" style="min-height:75px" oninput="liveSearch()">Discover the proven strategies in Atomic Habits by James Clear. Learn how small changes can lead to remarkable results.</textarea>
+                            <div class="char-count" id="seo-dc">119/160 characters</div>
+                            <div class="hint">This description appears in search results.</div>
+                        </div>
+                        <div class="field">
+                            <label class="label">SEO Keywords</label>
+                            <div class="kw-tags" id="kw-wrap">
+                                <span class="kw-tag">atomic habits <button onclick="rmKw(this)">×</button></span>
+                                <span class="kw-tag">james clear <button onclick="rmKw(this)">×</button></span>
+                                <span class="kw-tag">habits <button onclick="rmKw(this)">×</button></span>
+                                <span class="kw-tag">productivity <button onclick="rmKw(this)">×</button></span>
+                                <input class="kw-input" placeholder="Add keyword and press Enter" onkeydown="addKw(event)">
+                            </div>
+                            <div class="hint">Add relevant keywords separated by commas or enter.</div>
+                        </div>
+                        <div class="frow">
+                            <div class="field"><label class="label">URL Slug <span class="req">*</span></label><input type="text" class="input" value="atomic-habits-james-clear"><div class="hint">This will be used in the book's URL.</div></div>
+                            <div class="field"><label class="label">Canonical URL (Optional)</label><input type="text" class="input" value="https://unilaglibrary.com/books/atomic-habits"><div class="hint">Use canonical URL if this book has multiple URLs.</div></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Visibility Settings</div>
+                        <div class="card-sub">Control where and how this book is visible.</div>
+                        <div class="toggle-grid">
+                            <div class="tg-block"><div><div class="tg-title">Published</div><div class="hint">Make this book available to readers.</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                            <div class="tg-block"><div><div class="tg-title">Show in Recommendations</div><div class="hint">Include in recommended books.</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                            <div class="tg-block"><div><div class="tg-title">Show in Search Results</div><div class="hint">Allow this book to appear in search results.</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                            <div class="tg-block"><div><div class="tg-title">Show in New Arrivals</div><div class="hint">Display in the new arrivals section.</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                            <div class="tg-block"><div><div class="tg-title">Show on Homepage</div><div class="hint">Display this book on the homepage.</div></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+                            <div class="tg-block"><div><div class="tg-title">Allow in Collections</div><div class="hint">Allow this book to be added to collections.</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                            <div class="tg-block"><div><div class="tg-title">Featured Book</div><div class="hint">Highlight this book as a featured book.</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                            <div class="tg-block"><div><div class="tg-title">Allow Previews</div><div class="hint">Allow readers to preview this book.</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Discoverability</div>
+                        <div class="card-sub">Help readers find your book easily.</div>
+                        <div class="frow">
+                            <div class="field"><label class="label">Primary Category <span class="req">*</span></label><select class="input"><option>Self Help</option><option>Technology</option><option>Business</option></select></div>
+                            <div class="field"><label class="label">Language <span class="req">*</span></label><select class="input"><option>English</option><option>French</option></select></div>
+                        </div>
+                        <div class="frow">
+                            <div class="field">
+                                <label class="label">Additional Categories</label>
+                                <div class="kw-tags"><span class="kw-tag">Personal Development <button onclick="rmKw(this)">×</button></span><span class="kw-tag">Psychology <button onclick="rmKw(this)">×</button></span><input class="kw-input" placeholder="Add category"></div>
+                            </div>
+                            <div class="field"><label class="label">Reading Level</label><select class="input"><option>Intermediate</option><option>Beginner</option><option>Advanced</option></select><div class="hint">Helps readers find books suitable for their level.</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-col">
+                    <div class="card">
+                        <div class="card-title">Search Preview</div>
+                        <div class="card-sub">This is how your book may appear in search results.</div>
+                        <div class="seo-prev">
+                            <div class="seo-url">unilaglibrary.com › books › atomic-habits-james-clear</div>
+                            <div class="seo-title" id="seo-pt">Atomic Habits by James Clear | Unilag Library</div>
+                            <div class="seo-desc" id="seo-pd">Discover the proven strategies in Atomic Habits by James Clear. Learn how small changes can lead to remarkable results.</div>
+                            <div class="seo-stars">★★★★★ 4.8 (124 reviews)</div>
+                            <div class="seo-tip"><i class="ti ti-info-circle"></i> Tip: Write a clear title and description to improve your book's visibility.</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Visibility Summary</div>
+                        <div class="card-sub">Overview of your visibility settings.</div>
+                        <div class="summary-list">
+                            <div class="sum-row"><span>Published</span><span class="badge badge-g">Yes</span></div>
+                            <div class="sum-row"><span>Search Visibility</span><span class="badge badge-g">Enabled</span></div>
+                            <div class="sum-row"><span>Homepage</span><span class="badge badge-r">Not Featured</span></div>
+                            <div class="sum-row"><span>Featured Book</span><span class="badge badge-g">Yes</span></div>
+                            <div class="sum-row"><span>Recommendations</span><span class="badge badge-g">Enabled</span></div>
+                            <div class="sum-row"><span>New Arrivals</span><span class="badge badge-g">Enabled</span></div>
+                            <div class="sum-row"><span>Collections</span><span class="badge badge-g">Enabled</span></div>
+                            <div class="sum-row"><span>Previews</span><span class="badge badge-g">Enabled</span></div>
+                        </div>
+                        <div class="disc-badge"><i class="ti ti-circle-check"></i> Your book is highly discoverable</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Social Share Preview</div>
+                        <div class="card-sub">This is how your book will look when shared.</div>
+                        <div class="social-card">
+                            <div class="social-cover">Atomic Habits</div>
+                            <div class="social-body">
+                                <div class="social-ttl">Atomic Habits by James Clear</div>
+                                <div class="social-dsc">Discover the proven strategies in Atomic Habits by James Clear. Learn how small changes can lead to remarkable results.</div>
+                                <div class="social-url">unilaglibrary.com</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="step-footer">
+                <button class="btn btn-ghost" onclick="goStep(3)"><i class="ti ti-arrow-left"></i> Previous</button>
+                <button class="btn btn-primary"><i class="ti ti-device-floppy"></i> Save &amp; Update Book</button>
+            </div>
+        </div>
+
+    </div>
+    <script src="add-book.js"></script>
+
+                            <script>
+    const stepMeta = {
+    1: { title: 'Add New Book',     sub: 'Fill in the details below to add a new book to your library.',          bc: null },
+    2: { title: 'Pricing & Access', sub: 'Set the price, access rules and visibility settings for this book.',    bc: 'Pricing & Access' },
+    3: { title: 'Files & Versions', sub: 'Upload, manage and track all versions of your book files.',             bc: 'Files & Versions' },
+    4: { title: 'SEO & Visibility', sub: 'Improve discoverability and control how this book appears to readers.', bc: 'SEO & Visibility' },
+    };
+
+    let currentStep = 1;
+
+    function goStep(n) {
+    document.getElementById('p' + currentStep).classList.remove('active');
+    const tabs = document.querySelectorAll('.step-tab');
+    for (let i = 1; i < n; i++) {
+    tabs[i - 1].classList.remove('active');
+    tabs[i - 1].classList.add('done');
+    document.getElementById('c' + i).innerHTML = '<i class="ti ti-check"></i>';
+    }
+    for (let i = n; i <= 4; i++) {
+    tabs[i - 1].classList.remove('done');
+    if (i !== n) tabs[i - 1].classList.remove('active');
+    if (i > n) document.getElementById('c' + i).textContent = i;
+    }
+    tabs[n - 1].classList.add('active');
+    tabs[n - 1].classList.remove('done');
+    document.getElementById('c' + n).textContent = n;
+    currentStep = n;
+    document.getElementById('p' + n).classList.add('active');
+    const meta = stepMeta[n];
+    document.getElementById('page-title').textContent = meta.title;
+    document.getElementById('page-sub').textContent = meta.sub;
+    if (meta.bc) {
+    document.getElementById('bc-mid').textContent = 'Edit Book';
+    document.getElementById('bc-sep2').style.display = 'inline';
+    document.getElementById('bc-cur').textContent = meta.bc;
+    } else {
+    document.getElementById('bc-mid').textContent = 'Add New Book';
+    document.getElementById('bc-sep2').style.display = 'none';
+    document.getElementById('bc-cur').textContent = '';
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function selPc(el) {
+    document.querySelectorAll('.pc').forEach(p => p.classList.remove('sel'));
+    el.classList.add('sel');
+    }
+
+    function toggleMenu(btn) {
+    const menu = btn.nextElementSibling;
+    const isOpen = menu.classList.contains('open');
+    document.querySelectorAll('.vmenu').forEach(m => m.classList.remove('open'));
+    if (!isOpen) menu.classList.add('open');
+    }
+
+    document.addEventListener('click', function (e) {
+    if (!e.target.closest('.icon-btn')) {
+    document.querySelectorAll('.vmenu').forEach(m => m.classList.remove('open'));
+    }
+    });
+
+    function cc(inputId, counterId, max) {
+    const len = document.getElementById(inputId).value.length;
+    document.getElementById(counterId).textContent = len + '/' + max;
+    }
+
+    function liveSearch() {
+    const t = document.getElementById('seo-t').value;
+    const d = document.getElementById('seo-d').value;
+    document.getElementById('seo-pt').textContent = t;
+    document.getElementById('seo-pd').textContent = d;
+    document.getElementById('seo-tc').textContent = t.length + '/60 characters';
+    document.getElementById('seo-dc').textContent = d.length + '/160 characters';
+    }
+
+    function addKw(e) {
+    if (e.key !== 'Enter' && e.key !== ',') return;
+    e.preventDefault();
+    const input = e.target;
+    const val = input.value.trim().replace(/,$/, '');
+    if (!val) return;
+    const tag = document.createElement('span');
+    tag.className = 'kw-tag';
+    tag.innerHTML = val + ' <button onclick="rmKw(this)">×</button>';
+    input.parentNode.insertBefore(tag, input);
+    input.value = '';
+    }
+
+    function rmKw(btn) {
+    btn.closest('.kw-tag').remove();
+    }
+
+    document.querySelectorAll('textarea').forEach(function (ta) {
+    ta.addEventListener('input', function () {
+    const counter = this.nextElementSibling;
+    if (counter && counter.classList.contains('char-count')) {
+    const max = parseInt(counter.textContent.split('/')[1]) || 2000;
+    counter.textContent = this.value.length + '/' + max;
+    }
+    });
+    });
+                            </script>

@@ -1,0 +1,124 @@
+﻿
+
+.mode-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+    .mode-overlay.is-visible {
+        display: flex;
+        opacity: 1;
+    }
+
+.mode-card {
+    background: var(--notify-bg);
+    border: 0.5px solid var(--notify-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    box-shadow: 0 0 50px rgba(124, 58, 237, 0.18), 0 20px 40px rgba(0, 0, 0, 0.4);
+    transform: scale(0.95) translateY(8px);
+    transition: transform 0.2s ease;
+    text-align: center;
+}
+
+.mode-overlay.is-visible .mode-card {
+    transform: scale(1) translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.mode-card .notify-title {
+    font-size: 18px;
+    margin: 0 0 6px;
+}
+
+.mode-card .notify-message {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.modal-actions {
+    margin-top: 18px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.modal-btn {
+    border: 0.5px solid var(--notify-border);
+    background: transparent;
+    color: var(--notify-text-primary);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+    .modal-btn:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .modal-btn.is-primary {
+        background: var(--notify-accent);
+        border-color: var(--notify-accent);
+        color: #1a1025;
+    }
+
+        .modal-btn.is-primary:hover {
+            background: #b89cfb;
+        }
+
+.notify-confirm-input-wrap {
+    margin-top: 14px;
+    text-align: left;
+}
+
+.notify-confirm-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 0.5px solid var(--notify-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--notify-text-primary);
+    outline: none;
+}
+
+    .notify-confirm-input:focus {
+        border-color: var(--notify-accent);
+    }
+
+.modal-btn.is-danger {
+    background: #e63b60;
+    border-color: #e63b60;
+    color: #fff;
+}
+
+    .modal-btn.is-danger:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        background: #e63b60;
+        border-color: #e63b60;
+    }
+
+    .modal-btn.is-danger:not(:disabled):hover {
+        background: #c92e4f;
+    }

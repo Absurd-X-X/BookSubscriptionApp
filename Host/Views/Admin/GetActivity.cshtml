@@ -1,0 +1,315 @@
+﻿@using static Application.Queries.GetActivityById
+@model GetActivityByIdResponse
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Audit Log Details";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+<link rel="stylesheet" href="~/css/activity.css" />
+
+<div class="adl-header">
+    <h1>Audit Log Details</h1>
+    <button type="button" class="adl-back-link" id="backToAuditLogs">
+        <i class="ti ti-arrow-left"></i> Back to Audit Logs
+    </button>
+</div>
+
+@{
+    string[] strings = { "jd", "sm", "la", "mt", "aw" };
+
+    Random rand = new Random();
+
+    string userInitials = strings[rand.Next(0, strings.Length)];
+
+    string name = Model.UserName;
+    string[] nameParts = name.Split(' ');
+
+    char firstInitial;
+    char secondInitial;
+
+    if (nameParts.Length < 2)
+    {
+        firstInitial = nameParts[0][0];
+        secondInitial = nameParts[0][nameParts.Length - 1];
+    }
+    else
+    {
+        firstInitial = nameParts[0][0];
+        secondInitial = nameParts[1][0];
+    }
+}
+
+<!-- ── LOG OVERVIEW ── -->
+<div class="adl-overview-card">
+    <div class="adl-overview-top">
+        <div class="adl-overview-icon"><i class="ti ti-books"></i></div>
+        <div class="adl-overview-text">
+            <div class="adl-overview-label">Log Overview</div>
+            <div class="adl-overview-title-row">
+                <h2>Updated book &ldquo;Atomic Habits&rdquo; (Price)</h2>
+                <span class="action-badge action-badge--update">UPDATE</span>
+            </div>
+            <div class="adl-overview-desc">The book price was updated from $12.99 to $14.99.</div>
+        </div>
+    </div>
+
+    <div class="adl-meta-strip">
+        <div class="adl-meta-item">
+            <div class="adl-meta-avatar avatar-green">@firstInitial@secondInitial</div>
+            <div class="adl-meta-text">
+                <div class="adl-meta-primary">@Model.UserName</div>
+                <div class="adl-meta-secondary">@Model.Role</div>
+            </div>
+        </div>
+        <div class="adl-meta-item">
+            <div class="adl-meta-icon"><i class="ti ti-books"></i></div>
+            <div class="adl-meta-text">
+                <div class="adl-meta-primary">Books</div>
+                <div class="adl-meta-secondary">Module</div>
+            </div>
+        </div>
+        <div class="adl-meta-item">
+            <div class="adl-meta-icon"><i class="ti ti-book"></i></div>
+            <div class="adl-meta-text">
+                <div class="adl-meta-primary">Book</div>
+                <div class="adl-meta-secondary">Entity</div>
+            </div>
+        </div>
+        <div class="adl-meta-item">
+            <div class="adl-meta-text">
+                <div class="adl-meta-primary">BK-2025-00123</div>
+                <div class="adl-meta-secondary">Entity ID</div>
+            </div>
+        </div>
+        <div class="adl-meta-item">
+            <div class="adl-meta-icon"><i class="ti ti-calendar"></i></div>
+            <div class="adl-meta-text">
+                <div class="adl-meta-primary">@Model.Timestamp.ToString("MMM dd, yyyy")</div>
+                <div class="adl-meta-secondary">@Model.Timestamp.ToString("hh:mm tt")</div>
+            </div>
+        </div>
+        <div class="adl-meta-item">
+            <div class="adl-meta-text">
+                <div class="adl-meta-primary">197.159.112.45</div>
+                <div class="adl-meta-secondary">IP Address</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── DETAILS + USER INFORMATION GRID ── -->
+<div class="adl-grid">
+
+    <!-- LEFT: Details -->
+    <div class="adl-card">
+        <div class="adl-card-title">Details</div>
+
+        <div class="adl-detail-row">
+            <div class="adl-detail-label">Action</div>
+            <div class="adl-detail-value"><span class="action-badge action-badge--update">@Model.ActionType</span></div>
+        </div>
+        <div class="adl-detail-row">
+            <div class="adl-detail-label">Module</div>
+            <div class="adl-detail-value">Books</div>
+        </div>
+        <div class="adl-detail-row">
+            <div class="adl-detail-label">Entity</div>
+            <div class="adl-detail-value">Book</div>
+        </div>
+        <div class="adl-detail-row">
+            <div class="adl-detail-label">Entity ID</div>
+            <div class="adl-detail-value">BK-2025-00123</div>
+        </div>
+        <div class="adl-detail-row">
+            <div class="adl-detail-label">Description</div>
+            <div class="adl-detail-value">@Model.Description</div>
+        </div>
+        <div class="adl-detail-row">
+            <div class="adl-detail-label">Old Value</div>
+            <div class="adl-detail-value">Not Set</div>
+        </div>
+        <div class="adl-detail-row">
+            <div class="adl-detail-label">New Value</div>
+            <div class="adl-detail-value">Not Set Either</div>
+        </div>
+        <div class="adl-detail-row">
+            <div class="adl-detail-label">Changes</div>
+            <div class="adl-detail-value">
+                <div class="adl-diff-block">
+                    <div class="adl-diff-line adl-diff-line--removed">- "price": "12.99"</div>
+                    <div class="adl-diff-line adl-diff-line--added">+ "price": "14.99"</div>
+                </div>
+            </div>
+        </div>
+        <div class="adl-detail-row">
+            <div class="adl-detail-label">IP Address</div>
+            <div class="adl-detail-value">197.159.112.45</div>
+        </div>
+        <div class="adl-detail-row">
+            <div class="adl-detail-label">User Agent</div>
+            <div class="adl-detail-value">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36</div>
+        </div>
+        <div class="adl-detail-row">
+            <div class="adl-detail-label">Date &amp; Time</div>
+            <div class="adl-detail-value">@Model.Timestamp.ToString("MMM dd, yyyy  hh:mm tt")</div>
+        </div>
+        <div class="adl-detail-row">
+            <div class="adl-detail-label">Status</div>
+            <div class="adl-detail-value"><span class="status-badge status-badge--success">Success</span></div>
+        </div>
+    </div>
+
+    <!-- RIGHT: User Information + Additional Information -->
+    <div>
+        <div class="adl-side-card">
+            <div class="adl-card-title">User Information</div>
+            <div class="adl-user-row">
+                <div class="adl-user-avatar avatar-green">@firstInitial@secondInitial</div>
+                <div>
+                    <div class="adl-user-name">@Model.UserName</div>
+                    <div class="adl-user-role">@Model.Role</div>
+                    <div class="adl-user-email">@Model.Email</div>
+                </div>
+            </div>
+            <div class="adl-info-row">
+                <span class="adl-info-label">User ID</span>
+                <span class="adl-info-value">USR-2025-00078</span>
+            </div>
+            <div class="adl-info-row">
+                <span class="adl-info-label">Joined</span>
+                <span class="adl-info-value">@Model.DateJoined.ToString("MMM dd, yyyy  hh:mm tt")</span>
+            </div>
+            <div class="adl-info-row">
+                <span class="adl-info-label">Last Active</span>
+                <span class="adl-info-value">@Model.DateJoined.AddHours(-24).ToString("MMM dd, yyyy  hh:mm tt")</span>
+            </div>
+        </div>
+
+        <div class="adl-side-card">
+            <div class="adl-card-title">Additional Information</div>
+            <div class="adl-info-row">
+                <span class="adl-info-label">Device</span>
+                <span class="adl-info-value">Windows 10</span>
+            </div>
+            <div class="adl-info-row">
+                <span class="adl-info-label">Browser</span>
+                <span class="adl-info-value">Chrome 125.0.0.0</span>
+            </div>
+            <div class="adl-info-row">
+                <span class="adl-info-label">Location</span>
+                <span class="adl-info-value">New York, USA</span>
+            </div>
+            <div class="adl-info-row">
+                <span class="adl-info-label">Session ID</span>
+                <span class="adl-info-value">sess_8f3a7b2c6e1d4a8f</span>
+            </div>
+            <div class="adl-info-row">
+                <span class="adl-info-label">Reference</span>
+                <span class="adl-info-value">&ndash;</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── RELATED LOGS ── -->
+<div class="adl-related-card">
+    <div class="adl-card-title">Related Logs</div>
+    <table class="related-logs-table">
+        <thead>
+            <tr>
+                <th>Date &amp; Time</th>
+                <th>Action</th>
+                <th>Module</th>
+                <th>Entity</th>
+                <th>Details</th>
+                <th>IP Address</th>
+                <th>User</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-log-id="WT-2025-00456">
+                <td>@Model.DateJoined.ToString("MMM dd, yyyy  hh:mm tt")</td>
+                <td><span class="action-badge action-badge--create">CREATE</span></td>
+                <td>Wallets</td>
+                <td>Wallet Transaction</td>
+                <td>Added $15,000 to wallet via Paystack</td>
+                <td>197.159.112.48</td>
+                <td>
+                    <div class="related-user-cell">
+                        <div class="related-user-avatar avatar-purple">SM</div>
+                        <div>
+                            <div class="related-user-name">Sarah Miller</div>
+                            <div class="related-user-role">Reader</div>
+                        </div>
+                    </div>
+                </td>
+                <td><button type="button" class="related-view-link" data-log-id="WT-2025-00456">View</button></td>
+            </tr>
+            <tr data-log-id="US-2025-00078">
+                <td>Jun 8, 2025<br>09:50 AM</td>
+                <td><span class="action-badge action-badge--update">UPDATE</span></td>
+                <td>Users</td>
+                <td>User</td>
+                <td>Updated user role from Reader to Admin</td>
+                <td>197.159.112.20</td>
+                <td>
+                    <div class="related-user-cell">
+                        <div class="related-user-avatar avatar-orange">LA</div>
+                        <div>
+                            <div class="related-user-name">Library Admin</div>
+                            <div class="related-user-role">Admin</div>
+                        </div>
+                    </div>
+                </td>
+                <td><button type="button" class="related-view-link" data-log-id="US-2025-00078">View</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    (function () {
+        'use strict';
+
+        /* ── Back to Audit Logs: uses browser history ── */
+        var backBtn = document.getElementById('backToAuditLogs');
+        if (backBtn) {
+            backBtn.addEventListener('click', function () {
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    // Fallback if there's no history to go back to
+                    window.location.href = '@Url.Action("AdminActivity", "Admin")';
+                }
+            });
+        }
+
+        /* ── Related Logs "View" \u2014 navigate to that log's detail page ── */
+        function goToLogDetails(logId) {
+            // Wire this to the real route once available, e.g.:
+            // window.location.href = '@Url.Action("GetActivityDetails", "Admin")' + '?id=' + encodeURIComponent(logId);
+            window.location.href = '@Url.Action("GetActivityDetails", "Admin")' + '?id=' + encodeURIComponent(logId);
+        }
+
+        document.querySelectorAll('.related-view-link').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                goToLogDetails(btn.getAttribute('data-log-id'));
+            });
+        });
+
+        // Clicking anywhere else on a related-log row also navigates to that log
+        document.querySelectorAll('.related-logs-table tbody tr').forEach(function (row) {
+            row.style.cursor = 'pointer';
+            row.addEventListener('click', function () {
+                goToLogDetails(row.getAttribute('data-log-id'));
+            });
+        });
+
+    })();
+</script>
+

@@ -1,0 +1,408 @@
+﻿* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', Arial, sans-serif;
+    color: #FFFFFF;
+}
+
+body {
+    background-color: #080B1A;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+
+}
+
+main::-webkit-scrollbar {
+    display: none;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: 70px 1fr;
+    grid-template-areas:
+        "nv mn"
+        "nv mn";
+    height: 100vh;
+    width: 100vw;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+    grid-area: nv;
+    background: #0d1730;
+    border-right: 1px solid #161D33;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    z-index: 10;
+    overflow-y: auto;
+    /* Custom slim scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+}
+
+    .sidebar:hover {
+        scrollbar-color: #1EA7C4 transparent;
+    }
+
+    /* Webkit slim scrollbar */
+    .sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background: transparent;
+        border-radius: 4px;
+        transition: background 0.3s ease;
+    }
+
+    .sidebar:hover::-webkit-scrollbar-thumb {
+        background: #1EA7C4;
+    }
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin-bottom: 32px;
+    padding-left: 12px;
+    line-height: 1.3;
+}
+
+    .logo span {
+        color: #8A94A6;
+        font-weight: 400;
+        font-size: 12px;
+    }
+
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2pc;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: #8A94A6;
+    border-radius: 6px;
+    border-left: 3px solid transparent;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+    .nav-item i {
+        font-size: 17px;
+        color: #8A94A6;
+        transition: color 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+        background-color: rgba(11, 18, 43, 0.85);
+        color: #FFFFFF;
+        border-left: 3px solid #1EA7C4;
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+        .nav-item:hover i,
+        .nav-item.active i {
+            color: #1EA7C4;
+        }
+
+/* ── Header ── */
+.header {
+    grid-area: hd;
+    background-color: #080B1A;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 32px;
+    border-bottom: 1px solid #12182E;
+    position: relative;
+}
+
+.welcome-text {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #12182E;
+    border: 1px solid #1C2541;
+    border-radius: 6px;
+    padding: 6px 12px;
+}
+
+    .search-box i {
+        font-size: 17px;
+        color: #4D5670;
+    }
+
+    .search-box input {
+        background: none;
+        border: none;
+        outline: none;
+        color: #FFFFFF;
+        font-size: 13px;
+        width: 220px;
+    }
+
+        .search-box input::placeholder {
+            color: #4D5670;
+        }
+
+.notif-wrap {
+    position: relative;
+    cursor: pointer;
+}
+
+    .notif-wrap i {
+        font-size: 22px;
+        color: #8A94A6;
+        transition: color 0.2s ease;
+    }
+
+    .notif-wrap:hover i {
+        color: #FFFFFF;
+    }
+
+.notif-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #1EA7C4;
+    color: #FFFFFF;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-details {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    position: relative;
+}
+
+.profile-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #1EA7C4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(77, 163, 255, 0.45);
+    box-shadow: 0 0 12px rgba(0, 140, 255, 0.18);
+}
+
+    .profile-avatar i {
+        font-size: 17px;
+        color: #FFFFFF;
+    }
+
+.profile-name {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.chevron-arrow {
+    font-size: 14px;
+    color: #8A94A6;
+    transition: transform 0.25s ease;
+}
+
+    .chevron-arrow.rotate {
+        transform: rotate(180deg);
+    }
+
+.main {
+    grid-area: mn;
+    background-color: #080B1A;
+    overflow-y: auto;
+}
+
+/* ── Profile dropdown ── */
+.profile-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 12px);
+    background-color: #12182E;
+    border: 1px solid #1C2541;
+    min-width: 170px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    padding: 6px 0;
+    list-style: none;
+    z-index: 1050;
+    margin: 0;
+    text-align: center;
+}
+
+    .profile-dropdown-menu.show {
+        display: block;
+    }
+
+    .profile-dropdown-menu li a {
+        color: #d1d5db;
+        padding: 10px 16px;
+        text-decoration: none;
+        display: block;
+        font-size: 13px;
+        border-bottom: 1px solid #1C2541;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+
+        .profile-dropdown-menu li a:hover {
+            background-color: rgba(11, 18, 43, 0.85);
+            color: #FFFFFF;
+        }
+
+    .profile-dropdown-menu .dropdown-divider {
+        border: 0;
+        margin: 6px 0;
+        border-top: 1px solid #1C2541;
+    }
+
+    .profile-dropdown-menu .logout-link {
+        color: #ff4d4d;
+    }
+
+/* ── Collapsible sidebar groups ── */
+.nav-group-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 14px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #8A94A6;
+    background: none;
+    border: none;
+    border-left: 3px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 10px;
+}
+
+.nav-group-title {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    color: #8A94A6;
+    text-transform: uppercase;
+}
+
+.nav-subitem-badge {
+    position: relative;
+}
+
+.badge {
+    margin-left: auto;
+    background: #1EA7C4;
+    color: #FFFFFF;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-group-toggle:hover,
+.nav-group-toggle.active {
+    background-color: rgba(11, 18, 43, 0.85);
+    color: #FFFFFF;
+    border-left: 3px solid #1EA7C4;
+}
+
+/* Rotating group chevron */
+.group-arrow {
+    font-size: 14px;
+    color: #4D5670;
+    transition: transform 0.25s ease, color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.nav-group-toggle:hover .group-arrow,
+.nav-group-toggle.active .group-arrow {
+    color: #1EA7C4;
+}
+
+/* When aria-expanded="true", rotate the chevron */
+.nav-group-toggle[aria-expanded="true"] .group-arrow {
+    transform: rotate(180deg);
+}
+
+.nav-group {
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: hidden;
+    transition: grid-template-rows 0.25s ease;
+}
+
+    .nav-group.open {
+        grid-template-rows: 1fr;
+    }
+
+.nav-group-inner {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.nav-subitem {
+    padding-left: 40px;
+    font-size: 13px;
+}
+
+    .nav-subitem i {
+        font-size: 15px;
+    }
+
+.nav-item.logout-link {
+    color: #ff4d4d;
+}
+
+    .nav-item.logout-link i {
+        color: #ff4d4d;
+    }

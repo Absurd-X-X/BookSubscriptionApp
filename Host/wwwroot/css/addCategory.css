@@ -1,0 +1,140 @@
+﻿
+.category-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 20px;
+    width: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.form-card {
+    background-color: #0E1326;
+    border: 1px solid #161D33;
+    border-radius: 8px;
+    padding: 32px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.form-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: white;
+}
+
+.form-header p {
+    font-size: 13px;
+    color: #8A94A6;
+    margin-bottom: 24px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+    .input-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #8A94A6;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .input-group input,
+    .input-group textarea {
+        background-color: #12182E;
+        border: 1px solid #1C2541;
+        border-radius: 6px;
+        padding: 12px 16px;
+        color: #FFFFFF;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: #1EA7C4; 
+        }
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #1EA7C4;
+    color: #FFFFFF;
+}
+
+.btn-secondary {
+    background-color: #161D33;
+    color: #8A94A6;
+}
+
+    .btn-primary:hover, .btn-secondary:hover {
+        opacity: 0.9;
+    }
+
+    .input-group textarea{
+        line-height:1.8
+    }
+
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+    .password-wrapper input {
+        padding-right: 42px !important;
+    }
+
+.toggle-password-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    z-index: 5;
+}
+
+    .toggle-password-btn svg {
+        width: 20px;
+        height: 20px;
+        transition: stroke 0.15s ease;
+    }
+
+    .toggle-password-btn:hover svg {
+        stroke: #1EA7C4;
+    }
+
+    .toggle-password-btn:focus {
+        outline: none;
+    }
+

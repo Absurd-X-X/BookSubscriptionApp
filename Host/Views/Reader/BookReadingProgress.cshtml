@@ -1,0 +1,441 @@
+﻿@{
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+    ViewData["Title"] = "Reading Progress";
+}
+<link href="~/css/bookReadingProgress.css" rel="stylesheet" />
+<main>
+
+    <!-- Topbar -->
+    <div class="cr-topbar">
+        <button class="cr-tb-back" id="cr-back-btn">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
+            Back to Dashboard
+        </button>
+
+        <div class="cr-tb-search">
+            <span class="cr-tb-search-ic">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+            </span>
+            <input type="text" id="cr-search" placeholder="Search books, authors…" autocomplete="off" />
+        </div>
+
+        <div class="cr-tb-right">
+            <div class="cr-notif-wrap" id="cr-notif-wrap">
+                <button class="cr-notif-btn" id="cr-notif-btn">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
+                    <span class="cr-notif-badge" id="cr-notif-count">8</span>
+                </button>
+
+                <div class="cr-notif-panel" id="cr-notif-panel">
+                    <div class="cr-notif-head">
+                        <span class="cr-notif-head-title">Notifications</span>
+                        <span class="cr-notif-mark" id="cr-mark-all">Mark all read</span>
+                    </div>
+                    <div class="cr-notif-list" id="cr-notif-list"></div>
+                </div>
+            </div>
+
+            <div class="cr-avatar">
+                <div class="cr-av">JD</div>
+                <svg width="14" height="14" fill="none" stroke="#6b6990" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="cr-page">
+
+        <div class="cr-page-header">
+            <h1 class="cr-page-title">Continue Reading</h1>
+            <p class="cr-page-sub">Pick up where you left off and keep your reading streak alive.</p>
+        </div>
+
+        <!-- ── Book Hero Card ── -->
+        <div class="cr-hero">
+            <!-- Cover -->
+            <div class="cr-cover">
+                <div class="cr-cover-small">Tiny Changes,<br>Remarkable Results</div>
+                <div class="cr-cover-title">Atomic<br>Habits</div>
+                <div class="cr-cover-author">James Clear</div>
+            </div>
+
+            <!-- Info -->
+            <div class="cr-info">
+                <div class="cr-book-title">Atomic Habits</div>
+                <div class="cr-book-tagline">An Easy & Proven Way to Build Good Habits & Break Bad Ones</div>
+                <div class="cr-book-author">James Clear</div>
+
+                <div class="cr-stars">
+                    <span class="cr-star">★</span>
+                    <span class="cr-star">★</span>
+                    <span class="cr-star">★</span>
+                    <span class="cr-star">★</span>
+                    <span class="cr-star" style="opacity:.55">★</span>
+                    <span class="cr-rating-val">4.6</span>
+                    <span class="cr-rating-count">(12,345 ratings)</span>
+                </div>
+
+                <div class="cr-stats-row">
+                    <div class="cr-stat">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                            <svg width="15" height="15" fill="none" stroke="#8b89a8" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                            <span class="cr-stat-val">67%</span>
+                        </div>
+                        <div class="cr-stat-label">Completed</div>
+                    </div>
+                    <div class="cr-stat">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                            <svg width="15" height="15" fill="none" stroke="#8b89a8" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                            <span class="cr-stat-val">9h 24m</span>
+                        </div>
+                        <div class="cr-stat-label">Time left</div>
+                    </div>
+                    <div class="cr-stat">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                            <svg width="15" height="15" fill="none" stroke="#8b89a8" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
+                            <span class="cr-stat-val">1 8</span>
+                        </div>
+                        <div class="cr-stat-label">Chapters</div>
+                    </div>
+                    <div class="cr-stat">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                            <svg width="15" height="15" fill="none" stroke="#8b89a8" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                            <span class="cr-stat-val">248</span>
+                        </div>
+                        <div class="cr-stat-label">Pages read</div>
+                    </div>
+                </div>
+
+                <div class="cr-progress-label-row">
+                    <span class="cr-progress-label">Your Progress</span>
+                    <span class="cr-progress-pct" id="cr-prog-pct">67%</span>
+                </div>
+                <div class="cr-prog-bg">
+                    <div class="cr-prog-fill" id="cr-prog-fill" style="width:67%"></div>
+                </div>
+                <div class="cr-last-read">Last read: <span>Today, 7:45 PM</span></div>
+
+                <div style="margin-top:14px;">
+                    <button class="cr-btn-finished" id="cr-btn-finished">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="9 12 11 14 15 10" /></svg>
+                        Mark as Finished
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="cr-actions">
+                <button class="cr-btn-continue" id="cr-btn-continue">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                    Continue Reading
+                </button>
+                <button class="cr-btn-details" id="cr-btn-details">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                    View Book Details
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Bottom Grid ── -->
+        <div class="cr-bottom">
+
+            <!-- Current Position -->
+            <div class="cr-position-card">
+                <div class="cr-card-title">Your Current Position</div>
+
+                <div class="cr-chapter-row">
+                    <div class="cr-chapter-icon">
+                        <svg width="18" height="18" fill="none" stroke="#a78bfa" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></svg>
+                    </div>
+                    <div class="cr-chapter-body">
+                        <div class="cr-chapter-num">Chapter 11</div>
+                        <div class="cr-chapter-name">The Law of the Margin</div>
+                        <div class="cr-chapter-desc">This chapter discusses how small improvements in your habits can lead to remarkable results over time.</div>
+                    </div>
+                    <button class="cr-bookmark-btn" id="cr-bookmark-btn" title="Bookmark this chapter">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>
+                    </button>
+                </div>
+
+                <div class="cr-chap-prog-label">Reading Progress in this Chapter</div>
+                <div class="cr-chap-row">
+                    <div class="cr-chap-bg">
+                        <div class="cr-chap-fill" id="cr-chap-fill" style="width:45%"></div>
+                    </div>
+                    <span class="cr-chap-pct">45%</span>
+                </div>
+                <div class="cr-chap-pages">12 of 27 pages</div>
+
+                <div class="cr-nav-row">
+                    <button class="cr-btn-prev" id="cr-btn-prev">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
+                        Previous Chapter
+                    </button>
+                    <button class="cr-btn-next" id="cr-btn-next">
+                        Next Chapter
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reading Insights -->
+            <div class="cr-insights-card">
+                <div class="cr-insights-header">
+                    <span class="cr-insights-title">Reading Insights</span>
+                    <span class="cr-insights-view" id="cr-view-all">View all</span>
+                </div>
+
+                <div class="cr-insight-row">
+                    <div class="cr-insight-icon purple">
+                        <svg width="18" height="18" fill="none" stroke="#a78bfa" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                    </div>
+                    <div class="cr-insight-body">
+                        <div class="cr-insight-name">Total time spent</div>
+                        <div class="cr-insight-sub">Across all reading sessions</div>
+                    </div>
+                    <div class="cr-insight-val">3h 36m</div>
+                </div>
+
+                <div class="cr-insight-row">
+                    <div class="cr-insight-icon orange">🔥</div>
+                    <div class="cr-insight-body">
+                        <div class="cr-insight-name">Reading streak</div>
+                        <div class="cr-insight-sub">Keep it up! You're on fire! 🔥</div>
+                    </div>
+                    <div class="cr-insight-val">12 days</div>
+                </div>
+
+                <div class="cr-insight-row">
+                    <div class="cr-insight-icon green">
+                        <svg width="18" height="18" fill="none" stroke="#34d399" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="9 12 11 14 15 10" /></svg>
+                    </div>
+                    <div class="cr-insight-body">
+                        <div class="cr-insight-name">Daily goal</div>
+                        <div class="cr-insight-sub">You've met your goal today! 🚀</div>
+                        <div class="cr-goal-bar-wrap">
+                            <div class="cr-goal-bg"><div class="cr-goal-fill green" style="width:100%"></div></div>
+                        </div>
+                    </div>
+                    <div class="cr-insight-val">30 minutes</div>
+                </div>
+
+                <div class="cr-insight-row">
+                    <div class="cr-insight-icon blue">
+                        <svg width="18" height="18" fill="none" stroke="#60a5fa" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>
+                    </div>
+                    <div class="cr-insight-body">
+                        <div class="cr-insight-name">Pages read this week</div>
+                        <div class="cr-insight-sub">Goal: 100 pages</div>
+                        <div class="cr-goal-bar-wrap">
+                            <div class="cr-goal-bg"><div class="cr-goal-fill blue" style="width:82%"></div></div>
+                        </div>
+                    </div>
+                    <div class="cr-insight-val">82 pages</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tip bar -->
+        <div class="cr-tip">
+            <span class="cr-tip-icon">💡</span>
+            <span><strong>Tip:</strong> Reading for 15 more minutes today will help you finish this chapter!</span>
+        </div>
+
+    </div><!-- /cr-page -->
+</main>
+
+<!-- Toast root -->
+<div id="cr-toast-root"></div>
+
+
+<!--
+  ══════════════════════════════════════════
+  JAVASCRIPT
+  ══════════════════════════════════════════
+-->
+<script>
+    (function(){
+    'use strict';
+
+    /* ── TOAST ── */
+    function toast(msg, type='info', icon='✦'){
+      const root = document.getElementById('cr-toast-root');
+      const el = document.createElement('div');
+      el.className = 'cr-toast';
+      el.innerHTML = `<div class="cr-toast-ic ${type}">${icon}</div><span class="cr-toast-msg">${msg}</span>`;
+      root.appendChild(el);
+      setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),300); }, 2800);
+    }
+
+    /* ── NOTIFICATIONS ── */
+    const NOTIFS = [
+      {icon:'📖',bg:'rgba(124,92,252,.2)', title:'Keep reading!',           text:'You\'re only 33% away from finishing.',      time:'Just now',   unread:true},
+      {icon:'🔥',bg:'rgba(249,115,22,.15)',title:'12-day streak!',           text:'Keep it up — you\'re on fire.',              time:'1 hr ago',   unread:true},
+      {icon:'📚',bg:'rgba(52,211,153,.12)',title:'New recommendation',       text:'"Deep Work" matches your reading style.',    time:'3 hrs ago',  unread:true},
+      {icon:'✅',bg:'rgba(52,211,153,.12)',title:'Daily goal met',            text:'You hit 30 minutes today. Well done!',       time:'Today',      unread:false},
+      {icon:'💡',bg:'rgba(99,179,237,.12)',title:'Reading tip',               text:'Try reading before bed for better recall.',  time:'Yesterday',  unread:false},
+      {icon:'⭐',bg:'rgba(234,179,8,.15)', title:'Review liked',             text:'5 people liked your Atomic Habits review.',  time:'2 days ago', unread:false},
+      {icon:'🎯',bg:'rgba(124,92,252,.18)',title:'Weekly goal',              text:'82 of 100 pages done this week!',            time:'3 days ago', unread:false},
+      {icon:'📅',bg:'rgba(99,102,241,.18)',title:'Subscription active',       text:'Premium renews in 3 days.',                  time:'4 days ago', unread:false},
+    ];
+
+    const notifList = document.getElementById('cr-notif-list');
+    notifList.innerHTML = NOTIFS.map(n=>`
+      <div class="cr-notif-row${n.unread?' unread':''}">
+        <div class="cr-notif-dot ${n.unread?'on':''}"></div>
+        <div class="cr-notif-icon-wrap" style="background:${n.bg}">${n.icon}</div>
+        <div class="cr-notif-body">
+          <strong>${n.title}</strong>
+          <p>${n.text}</p>
+          <span class="cr-notif-time">${n.time}</span>
+        </div>
+      </div>`).join('');
+
+    function updateBadge(){
+      const count = notifList.querySelectorAll('.cr-notif-row.unread').length;
+      const badge = document.getElementById('cr-notif-count');
+      badge.textContent = count;
+      badge.style.display = count ? '' : 'none';
+    }
+
+    notifList.querySelectorAll('.cr-notif-row').forEach(row=>{
+      row.addEventListener('click',()=>{
+        row.classList.remove('unread');
+        const dot = row.querySelector('.cr-notif-dot');
+        if(dot) dot.className = 'cr-notif-dot';
+        updateBadge();
+      });
+    });
+
+    document.getElementById('cr-mark-all').addEventListener('click', e=>{
+      e.stopPropagation();
+      notifList.querySelectorAll('.cr-notif-row').forEach(r=>{
+        r.classList.remove('unread');
+        const d = r.querySelector('.cr-notif-dot');
+        if(d) d.className='cr-notif-dot';
+      });
+      updateBadge();
+      toast('All notifications marked as read','success','✓');
+    });
+
+    /* ── NOTIFICATION PANEL TOGGLE ── */
+    const notifBtn   = document.getElementById('cr-notif-btn');
+    const notifPanel = document.getElementById('cr-notif-panel');
+
+    notifBtn.addEventListener('click', e=>{
+      e.stopPropagation();
+      notifPanel.classList.toggle('is-open');
+    });
+    notifPanel.addEventListener('click', e=>e.stopPropagation());
+    document.addEventListener('click', ()=> notifPanel.classList.remove('is-open'));
+
+    /* ── BACK BUTTON ── */
+    document.getElementById('cr-back-btn').addEventListener('click',()=>{
+      toast('Going back to Dashboard…','info','←');
+      // history.back();
+    });
+
+    /* ── SEARCH ── */
+    let searchDebounce;
+    document.getElementById('cr-search').addEventListener('input', e=>{
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(()=>{
+        const q = e.target.value.trim();
+        if(q) toast(`Searching for "${q}"…`,'info','🔍');
+      }, 400);
+    });
+    document.getElementById('cr-search').addEventListener('keydown', e=>{
+      if(e.key==='Escape') e.target.value='';
+    });
+
+    /* ── CONTINUE READING ── */
+    document.getElementById('cr-btn-continue').addEventListener('click',()=>{
+      toast('Opening Atomic Habits… Chapter 11','success','▶');
+    });
+
+    /* ── VIEW BOOK DETAILS ── */
+    document.getElementById('cr-btn-details').addEventListener('click',()=>{
+      toast('Opening book details…','info','📖');
+    });
+
+    /* ── MARK AS FINISHED ── */
+    const finishedBtn = document.getElementById('cr-btn-finished');
+    let isFinished = false;
+    finishedBtn.addEventListener('click',()=>{
+      isFinished = !isFinished;
+      finishedBtn.classList.toggle('done', isFinished);
+      finishedBtn.innerHTML = isFinished
+        ? `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg> Marked as Finished`
+        : `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg> Mark as Finished`;
+
+      if(isFinished){
+        // animate progress to 100%
+        document.getElementById('cr-prog-fill').style.transition='width .6s ease';
+        document.getElementById('cr-prog-fill').style.width='100%';
+        document.getElementById('cr-prog-pct').textContent='100%';
+        toast('🎉 Atomic Habits marked as finished!','success','🏆');
+      } else {
+        document.getElementById('cr-prog-fill').style.width='67%';
+        document.getElementById('cr-prog-pct').textContent='67%';
+        toast('Moved back to reading list','info','📖');
+      }
+    });
+
+    /* ── BOOKMARK ── */
+    const bookmarkBtn = document.getElementById('cr-bookmark-btn');
+    let bookmarked = false;
+    bookmarkBtn.addEventListener('click',()=>{
+      bookmarked = !bookmarked;
+      bookmarkBtn.classList.toggle('saved', bookmarked);
+      bookmarkBtn.querySelector('svg').setAttribute('fill', bookmarked?'currentColor':'none');
+      toast(bookmarked ? 'Chapter 11 bookmarked!' : 'Bookmark removed','success', bookmarked?'🔖':'✕');
+    });
+
+    /* ── CHAPTER NAVIGATION ── */
+    const chapters = [
+      {num:10, name:'The Goldilocks Rule',         desc:'Why we stay motivated in life and work when tackling tasks of just the right difficulty.',  pages:24},
+      {num:11, name:'The Law of the Margin',        desc:'This chapter discusses how small improvements in your habits can lead to remarkable results over time.', pages:27},
+      {num:12, name:'The Downside of Creating Good Habits', desc:'The upside of habits is that we can do things without thinking. The downside is we stop paying attention to small errors.', pages:22},
+    ];
+    let chapterIndex = 1; // start at chapter 11
+
+    function updateChapter(){
+      const c = chapters[chapterIndex];
+      document.querySelector('.cr-chapter-num').textContent  = `Chapter ${c.num}`;
+      document.querySelector('.cr-chapter-name').textContent = c.name;
+      document.querySelector('.cr-chapter-desc').textContent = c.desc;
+      document.querySelector('.cr-chap-pages').textContent   = `0 of ${c.pages} pages`;
+      document.getElementById('cr-chap-fill').style.width    = '0%';
+      document.querySelector('.cr-chap-pct').textContent     = '0%';
+      bookmarked = false;
+      bookmarkBtn.classList.remove('saved');
+      bookmarkBtn.querySelector('svg').setAttribute('fill','none');
+    }
+
+    document.getElementById('cr-btn-prev').addEventListener('click',()=>{
+      if(chapterIndex > 0){
+        chapterIndex--;
+        updateChapter();
+        toast(`Went to Chapter ${chapters[chapterIndex].num}`,'info','◀');
+      } else {
+        toast('This is the first chapter','warn','⚠️');
+      }
+    });
+
+    document.getElementById('cr-btn-next').addEventListener('click',()=>{
+      if(chapterIndex < chapters.length-1){
+        chapterIndex++;
+        updateChapter();
+        toast(`Moving to Chapter ${chapters[chapterIndex].num}`,'info','▶');
+      } else {
+        toast('This is the last chapter — you\'re almost done!','warn','🏁');
+      }
+    });
+
+    /* ── VIEW ALL INSIGHTS ── */
+    document.getElementById('cr-view-all').addEventListener('click',()=>{
+      toast('Opening Reading Insights…','info','📊');
+    });
+
+    })();
+</script>

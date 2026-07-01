@@ -1,0 +1,229 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Verify Your Email";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="~/css/verifyEmail.css" rel="stylesheet" />
+</head>
+<body>
+
+    <div class="page">
+
+        <div class="brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 5.5C4 4.67 4.67 4 5.5 4H11V20H5.5C4.67 20 4 19.33 4 18.5V5.5Z" fill="white" fill-opacity="0.9" />
+                    <path d="M13 4H18.5C19.33 4 20 4.67 20 5.5V18.5C20 19.33 19.33 20 18.5 20H13V4Z" fill="white" fill-opacity="0.6" />
+                </svg>
+            </div>
+            <div>
+                <div class="brand-name">Atomic Habits</div>
+                <div class="brand-sub">Reader</div>
+            </div>
+        </div>
+
+        <div class="card">
+
+            <div class="hero-art">
+                <img src="~/lib/images/verify_otp_art.png" alt="">
+            </div>
+
+            <h1 class="title">Verify your email</h1>
+            <p class="subtext">We've sent a 4-digit verification code to</p>
+            <p class="email-line">@ViewBag.Email</p>
+            <p class="instructions">Please enter the code below to verify your email address.</p>
+
+            <form asp-controller="Auth" asp-action="VerifyEmail" method="post" id="otpForm" novalidate>
+                <input type="hidden" name="email" value="@ViewBag.Email" />
+                <input type="hidden" name="token" id="codeField" />
+
+                <div class="otp-row" id="otpRow">
+                    <input type="text" inputmode="numeric" maxlength="1" class="otp-box" id="otp-0" autocomplete="one-time-code">
+                    <input type="text" inputmode="numeric" maxlength="1" class="otp-box" id="otp-1">
+                    <input type="text" inputmode="numeric" maxlength="1" class="otp-box" id="otp-2">
+                    <input type="text" inputmode="numeric" maxlength="1" class="otp-box" id="otp-3">
+                </div>
+
+                <div class="error" id="otpError"></div>
+
+                <p class="expiry-note">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                    This code will expire in <span class="expiry-time" id="expiryTime">09:45</span>
+                </p>
+
+                <button type="submit" class="verify-btn" id="verifyBtn">Verify Email</button>
+            </form>
+
+            <div class="foot-divider"></div>
+
+            <p class="resend-prompt">Didn't receive the code?</p>
+            <button type="button" class="resend-link" id="resendBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
+                <span id="resendLabel">Resend code (00:45)</span>
+            </button>
+
+            <div class="foot-divider"></div>
+
+            <p class="change-prompt">Entered the wrong email?</p>
+            <a href="@Url.Action("Register", "Auth")" class="change-link">Change email address</a>
+        </div>
+
+        <div class="support-box">
+            <div class="support-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6" /><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" /></svg>
+            </div>
+            <div class="support-text">
+                <strong>Need help?</strong>
+                <span>Contact our support team and we'll get back to you.</span>
+            </div>
+            <a href="@Url.Action("Contact", "Support")" class="support-btn">
+                Contact Support
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6" /></svg>
+            </a>
+        </div>
+
+        <p class="footer-secure">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+            Your data is safe and secure with us.
+        </p>
+        <p class="footer-copyright">© 2024 Atomic Habits Reader. All rights reserved.</p>
+
+    </div>
+
+    <script>
+            // ===== Grab the 4 boxes as a real array (in order) =====
+            const otpInputs = Array.from(document.querySelectorAll('.otp-box'));
+            const codeField = document.getElementById('codeField');
+            const otpForm = document.getElementById('otpForm');
+            const otpError = document.getElementById('otpError');
+
+            function sanitizeDigit(value) {
+              return value.replace(/[^0-9]/g, '').slice(0, 1);
+            }
+
+            function syncHiddenField() {
+              codeField.value = otpInputs.map(input => input.value).join('');
+            }
+
+            function tryAutoSubmit() {
+              const allFilled = otpInputs.every(input => input.value.length === 1);
+              if (allFilled) {
+                syncHiddenField();
+                otpForm.requestSubmit();
+              }
+            }
+
+            otpInputs.forEach((input, index) => {
+
+              input.addEventListener('input', () => {
+                input.value = sanitizeDigit(input.value);
+
+                if (input.value.length === 1 && index < otpInputs.length - 1) {
+                  otpInputs[index + 1].focus();
+                }
+
+                syncHiddenField();
+                tryAutoSubmit();
+              });
+
+              input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && input.value === '' && index > 0) {
+                  otpInputs[index - 1].focus();
+                }
+              });
+
+              input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pasted = e.clipboardData.getData('text');
+                const digits = pasted.replace(/[^0-9]/g, '').slice(0, otpInputs.length);
+
+                if (digits.length === 0) return;
+
+                digits.split('').forEach((digit, i) => {
+                  if (otpInputs[i]) {
+                    otpInputs[i].value = digit;
+                  }
+                });
+
+                const nextEmptyIndex = digits.length < otpInputs.length ? digits.length : otpInputs.length - 1;
+                otpInputs[nextEmptyIndex].focus();
+
+                syncHiddenField();
+                tryAutoSubmit();
+              });
+            });
+
+            otpForm.addEventListener('submit', (e) => {
+              syncHiddenField();
+              if (codeField.value.length !== otpInputs.length) {
+                e.preventDefault();
+                otpError.textContent = 'Please enter all 4 digits.';
+              } else {
+                otpError.textContent = '';
+              }
+            });
+
+            otpInputs[0].focus();
+
+            // ===== Countdown timer for code expiry =====
+            const expiryTimeEl = document.getElementById('expiryTime');
+            let secondsLeft = 9 * 60 + 45;
+
+            const expiryTimer = setInterval(() => {
+              secondsLeft -= 1;
+
+              if (secondsLeft <= 0) {
+                clearInterval(expiryTimer);
+                expiryTimeEl.textContent = '00:00';
+                otpError.textContent = 'This code has expired. Please request a new one.';
+                otpInputs.forEach(input => input.disabled = true);
+                return;
+              }
+
+              const minutes = Math.floor(secondsLeft / 60);
+              const seconds = secondsLeft % 60;
+              expiryTimeEl.textContent =
+                String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+            }, 1000);
+
+            // ===== Resend code cooldown =====
+            const resendBtn = document.getElementById('resendBtn');
+            const resendLabel = document.getElementById('resendLabel');
+            const RESEND_COOLDOWN = 45;
+
+            function startResendCooldown() {
+              let remaining = RESEND_COOLDOWN;
+              resendBtn.disabled = true;
+              resendLabel.textContent = `Resend code (00:${String(remaining).padStart(2, '0')})`;
+
+              const resendTimer = setInterval(() => {
+                remaining -= 1;
+                if (remaining <= 0) {
+                  clearInterval(resendTimer);
+                  resendBtn.disabled = false;
+                  resendLabel.textContent = 'Resend code';
+                } else {
+                  resendLabel.textContent = `Resend code (00:${String(remaining).padStart(2, '0')})`;
+                }
+              }, 1000);
+            }
+
+            resendBtn.addEventListener('click', () => {
+              fetch('@Url.Action("ResendVerification", "Auth")', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'email=' + encodeURIComponent('@ViewBag.Email')
+              });
+              startResendCooldown();
+            });
+
+            startResendCooldown();
+    </script>
+
+</body>
+</html>
+

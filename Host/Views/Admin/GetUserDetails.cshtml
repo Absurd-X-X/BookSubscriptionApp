@@ -1,0 +1,182 @@
+﻿@using Application.ViewModels
+@model UserDetailsAuditLog
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Get User Details";
+}
+
+<link href="~/css/getUserDetails.css" rel="stylesheet" />
+
+<section class="user-details">
+    <h3>User Details: @Model.UserDetails.FullName @Model.UserDetails.UserName</h3>
+    <div class="for-back">
+        <button type="button" class="btn-secondary" onclick="window.history.back()">
+            <img src="~/lib/images/arrow-left-solid-full.svg" alt="Alternate Text" />Back To Directory
+            </button>
+    </div>
+
+    <div class="main-info">
+        <div class="info-one">
+            <div class="picture">
+                <img src="@(Model.UserDetails.ImageUrl.ToLower() == "none" ? Url.Content("~/lib/images/mypics.jpg") : Model.UserDetails.ImageUrl)" alt="User avatar" />
+            </div>
+            <div class="others">
+                <small>Full Name</small>
+                <h4>@Model.UserDetails.FullName</h4>
+                <small>Username</small>
+                <p class="only-me">@Model.UserDetails.UserName</p>
+                <small>Email</small>
+                <p>@Model.UserDetails.Email</p>
+            </div>
+        </div>
+        <div class="info-two">
+            <p>System Activity Logs</p>
+            <div class="search-box">
+                <input type="text" placeholder="Search...">
+                <img src="~/lib/images/search.svg" class="search-icon" alt="Search">
+            </div>
+            <div class="audit-container">
+                @foreach (var audit in Model.AuditLogs)
+                {
+                    <div class="audit-logs">
+                        <h2>@audit.Icon</h2>
+
+                        <div class="needful">
+                            <p>@audit.ActionType</p>
+                            <div class="need">
+                                <p>@audit.Description</p>
+                                <small>@audit.Timestamp.ToString("MMM dd, yyyy")</small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="info-three">
+            <p>System Stats</p>
+            <div class="system-stats">
+                <div class="stat-one">
+                    <img src="~/lib/images/members.png" alt="Alternate Text" />
+                    <div class="text-abt">
+                        <small>Total Actions Performed</small>
+                        <p>Value</p>
+                    </div>
+                </div>
+                <div class="stat-two">
+                    <img src="~/lib/images/members.png" alt="Alternate Text" />
+                    <div class="text-abt">
+                        <small>Total Actions Performed</small>
+                        <p>Value</p>
+                    </div>
+                </div>
+                <div class="stat-three">
+                    <img src="~/lib/images/members.png" alt="Alternate Text" />
+                    <div class="text-abt">
+                        <small>Total Actions Performed</small>
+                        <p>Value</p>
+                    </div>
+                </div>
+                <div class="stat-four">
+                    <img src="~/lib/images/members.png" alt="Alternate Text" />
+                    <div class="text-abt">
+                        <small>Total Actions Performed</small>
+                        <p>Value</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-four">
+            <p>Account Information</p>
+            <div class="sub-info-four">
+                <div class="one-box">
+                    <small>Role</small>
+                    <p>
+                        @{
+                            string roleClass = Model.UserDetails.Role?.ToLower() switch
+                            {
+                                "admin" => "badge-admin",
+                                "library" => "badge-moderator",
+                                "reader" => "badge-subscriber",
+                                _ => "badge-default"
+                            };
+                        }
+                        <span class="role-badge @roleClass">@Model.UserDetails.Role</span>
+                    </p>
+                    <select name="filter-action" id="filter-action">
+                        <option value="" disabled selected>Change Role</option>
+                        <option value="library">Subscriber</option>
+                        <option value="Readers">Moderator</option>
+                        <option value="Others">Guest</option>
+                    </select>
+                </div>
+                <div class="two-box">
+                    <small>Date Joined</small>
+                    @{
+                        string date = Model.UserDetails.DateJoined.ToString("MMM dd, yyyy");
+                    }
+                    <h4>@date</h4>
+                    <small>Created on @Model.UserDetails.DateJoined.ToString("MMM dd") <<br />@Model.UserDetails.DateJoined.TimeOfDay</small>
+                </div>
+                <div class="three-box">
+                    <div class="status">
+                        <small>Status</small>
+                        @{
+                            string status = Model.UserDetails.Status ? "badge-moderator" : "badge-subscriber";
+                        }
+                        <span class="role-badge @status">@(Model.UserDetails.Status ? "Suspended" : "Active")</span>
+                    </div>
+                    <div class="soul-toggle-wrapper">
+                        <input type="checkbox"
+                               id="backendStatusToggle"
+                               class="soul-toggle-checkbox"
+                               disabled
+                        @(Model.UserDetails.Status ? "checked" : "") />
+
+                        <label for="backendStatusToggle" class="soul-toggle-track"></label>
+
+                        <span class="soul-toggle-text">Deactivate/Suspend</span>
+                    </div>
+                </div>
+                <div class="four-box">
+
+                    <a href="#">Update Profile</a>
+                    <a href="#" style="background: linear-gradient(135deg, #111C3D, #0B122B); color: red; border: 1px solid red">Ban User</a>
+                </div>
+            </div>
+
+        </div>
+        <div class="info-five">
+            <p>Security Settings</p> 
+
+            <div class="sec-settings">
+                <div class="sec">
+                    <div class="together">
+                        <h4>🔒</h4>
+                        <small>Password Reset</small>
+                    </div>
+                    <p>></p>
+                </div>
+                <div class="sec">
+                    <div class="together">
+                        <h4>🔒</h4>
+                        <small>Two-Factor Authentication (<small style="color: greenyellow">Enabled</small>)</small>
+                    </div>
+                    <p>></p>
+                </div>
+                <div class="sec">
+                    <div class="together">
+                        <h4>🔒</h4>
+                        <small>Session Logs</small>
+                    </div>
+                    <p>></p>
+                </div>
+                <div class="sec-exc">
+                    <small>Action Logs</small>
+                    <a href="#">Action Logs</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

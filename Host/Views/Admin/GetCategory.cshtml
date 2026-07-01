@@ -1,0 +1,92 @@
+﻿@using static Application.Queries.GetCategoryById
+@model GetCategoryByIdResponse
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Get Category";
+}
+<link rel="stylesheet" href="~/css/getCategory.css">
+
+<div class="category-container">
+    <div class="header-note">
+        <h3>CATEGORY PREVIEW</h3>
+    </div>
+    <div class="category-info">
+        <form class="datas" asp-controller="Admin" asp-action="EditCategory" method="post">
+            @Html.AntiForgeryToken()
+
+            
+            <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+
+            <h2>@Model.Name</h2>
+
+            <div class="combine">
+                <div class="img-data">
+                    <img src="~/lib/images/layer-group-solid-full.svg" alt="icon">
+                    <label for="CategoryName">Category Name</label>
+                    <input type="text" id="CategoryName" name="name" value="@Model.Name" required autocomplete="off" />
+                </div>
+                <div class="properties">
+                    <div class="infos">
+                        <label for="DateCreated">Added On: </label>
+                        <input type="text" value="@Model.DateCreated" readonly />
+                    </div>
+                    <div class="infos">
+                        <label for="AddedBy">Added By: </label>
+                        <input type="text" value="@Model.CreatedBy" readonly />
+                    </div>
+                    <div class="infos">
+                        <label for="ModifiedOn">Modified On: </label>
+                        <input type="text" value="@Model.DateModified" readonly />
+                    </div>
+                    <div class="infos">
+                        <label for="ModifiedBy">Modified By: </label>
+                        <input type="text" value="You" readonly />
+                    </div>
+                </div>
+            </div>
+
+            <div class="description">
+                <label for="Description">Description</label>
+                <div class="infos">
+                    <textarea id="Description" name="description" rows="5">@Model.Description</textarea>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="window.history.back()">Cancel Changes</button>
+                <button type="submit" class="btn-primary">Update Category</button>
+            </div>
+        </form>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Added Date</th>
+                        <th>Genre</th>
+                        <th>Engagement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Books)
+                    {
+                        <tr>
+                            <td><img src="@item.BookCoverUrl" alt="Alternate Text" /> @item.Title</td>
+                            <td>@item.Author</td>
+                            <td>@item.DateCreated</td>
+                            <td>@item.Genre</td>
+                            <td class="engagement-cell">
+                                <div class="progress-track">
+                                    <div class="progress-fill" style="max-width: 100%; width: @(item.NoOfTimeReadByPeople * 10)%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

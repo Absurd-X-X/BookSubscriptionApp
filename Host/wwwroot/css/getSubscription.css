@@ -1,0 +1,410 @@
+﻿
+.sub-cont{
+    height:100%;
+    width: 100%;
+}
+
+.details-grid {
+    display: grid;
+    margin-top: 7px;
+    grid-template-columns: repeat(12,1fr);
+    grid-template-rows: 78px 195px 215px 120px;
+    gap: 15px;
+    grid-template-areas:
+        "id id id plan plan plan revenue revenue revenue status status status"
+        "info info info info customer customer customer customer timeline timeline timeline timeline"
+        "payment payment payment payment payment payment usage usage usage summary summary summary"
+        "notes notes notes notes notes notes danger danger danger danger danger danger";
+}
+
+small {
+    color: #cccecf;
+}
+
+
+.card {
+    background: #0d1730;
+    border: 1px solid #1d3f6e;
+    border-radius: 10px;
+    padding: 1pc;
+    color: white;
+    font-size: 14px;
+    font-weight: 300;
+    box-shadow: 0 0 15px rgba(0,140,255,.12);
+}
+
+
+.for-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+}
+
+    .for-image.blue {
+        background-color: rgba(0, 123, 255, 0.15);
+    }
+
+    .for-image.green {
+        background-color: rgba(40, 167, 69, 0.15);
+    }
+
+    .for-image.purple {
+        background-color: rgba(111, 66, 193, 0.15);
+    }
+
+    .for-image.teal {
+        background-color: rgba(32, 201, 151, 0.15);
+    }
+
+    .for-image.blue img {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+        transition: opacity 0.2s ease;
+        filter: brightness(0) saturate(100%) invert(35%) sepia(35%) saturate(1313%) hue-rotate(174deg) brightness(89%) contrast(89%);
+        opacity: 1;
+        padding: 5px;
+        border-radius: 3px;
+    }
+
+    .for-image.green img {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+        transition: opacity 0.2s ease;
+        filter: brightness(0) saturate(100%) invert(46%) sepia(51%) saturate(542%) hue-rotate(101deg) brightness(97%) contrast(83%);
+        opacity: 1;
+        padding: 5px;
+        border-radius: 3px;
+    }
+
+    .for-image.purple img {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+        transition: opacity 0.2s ease;
+        filter: brightness(0) saturate(100%) invert(35%) sepia(35%) saturate(1313%) hue-rotate(174deg) brightness(89%) contrast(89%);
+        opacity: 1;
+        padding: 5px;
+        border-radius: 3px;
+    }
+
+    .for-image.teal img {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+        transition: opacity 0.2s ease;
+        filter: brightness(0) saturate(100%) invert(46%) sepia(51%) saturate(542%) hue-rotate(101deg) brightness(97%) contrast(83%);
+        opacity: 1;
+        padding: 5px;
+        border-radius: 3px;
+    }
+
+.img-name img {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    filter: brightness(0) invert(0.8);
+    transition: filter 0.2s ease;
+}
+
+
+.subscription-id {
+    grid-area: id;
+    display: flex;
+    flex-direction: row;
+    gap: 2pc;
+}
+
+.current-plan {
+    grid-area: plan;
+    display: flex;
+    flex-direction: row;
+    gap: 2pc;
+}
+
+.monthly-revenue {
+    grid-area: revenue;
+    display: flex;
+    flex-direction: row;
+    gap: 2pc;
+}
+
+.status {
+    grid-area: status;
+    display: flex;
+    flex-direction: row;
+    gap: 2pc;
+}
+
+/* INFO ROW */
+
+.subscription-info {
+    grid-area: info;
+}
+
+.customer-info {
+    grid-area: customer;
+}
+
+.timeline {
+    grid-area: timeline;
+}
+
+.img-housing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    background-color: rgba(0, 123, 255, 0.15);
+}
+
+    .img-housing img {
+        width: 25px;
+        height: 25px;
+        object-fit: contain;
+        transition: opacity 0.2s ease;
+        filter: brightness(0) saturate(100%) invert(50%) sepia(85%) saturate(1200%) hue-rotate(175deg) brightness(95%) contrast(100%);
+        opacity: 1;
+        padding: 5px;
+        border-radius: 3px;
+    }
+
+/* PAYMENT ROW */
+
+.payment-history {
+    grid-area: payment;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.usage {
+    grid-area: usage;
+}
+
+.summary {
+    grid-area: summary;
+}
+
+/* BOTTOM ROW */
+
+.admin-notes {
+    grid-area: notes;
+}
+
+.danger-zone {
+    grid-area: danger;
+    border: 1px solid red;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 300;
+    padding: 10px;
+    color: red;
+    box-shadow: 0 0 15px rgba(0,140,255,.12);
+}
+
+    .danger-zone p {
+        color: red;
+        font-weight: 300;
+
+    }
+
+    .danger-zone small {
+        color: #cccecf;
+    }
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 50%;
+    margin-top: 7px;
+    width: 100%;
+    gap: 2pc;
+}
+
+.action-link {
+    padding: 10px;
+    border: 1px solid red;
+    color: red;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 400;
+    display: inline-block;
+    white-space: nowrap;
+    text-decoration: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    align-items:center;
+    height: 2pc;
+    margin-top: 1pc;
+}
+
+.camped {
+    display: flex;
+    flex-direction: row;
+    gap: 6pc;
+    border-bottom: 2px solid #161D33;
+    margin-top: 10px;
+    justify-content: space-between
+}
+
+.also-camp {
+    display: flex;
+    flex-direction: row;
+    gap: 2pc;
+    margin-top: 3px;
+}
+
+.img-name, .value {
+    display: flex;
+    flex-direction: row;
+    gap: 2pc;
+}
+
+.pics {
+    height: 25%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 3pc;
+    align-items: center;
+    margin-bottom: 10px;
+    margin: 10px;
+}
+
+    .pics img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid rgba(77, 163, 255, 0.45);
+        box-shadow: 0 0 12px rgba(0, 140, 255, 0.18), 0 0 2px rgba(255,255,255,0.12);
+        transition: 0.3s ease;
+    }
+
+
+table {
+    border-top: 10px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    text-align: left;
+    padding: 5px 10px;
+    font-size: 10px;
+    border-bottom: 1px solid rgba(80, 120, 200, 0.25);
+}
+
+th {
+    color: white;
+    font-weight: 300;
+    text-transform: capitalize;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    background: linear-gradient( 90deg, #1b243d 0%, #202b46 50%, #1b243d 100% );
+}
+
+td {
+    color: white
+}
+
+/*.action-link {
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 10px;
+}*/
+
+/*    .action-link.edit, .action-link.details {
+        color: #1EA7C4;
+        border-right: 1px solid #1EA7C4;
+    }*/
+
+    .action-link.delete {
+        color: #E63B60;
+    }
+
+    .action-link:hover {
+        opacity: 0.8;
+    }
+
+.contains {
+    margin-top: 5px;
+    display : grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 5px;
+    height: 80%;
+    width: 100%;
+}
+
+.item {
+    padding: 3px;
+    border: 1px solid #1d3f6e;
+    border-radius: 7px;
+    display: flex;
+    flex-direction: row;
+    gap: 3px;
+}
+
+    .item img {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+        transition: opacity 0.2s ease;
+        filter: brightness(0) saturate(100%) invert(50%) sepia(85%) saturate(1200%) hue-rotate(175deg) brightness(95%) contrast(100%);
+        opacity: 1;
+        padding: 5px;
+        border-radius: 3px;
+    }
+
+.for{
+    display: flex;
+    flex-direction: row;
+    gap: 1pc;
+}
+
+    .for span {
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+        background: #38BDF8;
+        border: 1px solid #1d3f6e;
+        margin-top: 5px;
+    }
+
+.use {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5pc;
+    align-items: center;
+}
+
+.summaries {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.use img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    transition: opacity 0.2s ease;
+    filter: brightness(0) saturate(100%) invert(50%) sepia(85%) saturate(1200%) hue-rotate(175deg) brightness(95%) contrast(100%);
+    opacity: 1;
+    padding: 5px;
+    border-radius: 3px;
+}
+

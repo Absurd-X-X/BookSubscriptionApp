@@ -1,0 +1,717 @@
+﻿@{
+    ViewData["Title"] = "My Personal Settings";
+    ViewData["ScrollPage"] = "personal";
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/readerPersonal.css" />
+
+<!-- PAGE HEADER -->
+<div class="pn-header">
+    <h1>Personal</h1>
+    <p>Manage your account settings and preferences.</p>
+</div>
+
+<div class="pn-body">
+    <div class="pn-feed">
+
+        <!-- ▌ PROFILE INFORMATION -->
+        <section id="section-profile" class="page-section pn-card" data-hash="#section-profile" data-page="personal">
+            <div class="pn-sec-title">Profile Information</div>
+            <div class="pn-sec-sub">Update your personal details and how others see you.</div>
+
+            <div class="pi-inner">
+                <!-- Avatar column -->
+                <div class="pi-avatar-col">
+                    <div class="pi-avatar-wrap">
+                        <img src="/img/profile-placeholder.jpg" alt="Profile photo" class="pi-avatar" id="piAvatar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                        <div class="pi-avatar-fallback" style="display:none">JD</div>
+                        <label class="pi-cam" for="piFileInput" title="Change photo">
+                            <i class="ti ti-camera"></i>
+                        </label>
+                        <input type="file" id="piFileInput" accept="image/*" style="display:none" />
+                    </div>
+                    <div class="pi-name">John Doe</div>
+                    <div class="pi-badge"><i class="ti ti-rosette"></i> Premium Member</div>
+                    <div class="pi-since">Member since Jan 15, 2024</div>
+                </div>
+
+                <!-- Form column -->
+                <div class="pi-form-col">
+                    <div class="pn-field">
+                        <label>Full Name</label>
+                        <input type="text" id="piFullName" value="John Doe" />
+                    </div>
+                    <div class="pn-field">
+                        <label>Email Address</label>
+                        <div class="pn-input-addon">
+                            <input type="email" id="piEmail" value="john.doe@email.com" />
+                            <span class="pn-verified"><i class="ti ti-check"></i> Verified</span>
+                        </div>
+                    </div>
+                    <div class="pn-field">
+                        <label>Username</label>
+                        <input type="text" id="piUsername" value="johndoe_reader" />
+                    </div>
+                    <div class="pn-field">
+                        <label>Bio</label>
+                        <textarea id="piBio" maxlength="120" rows="3">A passionate reader exploring new ideas every day.</textarea>
+                        <div class="pn-bio-count"><span id="piBioCount">46</span>/120</div>
+                    </div>
+                    <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+                        <button class="pn-btn-primary" id="saveChangesBtn">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ▌ SECURITY -->
+        <section id="section-security" class="page-section pn-card" data-hash="#section-security" data-page="personal">
+            <div class="pn-sec-title">Security</div>
+            <div class="pn-sec-sub">Manage your password and account security.</div>
+
+            <!-- Password row -->
+            <div class="sec-row sec-row-plain">
+                <div class="sec-row-l">
+                    <div class="sec-ico"><i class="ti ti-lock"></i></div>
+                    <div class="sec-dots">••••••••</div>
+                </div>
+                <button class="pn-btn-outline-sm" id="changePwBtn">Change</button>
+            </div>
+
+            <!-- 2FA row -->
+            <div class="sec-row sec-row-link" id="twoFaRow">
+                <div class="sec-row-l">
+                    <div class="sec-ico"><i class="ti ti-shield-check"></i></div>
+                    <div>
+                        <div class="sec-title">Two-Factor Authentication</div>
+                        <div class="sec-sub">Add an extra layer of security to your account.</div>
+                    </div>
+                </div>
+                <div class="sec-row-r">
+                    <span class="sec-enabled" id="twoFaStatus">Enabled</span>
+                    <i class="ti ti-chevron-right sec-chev"></i>
+                </div>
+            </div>
+
+            <!-- Active Sessions row -->
+            <div class="sec-row sec-row-link" id="sessionsRow">
+                <div class="sec-row-l">
+                    <div class="sec-ico"><i class="ti ti-devices"></i></div>
+                    <div>
+                        <div class="sec-title">Active Sessions</div>
+                        <div class="sec-sub">Manage your active login sessions.</div>
+                    </div>
+                </div>
+                <div class="sec-row-r">
+                    <span class="sec-sessions">3 active</span>
+                    <i class="ti ti-chevron-right sec-chev"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- ▌ PREFERENCES -->
+        <section id="section-preferences" class="page-section pn-card" data-hash="#section-preferences" data-page="personal">
+            <div class="pn-sec-title">Preferences</div>
+            <div class="pn-sec-sub">Customize your reading experience.</div>
+
+            <!-- Theme -->
+            <div class="pref-row">
+                <div class="pref-row-l">
+                    <div class="pref-ico"><i class="ti ti-palette"></i></div>
+                    <div>
+                        <div class="pref-title">Theme</div>
+                        <div class="pref-sub">Choose your preferred theme.</div>
+                    </div>
+                </div>
+                <div class="pn-select-wrap">
+                    <select class="pn-select" id="themeSelect">
+                        <option value="dark" selected>🌙 Dark</option>
+                        <option value="light">☀️ Light</option>
+                        <option value="system">💻 System</option>
+                    </select>
+                    <i class="ti ti-chevron-down pn-sel-arr"></i>
+                </div>
+            </div>
+
+            <!-- Reading Goals -->
+            <div class="pref-row">
+                <div class="pref-row-l">
+                    <div class="pref-ico"><i class="ti ti-target"></i></div>
+                    <div>
+                        <div class="pref-title">Reading Goals</div>
+                        <div class="pref-sub">Set your daily reading goals and reminders.</div>
+                    </div>
+                </div>
+                <button class="pn-btn-outline-sm" id="editGoalsBtn">Edit</button>
+            </div>
+
+            <!-- Language -->
+            <div class="pref-row">
+                <div class="pref-row-l">
+                    <div class="pref-ico"><i class="ti ti-world"></i></div>
+                    <div>
+                        <div class="pref-title">Language</div>
+                        <div class="pref-sub">Choose your preferred language.</div>
+                    </div>
+                </div>
+                <div class="pn-select-wrap">
+                    <select class="pn-select" id="langSelect">
+                        <option value="en" selected>English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                        <option value="pt">Português</option>
+                    </select>
+                    <i class="ti ti-chevron-down pn-sel-arr"></i>
+                </div>
+            </div>
+
+            <!-- Default View -->
+            <div class="pref-row">
+                <div class="pref-row-l">
+                    <div class="pref-ico"><i class="ti ti-layout-grid"></i></div>
+                    <div>
+                        <div class="pref-title">Default View</div>
+                        <div class="pref-sub">Choose how you want to see content.</div>
+                    </div>
+                </div>
+                <div class="pn-select-wrap">
+                    <select class="pn-select" id="viewSelect">
+                        <option value="grid" selected>Grid View</option>
+                        <option value="list">List View</option>
+                        <option value="compact">Compact View</option>
+                    </select>
+                    <i class="ti ti-chevron-down pn-sel-arr"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- ▌ NOTIFICATIONS -->
+        <section id="section-notifications" class="page-section pn-card" data-hash="#section-notifications" data-page="personal">
+            <div class="pn-sec-title">Notifications</div>
+            <div class="pn-sec-sub">Manage how you want to be notified.</div>
+
+            <div class="notif-pref-row">
+                <div class="np-left">
+                    <div class="np-ico"><i class="ti ti-bell"></i></div>
+                    <div>
+                        <div class="np-title">Email Notifications</div>
+                        <div class="np-sub">Receive updates via email.</div>
+                    </div>
+                </div>
+                <label class="pn-toggle">
+                    <input type="checkbox" checked data-notif="email" />
+                    <span class="pn-track"><span class="pn-thumb"></span></span>
+                </label>
+            </div>
+
+            <div class="notif-pref-row">
+                <div class="np-left">
+                    <div class="np-ico"><i class="ti ti-bell-ringing"></i></div>
+                    <div>
+                        <div class="np-title">Push Notifications</div>
+                        <div class="np-sub">Receive push notifications on your device.</div>
+                    </div>
+                </div>
+                <label class="pn-toggle">
+                    <input type="checkbox" checked data-notif="push" />
+                    <span class="pn-track"><span class="pn-thumb"></span></span>
+                </label>
+            </div>
+
+            <div class="notif-pref-row">
+                <div class="np-left">
+                    <div class="np-ico"><i class="ti ti-bell-plus"></i></div>
+                    <div>
+                        <div class="np-title">New Book Alerts</div>
+                        <div class="np-sub">Get notified about new book releases.</div>
+                    </div>
+                </div>
+                <label class="pn-toggle">
+                    <input type="checkbox" checked data-notif="newbooks" />
+                    <span class="pn-track"><span class="pn-thumb"></span></span>
+                </label>
+            </div>
+
+            <div class="notif-pref-row">
+                <div class="np-left">
+                    <div class="np-ico"><i class="ti ti-bell-off"></i></div>
+                    <div>
+                        <div class="np-title">Reading Reminders</div>
+                        <div class="np-sub">Daily reminders to keep your streak alive.</div>
+                    </div>
+                </div>
+                <label class="pn-toggle">
+                    <input type="checkbox" data-notif="reminders" />
+                    <span class="pn-track"><span class="pn-thumb"></span></span>
+                </label>
+            </div>
+        </section>
+
+        <!-- ▌ DANGER ZONE -->
+        <section id="section-danger" class="page-section pn-danger-card" data-hash="#section-danger" data-page="personal">
+            <div class="pn-danger-title"><i class="ti ti-alert-triangle"></i> Danger Zone</div>
+            <div class="pn-danger-sub">Irreversible and destructive actions.</div>
+            <div class="danger-row">
+                <div class="danger-row-l">
+                    <div class="danger-ico"><i class="ti ti-trash"></i></div>
+                    <div>
+                        <div class="danger-title">Delete Account</div>
+                        <div class="danger-sub">Permanently delete your account and all data.</div>
+                    </div>
+                </div>
+                <button class="pn-btn-danger" id="deleteAccBtn">
+                    <i class="ti ti-trash" style="font-size:13px"></i> Delete Account
+                </button>
+            </div>
+        </section>
+
+    </div><!-- pn-feed -->
+    <!-- ── RIGHT ASIDE -->
+    <aside class="pn-aside">
+
+        <!-- Account Overview -->
+        <div class="pn-aside-card">
+            <div class="pna-title">Account Overview</div>
+            <div class="ao-row">
+                <div class="ao-ico"><i class="ti ti-rosette"></i></div>
+                <div><div class="ao-lbl">Membership</div><div class="ao-val premium">Premium Member</div></div>
+            </div>
+            <div class="ao-row">
+                <div class="ao-ico"><i class="ti ti-calendar"></i></div>
+                <div><div class="ao-lbl">Plan</div><div class="ao-val">Premium Plan</div></div>
+            </div>
+            <div class="ao-row">
+                <div class="ao-ico"><i class="ti ti-calendar-event"></i></div>
+                <div><div class="ao-lbl">Member Since</div><div class="ao-val">Jan 15, 2024</div></div>
+            </div>
+            <div class="ao-row">
+                <div class="ao-ico"><i class="ti ti-book"></i></div>
+                <div><div class="ao-lbl">Total Books Read</div><div class="ao-val">24 books</div></div>
+            </div>
+            <div class="ao-row">
+                <div class="ao-ico" style="background:rgba(240,132,41,.15);color:#f08429"><i class="ti ti-flame"></i></div>
+                <div><div class="ao-lbl">Reading Streak</div><div class="ao-val">12 days</div></div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="pn-aside-card">
+            <div class="pna-title">Quick Actions</div>
+            <div class="qa-row" id="qaDownload">
+                <div class="qa-row-l">
+                    <div class="qa-ico"><i class="ti ti-download"></i></div>
+                    <div><div class="qa-title">Download My Data</div><div class="qa-sub">Get a copy of your data</div></div>
+                </div>
+                <i class="ti ti-chevron-right qa-chev"></i>
+            </div>
+            <div class="qa-row" id="qaPrivacy">
+                <div class="qa-row-l">
+                    <div class="qa-ico"><i class="ti ti-shield"></i></div>
+                    <div><div class="qa-title">Privacy Settings</div><div class="qa-sub">Manage your privacy</div></div>
+                </div>
+                <i class="ti ti-chevron-right qa-chev"></i>
+            </div>
+            <div class="qa-row" id="qaBlocked">
+                <div class="qa-row-l">
+                    <div class="qa-ico"><i class="ti ti-ban"></i></div>
+                    <div><div class="qa-title">Blocked Users</div><div class="qa-sub">Manage blocked users</div></div>
+                </div>
+                <i class="ti ti-chevron-right qa-chev"></i>
+            </div>
+            <div class="qa-row" id="qaClose">
+                <div class="qa-row-l">
+                    <div class="qa-ico"><i class="ti ti-user-off"></i></div>
+                    <div><div class="qa-title">Close Account</div><div class="qa-sub">Temporarily deactivate</div></div>
+                </div>
+                <i class="ti ti-chevron-right qa-chev"></i>
+            </div>
+        </div>
+
+        <!-- Reading Stats -->
+        <div class="pn-aside-card">
+            <div class="pna-title-row">
+                <span class="pna-title" style="margin-bottom:0">Reading Stats</span>
+                <div class="pd-w">
+                    <button class="pd-btn" id="statPeriodBtn" type="button">
+                        <span id="statPeriodLabel">This year</span>
+                        <i class="ti ti-chevron-down"></i>
+                    </button>
+                    <div class="pd-drop" id="statPeriodDrop">
+                        <a class="active" data-p="year">This year</a>
+                        <a data-p="month">This month</a>
+                        <a data-p="week">This week</a>
+                        <a data-p="all">All time</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donut -->
+            <div class="rs-donut-wrap">
+                <svg viewBox="0 0 120 120" width="120" height="120">
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="#1f1f30" stroke-width="12" />
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="#7c6af7" stroke-width="12"
+                            stroke-dasharray="213.63 314.16"
+                            stroke-linecap="round"
+                            transform="rotate(-90 60 60)"
+                            id="rsDonutArc" />
+                    <text x="60" y="55" text-anchor="middle" font-size="20" font-weight="800" fill="#fff" font-family="Inter,sans-serif" id="rsDonutPct">68%</text>
+                    <text x="60" y="70" text-anchor="middle" font-size="9" fill="#52526a" font-family="Inter,sans-serif">of yearly goal</text>
+                </svg>
+            </div>
+
+            <div class="rs-stats">
+                <div class="rs-stat-row">
+                    <div class="rs-stat-l"><i class="ti ti-bookmark"></i> Books Goal</div>
+                    <div class="rs-stat-v">35 books</div>
+                </div>
+                <div class="rs-stat-row">
+                    <div class="rs-stat-l"><i class="ti ti-book"></i> Books Read</div>
+                    <div class="rs-stat-v">24 books</div>
+                </div>
+                <div class="rs-stat-row">
+                    <div class="rs-stat-l"><i class="ti ti-books"></i> Books Left</div>
+                    <div class="rs-stat-v">11 books</div>
+                </div>
+            </div>
+            <button class="pn-btn-full-outline">View Full Stats</button>
+        </div>
+
+        <!-- Quote -->
+        <div class="pn-quote-card">
+            <div class="pnq-mark">"</div>
+            <div class="pnq-text">A reader lives a thousand lives before he dies.</div>
+            <div class="pnq-auth">— George R. R. Martin</div>
+            <div style="text-align:center;margin-top:12px">
+                <svg viewBox="0 0 120 72" width="110" height="66" aria-hidden="true">
+                    <defs>
+                        <radialGradient id="qgpn" cx="50%" cy="80%" r="55%">
+                            <stop offset="0%" stop-color="#7c6af7" stop-opacity=".25" />
+                            <stop offset="100%" stop-color="#7c6af7" stop-opacity="0" />
+                        </radialGradient>
+                    </defs>
+                    <ellipse cx="60" cy="66" rx="50" ry="7" fill="url(#qgpn)" />
+                    <path d="M12 56 Q60 8 108 56" fill="#2d2060" opacity=".4" />
+                    <path d="M16 56 Q60 12 104 56" fill="none" stroke="#7c6af7" stroke-width="1.5" />
+                    <path d="M22 56 Q60 18 98 56" fill="#7c6af7" opacity=".06" />
+                    <line x1="60" y1="12" x2="60" y2="56" stroke="#9080f8" stroke-width="1" />
+                    <polygon points="60,5 64,12 60,16 56,12" fill="#7c6af7" opacity=".7" />
+                    <circle cx="38" cy="32" r="1.5" fill="#7c6af7" opacity=".5" />
+                    <circle cx="82" cy="28" r="1.5" fill="#7c6af7" opacity=".5" />
+                    <circle cx="28" cy="44" r="1" fill="#a58bf8" opacity=".4" />
+                    <circle cx="92" cy="42" r="1" fill="#a58bf8" opacity=".4" />
+                </svg>
+            </div>
+        </div>
+
+    </aside>
+</div><!-- pn-body -->
+<!-- CHANGE PASSWORD MODAL -->
+<div class="pn-modal-bd" id="pwModal">
+    <div class="pn-modal">
+        <div class="pn-mhdr">
+            <h3>Change Password</h3>
+            <i class="ti ti-x pn-mclose" id="closePwModal"></i>
+        </div>
+        <label>Current Password</label>
+        <input type="password" placeholder="Enter current password" class="pn-minput" />
+        <label>New Password</label>
+        <input type="password" placeholder="Enter new password" class="pn-minput" id="newPwInput" />
+        <label>Confirm New Password</label>
+        <input type="password" placeholder="Confirm new password" class="pn-minput" id="confirmPwInput" />
+        <div class="pn-mfoot">
+            <button class="pn-mcancel" id="cancelPwModal">Cancel</button>
+            <button class="pn-btn-primary" id="savePwBtn">Update Password</button>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE ACCOUNT CONFIRM MODAL -->
+<div class="pn-modal-bd" id="deleteModal">
+    <div class="pn-modal">
+        <div class="pn-mhdr">
+            <h3 style="color:#f87171">Delete Account</h3>
+            <i class="ti ti-x pn-mclose" id="closeDeleteModal"></i>
+        </div>
+        <p style="font-size:12px;color:#8888a8;margin-bottom:14px;line-height:1.6">
+            This action is <strong style="color:#f87171">permanent and irreversible</strong>. All your books, progress, reviews and data will be deleted.
+        </p>
+        <label>Type <strong style="color:#f87171">DELETE</strong> to confirm</label>
+        <input type="text" placeholder="DELETE" class="pn-minput" id="deleteConfirmInput" />
+        <div class="pn-mfoot">
+            <button class="pn-mcancel" id="cancelDeleteModal">Cancel</button>
+            <button class="pn-btn-danger" id="confirmDeleteBtn" disabled>Delete My Account</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="pn-toast" id="pnToast"></div>
+
+<script>
+        /* readerPersonal.js — all interactions for the Personal page */
+    (function () {
+      'use strict';
+
+      function gi(id) { return document.getElementById(id); }
+
+      /* ── Toast ────────────────────────────────────────────────── */
+      var toastTimer;
+      function showToast(msg, type) {
+        var t = gi('pnToast');
+        if (!t) return;
+        t.textContent = msg;
+        t.className = 'pn-toast show ' + (type || '');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          t.className = 'pn-toast';
+        }, 3000);
+      }
+
+      /* ── Close-all dropdowns helper ───────────────────────────── */
+      function closeAllDrops(except) {
+        document.querySelectorAll('.pd-drop').forEach(function (d) {
+          if (d !== except) d.classList.remove('open');
+        });
+        document.querySelectorAll('.pd-btn').forEach(function (b) {
+          if (b.nextElementSibling !== except) b.classList.remove('open');
+        });
+      }
+      document.addEventListener('click', function () { closeAllDrops(null); });
+
+      /* ── Profile picture upload ────────────────────────────────── */
+      var fileInput = gi('piFileInput');
+      if (fileInput) {
+        fileInput.addEventListener('change', function () {
+          var file = this.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            var img = gi('piAvatar');
+            var fb  = img && img.nextElementSibling;
+            if (img) {
+              img.src = e.target.result;
+              img.style.display = '';
+              if (fb) fb.style.display = 'none';
+            }
+            showToast('Profile photo updated', 'success');
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      /* ── Bio character counter ────────────────────────────────── */
+      var bioTA    = gi('piBio');
+      var bioCount = gi('piBioCount');
+      if (bioTA && bioCount) {
+        function updateCount() {
+          bioCount.textContent = bioTA.value.length;
+        }
+        bioTA.addEventListener('input', updateCount);
+        updateCount();
+      }
+
+      /* ── Save Changes ─────────────────────────────────────────── */
+      var saveBtn = gi('saveChangesBtn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', function () {
+          var name = gi('piFullName') ? gi('piFullName').value.trim() : '';
+          if (!name) { showToast('Full name cannot be empty', 'error'); return; }
+          // Update displayed name in the avatar column
+          var nameEl = document.querySelector('.pi-name');
+          if (nameEl) nameEl.textContent = name;
+          showToast('Changes saved successfully', 'success');
+        });
+      }
+
+      /* ── Change Password Modal ────────────────────────────────── */
+      var pwModal  = gi('pwModal');
+      function openPwModal()  { if (pwModal) pwModal.classList.add('open'); }
+      function closePwModal() { if (pwModal) pwModal.classList.remove('open'); }
+
+      var changePwBtn = gi('changePwBtn');
+      if (changePwBtn) changePwBtn.addEventListener('click', openPwModal);
+      if (gi('closePwModal'))  gi('closePwModal').addEventListener('click', closePwModal);
+      if (gi('cancelPwModal')) gi('cancelPwModal').addEventListener('click', closePwModal);
+      if (pwModal) pwModal.addEventListener('click', function (e) { if (e.target === pwModal) closePwModal(); });
+
+      var savePwBtn = gi('savePwBtn');
+      if (savePwBtn) {
+        savePwBtn.addEventListener('click', function () {
+          var np = gi('newPwInput')   ? gi('newPwInput').value   : '';
+          var cp = gi('confirmPwInput') ? gi('confirmPwInput').value : '';
+          if (!np) { showToast('Please enter a new password', 'error'); return; }
+          if (np !== cp) { showToast('Passwords do not match', 'error'); return; }
+          if (np.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+          closePwModal();
+          showToast('Password updated successfully', 'success');
+        });
+      }
+
+      /* ── 2FA & Sessions rows ──────────────────────────────────── */
+      var twoFaRow = gi('twoFaRow');
+      if (twoFaRow) {
+        twoFaRow.addEventListener('click', function () {
+          var s = gi('twoFaStatus');
+          if (!s) return;
+          var isEnabled = s.textContent.trim() === 'Enabled';
+          s.textContent = isEnabled ? 'Disabled' : 'Enabled';
+          s.style.color  = isEnabled ? 'var(--red)' : 'var(--green)';
+          showToast('Two-factor authentication ' + (isEnabled ? 'disabled' : 'enabled'), isEnabled ? 'error' : 'success');
+        });
+      }
+      var sessionsRow = gi('sessionsRow');
+      if (sessionsRow) {
+        sessionsRow.addEventListener('click', function () {
+          showToast('Active sessions panel coming soon', '');
+        });
+      }
+
+      /* ── Preference dropdowns (theme, language, view) ─────────── */
+      var themeSelect = gi('themeSelect');
+      if (themeSelect) {
+        themeSelect.addEventListener('change', function () {
+          showToast('Theme changed to ' + this.options[this.selectedIndex].text, 'success');
+        });
+      }
+      var langSelect = gi('langSelect');
+      if (langSelect) {
+        langSelect.addEventListener('change', function () {
+          showToast('Language changed to ' + this.options[this.selectedIndex].text, 'success');
+        });
+      }
+      var viewSelect = gi('viewSelect');
+      if (viewSelect) {
+        viewSelect.addEventListener('change', function () {
+          showToast('Default view changed to ' + this.options[this.selectedIndex].text, 'success');
+        });
+      }
+
+      /* ── Edit Goals ───────────────────────────────────────────── */
+      var editGoalsBtn = gi('editGoalsBtn');
+      if (editGoalsBtn) {
+        editGoalsBtn.addEventListener('click', function () {
+          showToast('Reading goals editor coming soon', '');
+        });
+      }
+
+      /* ── Notification toggles ─────────────────────────────────── */
+      document.querySelectorAll('.pn-toggle input[data-notif]').forEach(function (chk) {
+        chk.addEventListener('change', function () {
+          var label = this.getAttribute('data-notif');
+          var labels = {
+            email:    'Email notifications',
+            push:     'Push notifications',
+            newbooks: 'New book alerts',
+            reminders:'Reading reminders'
+          };
+          var txt = labels[label] || label;
+          showToast(txt + ' ' + (this.checked ? 'enabled' : 'disabled'), this.checked ? 'success' : '');
+        });
+      });
+
+      /* ── Quick Actions ────────────────────────────────────────── */
+      var qaActions = {
+        qaDownload: 'Preparing your data download…',
+        qaPrivacy:  'Privacy settings coming soon',
+        qaBlocked:  'Blocked users panel coming soon',
+        qaClose:    'Account deactivation coming soon'
+      };
+      Object.keys(qaActions).forEach(function (id) {
+        var el = gi(id);
+        if (el) el.addEventListener('click', function () { showToast(qaActions[id], ''); });
+      });
+
+      /* ── Reading Stats period selector ───────────────────────── */
+      var statPeriodBtn  = gi('statPeriodBtn');
+      var statPeriodDrop = gi('statPeriodDrop');
+      var statPeriodLbl  = gi('statPeriodLabel');
+
+      var STAT_DATA = {
+        year:  { pct: 68, goal: '35 books', read: '24 books', left: '11 books' },
+        month: { pct: 42, goal: '4 books',  read: '2 books',  left: '2 books'  },
+        week:  { pct: 80, goal: '1 book',   read: '1 book',   left: '0 books'  },
+        all:   { pct: 55, goal: '100 books',read: '55 books', left: '45 books' }
+      };
+
+      function updateStats(key) {
+        var d = STAT_DATA[key] || STAT_DATA.year;
+        var arc = gi('rsDonutArc');
+        var pctTxt = gi('rsDonutPct');
+        if (arc) {
+          var circumference = 314.16;
+          var dashArray = (d.pct / 100) * circumference;
+          arc.setAttribute('stroke-dasharray', dashArray.toFixed(2) + ' ' + circumference);
+        }
+        if (pctTxt) pctTxt.textContent = d.pct + '%';
+
+        var rows = document.querySelectorAll('.rs-stat-v');
+        if (rows[0]) rows[0].textContent = d.goal;
+        if (rows[1]) rows[1].textContent = d.read;
+        if (rows[2]) rows[2].textContent = d.left;
+      }
+
+      if (statPeriodBtn) {
+        statPeriodBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var isOpen = statPeriodDrop.classList.contains('open');
+          closeAllDrops(null);
+          if (!isOpen) {
+            statPeriodDrop.classList.add('open');
+            statPeriodBtn.classList.add('open');
+          }
+        });
+        statPeriodDrop.querySelectorAll('a[data-p]').forEach(function (a) {
+          a.addEventListener('click', function (e) {
+            e.stopPropagation();
+            statPeriodDrop.querySelectorAll('a').forEach(function (x) { x.classList.remove('active'); });
+            this.classList.add('active');
+            statPeriodLbl.textContent = this.textContent;
+            updateStats(this.getAttribute('data-p'));
+            statPeriodDrop.classList.remove('open');
+            statPeriodBtn.classList.remove('open');
+          });
+        });
+      }
+
+      /* ── Delete Account Modal ─────────────────────────────────── */
+      var deleteModal   = gi('deleteModal');
+      var deleteConfirm = gi('deleteConfirmInput');
+      var confirmDelBtn = gi('confirmDeleteBtn');
+
+      function openDeleteModal()  { if (deleteModal) deleteModal.classList.add('open'); }
+      function closeDeleteModal() { if (deleteModal) deleteModal.classList.remove('open'); if (deleteConfirm) deleteConfirm.value = ''; if (confirmDelBtn) confirmDelBtn.disabled = true; }
+
+      var deleteAccBtn = gi('deleteAccBtn');
+      if (deleteAccBtn) deleteAccBtn.addEventListener('click', openDeleteModal);
+      if (gi('closeDeleteModal'))  gi('closeDeleteModal').addEventListener('click', closeDeleteModal);
+      if (gi('cancelDeleteModal')) gi('cancelDeleteModal').addEventListener('click', closeDeleteModal);
+      if (deleteModal) deleteModal.addEventListener('click', function (e) { if (e.target === deleteModal) closeDeleteModal(); });
+
+      if (deleteConfirm && confirmDelBtn) {
+        deleteConfirm.addEventListener('input', function () {
+          confirmDelBtn.disabled = this.value.trim() !== 'DELETE';
+        });
+      }
+      if (confirmDelBtn) {
+        confirmDelBtn.addEventListener('click', function () {
+          showToast('Account deletion requested. You will receive a confirmation email.', 'error');
+          closeDeleteModal();
+        });
+      }
+
+      /* ── View Full Stats button ───────────────────────────────── */
+      var vfsBtn = document.querySelector('.pn-btn-full-outline');
+      if (vfsBtn) {
+        vfsBtn.addEventListener('click', function () {
+          showToast('Full stats page coming soon', '');
+        });
+      }
+
+      /* ── Init ─────────────────────────────────────────────────── */
+      updateStats('year');
+
+    })();
+</script>
+

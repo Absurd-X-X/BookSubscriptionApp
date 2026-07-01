@@ -1,0 +1,574 @@
+﻿
+/* ---- Scoped variables for this content block ---- */
+.review-main {
+    --bg: #0c0e1a;
+    --panel: #12142400;
+    --card: #13122a;
+    --card-border: #2d2b72;
+    --text: #f3f4f8;
+    --text-dim: #9a9cb3;
+    --text-faint: #6c6e89;
+    --accent: #7c3aed;
+    --accent-light: #a78bfa;
+    --green: #22c55e;
+    --green-bg: rgba(34,197,94,0.12);
+    --red: #f87171;
+    --gold: #f5b300;
+    --radius: 5px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    padding: 28px 32px 32px;
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+.review-main * {
+    box-sizing: border-box;
+}
+
+/* ---- Top bar ---- */
+.review-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-dim);
+    font-size: 14px;
+    text-decoration: none;
+    margin-bottom: 18px;
+    cursor: pointer;
+}
+
+    .review-back:hover {
+        color: var(--text);
+    }
+
+.review-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 26px;
+    gap: 20px;
+}
+
+    .review-header-row h1 {
+        font-size: 30px;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+        letter-spacing: -0.3px;
+    }
+
+    .review-header-row p {
+        margin: 0;
+        color: var(--text-dim);
+        font-size: 14.5px;
+    }
+
+.review-header-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.date-range-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.export-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    border: none;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+    .export-btn:hover {
+        filter: brightness(1.08);
+    }
+
+/* ---- Grid layout: left content + right sidebar ---- */
+.review-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: start;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+}
+
+/* ---- Reviewer summary row inside main card ---- */
+.reviewer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.reviewer-identity {
+    display: flex;
+    gap: 14px;
+}
+
+.avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b5cf6, #5b21b6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.reviewer-identity-text .name {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.reviewer-identity-text .email {
+    color: var(--text-dim);
+    font-size: 13.5px;
+    margin-bottom: 8px;
+}
+
+.reviewer-meta {
+    display: flex;
+    gap: 18px;
+    color: var(--text-dim);
+    font-size: 13px;
+}
+
+    .reviewer-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+.reviewer-status {
+    text-align: right;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--green-bg);
+    color: var(--green);
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+
+    .status-pill::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--green);
+    }
+
+.reviewer-status .timestamp {
+    color: var(--text-faint);
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+.more-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 12px;
+}
+
+.reviewer-status-top {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* ---- Book strip ---- */
+.book-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.book-strip-info {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.book-thumb {
+    width: 52px;
+    height: 70px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #2a2150;
+}
+
+.book-strip-info .book-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.book-strip-info .book-author {
+    color: var(--text-dim);
+    font-size: 13.5px;
+}
+
+.book-strip-score {
+    text-align: right;
+}
+
+    .book-strip-score .score {
+        font-size: 22px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+.stars {
+    color: var(--gold);
+    letter-spacing: 2px;
+    font-size: 16px;
+}
+
+.book-strip-score .label {
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+/* ---- Review body ---- */
+.field-label {
+    color: var(--text-dim);
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.review-title-text {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 0 0 22px 0;
+}
+
+.review-body-text {
+    color: #d4d5e3;
+    font-size: 14.5px;
+    line-height: 1.7;
+    margin: 0 0 14px 0;
+}
+
+.helpful-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    margin: 22px 0 26px 0;
+}
+
+.vote-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid var(--card-border);
+    color: var(--text-dim);
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+    .vote-btn.yes {
+        color: var(--green);
+        border-color: rgba(34,197,94,0.25);
+    }
+
+    .vote-btn.no {
+        color: var(--red);
+        border-color: rgba(248,113,113,0.25);
+    }
+
+/* ---- Rating breakdown ---- */
+.rating-breakdown h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+}
+
+.rating-row {
+    display: grid;
+    grid-template-columns: 160px 1fr 50px 1fr;
+    align-items: center;
+    padding: 10px 0;
+    font-size: 14px;
+}
+
+    .rating-row .rating-name {
+        color: var(--text);
+    }
+
+    .rating-row .stars {
+        font-size: 14px;
+    }
+
+    .rating-row .rating-fraction {
+        color: var(--text-dim);
+    }
+
+    .rating-row .rating-word {
+        text-align: right;
+        color: var(--text-dim);
+    }
+
+/* ---- Action bar ---- */
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 22px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+}
+
+.action-bar-left {
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.btn-approve {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: #fff;
+}
+
+    .btn-approve:hover {
+        filter: brightness(1.08);
+    }
+
+.btn-reject {
+    background: transparent;
+    border: 1px solid rgba(248,113,113,0.35);
+    color: var(--red);
+}
+
+    .btn-reject:hover {
+        background: rgba(248,113,113,0.08);
+    }
+
+.btn-edit {
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--text);
+}
+
+    .btn-edit:hover {
+        background: rgba(255,255,255,0.04);
+    }
+
+.btn-delete {
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--text-dim);
+}
+
+    .btn-delete:hover {
+        background: rgba(255,255,255,0.04);
+        color: var(--red);
+    }
+
+/* ---- Sidebar ---- */
+.side {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+    .sidebar h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 18px 0;
+    }
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    font-size: 13.5px;
+    border-bottom: 1px solid var(--card-border);
+}
+
+    .info-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .info-row .info-key {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-dim);
+    }
+
+    .info-row .info-val {
+        color: var(--text);
+        font-weight: 500;
+        text-align: right;
+    }
+
+/* Book info card with cover */
+.book-info-card-top {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding-bottom: 16px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.book-info-cover {
+    width: 50px;
+    height: 68px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #2a2150;
+}
+
+.book-info-card-top .book-title {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+
+.book-info-card-top .book-author {
+    color: var(--text-dim);
+    font-size: 13px;
+}
+
+/* Review history timeline */
+.timeline {
+    position: relative;
+    padding-left: 6px;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 14px;
+    position: relative;
+    padding-bottom: 22px;
+}
+
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+
+.timeline-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #fff;
+    position: relative;
+    z-index: 1;
+}
+
+    .timeline-dot.done {
+        background: var(--green);
+    }
+
+    .timeline-dot.active {
+        background: #3b82f6;
+    }
+
+.timeline-item:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    top: 22px;
+    left: 10.5px;
+    width: 1px;
+    height: calc(100% - 14px);
+    background: var(--card-border);
+}
+
+.timeline-text .timeline-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+
+.timeline-text .timeline-meta {
+    color: var(--text-faint);
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+/* ---- Icon helper (simple inline svg via mask not needed; using unicode/emoji-free dashes) ---- */
+.ic {
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+@media (max-width: 980px) {
+    .review-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .review-header-row {
+        flex-direction: column;
+    }
+}
