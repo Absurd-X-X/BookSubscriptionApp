@@ -12,21 +12,21 @@ namespace Host.Controllers
     [Authorize]
     public class WalletController(IMediator mediator) : Controller
     {
-        //public async Task<IActionResult> Index()
-        //{
-        //    var customerId = ClaimsHelper.GetCustomerId(User);
+        public async Task<IActionResult> Index(int page = 1, int PageSize = 7)
+        {
+            var customerId = ClaimsHelper.GetCustomerId(User);
 
-        //    var balance = await mediator.Send(
-        //        new GetWalletBalanceQuery(customerId));
+            var balance = await mediator.Send(
+                new GetWalletBalanceQuery(customerId));
 
-        //    var transactions = await mediator.Send(
-        //        new GetTransactionHistoryQuery(customerId));
+            var transactions = await mediator.Send(
+                new GetTransactionHistoryQuery(customerId, page, PageSize));
 
-        //    ViewBag.Balance = balance.Data?.Balance ?? 0;
-        //    ViewBag.WalletId = balance.Data?.WalletId;
+            ViewBag.Balance = balance.Data?.Balance ?? 0;
+            ViewBag.WalletId = balance.Data?.WalletId;
 
-        //    return View(transactions.Data);
-        //}
+            return View(transactions.Data);
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
