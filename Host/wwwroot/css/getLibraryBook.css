@@ -8,11 +8,11 @@ main::-webkit-scrollbar {
 ============================================ */
 .book-header {
     display: flex;
-    gap: 1.5rem;
+    gap: 2.5rem;
     align-items: flex-start;
-    background: #0d1730;
-    border: 1px solid #2d3158;
-    border-radius: 14px;
+    background: #13122a;
+    border: 1px solid #2d2b72;
+    border-radius: 7px;
     padding: 1.5rem;
     margin-bottom: 0.8rem;
 }
@@ -22,8 +22,8 @@ main::-webkit-scrollbar {
 }
 
 .book-cover-img {
-    width: 130px;
-    height: 190px;
+    width: 150px;
+    height: 250px;
     border-radius: 8px;
     overflow: hidden;
     background: #f5f0e8;
@@ -71,26 +71,28 @@ main::-webkit-scrollbar {
 
 .book-header-info {
     flex: 1;
+    height: 100%
 }
 
 .book-title {
     font-size: 26px;
     font-weight: 700;
     color: #e2e8f0;
-    margin-bottom: 4px;
+    margin-top: 15px;
+    margin-bottom: 7px;
 }
 
 .book-author {
     font-size: 15px;
     color: #9ca3af;
-    margin-bottom: 12px;
+    margin-bottom: 18px;
 }
 
 .book-badges {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 18px;
     flex-wrap: wrap;
 }
 
@@ -103,7 +105,7 @@ main::-webkit-scrollbar {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .star-icon {
@@ -131,11 +133,12 @@ main::-webkit-scrollbar {
 .stat-box {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 18px;
     background: #252847;
     border: 1px solid #2d3158;
     border-radius: 10px;
     padding: 12px;
+    border: 1px solid #2d2b72;
 }
 
 .stat-icon {
@@ -284,11 +287,11 @@ canvas {
    CARDS
 ============================================ */
 .card {
-    background: #0d1730;
-    border: 1px solid #2d3158;
-    border-radius: 12px;
+    background: #13122a;
+    border: 1px solid #2d2b72;
+    border-radius: 7px;
     padding: 1.25rem 1.5rem;
-    margin-bottom: 5px;
+    margin-bottom: 15px;
 }
 
 .card-title {
@@ -1298,7 +1301,7 @@ canvas {
 
 .rov-item {
     background: #252847;
-    border: 1px solid #2d3158;
+    border: 1px solid #2d2b72;
     border-radius: 10px;
     padding: 14px;
 }
@@ -1441,8 +1444,8 @@ canvas {
 }
 
 .rev-card {
-    background: #1e2139;
-    border: 1px solid #2d3158;
+    background: #13122a;
+    border: 1px solid #2d2b72;
     border-radius: 12px;
     padding: 1.25rem;
 }

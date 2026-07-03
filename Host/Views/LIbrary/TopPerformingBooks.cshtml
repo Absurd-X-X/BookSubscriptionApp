@@ -1,0 +1,507 @@
+﻿@{
+    Layout = "~/Views/Shared/_LibraryLayout.cshtml";
+    ViewData["Title"] = "Library Top Performing Books";
+}
+
+<link href="~/css/topPerforminBooks.css" rel="stylesheet" />
+
+    <!-- ============================================================
+     PAGE HEADER
+     ============================================================ -->
+    <div class="page-header">
+        <div class="page-title">
+            <h1>Top Performing Books</h1>
+            <p>Discover the books that are performing the best in your library based on reads, revenue and user engagement.</p>
+        </div>
+
+        <div class="header-actions">
+            <!-- Date picker -->
+            <div style="position:relative;">
+                <button class="date-picker-btn" id="datePicker">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                    <span id="dateLabel">May 1 - May 31, 2024</span>
+                    <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
+                </button>
+                <div class="date-dropdown" id="dateDropdown">
+                    <button onclick="selectDate(this, 'This Week')">This Week</button>
+                    <button onclick="selectDate(this, 'This Month')">This Month</button>
+                    <button onclick="selectDate(this, 'Last Month')">Last Month</button>
+                    <button onclick="selectDate(this, 'Last 3 Months')">Last 3 Months</button>
+                    <button class="is-selected" onclick="selectDate(this, 'May 1 - May 31, 2024')">May 1 – May 31, 2024</button>
+                    <button onclick="selectDate(this, 'This Year')">This Year</button>
+                    <button onclick="selectDate(this, 'All Time')">All Time</button>
+                </div>
+            </div>
+
+            <!-- Export -->
+            <button class="export-btn" onclick="handleExport()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                Export Report
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+     FILTER TABS
+     ============================================================ -->
+    <div class="filter-tabs">
+        <button class="filter-tab is-active" onclick="filterTab(this, 'all')">All Books</button>
+        <button class="filter-tab" onclick="filterTab(this, 'month')">This Month</button>
+        <button class="filter-tab" onclick="filterTab(this, 'last_month')">Last Month</button>
+        <button class="filter-tab" onclick="filterTab(this, 'year')">This Year</button>
+        <button class="filter-tab" onclick="filterTab(this, 'all_time')">All Time</button>
+    </div>
+
+    <!-- ============================================================
+     TABLE
+     ============================================================ -->
+    <div class="table-card">
+        <div class="table-wrap">
+            <table id="booksTable">
+                <thead>
+                    <tr>
+                        <th class="col-rank">#</th>
+                        <th>Book</th>
+                        <th class="sortable" data-col="reads" onclick="sortTable('reads', this)">
+                            <span class="th-inner">Reads <span class="sort-icon"><svg width="8" height="5" viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor" /></svg><svg width="8" height="5" viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor" /></svg></span></span>
+                        </th>
+                        <th class="sortable" data-col="revenue" onclick="sortTable('revenue', this)">
+                            <span class="th-inner">Revenue <span class="sort-icon"><svg width="8" height="5" viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor" /></svg><svg width="8" height="5" viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor" /></svg></span></span>
+                        </th>
+                        <th class="sortable" data-col="rating" onclick="sortTable('rating', this)">
+                            <span class="th-inner">Average Rating <span class="sort-icon"><svg width="8" height="5" viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor" /></svg><svg width="8" height="5" viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor" /></svg></span></span>
+                        </th>
+                        <th class="sortable" data-col="reviews" onclick="sortTable('reviews', this)">
+                            <span class="th-inner">Reviews <span class="sort-icon"><svg width="8" height="5" viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor" /></svg><svg width="8" height="5" viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor" /></svg></span></span>
+                        </th>
+                        <th class="sortable" data-col="completion" onclick="sortTable('completion', this)">
+                            <span class="th-inner">Completion Rate <span class="sort-icon"><svg width="8" height="5" viewBox="0 0 8 5"><path d="M4 0L8 5H0z" fill="currentColor" /></svg><svg width="8" height="5" viewBox="0 0 8 5"><path d="M4 5L0 0h8z" fill="currentColor" /></svg></span></span>
+                        </th>
+                        <th>Added On</th>
+                        <th class="col-actions"></th>
+                    </tr>
+                </thead>
+                <tbody id="booksBody"></tbody>
+            </table>
+        </div>
+
+        <div class="table-footer">
+            <span class="table-footer-info" id="footerInfo">Showing 1 to 10 of 24 books</span>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+            /* ============================================================
+               DATA
+               ============================================================ */
+            const ALL_BOOKS = [
+              { id:1,  title:'Atomic Habits',         author:'James Clear',       cover:'#E8A87C', reads:1245, readsChange:12,  revenue:98000,  revenueChange:8,   rating:4.9, reviews:245, completion:78, completionChange:5,  added:'Apr 15, 2024', published:true  },
+              { id:2,  title:'Clean Code',            author:'Robert C. Martin',  cover:'#4A90D9', reads:985,  readsChange:18,  revenue:64800,  revenueChange:15,  rating:4.8, reviews:192, completion:72, completionChange:4,  added:'Mar 10, 2024', published:true  },
+              { id:3,  title:'Deep Work',             author:'Cal Newport',       cover:'#E8C97C', reads:876,  readsChange:10,  revenue:76500,  revenueChange:7,   rating:4.7, reviews:168, completion:69, completionChange:6,  added:'Feb 28, 2024', published:true  },
+              { id:4,  title:'Rich Dad Poor Dad',     author:'Robert Kiyosaki',   cover:'#D97C7C', reads:765,  readsChange:9,   revenue:58200,  revenueChange:6,   rating:4.6, reviews:156, completion:65, completionChange:3,  added:'Jan 18, 2024', published:true  },
+              { id:5,  title:'The 5 AM Club',         author:'Robin Sharma',      cover:'#E8B97C', reads:654,  readsChange:11,  revenue:48600,  revenueChange:9,   rating:4.5, reviews:134, completion:61, completionChange:4,  added:'Apr 02, 2024', published:true  },
+              { id:6,  title:'The 5 Love Languages', author:'Gary Chapman',      cover:'#C97CA8', reads:598,  readsChange:7,   revenue:41300,  revenueChange:5,   rating:4.4, reviews:118, completion:58, completionChange:2,  added:'Mar 25, 2024', published:true  },
+              { id:7,  title:'Thinking, Fast and Slow', author:'Daniel Kahneman',cover:'#6B7BA8', reads:542,  readsChange:6,   revenue:39200,  revenueChange:4,   rating:4.4, reviews:102, completion:55, completionChange:3,  added:'Feb 12, 2024', published:true  },
+              { id:8,  title:'The Power of Habit',    author:'Charles Duhigg',    cover:'#C94A4A', reads:498,  readsChange:8,   revenue:36000,  revenueChange:5,   rating:4.3, reviews:94,  completion:53, completionChange:3,  added:'Jan 30, 2024', published:true  },
+              { id:9,  title:'The 48 Laws of Power',  author:'Robert Greene',     cover:'#3A3A3A', reads:462,  readsChange:5,   revenue:33800,  revenueChange:3,   rating:4.3, reviews:88,  completion:50, completionChange:2,  added:'Apr 20, 2024', published:true  },
+              { id:10, title:'Essentialism',          author:'Greg McKeown',      cover:'#7CA8C9', reads:421,  readsChange:6,   revenue:31200,  revenueChange:4,   rating:4.2, reviews:76,  completion:48, completionChange:2,  added:'May 05, 2024', published:true  },
+              { id:11, title:'The Lean Startup',      author:'Eric Ries',         cover:'#7CB87C', reads:395,  readsChange:4,   revenue:28900,  revenueChange:3,   rating:4.2, reviews:71,  completion:45, completionChange:1,  added:'Mar 08, 2024', published:true  },
+              { id:12, title:'Start With Why',        author:'Simon Sinek',       cover:'#C9A87C', reads:360,  readsChange:3,   revenue:26400,  revenueChange:2,   rating:4.1, reviews:63,  completion:43, completionChange:2,  added:'Feb 20, 2024', published:false },
+              { id:13, title:'Mindset',               author:'Carol Dweck',       cover:'#9B7CC9', reads:342,  readsChange:9,   revenue:24800,  revenueChange:7,   rating:4.1, reviews:59,  completion:41, completionChange:3,  added:'Jan 05, 2024', published:true  },
+              { id:14, title:'Grit',                  author:'Angela Duckworth',  cover:'#7CC9C9', reads:318,  readsChange:5,   revenue:23100,  revenueChange:4,   rating:4.0, reviews:54,  completion:39, completionChange:2,  added:'Apr 12, 2024', published:true  },
+              { id:15, title:'Good to Great',         author:'Jim Collins',       cover:'#C9C97C', reads:295,  readsChange:2,   revenue:21500,  revenueChange:1,   rating:4.0, reviews:48,  completion:37, completionChange:1,  added:'Mar 30, 2024', published:true  },
+              { id:16, title:'The Alchemist',         author:'Paulo Coelho',      cover:'#C9A07C', reads:275,  readsChange:7,   revenue:19800,  revenueChange:6,   rating:3.9, reviews:44,  completion:35, completionChange:2,  added:'Feb 05, 2024', published:true  },
+              { id:17, title:'Ikigai',                author:'Héctor García',     cover:'#FF8C69', reads:254,  readsChange:11,  revenue:18200,  revenueChange:9,   rating:3.9, reviews:39,  completion:34, completionChange:3,  added:'May 01, 2024', published:true  },
+              { id:18, title:'Zero to One',           author:'Peter Thiel',       cover:'#69B4FF', reads:238,  readsChange:4,   revenue:17100,  revenueChange:3,   rating:3.8, reviews:35,  completion:32, completionChange:1,  added:'Jan 22, 2024', published:true  },
+              { id:19, title:'The Psychology of Money', author:'Morgan Housel',  cover:'#A8D5A2', reads:221,  readsChange:13,  revenue:15900,  revenueChange:11,  rating:3.8, reviews:31,  completion:30, completionChange:4,  added:'Apr 08, 2024', published:false },
+              { id:20, title:'Man\'s Search for Meaning', author:'Viktor Frankl',cover:'#D4A0A0', reads:198,  readsChange:3,   revenue:14200,  revenueChange:2,   rating:3.7, reviews:27,  completion:28, completionChange:1,  added:'Mar 15, 2024', published:true  },
+              { id:21, title:'Sapiens',               author:'Yuval Noah Harari', cover:'#A0B4D4', reads:185,  readsChange:6,   revenue:13300,  revenueChange:5,   rating:3.7, reviews:23,  completion:26, completionChange:2,  added:'Feb 18, 2024', published:true  },
+              { id:22, title:'Atomic Design',         author:'Brad Frost',        cover:'#D4C4A0', reads:168,  readsChange:2,   revenue:12100,  revenueChange:1,   rating:3.6, reviews:19,  completion:24, completionChange:1,  added:'Jan 10, 2024', published:true  },
+              { id:23, title:'Never Split the Difference', author:'Chris Voss',  cover:'#B4A0D4', reads:152,  readsChange:8,   revenue:10900,  revenueChange:7,   rating:3.6, reviews:15,  completion:22, completionChange:2,  added:'May 12, 2024', published:true  },
+              { id:24, title:'The 7 Habits',          author:'Stephen Covey',     cover:'#A0D4B4', reads:138,  readsChange:1,   revenue:9800,   revenueChange:0,   rating:3.5, reviews:11,  completion:20, completionChange:1,  added:'Mar 02, 2024', published:true  },
+            ];
+
+            /* ============================================================
+               STATE
+               ============================================================ */
+            let books = [...ALL_BOOKS];
+            let currentPage = 1;
+            const PAGE_SIZE = 10;
+            let sortCol = null;
+            let sortDir = 'desc';
+            let activeFilter = 'all';
+            let openMenuId = null;
+
+            /* ============================================================
+               RENDER
+               ============================================================ */
+            function renderTable() {
+              const start = (currentPage - 1) * PAGE_SIZE;
+              const pageBooks = books.slice(start, start + PAGE_SIZE);
+              const tbody = document.getElementById('booksBody');
+
+              tbody.innerHTML = pageBooks.map((b, i) => {
+                const rank = start + i + 1;
+                const readsDir   = b.readsChange >= 0 ? 'up' : 'down';
+                const revDir     = b.revenueChange >= 0 ? 'up' : 'down';
+                const compDir    = b.completionChange >= 0 ? 'up' : 'down';
+
+                return `
+                <tr data-id="${b.id}">
+                  <td class="col-rank">${rank}</td>
+
+                  <td>
+                    <div class="book-cell">
+                      <div class="book-cover-placeholder" style="background:linear-gradient(135deg,${b.cover}33,${b.cover}11);">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${b.cover}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                      </div>
+                      <div class="book-info">
+                        <span class="book-title">${b.title}</span>
+                        <span class="book-author">${b.author}</span>
+                        <span class="book-badge ${b.published ? '' : 'unpublished'}">${b.published ? 'Published' : 'Unpublished'}</span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td>
+                    <div class="stat-cell">
+                      <span class="stat-main">${b.reads.toLocaleString()}</span>
+                      <span class="stat-change ${readsDir}">↑ ${Math.abs(b.readsChange)}%</span>
+                    </div>
+                  </td>
+
+                  <td>
+                    <div class="stat-cell">
+                      <span class="stat-main">₦${b.revenue.toLocaleString()}</span>
+                      <span class="stat-change ${revDir}">↑ ${Math.abs(b.revenueChange)}%</span>
+                    </div>
+                  </td>
+
+                  <td>
+                    <div class="rating-cell">
+                      <span class="rating-main">${b.rating.toFixed(1)} <span class="star">★</span></span>
+                      <span class="reviews-sub">${b.reviews} reviews</span>
+                    </div>
+                  </td>
+
+                  <td>
+                    <div class="stat-cell">
+                      <span class="stat-main">${b.reviews.toLocaleString()}</span>
+                      <span class="stat-change up">↑ ${Math.abs(b.readsChange - 2)}%</span>
+                    </div>
+                  </td>
+
+                  <td>
+                    <div class="completion-cell">
+                      <div class="completion-top">
+                        <span class="completion-pct">${b.completion}%</span>
+                        <span class="completion-change ${compDir}">↑ ${Math.abs(b.completionChange)}%</span>
+                      </div>
+                      <div class="completion-bar-track">
+                        <div class="completion-bar-fill" style="width:${b.completion}%"></div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td class="date-cell">${b.added}</td>
+
+                  <td class="actions-cell">
+                    <button class="more-btn ${openMenuId === b.id ? 'is-open' : ''}"
+                            onclick="toggleMenu(event, ${b.id})"
+                            aria-label="More options">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+                      </svg>
+                    </button>
+
+                    <div class="context-menu ${openMenuId === b.id ? 'is-open' : ''}" id="menu-${b.id}">
+                      <button class="context-menu-item" onclick="menuAction('view', ${b.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        View Book
+                      </button>
+                      <button class="context-menu-item" onclick="menuAction('preview', ${b.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                        Preview Book
+                      </button>
+                      <button class="context-menu-item" onclick="menuAction('edit', ${b.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Edit Book
+                      </button>
+
+                      <div class="context-menu-divider"></div>
+
+                      <button class="context-menu-item" onclick="menuAction('analytics', ${b.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                        View Analytics
+                      </button>
+                      <button class="context-menu-item" onclick="menuAction('revenue', ${b.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        View Revenue
+                      </button>
+                      <button class="context-menu-item" onclick="menuAction('reviews', ${b.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        View Reviews
+                      </button>
+
+                      <div class="context-menu-divider"></div>
+
+                      <button class="context-menu-item" onclick="menuAction('share', ${b.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                        Share Book Link
+                      </button>
+                      <button class="context-menu-item" onclick="menuAction('export', ${b.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Export Book Report
+                      </button>
+                      <button class="context-menu-item" onclick="menuAction('toggle', ${b.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="${b.published ? '17' : '7'}" cy="12" r="3" fill="currentColor"/></svg>
+                        ${b.published ? 'Unpublish Book' : 'Publish Book'}
+                      </button>
+
+                      <div class="context-menu-divider"></div>
+
+                      <button class="context-menu-item" onclick="menuAction('archive', ${b.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+                        Archive Book
+                      </button>
+                      <button class="context-menu-item is-danger" onclick="menuAction('delete', ${b.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                        Delete Book
+                      </button>
+                    </div>
+                  </td>
+                </tr>`;
+              }).join('');
+
+              renderPagination();
+              updateFooterInfo();
+            }
+
+            function renderPagination() {
+              const totalPages = Math.ceil(books.length / PAGE_SIZE);
+              const pg = document.getElementById('pagination');
+              let html = '';
+
+              html += `<button class="pg-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>`;
+
+              for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="pg-btn ${i === currentPage ? 'is-active' : ''}" onclick="goPage(${i})">${i}</button>`;
+              }
+
+              html += `<button class="pg-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>`;
+
+              pg.innerHTML = html;
+            }
+
+            function updateFooterInfo() {
+              const start = (currentPage - 1) * PAGE_SIZE + 1;
+              const end = Math.min(currentPage * PAGE_SIZE, books.length);
+              document.getElementById('footerInfo').textContent = `Showing ${start} to ${end} of ${books.length} books`;
+            }
+
+            /* ============================================================
+               PAGINATION
+               ============================================================ */
+            function goPage(page) {
+              const totalPages = Math.ceil(books.length / PAGE_SIZE);
+              if (page < 1 || page > totalPages) return;
+              currentPage = page;
+              closeAllMenus();
+              renderTable();
+            }
+
+            /* ============================================================
+               SORTING
+               ============================================================ */
+            function sortTable(col, thEl) {
+              if (sortCol === col) {
+                sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+              } else {
+                sortCol = col;
+                sortDir = 'desc';
+              }
+
+              // Update header classes
+              document.querySelectorAll('th.sortable').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+              });
+              thEl.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+
+              const colMap = { reads:'reads', revenue:'revenue', rating:'rating', reviews:'reviews', completion:'completion' };
+              const key = colMap[col];
+
+              books.sort((a, b) => {
+                const diff = a[key] - b[key];
+                return sortDir === 'asc' ? diff : -diff;
+              });
+
+              currentPage = 1;
+              renderTable();
+            }
+
+            /* ============================================================
+               FILTER TABS
+               ============================================================ */
+            function filterTab(btn, filter) {
+              document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('is-active'));
+              btn.classList.add('is-active');
+              activeFilter = filter;
+
+              // Simulate filter — in real app, hit the server
+              // For demo: all filters show all books, sorted by reads desc
+              books = [...ALL_BOOKS];
+              sortCol = null;
+              document.querySelectorAll('th.sortable').forEach(th => th.classList.remove('sort-asc','sort-desc'));
+
+              currentPage = 1;
+              renderTable();
+              showToast('info', `Showing ${btn.textContent} results`);
+            }
+
+            /* ============================================================
+               DATE PICKER
+               ============================================================ */
+            function selectDate(btn, label) {
+              document.querySelectorAll('.date-dropdown button').forEach(b => b.classList.remove('is-selected'));
+              btn.classList.add('is-selected');
+              document.getElementById('dateLabel').textContent = label;
+              closeDropdown();
+              showToast('info', `Date range: ${label}`);
+            }
+
+            const datePicker = document.getElementById('datePicker');
+            const dateDropdown = document.getElementById('dateDropdown');
+
+            datePicker.addEventListener('click', function(e) {
+              e.stopPropagation();
+              const open = dateDropdown.classList.toggle('is-open');
+              datePicker.classList.toggle('is-open', open);
+            });
+
+            function closeDropdown() {
+              dateDropdown.classList.remove('is-open');
+              datePicker.classList.remove('is-open');
+            }
+
+            /* ============================================================
+               THREE-DOT CONTEXT MENU
+               ============================================================ */
+            function toggleMenu(e, id) {
+              e.stopPropagation();
+              if (openMenuId === id) {
+                openMenuId = null;
+              } else {
+                openMenuId = id;
+              }
+              renderTable();
+            }
+
+            function closeAllMenus() {
+              openMenuId = null;
+            }
+
+            function menuAction(action, id) {
+              const book = ALL_BOOKS.find(b => b.id === id);
+              closeAllMenus();
+
+              switch(action) {
+                case 'view':
+                  showToast('info', `Viewing "${book.title}"`);
+                  break;
+                case 'preview':
+                  showToast('info', `Previewing "${book.title}"`);
+                  break;
+                case 'edit':
+                  showToast('info', `Opening editor for "${book.title}"`);
+                  break;
+                case 'analytics':
+                  showToast('info', `Loading analytics for "${book.title}"`);
+                  break;
+                case 'revenue':
+                  showToast('info', `Loading revenue for "${book.title}"`);
+                  break;
+                case 'reviews':
+                  showToast('info', `Loading reviews for "${book.title}"`);
+                  break;
+                case 'share':
+                  navigator.clipboard?.writeText(`https://soulshelf.app/books/${id}`).catch(()=>{});
+                  showToast('success', `Link copied for "${book.title}"`);
+                  break;
+                case 'export':
+                  showToast('success', `Exporting report for "${book.title}"`);
+                  break;
+                case 'toggle':
+                  // toggle published state in local data
+                  const b = books.find(bk => bk.id === id);
+                  const ab = ALL_BOOKS.find(bk => bk.id === id);
+                  if (b) b.published = !b.published;
+                  if (ab) ab.published = !ab.published;
+                  showToast('success', `"${book.title}" ${ab.published ? 'published' : 'unpublished'}`);
+                  renderTable();
+                  return;
+                case 'archive':
+                  showToast('info', `"${book.title}" archived`);
+                  break;
+                case 'delete':
+                  if (confirm(`Delete "${book.title}"? This cannot be undone.`)) {
+                    books = books.filter(bk => bk.id !== id);
+                    showToast('danger', `"${book.title}" deleted`);
+                    if ((currentPage - 1) * PAGE_SIZE >= books.length && currentPage > 1) currentPage--;
+                    renderTable();
+                    return;
+                  }
+                  break;
+              }
+              renderTable();
+            }
+
+            /* ============================================================
+               EXPORT
+               ============================================================ */
+            function handleExport() {
+              showToast('success', 'Exporting report… your download will start shortly.');
+            }
+
+            /* ============================================================
+               CLOSE MENUS / DROPDOWNS ON OUTSIDE CLICK
+               ============================================================ */
+            document.addEventListener('click', function() {
+              closeAllMenus();
+              closeDropdown();
+              renderTable();
+            });
+
+            /* ============================================================
+               TOAST
+               ============================================================ */
+            function showToast(type, message) {
+              const icons = {
+                success: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#24B35F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+                info:    `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+                danger:  `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E63B60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
+              };
+              const container = document.getElementById('toastContainer');
+              const toast = document.createElement('div');
+              toast.className = `toast is-${type}`;
+              toast.innerHTML = `${icons[type]}<span>${message}</span>`;
+              container.appendChild(toast);
+              setTimeout(() => {
+                toast.style.transition = 'opacity .3s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 320);
+              }, 3000);
+            }
+
+            /* ============================================================
+               INIT
+               ============================================================ */
+            renderTable();
+    </script>

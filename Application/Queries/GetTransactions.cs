@@ -1,6 +1,8 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Pagenation;
 using Application.Common.Repositories;
+using Domain.Entities;
+using Domain.Enums;
 using MediatR;
 
 namespace Application.Queries
@@ -27,12 +29,19 @@ namespace Application.Queries
                         PageSize = request.PageSize
                     }, true);
 
-                var response = transactions.Items.Select(t =>
-                    new GetTransactionsResponse(
-                        t.Id, t.Balance, t.Type.ToString(),
-                        t.Status.ToString(), t.Description,
-                        t.BalanceBefore, t.BalanceAfter,
-                        t.DateCreated))
+                var response = transactions.Items.Select(transaction =>
+                    new GetTransactionsResponse(transaction.Id,
+                    transaction.WalletId,
+                    transaction.Balance,
+                    transaction.Type,
+                    transaction.Status,
+                    transaction.PaystackReference,
+                    transaction.Description,
+                    transaction.BalanceBefore,
+                    transaction.BalanceAfter,
+                    transaction.CreatedBy,
+                    transaction.DateCreated,
+                    transaction.Wallet))
                     .ToList();
 
                 var transactionsResponse = new PagenatedList<GetTransactionsResponse>
@@ -49,9 +58,17 @@ namespace Application.Queries
         }
 
         public record GetTransactionsResponse(
-            Guid TransactionId, decimal Amount,
-            string Type, string Status, string Description,
-            decimal BalanceBefore, decimal BalanceAfter,
-            DateTime DateCreated);
+            Guid Id,
+            Guid WalletId,
+            decimal Balance,
+            TransactionType Type,
+            WalletTransactionStatus Status,
+            string? PaystackReference,
+            string Description,
+            decimal BalanceBefore,
+            decimal BalanceAfter,
+            string CreatedBy,
+            DateTime DateCreated,
+            Wallet Wallet);
     }
 }

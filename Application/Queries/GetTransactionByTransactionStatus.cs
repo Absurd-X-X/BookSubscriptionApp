@@ -1,6 +1,7 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Pagenation;
 using Application.Common.Repositories;
+using Domain.Entities;
 using Domain.Enums;
 using MediatR;
 
@@ -8,25 +9,33 @@ namespace Application.Queries
 {
     public class GetTransactionByTransactionStatus
     {
-        public record GetTransactionByTransactionStatusCommand(int Page, int PageSize, WalletTransactionStatus Status) :
+        public record GetTransactionByTypeQuery(int Page, int PageSize, TransactionType Type) :
             IRequest<Result<PagenatedList<GetTransactionByTransactionStatusResponse>>>;
 
         public class GetTransactionByTransactionStatusHandler(
             IWalletTransactionRepository walletTransactionRepository) :
-            IRequestHandler<GetTransactionByTransactionStatusCommand, Result<PagenatedList<GetTransactionByTransactionStatusResponse>>>
+            IRequestHandler<GetTransactionByTypeQuery, Result<PagenatedList<GetTransactionByTransactionStatusResponse>>>
         {
-            public async Task<Result<PagenatedList<GetTransactionByTransactionStatusResponse>>> Handle(GetTransactionByTransactionStatusCommand request, CancellationToken cancellationToken)
+            public async Task<Result<PagenatedList<GetTransactionByTransactionStatusResponse>>> Handle(GetTransactionByTypeQuery request, CancellationToken cancellationToken)
             {
 
                 var transactions = await walletTransactionRepository
-                    .GetByTransactionStatusAsync(request.Status, new PageRequest { Page = request.Page, PageSize = request.PageSize }, true);
+                    .GetByTransactionTypeAsync(request.Type, new PageRequest { Page = request.Page, PageSize = request.PageSize }, true);
 
-                var response = transactions.Items.Select(t =>
+                var response = transactions.Items.Select(transaction =>
                     new GetTransactionByTransactionStatusResponse(
-                        t.Id, t.Balance, t.Type.ToString(),
-                        t.Status.ToString(), t.Description,
-                        t.BalanceBefore, t.BalanceAfter,
-                        t.DateCreated))
+                        transaction.Id,
+                        transaction.WalletId,
+                        transaction.Balance,
+                        transaction.Type,
+                        transaction.Status,
+                        transaction.PaystackReference,
+                        transaction.Description,
+                        transaction.BalanceBefore,
+                        transaction.BalanceAfter,
+                        transaction.CreatedBy,
+                        transaction.DateCreated,
+                        transaction.Wallet))
                     .ToList();
 
                 var pagenated = new PagenatedList<GetTransactionByTransactionStatusResponse>
@@ -44,8 +53,17 @@ namespace Application.Queries
     }
 
     public record GetTransactionByTransactionStatusResponse(
-        Guid TransactionId, decimal Amount,
-        string Type, string Status, string Description,
-        decimal BalanceBefore, decimal BalanceAfter,
-        DateTime DateCreated);
+
+            Guid Id,
+            Guid WalletId,
+            decimal Balance,
+            TransactionType Type,
+            WalletTransactionStatus Status,
+            string? PaystackReference,
+            string Description,
+            decimal BalanceBefore,
+            decimal BalanceAfter,
+            string CreatedBy,
+            DateTime DateCreated,
+            Wallet Wallet);
 }

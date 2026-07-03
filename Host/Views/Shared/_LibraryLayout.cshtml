@@ -55,11 +55,6 @@
                     <img src="~/lib/images/members.png" alt="Users">BOOKS
                 </a>
 
-                <a href="@Url.Action("GetCategories", "Admin")"
-                   class="nav-item @(controller == "Admin" && (action == "GetCategories" || action == "GetCategory") ? "active" : "")">
-                    <img src="~/lib/images/layer-group-solid-full.svg" alt="">CATEGORY MGT
-                </a>
-
                 <a href="@Url.Action("GetRevenue", "Library")"
                    class="nav-item @(controller == "Library" && action == "GetRevenue" ? "active" : "")">
                     <img src="~/lib/images/book-outline.svg" alt="">REVENUE

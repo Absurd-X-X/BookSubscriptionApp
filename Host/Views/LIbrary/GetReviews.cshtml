@@ -505,114 +505,307 @@
 
         </div>
     </div>
-    <script>
-               var MENU_HTML =
-              '<button type="button" role="menuitem" class="kebab-item" data-action="edit">✎ Edit Book</button>' +
-              '<button type="button" role="menuitem" class="kebab-item" data-action="upload">⤓ Upload New Version</button>' +
-              '<button type="button" role="menuitem" class="kebab-item" data-action="duplicate">⧉ Duplicate Book</button>' +
-              '<button type="button" role="menuitem" class="kebab-item" data-action="share">↗ Share Link</button>' +
-              '<div class="kebab-sep"></div>' +
-              '<button type="button" role="menuitem" class="kebab-item" data-action="archive">🗄 Archive Book</button>' +
-              '<button type="button" role="menuitem" class="kebab-item danger" data-action="delete">🗑 Delete Book</button>';
 
-            function attachMenu(trigger, alignClass) {
-              // Wrap the trigger in a positioned container and attach a menu
-              var wrap = document.createElement("div");
-              wrap.className = "kebab-wrap";
-              trigger.parentNode.insertBefore(wrap, trigger);
-              wrap.appendChild(trigger);
-
-              var menu = document.createElement("div");
-              menu.className = "kebab-menu" + (alignClass ? " " + alignClass : "");
-              menu.setAttribute("role", "menu");
-              menu.innerHTML = MENU_HTML;
-              wrap.appendChild(menu);
-
-              trigger.addEventListener("click", function (e) {
-                e.stopPropagation();
-                var isOpen = wrap.classList.contains("open");
-                // Close any other open menus first
-                document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
-                  w.classList.remove("open");
-                });
-                if (!isOpen) wrap.classList.add("open");
-              });
-
-              menu.querySelectorAll(".kebab-item").forEach(function (item) {
-                item.addEventListener("click", function (e) {
-                  e.stopPropagation();
-                  wrap.classList.remove("open");
-                  var card = trigger.closest(".book-card");
-                  var title = card ? card.querySelector(".b-title").textContent : "";
-                  var action = item.getAttribute("data-action");
-                  console.log("[v0]", action, "clicked for:", title);
-                });
-              });
-            }
-
-            // Vertical kebab (top-right of each card) — menu opens downward to the right edge
-            document.querySelectorAll(".kebab").forEach(function (kebab) {
-              attachMenu(kebab, "");
-            });
-
-            // Horizontal "More" button (bottom action row) — menu opens upward
-            document.querySelectorAll('.b-actions button[aria-label="More"]').forEach(function (more) {
-              attachMenu(more, "menu-up");
-            });
-
-            // Close menus when clicking anywhere else
-            document.addEventListener("click", function () {
-              document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
-                w.classList.remove("open");
-              });
-            });
-
-                const modal =
-                    document.getElementById("paymentModal");
-
-                const openBtn =
-                    document.getElementById("openPaymentModal");
-
-                const closeBtn =
-                    document.getElementById("closePaymentModal");
-
-                const cancelBtn =
-                    document.getElementById("cancelPaymentModal");
-
-                /* Open */
-
-                openBtn.addEventListener("click", () => {
-
-                    modal.classList.add("show");
-
-                });
-
-                /* Close Button */
-
-                closeBtn.addEventListener("click", () => {
-
-                    modal.classList.remove("show");
-
-                });
-
-                /* Cancel Button */
-
-                cancelBtn.addEventListener("click", () => {
-
-                    modal.classList.remove("show");
-
-                });
-
-                /* Click Outside */
-
-                modal.addEventListener("click", (e) => {
-
-                    if (e.target === modal) {
-
-                        modal.classList.remove("show");
-
-                    }
-
-                });
-    </script>
 </div>
+
+<script>
+    (function () {
+        // ── DATA: pull rows into JS for filtering ──
+        var tbody = document.querySelector(".reviews-table tbody");
+        var allRows = Array.from(tbody.querySelectorAll("tr"));
+
+        var searchInput = document.querySelector(".search-input-wrap input");
+        var bookFilter = document.querySelectorAll(".filter-select")[0];
+        var ratingFilter = document.querySelectorAll(".filter-select")[1];
+        var statusFilter = document.querySelectorAll(".filter-select")[2];
+        var showingText = document.querySelector(".showing-text");
+        var perPageSelect = document.querySelector(".per-page-select");
+        var paginationWrap = document.querySelector(".pagination");
+
+        var currentPage = 1;
+        var perPage = 10;
+
+        // Populate "All Books" dropdown dynamically from table rows
+        function populateBookFilter() {
+            var titles = Array.from(new Set(allRows.map(function (r) {
+                return r.querySelector(".book-title").textContent.trim();
+            })));
+            titles.forEach(function (title) {
+                var opt = document.createElement("option");
+                opt.value = title;
+                opt.textContent = title;
+                bookFilter.appendChild(opt);
+            });
+        }
+        bookFilter.querySelector("option").value = "";
+        populateBookFilter();
+
+        ratingFilter.querySelector("option").value = "";
+        [5, 4, 3, 2, 1].forEach(function (n) {
+            var opt = document.createElement("option");
+            opt.value = n;
+            opt.textContent = n + " Stars";
+            ratingFilter.appendChild(opt);
+        });
+
+        statusFilter.querySelector("option").value = "";
+        ["Approved", "Pending", "Rejected"].forEach(function (s) {
+            var opt = document.createElement("option");
+            opt.value = s;
+            opt.textContent = s;
+            statusFilter.appendChild(opt);
+        });
+
+        function getRowRating(row) {
+            var filled = row.querySelectorAll(".stars")[0].textContent.match(/★/g);
+            return filled ? filled.length : 0;
+        }
+        function getRowStatus(row) {
+            var badge = row.querySelector(".status-badge");
+            return badge ? badge.textContent.trim() : "";
+        }
+
+        function applyFilters() {
+            var q = searchInput.value.trim().toLowerCase();
+            var book = bookFilter.value;
+            var rating = ratingFilter.value;
+            var status = statusFilter.value;
+
+            var filtered = allRows.filter(function (row) {
+                var title = row.querySelector(".book-title").textContent.toLowerCase();
+                var reviewer = row.querySelector(".reviewer-name").textContent.toLowerCase();
+                var matchesSearch = !q || title.indexOf(q) !== -1 || reviewer.indexOf(q) !== -1;
+                var matchesBook = !book || row.querySelector(".book-title").textContent.trim() === book;
+                var matchesRating = !rating || getRowRating(row) === parseInt(rating, 10);
+                var matchesStatus = !status || getRowStatus(row) === status;
+                return matchesSearch && matchesBook && matchesRating && matchesStatus;
+            });
+
+            currentPage = 1;
+            renderPage(filtered);
+        }
+
+        function renderPage(filtered) {
+            var total = filtered.length;
+            var totalPages = Math.max(1, Math.ceil(total / perPage));
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            var start = (currentPage - 1) * perPage;
+            var end = Math.min(start + perPage, total);
+            var pageRows = filtered.slice(start, end);
+
+            // Hide all, show only current page's matching rows
+            allRows.forEach(function (r) { r.style.display = "none"; });
+            pageRows.forEach(function (r) { r.style.display = ""; });
+
+            showingText.textContent = total === 0
+                ? "No reviews found"
+                : "Showing " + (start + 1) + " to " + end + " of " + total + " reviews";
+
+            renderPagination(totalPages, filtered);
+        }
+
+        function renderPagination(totalPages, filtered) {
+            // Clear old page buttons but keep prev/next/select structure
+            paginationWrap.innerHTML = "";
+
+            var prevBtn = document.createElement("button");
+            prevBtn.className = "page-btn";
+            prevBtn.innerHTML = "&#8249;";
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.addEventListener("click", function () {
+                if (currentPage > 1) { currentPage--; renderPage(filtered); }
+            });
+            paginationWrap.appendChild(prevBtn);
+
+            var pagesToShow = getPageList(currentPage, totalPages);
+            pagesToShow.forEach(function (p) {
+                if (p === "...") {
+                    var dots = document.createElement("span");
+                    dots.className = "page-btn dots";
+                    dots.textContent = "...";
+                    paginationWrap.appendChild(dots);
+                } else {
+                    var btn = document.createElement("button");
+                    btn.className = "page-btn" + (p === currentPage ? " active" : "");
+                    btn.textContent = p;
+                    btn.addEventListener("click", function () {
+                        currentPage = p;
+                        renderPage(filtered);
+                    });
+                    paginationWrap.appendChild(btn);
+                }
+            });
+
+            var nextBtn = document.createElement("button");
+            nextBtn.className = "page-btn";
+            nextBtn.innerHTML = "&#8250;";
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.addEventListener("click", function () {
+                if (currentPage < totalPages) { currentPage++; renderPage(filtered); }
+            });
+            paginationWrap.appendChild(nextBtn);
+
+            paginationWrap.appendChild(perPageSelect);
+        }
+
+        function getPageList(current, total) {
+            var pages = [];
+            if (total <= 7) {
+                for (var i = 1; i <= total; i++) pages.push(i);
+                return pages;
+            }
+            pages.push(1);
+            if (current > 3) pages.push("...");
+            var start = Math.max(2, current - 1);
+            var end = Math.min(total - 1, current + 1);
+            for (var j = start; j <= end; j++) pages.push(j);
+            if (current < total - 2) pages.push("...");
+            pages.push(total);
+            return pages;
+        }
+
+        // ── Event bindings ──
+        searchInput.addEventListener("input", debounce(applyFilters, 200));
+        bookFilter.addEventListener("change", applyFilters);
+        ratingFilter.addEventListener("change", applyFilters);
+        statusFilter.addEventListener("change", applyFilters);
+
+        perPageSelect.innerHTML = "";
+        [10, 25, 50, 100].forEach(function (n) {
+            var opt = document.createElement("option");
+            opt.value = n;
+            opt.textContent = n + " per page";
+            perPageSelect.appendChild(opt);
+        });
+        perPageSelect.addEventListener("change", function () {
+            perPage = parseInt(perPageSelect.value, 10);
+            applyFilters();
+        });
+
+        function debounce(fn, delay) {
+            var timer;
+            return function () {
+                var args = arguments;
+                clearTimeout(timer);
+                timer = setTimeout(function () { fn.apply(null, args); }, delay);
+            };
+        }
+
+        // ── Filters button (toggle a simple expanded state — hook up as needed) ──
+        var filtersBtn = document.querySelector(".filters-btn");
+        filtersBtn.addEventListener("click", function () {
+            // Placeholder: expand an advanced filter panel if/when you add one
+            filtersBtn.classList.toggle("active");
+        });
+
+        // ── Row actions: view + kebab menu ──
+        var MENU_HTML =
+            '<button type="button" role="menuitem" class="kebab-item" data-action="view">👁 View Full Review</button>' +
+            '<button type="button" role="menuitem" class="kebab-item" data-action="edit">✎ Edit Review</button>' +
+            '<button type="button" role="menuitem" class="kebab-item" data-action="approve">✓ Approve</button>' +
+            '<button type="button" role="menuitem" class="kebab-item" data-action="reject">✕ Reject</button>' +
+            '<div class="kebab-sep"></div>' +
+            '<button type="button" role="menuitem" class="kebab-item danger" data-action="delete">🗑 Delete Review</button>';
+
+        function attachMenu(trigger, alignClass) {
+            var wrap = document.createElement("div");
+            wrap.className = "kebab-wrap";
+            trigger.parentNode.insertBefore(wrap, trigger);
+            wrap.appendChild(trigger);
+
+            var menu = document.createElement("div");
+            menu.className = "kebab-menu" + (alignClass ? " " + alignClass : "");
+            menu.setAttribute("role", "menu");
+            menu.innerHTML = MENU_HTML;
+            wrap.appendChild(menu);
+
+                function positionMenu(trigger, menu) {
+        // Reset to default (down) first so we can measure correctly
+        menu.classList.remove("menu-up");
+        menu.style.visibility = "hidden";
+        menu.style.display = "block";
+
+        var triggerRect = trigger.getBoundingClientRect();
+        var menuHeight = menu.offsetHeight;
+        var spaceBelow = window.innerHeight - triggerRect.bottom;
+        var spaceAbove = triggerRect.top;
+
+        if (spaceBelow < menuHeight && spaceAbove > menuHeight) {
+            menu.classList.add("menu-up");
+        }
+
+        menu.style.display = "";
+        menu.style.visibility = "";
+    }
+
+         trigger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var isOpen = wrap.classList.contains("open");
+        document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
+            w.classList.remove("open");
+        });
+        if (!isOpen) {
+            positionMenu(trigger, menu);
+            wrap.classList.add("open");
+        }
+    });
+
+            menu.querySelectorAll(".kebab-item").forEach(function (item) {
+                item.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    wrap.classList.remove("open");
+                    var row = trigger.closest("tr");
+                    var reviewer = row ? row.querySelector(".reviewer-name").textContent : "";
+                    var action = item.getAttribute("data-action");
+                    handleRowAction(action, row, reviewer);
+                });
+            });
+        }
+
+        function handleRowAction(action, row, reviewer) {
+            console.log("[reviews]", action, "for:", reviewer);
+            // Hook up real endpoints/modals here as needed, e.g.:
+            // if (action === "delete") { openDeleteConfirm(row); }
+            // if (action === "approve") { updateStatusBadge(row, "approved"); }
+            if (action === "approve" || action === "reject") {
+                var badge = row.querySelector(".status-badge");
+                badge.className = "status-badge " + (action === "approve" ? "approved" : "rejected");
+                badge.textContent = action === "approve" ? "Approved" : "Rejected";
+            }
+        }
+
+        // Attach kebab menus to every "more" button in the actions column
+        document.querySelectorAll(".actions-cell .action-icon-btn:last-child").forEach(function (btn) {
+            attachMenu(btn, "menu-up");
+        });
+
+        // View (eye icon) buttons — currently plain buttons/links, log for now
+        document.querySelectorAll(".actions-cell .action-icon-btn:first-child").forEach(function (btn) {
+            btn.addEventListener("click", function (e) {
+                var row = btn.closest("tr");
+                if (btn.tagName === "A") return; // let real links navigate normally
+                var reviewer = row.querySelector(".reviewer-name").textContent;
+                console.log("[reviews] view review for:", reviewer);
+            });
+        });
+
+        // Close menus when clicking anywhere else
+        document.addEventListener("click", function () {
+            document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
+                w.classList.remove("open");
+            });
+        });
+
+        // ── Date range + export buttons (placeholders wired for future use) ──
+        document.querySelector(".date-range-btn").addEventListener("click", function () {
+            console.log("[reviews] open date range picker");
+        });
+        document.querySelector(".export-btn").addEventListener("click", function () {
+            console.log("[reviews] export reviews clicked");
+        });
+
+        // ── Init ──
+        renderPage(allRows);
+    })();
+</script>

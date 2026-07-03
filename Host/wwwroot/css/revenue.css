@@ -41,7 +41,7 @@ main::-webkit-scrollbar {
     background: #13102a;
     border: 1px solid #1e1b4b;
     padding: 8px 14px;
-    border-radius: 8px;
+    border-radius: 5px;
     color: #e2e8f0;
     font-size: 12px;
     cursor: pointer;
@@ -55,7 +55,7 @@ main::-webkit-scrollbar {
     color: white;
     border: none;
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: 5px;
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
@@ -73,9 +73,9 @@ main::-webkit-scrollbar {
 }
 
 .sc {
-    background: #13102a;
-    border: 1px solid #1e1b4b;
-    border-radius: 12px;
+    background: #13122a;
+    border: 1px solid #2d2b72;
+    border-radius: 7px;
     padding: 18px 20px;
     display: flex;
     justify-content: space-between;
@@ -137,9 +137,9 @@ main::-webkit-scrollbar {
 
 /* ── GENERIC CARD ── */
 .card {
-    background: #13102a;
-    border: 1px solid #1e1b4b;
-    border-radius: 12px;
+    background: #13122a;
+    border: 1px solid #2d2b72;
+    border-radius: 7px;
     padding: 20px;
 }
 
@@ -452,7 +452,7 @@ main::-webkit-scrollbar {
     color: white;
     border: none;
     padding: 9px;
-    border-radius: 8px;
+    border-radius: 5px;
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;

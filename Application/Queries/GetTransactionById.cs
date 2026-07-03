@@ -1,5 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Repositories;
+using Domain.Entities;
 using Domain.Enums;
 using MediatR;
 
@@ -28,7 +29,8 @@ namespace Application.Queries
                     transaction.BalanceBefore,
                     transaction.BalanceAfter,
                     transaction.CreatedBy,
-                    transaction.DateCreated
+                    transaction.DateCreated,
+                    transaction.Wallet
                     );
                 return Result<GetTransactionByIdResponse>.Success(response, "Retrieved");
             }
@@ -45,7 +47,8 @@ namespace Application.Queries
             decimal BalanceBefore, 
             decimal BalanceAfter, 
             string CreatedBy, 
-            DateTime DateCreated
+            DateTime DateCreated,
+            Wallet Wallet
             );
 
     }

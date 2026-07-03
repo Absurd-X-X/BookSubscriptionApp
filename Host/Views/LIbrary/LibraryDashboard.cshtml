@@ -3,7 +3,6 @@
     ViewData["Title"] = "Library Dashboard";
 }
 
-
 <link href="~/css/libraryDashboard.css" rel="stylesheet" />
   <main class="lib-main">
     <!-- Header -->
@@ -70,7 +69,7 @@
       <article class="card">
         <div class="card-head">
           <h2>Top Performing Books</h2>
-          <a class="link" href="#">View all</a>
+          <a class="link" href="@Url.Action("TopPerformingBooks", "Library")">View all</a>
         </div>
         <div class="top-scroll">
           <div class="top-card">
@@ -105,7 +104,7 @@
     <!-- Reviews + Activity -->
     <section class="two-col">
       <article class="card">
-        <div class="card-head"><h2>Recent Reviews</h2><a class="link" href="#">View all</a></div>
+            <div class="card-head"><h2>Recent Reviews</h2><a class="link" href="@Url.Action("GetReviews", "Library")">View all</a></div>
         <ul class="review-list">
           <li>
             <span class="avatar">SO</span>
@@ -143,7 +142,7 @@
       </article>
 
       <article class="card">
-        <div class="card-head"><h2>Recent Activity</h2><a class="link" href="#">View all</a></div>
+            <div class="card-head"><h2>Recent Activity</h2><a class="link" href="@Url.Action("GetActivity", "Library")">View all</a></div>
         <ul class="activity-list">
           <li>
             <span class="act-icon">📗</span>
@@ -179,7 +178,7 @@
 
     <!-- Recent Books -->
     <section class="card">
-      <div class="card-head"><h2>Recent Books</h2><a class="link" href="#">View all books</a></div>
+        <div class="card-head"><h2>Recent Books</h2><a class="link" href="@Url.Action("GetLibraryBooks", "Library")">View all books</a></div>
       <div class="book-scroll">
         <div class="book-card">
           <div class="book-cover">AH</div>

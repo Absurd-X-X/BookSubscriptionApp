@@ -103,25 +103,25 @@ namespace Host.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            //if (User.Identity is { IsAuthenticated: true })
-            //{
-            //    if (User.IsInRole("admin"))
-            //    {
-            //        return RedirectToAction("Index", "Admin");
-            //    }
+            if (User.Identity is { IsAuthenticated: true })
+            {
+                if (User.IsInRole("admin"))
+                {
+                    return RedirectToAction("Index", "Admin");
+                }
 
-            //    if (User.IsInRole("library"))
-            //    {
-            //        return RedirectToAction("LibraryDashboard", "Library");
-            //    }
+                if (User.IsInRole("library"))
+                {
+                    return RedirectToAction("LibraryDashboard", "Library");
+                }
 
-            //    if (User.IsInRole("reader"))
-            //    {
-            //        return RedirectToAction("ReaderDashboard", "Reader");
-            //    }
+                if (User.IsInRole("reader"))
+                {
+                    return RedirectToAction("ReaderDashboard", "Reader");
+                }
 
-            //    return RedirectToAction("Index", "Home");
-            //}
+                return RedirectToAction("Index", "Home");
+            }
 
             return View();
         }
@@ -200,18 +200,29 @@ namespace Host.Controllers
         public async Task<IActionResult> ForgotPassword(
             ForgotPasswordCommand command)
         {
-            if (!ModelState.IsValid) return View(command);
+            if (!ModelState.IsValid)
+                return Json(new
+                {
+                    success = false,
+                    message =
+                    string.Join(",", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)))
+                });
 
             var result = await mediator.Send(command);
             if (!result.Status)
             {
                 TempData["Error"] = result.Message;
-                return View(command);
+                return Json(new { success = false, message = result.Message });
             }
 
-            TempData["Success"] = result.Message;
-            return RedirectToAction(
-                nameof(ResetPassword), new { email = command.Email });
+            TempData["Success"] = result.Message; 
+            
+            return Json(new
+            {
+                success = true,
+                message = result.Message,
+                redirectUrl = Url.Action(nameof(ResendVerification), new { Email = command.Email })
+            });
         }
 
 

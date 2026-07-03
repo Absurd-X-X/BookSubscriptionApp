@@ -1,6 +1,7 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Pagenation;
 using Application.Common.Repositories;
+using Domain.Entities;
 using Domain.Enums;
 using MediatR;
 
@@ -8,7 +9,7 @@ namespace Application.Queries
 {
     public class GetPendingTransaction
     {
-        public record GetPendingTransactionQuery(int Page, int PageSize, TransactionType Type) : IRequest<Result<PagenatedList<GetPendingTransactionResponse>>>;
+        public record GetPendingTransactionQuery(int Page, int PageSize, WalletTransactionStatus Status) : IRequest<Result<PagenatedList<GetPendingTransactionResponse>>>;
 
         public class GetPendingTransactionHandler(
             IWalletTransactionRepository walletTransactionRepository) : IRequestHandler<GetPendingTransactionQuery, Result<PagenatedList<GetPendingTransactionResponse>>>
@@ -16,15 +17,23 @@ namespace Application.Queries
             public async Task<Result<PagenatedList<GetPendingTransactionResponse>>> Handle(GetPendingTransactionQuery request, CancellationToken cancellationToken)
             {
                 var transactions = await walletTransactionRepository
-                    .GetByTransactionTypeAsync(request.Type, new PageRequest { Page = request.Page, PageSize = request.PageSize }, true);
+                    .GetByTransactionStatusAsync(request.Status, new PageRequest { Page = request.Page, PageSize = request.PageSize }, true);
 
-                var response = transactions.Items.Select(t =>
+                var response = transactions.Items.Select(transaction =>
                     new GetPendingTransactionResponse(
-                        t.Id, t.Balance, t.Type.ToString(),
-                        t.Status.ToString(), t.Description,
-                        t.BalanceBefore, t.BalanceAfter,
-                        t.DateCreated))
-                    .ToList();
+                    transaction.Id,
+                    transaction.WalletId,
+                    transaction.Balance,
+                    transaction.Type,
+                    transaction.Status,
+                    transaction.PaystackReference,
+                    transaction.Description,
+                    transaction.BalanceBefore,
+                    transaction.BalanceAfter,
+                    transaction.CreatedBy,
+                    transaction.DateCreated,
+                    transaction.Wallet))
+                   .ToList();
 
                 var pagenated = new PagenatedList<GetPendingTransactionResponse>
                 {
@@ -41,9 +50,17 @@ namespace Application.Queries
     }
 
     public record GetPendingTransactionResponse(
-        Guid TransactionId, decimal Amount,
-        string Type, string Status, string Description,
-        decimal BalanceBefore, decimal BalanceAfter,
-        DateTime DateCreated);
-
+            Guid Id,
+            Guid WalletId,
+            decimal Balance,
+            TransactionType Type,
+            WalletTransactionStatus Status,
+            string? PaystackReference,
+            string Description,
+            decimal BalanceBefore,
+            decimal BalanceAfter,
+            string CreatedBy,
+            DateTime DateCreated,
+            Wallet Wallet
+        );
 }

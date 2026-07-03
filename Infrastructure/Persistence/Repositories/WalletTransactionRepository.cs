@@ -3,10 +3,7 @@ using Application.Common.Repositories;
 using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Persistence.Context;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1.Ocsp;
-using System.Transactions;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -28,6 +25,7 @@ namespace Infrastructure.Persistence.Repositories
 
                 var set = query
                     .Include(x => x.Wallet)
+                    .ThenInclude(x => x.User)
                     .Skip((currentPage - 1) * pageSize)
                     .Take(pageSize);
 
@@ -72,6 +70,7 @@ namespace Infrastructure.Persistence.Repositories
 
                 var set = query
                     .Include(x => x.Wallet)
+                    .ThenInclude(x => x.User)
                     .Skip((currentPage - 1) * pageSize)
                     .Take(pageSize);
 
@@ -105,6 +104,7 @@ namespace Infrastructure.Persistence.Repositories
 
                 var set = query
                     .Include(x => x.Wallet)
+                    .ThenInclude(x => x.User)
                     .Skip((currentPage - 1) * pageSize)
                     .Take(pageSize);
 
@@ -139,6 +139,7 @@ namespace Infrastructure.Persistence.Repositories
 
                 var set = query
                     .Include(x => x.Wallet)
+                    .ThenInclude(x => x.User)
                     .Skip((currentPage - 1) * pageSize)
                     .Take(pageSize);
 
@@ -173,6 +174,7 @@ namespace Infrastructure.Persistence.Repositories
 
                 var set = query
                     .Include(x => x.Wallet)
+                    .ThenInclude(x => x.User)
                     .Skip((currentPage - 1) * pageSize)
                     .Take(pageSize);
 
@@ -207,6 +209,7 @@ namespace Infrastructure.Persistence.Repositories
 
                 var set = query
                     .Include(x => x.Wallet)
+                    .ThenInclude(x => x.User)
                     .Skip((currentPage - 1) * pageSize)
                     .Take(pageSize);
 

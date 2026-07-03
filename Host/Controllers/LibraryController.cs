@@ -186,6 +186,13 @@ namespace Host.Controllers
             return View();
         }
 
+        [HttpGet]
+
+        public async Task<IActionResult> TopPerformingBooks()
+        {
+            return View();
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> GetConversations()
