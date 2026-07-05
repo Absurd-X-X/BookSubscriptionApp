@@ -1,8 +1,11 @@
-﻿using MediatR;
+﻿using Application.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Web.Helpers;
 using static Application.Command.AddBook;
 using static Application.Commands.UploadProfilePIcs;
+using static Application.Queries.GetBookByLibraryId;
+using static Application.Queries.GetByLibraryId;
 using static Application.Queries.GetConversationByUserId;
 using static Application.Queries.GetLibraryById;
 using static Application.Queries.GetLibraryDashboard;
@@ -61,6 +64,7 @@ namespace Host.Controllers
             var result = await mediator.Send(query with { LibraryId = libraryId } with { UserId = userId });
             return View(result.Data);
         }
+
         [HttpGet]
         public async Task<IActionResult> GetDetails(GetLibraryByIdQuery query)
         {
@@ -96,13 +100,65 @@ namespace Host.Controllers
 
         public async Task<IActionResult> LibraryDashboard()
         {
-            return View();
+            var libraryId = ClaimsHelper.GetCustomerId(User);
+            var userId = ClaimsHelper.GetUserId(User);
+
+            var response = await mediator.Send(new GetLibraryDashboardQuery(libraryId, userId));
+
+            if (!response.Status)
+            {
+                TempData["Error"] = response.Message;
+                return View(response.Data);
+            }
+
+            TempData["Success"] = response.Message;
+
+            return View(response.Data);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetLibraryBooks()
+        public async Task<IActionResult> GetLibraryBooksById(int page = 1, int pageSize = 10)
         {
-            return View();
+            var libraryId = ClaimsHelper.GetCustomerId(User);
+            var userId = ClaimsHelper.GetUserId(User);
+
+            var response = await mediator.Send(new GetBookByLibraryIdQuery(libraryId, page, pageSize));
+
+            if (!response.Status)
+            {
+                TempData["Error"] = response.Message;
+                return View(response.Data);
+            }
+
+            TempData["Success"] = response.Message;
+
+            return View(response.Data);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetLibraryBooks(
+        int page = 1,
+        int pageSize = 10,
+        string? search = null,
+        Guid? categoryId = null,
+        bool? isPublished = null,
+        string? sortBy = null)
+        {
+            var libraryId = ClaimsHelper.GetCustomerId(User);
+            var userId = ClaimsHelper.GetUserId(User);
+
+            var response = await mediator.Send(new GetByLibraryIdQuery(
+                libraryId, page, pageSize, search, categoryId, isPublished, sortBy));
+
+            if (!response.Status)
+            {
+                TempData["Error"] = response.Message;
+                return View(response.Data);
+            }
+
+            TempData["Success"] = response.Message;
+
+            return View(response.Data);
         }
 
         [HttpGet]

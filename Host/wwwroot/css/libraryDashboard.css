@@ -100,6 +100,11 @@ main::-webkit-scrollbar{
         margin-bottom: 16px;
     }
 
+    .performing{
+        overflow-x : auto;
+        width: 100%;
+    }
+
         .card-head h2 {
             margin: 0;
             font-size: 17px;
@@ -234,7 +239,7 @@ main::-webkit-scrollbar{
 
     .cover {
         position: relative;
-        height: 150px;
+        height: 230px;
         border-radius: 10px;
         background: #4f46e5;
         display: grid;
@@ -410,3 +415,15 @@ main::-webkit-scrollbar{
         font-size: 12px;
         color: var(--muted);
     }
+
+.cover.cover-img {
+    background-size: cover;
+    background-position: center;
+    background-color: transparent;
+}
+
+.book-cover.book-cover-img {
+    background-size: cover;
+    background-position: center;
+    color: transparent;
+}

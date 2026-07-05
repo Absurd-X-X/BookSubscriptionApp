@@ -74,7 +74,7 @@ namespace Infrastructure.Persistence.Repositories
             };
         }
 
-        public async Task<PagenatedList<Book>> GetBookByLibraryIdAsync(Guid libraryId, PageRequest request, bool usePaging)
+        public async Task<PagenatedList<Book>> GetByLibraryIdAsync(Guid libraryId, PageRequest request, bool usePaging)
         {
             var books = await context.Books.
                 Where(x => x.LibraryId == libraryId && !x.IsDeleted).ToListAsync();
@@ -144,6 +144,68 @@ namespace Infrastructure.Persistence.Repositories
             || p.Category.Name.Contains(search, StringComparison.CurrentCultureIgnoreCase)) 
 
             && !p.IsDeleted).ToListAsync();
+        }
+
+        public async Task<PagenatedList<Book>> GetBookByLibraryIdAsync(Guid libraryId, PageRequest request, bool usePaging, string? search = null, Guid? categoryId = null, bool? isPublished = null, string? sortBy = null)
+        {
+            var query = context.Books
+                .Where(x => x.LibraryId == libraryId && !x.IsDeleted)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var s = search.Trim();
+                query = query.Where(x =>
+                    x.Title.Contains(s) ||
+                    x.Author.Contains(s) ||
+                    x.Isbn.Contains(s));
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(x => x.CategoryId == categoryId.Value);
+            }
+
+            if (isPublished.HasValue)
+            {
+                query = query.Where(x => x.IsPublished == isPublished.Value);
+            }
+
+            query = sortBy switch
+            {
+                "oldest" => query.OrderBy(x => x.DateCreated),
+                "mostread" => query.OrderByDescending(x => x.NoOfTimeReadByPeople),
+                _ => query.OrderByDescending(x => x.DateCreated) // "newest" / default
+            };
+
+            var totalCount = await query.CountAsync();
+
+            query = query.Include(x => x.Category).Include(x => x.Library);
+
+            if (usePaging)
+            {
+                int currentPage = request.Page < 1 ? 1 : request.Page;
+                int pageSize = request.PageSize < 1 ? 10 : request.PageSize;
+
+                var items = await query
+                    .Skip((currentPage - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                return new PagenatedList<Book>
+                {
+                    Items = items,
+                    Page = currentPage,
+                    PageSize = pageSize,
+                    TotalCount = totalCount
+                };
+            }
+
+            return new PagenatedList<Book>
+            {
+                Items = await query.ToListAsync(),
+                TotalCount = totalCount
+            };
         }
     }
 }

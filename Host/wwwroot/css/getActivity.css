@@ -282,7 +282,7 @@
     background: var(--card);
     border: 1px solid var(--card-border);
     border-radius: var(--radius);
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -682,6 +682,67 @@
     text-align: center;
     pointer-events: none;
 }
+
+.al-menu-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.al-row-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    min-width: 170px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45);
+    display: none;
+    z-index: 20;
+}
+
+.al-menu-wrap.open .al-row-dropdown {
+    display: block;
+}
+
+.al-row-dropdown.al-menu-up {
+    top: auto;
+    bottom: calc(100% + 4px);
+}
+
+.al-menu-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 13px;
+    text-align: left;
+    padding: 8px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+    .al-menu-item:hover {
+        background: rgba(255,255,255,0.04);
+    }
+
+.al-menu-sep {
+    height: 1px;
+    background: var(--card-border);
+    margin: 6px 4px;
+}
+
+.al-menu-item.danger {
+    color: var(--red);
+}
+
+    .al-menu-item.danger:hover {
+        background: var(--red-bg);
+    }
 
 .al-donut-total {
     font-size: 22px;

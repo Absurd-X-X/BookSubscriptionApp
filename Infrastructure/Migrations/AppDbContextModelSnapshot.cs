@@ -128,6 +128,10 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("About")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Author")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -163,6 +167,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsPublished")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Isbn")
@@ -495,6 +502,54 @@ namespace Infrastructure.Migrations
                     b.ToTable("ReadingProgresses");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Review", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("EditedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("HelpfulCount")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ReaderId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("ReaderId");
+
+                    b.ToTable("Reviews");
+                });
+
             modelBuilder.Entity("Domain.Entities.Subscription", b =>
                 {
                     b.Property<Guid>("Id")
@@ -635,10 +690,10 @@ namespace Infrastructure.Migrations
                         {
                             Id = new Guid("c117635d-96e0-409b-9fae-72976ec9c42a"),
                             CreatedBy = "system",
-                            DateCreated = new DateTime(2026, 6, 29, 7, 17, 9, 214, DateTimeKind.Utc).AddTicks(5911),
+                            DateCreated = new DateTime(2026, 7, 5, 17, 26, 45, 193, DateTimeKind.Utc).AddTicks(4505),
                             DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
-                            HashPassword = "AQAAAAIAAYagAAAAEGtOxH1neKuhVziqVKi+CvKxseUlKEmhjdsLulwR/bqB+9ofuPgz8Osj/J0dSM8paw==",
+                            HashPassword = "AQAAAAIAAYagAAAAELdkhUcNFQS8TaxwURfRSwZCVI86FX27p6vK6ggf4Rd4WxBHS5ArL9bWgHJjtwkUGQ==",
                             IsDeleted = false,
                             IsVerified = true,
                             Role = "admin",
@@ -701,10 +756,10 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("eb84f382-3404-4a18-9c59-c5514d4850f1"),
+                            Id = new Guid("21374ad6-2754-4af2-8f57-7f1e60ecc1d3"),
                             Balance = 0m,
                             CreatedBy = "admin@gmail.com",
-                            DateCreated = new DateTime(2026, 6, 29, 7, 17, 9, 291, DateTimeKind.Utc).AddTicks(8723),
+                            DateCreated = new DateTime(2026, 7, 5, 17, 26, 45, 275, DateTimeKind.Utc).AddTicks(3222),
                             DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             UserId = new Guid("c117635d-96e0-409b-9fae-72976ec9c42a")
@@ -880,6 +935,25 @@ namespace Infrastructure.Migrations
                     b.Navigation("Reader");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Review", b =>
+                {
+                    b.HasOne("Domain.Entities.Book", "Book")
+                        .WithMany("Reviews")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Reader", "Reader")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ReaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Reader");
+                });
+
             modelBuilder.Entity("Domain.Entities.Subscription", b =>
                 {
                     b.HasOne("Domain.Entities.Reader", "Reader")
@@ -943,6 +1017,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Book", b =>
                 {
                     b.Navigation("ReadingProgresses");
+
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("Domain.Entities.Category", b =>
@@ -965,6 +1041,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Reader", b =>
                 {
                     b.Navigation("ReadingProgresses");
+
+                    b.Navigation("Reviews");
 
                     b.Navigation("Subscriptions");
                 });

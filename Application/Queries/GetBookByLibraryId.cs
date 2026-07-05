@@ -1,37 +1,68 @@
 ﻿using Application.Common.Dtos;
+using Application.Common.Pagenation;
 using Application.Common.Repositories;
-using Domain.Entities;
-using Mapster;
 using MediatR;
 
 namespace Application.Queries
 {
     public class GetBookByLibraryId
     {
-        public record GetBookByLibraryIdQuery(Guid Id) : IRequest<Result<GetBookByLibraryIdResponse>>;
+        public record GetBookByLibraryIdQuery(Guid LibraryId, int Page, int PageSize) : IRequest<Result<PagenatedList<GetBookByLibraryIdResponse>>>;
 
         public class GetBookByLibraryIdHandler(
-            ILibraryRepository libraryRepository
-            ) : IRequestHandler<GetBookByLibraryIdQuery, Result<GetBookByLibraryIdResponse>>
+            IBookRepository bookRepository
+            ) : IRequestHandler<GetBookByLibraryIdQuery, Result<PagenatedList<GetBookByLibraryIdResponse>>>
         {
-            public async Task<Result<GetBookByLibraryIdResponse>> Handle(GetBookByLibraryIdQuery request, CancellationToken cancellationToken)
+            public async Task<Result<PagenatedList<GetBookByLibraryIdResponse>>> Handle(GetBookByLibraryIdQuery request, CancellationToken cancellationToken)
             {
-                var library = await libraryRepository.GetAsync(request.Id);
+                var books = await bookRepository.GetBookByLibraryIdAsync(request.LibraryId, new PageRequest
+                {
+                    Page = request.Page,
+                    PageSize = request.PageSize
+                }, true);
+                var bookData = books.Items.Where(x => !x.IsDeleted).Select(x => new GetBookByLibraryIdResponse(
+                x.Id,
+                x.Title,
+                x.Author,
+                x.PublicationYear,
+                x.Isbn,
+                x.Genre,
+                x.Library.Id,
+                x.Library.Name,
+                x.Category.Id,
+                x.Category.Name,
+                x.Category.Description,
+                x.BookCoverUrl,
+                x.BookFileUrl,
+                x.DateCreated,
+                x.NoOfTimeReadByPeople * 5,
+                x.NoOfTimeReadByPeople,
+                x.IsPublished
+                )).ToList();
 
-                if (library == null)
-                    return Result<GetBookByLibraryIdResponse>.Failure("Not found");
+                var pagedData = new PagenatedList<GetBookByLibraryIdResponse>
+                {
+                    Items = bookData,
+                    Page = request.Page,
+                    PageSize = request.PageSize,
+                    TotalCount = books.TotalCount
+                };
 
-                return Result<GetBookByLibraryIdResponse>.Success(library.Adapt<GetBookByLibraryIdResponse>(), "Retrieved");
+                return Result<PagenatedList<GetBookByLibraryIdResponse>>.Success(pagedData, "Retrieved");
             }
         }
 
         public record GetBookByLibraryIdResponse(
-            Guid LibraryId,
-            string Email,
-            string PhoneNumber,
-            string RefNumber,
-            DateTime DateCreated,
-            IEnumerable<Book> Books
+            Guid BookId, string Title,
+            string Author, int PublicationYear,
+            string Isbn, string Genre,
+            Guid LibraryId, string LibraryName,
+            Guid CategoryId, string CategoryName,
+            string CategoryDescription,
+            string BookCoverUrl, string BookFileUrl, DateTime DateAdded,
+            int EngagementPercent,
+            int NoOfTimeReadByPeople,
+            bool IsPublished
             );
     }
 }

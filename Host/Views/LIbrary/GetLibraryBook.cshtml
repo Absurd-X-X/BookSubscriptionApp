@@ -1,6 +1,19 @@
-﻿@{
+﻿@using static Application.Queries.GetBookById
+@model GetBookByIdResponse
+
+@{
     Layout = "~/Views/Shared/_LibraryLayout.cshtml";
     ViewData["Title"] = "Get Book";
+
+    string GetInitials(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "??";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0].Length >= 2 ? parts[0].Substring(0, 2).ToUpper() : parts[0].ToUpper();
+        return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+    }
+
+    string[] avatarClasses = { "av-purple", "av-teal", "av-blue", "av-orange", "av-brown" };
 }
 <link href="~/css/getLibraryBook.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -8,55 +21,39 @@
 <!-- Book Header -->
 <div class="book-header">
     <div class="book-cover-wrap">
-        <div class="book-cover-img">
-            <div class="cover-placeholder">
-                <div class="cover-top">Tiny Changes,<br>Remarkable Results</div>
-                <div class="cover-main">Atomic<br>Habits</div>
-                <div class="cover-sub">An Easy & Proven Way to Build Good Habits & Break Bad Ones</div>
-                <div class="cover-author">James Clear</div>
+        @if (!string.IsNullOrWhiteSpace(Model.BookCoverUrl))
+        {
+            <img class="book-cover-img" src="@Model.BookCoverUrl" alt="@Model.Title cover" />
+        }
+        else
+        {
+            <div class="book-cover-img">
+                <div class="cover-placeholder">
+                    <div class="cover-main">@Model.Title</div>
+                    <div class="cover-author">@Model.Author</div>
+                </div>
             </div>
-        </div>
+        }
     </div>
     <div class="book-header-info">
-        <h1 class="book-title">Atomic Habits</h1>
-        <p class="book-author">James Clear</p>
+        <h1 class="book-title">@Model.Title</h1>
+        <p class="book-author">@Model.Author</p>
         <div class="book-badges">
-            <span class="badge badge-green">Published</span>
-            <span class="badge badge-purple">Self Help</span>
-            <span class="badge-date">&#128197; Published on May 28, 2024</span>
+            <span class="badge @(Model.IsActive ? "badge-red" : "badge-green")">@(Model.IsActive ? "Archived" : "Published")</span>
+            <span class="badge badge-purple">@Model.CategoryName</span>
+            <span class="badge-date">&#128197; Added on @Model.AddedDate.ToString("MMM d, yyyy")</span>
         </div>
         <div class="book-rating">
             <span class="star-icon">&#9733;</span>
-            <span class="rating-val">4.9</span>
-            <span class="rating-count">(245 reviews)</span>
+            <span class="rating-val">@Model.AverageRating</span>
+            <span class="rating-count">(@Model.TotalReviewCount reviews)</span>
         </div>
         <div class="book-stats">
             <div class="stat-box">
-                <span class="stat-icon si-green">&#128065;</span>
-                <div>
-                    <div class="stat-val">1,245</div>
-                    <div class="stat-lbl">Total Reads</div>
-                </div>
-            </div>
-            <div class="stat-box">
                 <span class="stat-icon si-blue">&#128218;</span>
                 <div>
-                    <div class="stat-val">98%</div>
-                    <div class="stat-lbl">Completion Rate</div>
-                </div>
-            </div>
-            <div class="stat-box">
-                <span class="stat-icon si-orange">&#9201;</span>
-                <div>
-                    <div class="stat-val">2h 34m</div>
-                    <div class="stat-lbl">Avg. Reading Time</div>
-                </div>
-            </div>
-            <div class="stat-box">
-                <span class="stat-icon si-pink">&#128179;</span>
-                <div>
-                    <div class="stat-val">&#8358;98,000</div>
-                    <div class="stat-lbl">Total Revenue</div>
+                    <div class="stat-val">@Model.Engagement%</div>
+                    <div class="stat-lbl">Engagement</div>
                 </div>
             </div>
         </div>
@@ -67,7 +64,7 @@
 <div class="tab-nav">
     <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
     <button class="tab-btn" data-tab="analytics" onclick="switchTab('analytics')">Analytics</button>
-    <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')">Reviews <span class="tab-count">245</span></button>
+    <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')">Reviews <span class="tab-count">@Model.TotalReviewCount</span></button>
     <button class="tab-btn" data-tab="revenue" onclick="switchTab('revenue')">Revenue</button>
 </div>
 
@@ -78,14 +75,12 @@
 
             <div class="card">
                 <h2 class="card-title">About the Book</h2>
-                <p class="book-desc">No matter your goals, Atomic Habits offers a proven framework for improving—every day. James Clear, one of the world's leading experts on habit formation, reveals practical strategies that will teach you exactly how to form good habits, break bad ones, and master the tiny behaviors that lead to remarkable results.</p>
                 <div class="book-meta-grid">
-                    <div class="meta-item"><span class="meta-lbl">Category</span><span class="meta-val">Self Help</span></div>
-                    <div class="meta-item"><span class="meta-lbl">ISBN</span><span class="meta-val">978-1847941831</span></div>
-                    <div class="meta-item"><span class="meta-lbl">Language</span><span class="meta-val">English</span></div>
-                    <div class="meta-item"><span class="meta-lbl">File Type</span><span class="meta-val">EPUB, PDF</span></div>
-                    <div class="meta-item"><span class="meta-lbl">Pages</span><span class="meta-val">320</span></div>
-                    <div class="meta-item"><span class="meta-lbl">File Size</span><span class="meta-val">2.4 MB</span></div>
+                    <div class="meta-item"><span class="meta-lbl">Category</span><span class="meta-val">@Model.CategoryName</span></div>
+                    <div class="meta-item"><span class="meta-lbl">ISBN</span><span class="meta-val">@Model.Isbn</span></div>
+                    <div class="meta-item"><span class="meta-lbl">Genre</span><span class="meta-val">@Model.Genre</span></div>
+                    <div class="meta-item"><span class="meta-lbl">Publication Year</span><span class="meta-val">@Model.PublicationYear</span></div>
+                    <div class="meta-item"><span class="meta-lbl">Library</span><span class="meta-val">@Model.LibraryName</span></div>
                 </div>
             </div>
 
@@ -95,77 +90,46 @@
                     <a href="#" class="view-all-link" onclick="switchTab('reviews');return false;">View all</a>
                 </div>
                 <div class="review-list">
-                    <div class="review-item">
-                        <div class="avatar av-purple">SO</div>
-                        <div class="review-body">
-                            <div class="review-top">
-                                <span class="reviewer-name">Sarah O.</span>
-                                <span class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                                <span class="review-age">2 days ago</span>
+                    @{
+                        int reviewIdx = 0;
+                    }
+                    @foreach (var review in Model.RecentBookReviews)
+                    {
+                        var avClass = avatarClasses[reviewIdx % avatarClasses.Length];
+                        var initials = GetInitials(review.Reader.Name);
+                        var stars = Math.Clamp(review.Rating, 0, 5);
+                        reviewIdx++;
+                        <div class="review-item">
+                            <div class="avatar @avClass">@initials</div>
+                            <div class="review-body">
+                                <div class="review-top">
+                                    <span class="reviewer-name">@review.Reader.Name</span>
+                                    <span class="review-stars">@(new string('★', stars) + new string('☆', 5 - stars))</span>
+                                    <span class="review-age">@review.DateCreated.ToString("MMM d, yyyy")</span>
+                                </div>
+                                <p class="review-text">@review.Comment</p>
                             </div>
-                            <p class="review-text">This book changed the way I think about small daily actions. Simple but powerful!</p>
                         </div>
-                    </div>
-                    <div class="review-item">
-                        <div class="avatar av-teal">MT</div>
-                        <div class="review-body">
-                            <div class="review-top">
-                                <span class="reviewer-name">Michael T.</span>
-                                <span class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                                <span class="review-age">5 days ago</span>
-                            </div>
-                            <p class="review-text">Practical, easy to read, and life changing. Highly recommend!</p>
-                        </div>
-                    </div>
-                    <div class="review-item">
-                        <div class="avatar av-blue">DL</div>
-                        <div class="review-body">
-                            <div class="review-top">
-                                <span class="reviewer-name">David L.</span>
-                                <span class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                                <span class="review-age">1 week ago</span>
-                            </div>
-                            <p class="review-text">The best book on habits I've ever read.</p>
-                        </div>
-                    </div>
-                    <div class="review-item">
-                        <div class="avatar av-orange">ER</div>
-                        <div class="review-body">
-                            <div class="review-top">
-                                <span class="reviewer-name">Emily R.</span>
-                                <span class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                                <span class="review-age">1 week ago</span>
-                            </div>
-                            <p class="review-text">Clear and actionable. Great examples!</p>
-                        </div>
-                    </div>
+                    }
+                    @if (!Model.RecentBookReviews.Any())
+                    {
+                        <p class="review-text">No reviews yet.</p>
+                    }
                 </div>
-                <button class="view-all-btn" onclick="switchTab('reviews')">View all 245 reviews</button>
+                <button class="view-all-btn" onclick="switchTab('reviews')">View all @Model.TotalReviewCount reviews</button>
             </div>
 
             <div class="card">
-                <h2 class="card-title">Book Files</h2>
+                <h2 class="card-title">Book File</h2>
                 <div class="file-list">
                     <div class="file-item">
-                        <div class="file-icon fi-red">PDF</div>
+                        <div class="file-icon fi-red">FILE</div>
                         <div class="file-info">
-                            <div class="file-name">Atomic Habits - Full Book.pdf</div>
-                            <div class="file-meta">PDF · 2.4 MB · Uploaded on May 20, 2024</div>
+                            <div class="file-name">@Model.Title</div>
+                            <div class="file-meta">Uploaded on @Model.AddedDate.ToString("MMM d, yyyy")</div>
                         </div>
                         <div class="file-actions">
-                            <button class="icon-btn" title="Download">&#8595;</button>
-                            <button class="icon-btn" title="More">&#8942;</button>
-                        </div>
-                    </div>
-                    <div class="file-item">
-                        <div class="file-icon fi-green">EPUB</div>
-                        <div class="file-info">
-                            <div class="file-name">Atomic Habits - Full Book.epub</div>
-                            <div class="file-meta">EPUB · 1.8 MB · Uploaded on May 20, 2024</div>
-                        </div>
-                        <div class="file-actions">
-                            <button class="icon-btn" title="Download">&#8595;</button>
-                            <button class="icon-btn" title="More">&#8942;</button>
+                            <a class="icon-btn" href="@Model.BookFileUrl" title="Download">&#8595;</a>
                         </div>
                     </div>
                 </div>
@@ -173,52 +137,6 @@
 
         </div>
         <div class="side-col">
-
-            <div class="card">
-                <div class="card-header-row">
-                    <h2 class="card-title">Book Performance <span class="card-title-sub">(This Month)</span></h2>
-                    <select class="mini-select"><option>This Month</option><option>Last Month</option></select>
-                </div>
-                <div class="perf-chart-area">
-                    <canvas id="perfChart"></canvas>
-                </div>
-                <div class="perf-stats">
-                    <div class="perf-stat">
-                        <div class="ps-val">245 <span class="ps-up">&#8593; 12%</span></div>
-                        <div class="ps-lbl">Reads</div>
-                    </div>
-                    <div class="perf-stat">
-                        <div class="ps-val">98% <span class="ps-up">&#8593; 8%</span></div>
-                        <div class="ps-lbl">Completion Rate</div>
-                    </div>
-                    <div class="perf-stat">
-                        <div class="ps-val">2h 34m <span class="ps-up">&#8593; 5%</span></div>
-                        <div class="ps-lbl">Reading Time</div>
-                    </div>
-                    <div class="perf-stat">
-                        <div class="ps-val">128 <span class="ps-up">&#8593; 15%</span></div>
-                        <div class="ps-lbl">New Readers</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header-row">
-                    <h2 class="card-title">Revenue Overview</h2>
-                    <select class="mini-select"><option>This Month</option><option>Last Month</option></select>
-                </div>
-                <div class="rev-total">&#8358;98,000 <span class="ps-up">&#8593; 10% from last month</span></div>
-                <div class="rev-chart-area">
-                    <canvas id="revChart"></canvas>
-                </div>
-                <div class="rev-stats">
-                    <div class="rev-stat"><div class="rs-lbl">Total Revenue</div><div class="rs-val">&#8358;98,000</div></div>
-                    <div class="rev-stat"><div class="rs-lbl">Paid Reads</div><div class="rs-val">980</div></div>
-                    <div class="rev-stat"><div class="rs-lbl">Free Reads</div><div class="rs-val">265</div></div>
-                    <div class="rev-stat"><div class="rs-lbl">Refunds</div><div class="rs-val">&#8358;0</div></div>
-                </div>
-            </div>
-
             <div class="card">
                 <h2 class="card-title">Quick Actions</h2>
                 <div class="quick-actions">
@@ -230,627 +148,8 @@
                         </div>
                         <span class="qa-arrow">&#8250;</span>
                     </div>
-                    <div class="qa-item">
-                        <span class="qa-icon qa-blue">&#8679;</span>
-                        <div class="qa-info">
-                            <div class="qa-title">Upload New Version</div>
-                            <div class="qa-desc">Upload a new file to replace current book</div>
-                        </div>
-                        <span class="qa-arrow">&#8250;</span>
-                    </div>
-                    <div class="qa-item">
-                        <span class="qa-icon qa-green">&#9647;</span>
-                        <div class="qa-info">
-                            <div class="qa-title">Duplicate Book</div>
-                            <div class="qa-desc">Create a copy of this book</div>
-                        </div>
-                        <span class="qa-arrow">&#8250;</span>
-                    </div>
-                    <div class="qa-item qa-danger">
-                        <span class="qa-icon qa-red">&#128190;</span>
-                        <div class="qa-info">
-                            <div class="qa-title qa-title-red">Archive Book</div>
-                            <div class="qa-desc">Hide this book from the public</div>
-                        </div>
-                        <span class="qa-arrow">&#8250;</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<!-- ===== TAB: Analytics ===== -->
-<div class="tab-pane" id="tab-analytics">
-    <div class="two-col-wide">
-
-        <div class="card">
-            <div class="card-header-row">
-                <h2 class="card-title">Reading Trend <span class="card-title-sub">(30 Days)</span></h2>
-                <select class="mini-select"><option>30 Days</option><option>7 Days</option><option>90 Days</option></select>
-            </div>
-            <canvas id="trendChart" height="350" width="1100"></canvas>
-        </div>
-
-        <div class="card reader-insights-card">
-            <h2 class="card-title">Reader Insights</h2>
-            <div class="insight-item">
-                <div class="insight-icon ii-purple">&#128101;</div>
-                <div class="insight-info">
-                    <div class="insight-lbl">Total Readers</div>
-                    <div class="insight-val">1,245</div>
-                </div>
-                <div class="insight-change up">&#8593; 12% <span>from last month</span></div>
-            </div>
-            <div class="insight-item">
-                <div class="insight-icon ii-green">&#128100;</div>
-                <div class="insight-info">
-                    <div class="insight-lbl">New Readers</div>
-                    <div class="insight-val">128</div>
-                </div>
-                <div class="insight-change up">&#8593; 18% <span>from last month</span></div>
-            </div>
-            <div class="insight-item">
-                <div class="insight-icon ii-blue">&#128101;</div>
-                <div class="insight-info">
-                    <div class="insight-lbl">Returning Readers</div>
-                    <div class="insight-val">1,117</div>
-                </div>
-                <div class="insight-change up">&#8593; 10% <span>from last month</span></div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="two-col">
-        <div class="card">
-            <h2 class="card-title">Completion Funnel</h2>
-            <div class="funnel-wrap">
-                <div class="funnel-left">
-                    <div class="funnel-row"><span class="fl-label">Started</span><span class="fl-val">1,245</span></div>
-                    <div class="funnel-row"><span class="fl-label">25% Reached</span><span class="fl-val">1,150</span></div>
-                    <div class="funnel-row"><span class="fl-label">50% Reached</span><span class="fl-val">1,030</span></div>
-                    <div class="funnel-row"><span class="fl-label">75% Reached</span><span class="fl-val">890</span></div>
-                    <div class="funnel-row"><span class="fl-label">Completed</span><span class="fl-val">760</span></div>
-                </div>
-                <div class="funnel-visual">
-                    <div class="funnel-bar" style="width:100%"></div>
-                    <div class="funnel-bar" style="width:92%"></div>
-                    <div class="funnel-bar" style="width:83%"></div>
-                    <div class="funnel-bar" style="width:71%"></div>
-                    <div class="funnel-bar" style="width:61%"></div>
-                </div>
-                <div class="funnel-right">
-                    <div class="fr-label">Completion Rate</div>
-                    <div class="fr-rate">98%</div>
-                    <div class="fr-change up">&#8593; 8% from last month</div>
-                    <div class="fr-label" style="margin-top:14px">Drop-off Rate</div>
-                    <div class="fr-rate" style="color:#f87171">2%</div>
-                    <div class="fr-change down">&#8595; 2% from last month</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2 class="card-title">Reading Time Distribution</h2>
-            <div class="donut-wrap">
-                <canvas id="donutChart" height="200" width="200"></canvas>
-                <div class="donut-legend">
-                    <div class="dl-item"><span class="dl-dot" style="background:#7c3aed"></span><span class="dl-lbl">&lt; 30 mins</span><span class="dl-pct">12%</span></div>
-                    <div class="dl-item"><span class="dl-dot" style="background:#818cf8"></span><span class="dl-lbl">30 - 60 mins</span><span class="dl-pct">28%</span></div>
-                    <div class="dl-item"><span class="dl-dot" style="background:#6366f1"></span><span class="dl-lbl">1 - 2 hours</span><span class="dl-pct">35%</span></div>
-                    <div class="dl-item"><span class="dl-dot" style="background:#f97316"></span><span class="dl-lbl">2 - 3 hours</span><span class="dl-pct">15%</span></div>
-                    <div class="dl-item"><span class="dl-dot" style="background:#4ade80"></span><span class="dl-lbl">&gt; 3 hours</span><span class="dl-pct">10%</span></div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="card">
-        <h2 class="card-title">Reader Demographics <span class="card-title-sub">(By Country)</span></h2>
-        <table class="data-table">
-            <thead>
-                <tr><th>Country</th><th>Readers</th><th>% of Total</th><th>Avg. Reading Time</th><th>Completion Rate</th></tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>🇳🇬 Nigeria</td>
-                    <td>640</td>
-                    <td>51.4%</td>
-                    <td>2h 48m</td>
-                    <td><div class="prog-wrap"><div class="prog-bar" style="width:97%"></div></div><span class="prog-lbl">97%</span></td>
-                </tr>
-                <tr>
-                    <td>🇬🇭 Ghana</td>
-                    <td>205</td>
-                    <td>16.5%</td>
-                    <td>2h 21m</td>
-                    <td><div class="prog-wrap"><div class="prog-bar" style="width:93%"></div></div><span class="prog-lbl">93%</span></td>
-                </tr>
-                <tr>
-                    <td>🇰🇪 Kenya</td>
-                    <td>150</td>
-                    <td>12.1%</td>
-                    <td>2h 11m</td>
-                    <td><div class="prog-wrap"><div class="prog-bar" style="width:90%"></div></div><span class="prog-lbl">90%</span></td>
-                </tr>
-                <tr>
-                    <td>🇿🇦 South Africa</td>
-                    <td>120</td>
-                    <td>9.6%</td>
-                    <td>2h 54m</td>
-                    <td><div class="prog-wrap"><div class="prog-bar" style="width:98%"></div></div><span class="prog-lbl">98%</span></td>
-                </tr>
-                <tr>
-                    <td>Others</td>
-                    <td>130</td>
-                    <td>10.4%</td>
-                    <td>2h 05m</td>
-                    <td><div class="prog-wrap"><div class="prog-bar" style="width:88%"></div></div><span class="prog-lbl">88%</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="two-col">
-        <div class="card">
-            <h2 class="card-title">Most Active Reading Days</h2>
-            <div class="hbar-list">
-                <div class="hbar-item"><span class="hbar-lbl">Monday</span><div class="hbar-track"><div class="hbar-fill" style="width:90%"></div></div><span class="hbar-pct">18%</span></div>
-                <div class="hbar-item"><span class="hbar-lbl">Tuesday</span><div class="hbar-track"><div class="hbar-fill" style="width:70%"></div></div><span class="hbar-pct">14%</span></div>
-                <div class="hbar-item"><span class="hbar-lbl">Wednesday</span><div class="hbar-track"><div class="hbar-fill" style="width:75%"></div></div><span class="hbar-pct">15%</span></div>
-                <div class="hbar-item"><span class="hbar-lbl">Thursday</span><div class="hbar-track"><div class="hbar-fill" style="width:65%"></div></div><span class="hbar-pct">13%</span></div>
-                <div class="hbar-item"><span class="hbar-lbl">Friday</span><div class="hbar-track"><div class="hbar-fill" style="width:55%"></div></div><span class="hbar-pct">11%</span></div>
-                <div class="hbar-item"><span class="hbar-lbl">Saturday</span><div class="hbar-track"><div class="hbar-fill" style="width:60%"></div></div><span class="hbar-pct">12%</span></div>
-                <div class="hbar-item"><span class="hbar-lbl">Sunday</span><div class="hbar-track"><div class="hbar-fill" style="width:85%"></div></div><span class="hbar-pct">17%</span></div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2 class="card-title">Reading Devices</h2>
-            <div class="donut-wrap">
-                <canvas id="deviceChart" height="240" width="240"></canvas>
-                <div class="donut-legend">
-                    <div class="dl-item"><span class="dl-dot" style="background:#7c3aed"></span><span class="dl-lbl">Mobile</span><span class="dl-pct">72%</span></div>
-                    <div class="dl-item"><span class="dl-dot" style="background:#818cf8"></span><span class="dl-lbl">Tablet</span><span class="dl-pct">18%</span></div>
-                    <div class="dl-item"><span class="dl-dot" style="background:#4ade80"></span><span class="dl-lbl">Desktop</span><span class="dl-pct">10%</span></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <h2 class="card-title">Reader Activity Timeline <span class="card-title-sub">(Average Hourly Activity)</span></h2>
-        <canvas id="timelineChart" height="100" width="1200"></canvas>
-    </div>
-</div>
-
-<!-- ===== TAB: Reviews ===== -->
-<div class="tab-pane" id="tab-reviews">
-
-    <div class="two-col">
-        <div class="card">
-            <h2 class="card-title">Average Rating</h2>
-            <div class="avg-rating-wrap">
-                <div class="avg-big">
-                    <div class="avg-num">4.9</div>
-                    <div class="avg-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                    <div class="avg-based">Based on 245 reviews</div>
-                </div>
-                <div class="avg-bars">
-                    <div class="rbar-row"><span class="rbar-lbl">5 Stars</span><div class="rbar-track"><div class="rbar-fill" style="width:81%"></div></div><span class="rbar-info">198 (80.8%)</span></div>
-                    <div class="rbar-row"><span class="rbar-lbl">4 Stars</span><div class="rbar-track"><div class="rbar-fill rf-blue" style="width:15%"></div></div><span class="rbar-info">37 (15.1%)</span></div>
-                    <div class="rbar-row"><span class="rbar-lbl">3 Stars</span><div class="rbar-track"><div class="rbar-fill rf-blue" style="width:3%"></div></div><span class="rbar-info">7 (2.9%)</span></div>
-                    <div class="rbar-row"><span class="rbar-lbl">2 Stars</span><div class="rbar-track"><div class="rbar-fill rf-gray" style="width:1%"></div></div><span class="rbar-info">2 (0.8%)</span></div>
-                    <div class="rbar-row"><span class="rbar-lbl">1 Star</span><div class="rbar-track"><div class="rbar-fill rf-gray" style="width:0.5%"></div></div><span class="rbar-info">1 (0.4%)</span></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2 class="card-title">Review Overview</h2>
-            <div class="review-ov-grid">
-                <div class="rov-item">
-                    <div class="rov-label">Total Reviews</div>
-                    <div class="rov-val">245</div>
-                    <div class="rov-change up">&#8593; 18% from last month</div>
-                </div>
-                <div class="rov-item">
-                    <div class="rov-label">Verified Reviews</div>
-                    <div class="rov-val">210</div>
-                    <div class="rov-change up">&#8593; 20% from last month</div>
-                </div>
-                <div class="rov-item">
-                    <div class="rov-label">Avg. Rating</div>
-                    <div class="rov-val">4.9 / 5</div>
-                    <div class="rov-change up">&#8593; 0.1 from last month</div>
-                </div>
-                <div class="rov-item">
-                    <div class="rov-label">Response Rate</div>
-                    <div class="rov-val">98%</div>
-                    <div class="rov-change up">&#8593; 5% from last month</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="two-col">
-        <div class="card">
-            <h2 class="card-title">Top Positive Feedback</h2>
-            <div class="feedback-list">
-                <div class="fb-item fb-pos"><span class="fb-icon">&#128077;</span><span class="fb-tag tag-green">Life changing &amp; practical</span><span class="fb-count">84 mentions</span></div>
-                <div class="fb-item fb-pos"><span class="fb-icon">&#128077;</span><span class="fb-tag tag-green">Easy to understand</span><span class="fb-count">62 mentions</span></div>
-                <div class="fb-item fb-pos"><span class="fb-icon">&#128077;</span><span class="fb-tag tag-green">Great examples</span><span class="fb-count">48 mentions</span></div>
-                <div class="fb-item fb-pos"><span class="fb-icon">&#128077;</span><span class="fb-tag tag-green">Actionable steps</span><span class="fb-count">46 mentions</span></div>
-                <div class="fb-item fb-pos"><span class="fb-icon">&#128077;</span><span class="fb-tag tag-green">Well written</span><span class="fb-count">38 mentions</span></div>
-            </div>
-        </div>
-        <div class="card">
-            <h2 class="card-title">Top Negative Feedback</h2>
-            <div class="feedback-list">
-                <div class="fb-item fb-neg"><span class="fb-icon">&#128078;</span><span class="fb-tag tag-red">Too repetitive</span><span class="fb-count">12 mentions</span></div>
-                <div class="fb-item fb-neg"><span class="fb-icon">&#128078;</span><span class="fb-tag tag-red">Some examples outdated</span><span class="fb-count">8 mentions</span></div>
-                <div class="fb-item fb-neg"><span class="fb-icon">&#128078;</span><span class="fb-tag tag-red">Too basic for advanced readers</span><span class="fb-count">6 mentions</span></div>
-                <div class="fb-item fb-neg"><span class="fb-icon">&#128078;</span><span class="fb-tag tag-red">Wish it had more science</span><span class="fb-count">5 mentions</span></div>
-                <div class="fb-item fb-neg"><span class="fb-icon">&#128078;</span><span class="fb-tag tag-red">Too short</span><span class="fb-count">4 mentions</span></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <h2 class="card-title">Recent Reviews</h2>
-        <div class="review-list">
-            <div class="review-item">
-                <div class="avatar av-purple">SO</div>
-                <div class="review-body">
-                    <div class="review-top">
-                        <span class="reviewer-name">Sarah O.</span>
-                        <span class="badge badge-green" style="font-size:11px">Verified</span>
-                        <span class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                        <span class="review-age">2 days ago</span>
-                    </div>
-                    <p class="review-text">This book changed the way I think about small daily actions. Simple but powerful!</p>
-                </div>
-                <div class="review-helpful">Helpful &#128077; 24</div>
-            </div>
-            <div class="review-item">
-                <div class="avatar av-teal">MT</div>
-                <div class="review-body">
-                    <div class="review-top">
-                        <span class="reviewer-name">Michael T.</span>
-                        <span class="badge badge-green" style="font-size:11px">Verified</span>
-                        <span class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                        <span class="review-age">5 days ago</span>
-                    </div>
-                    <p class="review-text">Practical, easy to read, and life changing. Highly recommend!</p>
-                </div>
-                <div class="review-helpful">Helpful &#128077; 18</div>
-            </div>
-            <div class="review-item">
-                <div class="avatar av-blue">DL</div>
-                <div class="review-body">
-                    <div class="review-top">
-                        <span class="reviewer-name">David L.</span>
-                        <span class="badge badge-green" style="font-size:11px">Verified</span>
-                        <span class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                        <span class="review-age">1 week ago</span>
-                    </div>
-                    <p class="review-text">The best book on habits I've ever read.</p>
-                </div>
-                <div class="review-helpful">Helpful &#128077; 15</div>
-            </div>
-            <div class="review-item">
-                <div class="avatar av-orange">ER</div>
-                <div class="review-body">
-                    <div class="review-top">
-                        <span class="reviewer-name">Emily R.</span>
-                        <span class="badge badge-green" style="font-size:11px">Verified</span>
-                        <span class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                        <span class="review-age">1 week ago</span>
-                    </div>
-                    <p class="review-text">Clear and actionable. Great examples!</p>
-                </div>
-                <div class="review-helpful">Helpful &#128077; 12</div>
-            </div>
-            <div class="review-item">
-                <div class="avatar av-brown">AK</div>
-                <div class="review-body">
-                    <div class="review-top">
-                        <span class="reviewer-name">Aisha K.</span>
-                        <span class="badge badge-green" style="font-size:11px">Verified</span>
-                        <span class="review-stars" style="color:#f59e0b">&#9733;&#9733;&#9733;&#9733;<span style="color:#374151">&#9733;</span></span>
-                        <span class="review-age">2 weeks ago</span>
-                    </div>
-                    <p class="review-text">Very helpful. Some parts felt repetitive but overall excellent.</p>
-                </div>
-                <div class="review-helpful">Helpful &#128077; 9</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-header-row">
-            <h2 class="card-title">All Reviews</h2>
-            <button class="btn btn-outline btn-sm">&#8595; Export Reviews</button>
-        </div>
-        <div class="filter-bar">
-            <select class="mini-select"><option>All Ratings</option><option>5 Stars</option><option>4 Stars</option></select>
-            <select class="mini-select"><option>All Users</option><option>Verified</option></select>
-            <select class="mini-select"><option>Most Recent</option><option>Oldest</option><option>Highest</option></select>
-            <div class="search-box"><input type="text" placeholder="Search reviews..."><span class="search-icon">&#128269;</span></div>
-        </div>
-        <table class="data-table">
-            <thead>
-                <tr><th>User</th><th>Rating</th><th>Review</th><th>Date</th><th>Helpful</th><th>Status</th><th></th></tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><div class="user-cell"><div class="avatar-sm av-purple">SO</div><div><div class="uc-name">Sarah O.</div><div class="uc-email">so@example.com</div></div></div></td>
-                    <td><span class="stars-sm">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
-                    <td>This book changed the way I think about small daily actions.</td>
-                    <td>May 28, 2024</td>
-                    <td>&#128077; 24</td>
-                    <td><span class="badge badge-green">Verified</span></td>
-                    <td><button class="icon-btn">&#8942;</button></td>
-                </tr>
-                <tr>
-                    <td><div class="user-cell"><div class="avatar-sm av-teal">MT</div><div><div class="uc-name">Michael T.</div><div class="uc-email">mt@example.com</div></div></div></td>
-                    <td><span class="stars-sm">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
-                    <td>Practical, easy to read, and life changing.</td>
-                    <td>May 27, 2024</td>
-                    <td>&#128077; 18</td>
-                    <td><span class="badge badge-green">Verified</span></td>
-                    <td><button class="icon-btn">&#8942;</button></td>
-                </tr>
-                <tr>
-                    <td><div class="user-cell"><div class="avatar-sm av-blue">DL</div><div><div class="uc-name">David L.</div><div class="uc-email">dl@example.com</div></div></div></td>
-                    <td><span class="stars-sm">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
-                    <td>The best book on habits I've ever read.</td>
-                    <td>May 26, 2024</td>
-                    <td>&#128077; 15</td>
-                    <td><span class="badge badge-green">Verified</span></td>
-                    <td><button class="icon-btn">&#8942;</button></td>
-                </tr>
-                <tr>
-                    <td><div class="user-cell"><div class="avatar-sm av-orange">ER</div><div><div class="uc-name">Emily R.</div><div class="uc-email">er@example.com</div></div></div></td>
-                    <td><span class="stars-sm">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
-                    <td>Clear and actionable. Great examples!</td>
-                    <td>May 25, 2024</td>
-                    <td>&#128077; 12</td>
-                    <td><span class="badge badge-green">Verified</span></td>
-                    <td><button class="icon-btn">&#8942;</button></td>
-                </tr>
-                <tr>
-                    <td><div class="user-cell"><div class="avatar-sm av-brown">AK</div><div><div class="uc-name">Aisha K.</div><div class="uc-email">ak@example.com</div></div></div></td>
-                    <td><span class="stars-sm">&#9733;&#9733;&#9733;&#9733;</span></td>
-                    <td>Very helpful. Some parts felt repetitive.</td>
-                    <td>May 24, 2024</td>
-                    <td>&#128077; 9</td>
-                    <td><span class="badge badge-green">Verified</span></td>
-                    <td><button class="icon-btn">&#8942;</button></td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="table-footer">
-            <span>Showing 1 to 10 of 245 reviews</span>
-            <div class="pagination">
-                <button class="pg-btn">&#8249;</button>
-                <button class="pg-btn active-pg">1</button>
-                <button class="pg-btn">2</button>
-                <button class="pg-btn">3</button>
-                <span class="pg-ellipsis">...</span>
-                <button class="pg-btn">25</button>
-                <button class="pg-btn">&#8250;</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ===== TAB: Revenue ===== -->
-<div class="tab-pane" id="tab-revenue">
-
-    <div class="rev-cards">
-        <div class="rev-card">
-            <div class="rc-label">Total Revenue</div>
-            <div class="rc-val">&#8358;98,000</div>
-            <div class="rc-change up">&#8593; 10% from last month</div>
-            <canvas id="rc1"></canvas>
-        </div>
-        <div class="rev-card">
-            <div class="rc-label">Paid Reads Revenue</div>
-            <div class="rc-val">&#8358;78,400</div>
-            <div class="rc-change up">&#8593; 12% from last month</div>
-            <canvas id="rc2"></canvas>
-        </div>
-        <div class="rev-card">
-            <div class="rc-label">Free Reads Revenue</div>
-            <div class="rc-val">&#8358;19,600</div>
-            <div class="rc-change up">&#8593; 5% from last month</div>
-            <canvas id="rc3"></canvas>
-        </div>
-        <div class="rev-card">
-            <div class="rc-label">Refunds</div>
-            <div class="rc-val">&#8358;0</div>
-            <div class="rc-change neutral">0% from last month</div>
-            <canvas id="rc4"></canvas>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-header-row">
-            <h2 class="card-title">Revenue Overview</h2>
-            <select class="mini-select"><option>This Month</option><option>Last Month</option></select>
-        </div>
-        <div class="rev-chart-meta">
-            <div class="legend-item"><span class="legend-dot" style="background:#7c3aed"></span> Paid Reads</div>
-            <div class="legend-item"><span class="legend-dot" style="background:#4ade80"></span> Free Reads</div>
-        </div>
-        <canvas id="revOverviewChart" height="140"></canvas>
-        <div class="rev-overview-aside">
-            <div class="roa-item"><span class="roa-lbl">Highest Day</span><div class="roa-date">May 29, 2024</div><div class="roa-val">&#8358;7,850</div></div>
-            <div class="roa-item"><span class="roa-lbl">Lowest Day</span><div class="roa-date">May 4, 2024</div><div class="roa-val">&#8358;1,230</div></div>
-            <div class="roa-item"><span class="roa-lbl">Daily Average</span><div class="roa-val">&#8358;3,161</div></div>
-        </div>
-    </div>
-
-    <div class="two-col">
-        <div class="card">
-            <h2 class="card-title">Revenue by Source</h2>
-            <div class="donut-wrap">
-                <canvas id="sourceChart" height="160"></canvas>
-                <div class="donut-legend">
-                    <div class="dl-item"><span class="dl-dot" style="background:#7c3aed"></span><span class="dl-lbl">Paid Reads (&#8358;78,400)</span><span class="dl-pct">80%</span></div>
-                    <div class="dl-item"><span class="dl-dot" style="background:#4ade80"></span><span class="dl-lbl">Free Reads (&#8358;19,600)</span><span class="dl-pct">20%</span></div>
-                </div>
-            </div>
-            <div class="source-total">Total <strong>&#8358;98,000</strong></div>
-        </div>
-
-        <div class="card">
-            <h2 class="card-title">Revenue by Country</h2>
-            <table class="data-table">
-                <thead><tr><th>Country</th><th>Revenue</th><th>% of Total</th><th>Trend</th></tr></thead>
-                <tbody>
-                    <tr><td>🇳🇬 Nigeria</td><td>&#8358;62,720</td><td>64%</td><td><span class="trend-up">&#8599;</span></td></tr>
-                    <tr><td>🇬🇭 Ghana</td><td>&#8358;12,740</td><td>13%</td><td><span class="trend-up">&#8599;</span></td></tr>
-                    <tr><td>🇰🇪 Kenya</td><td>&#8358;8,820</td><td>9%</td><td><span class="trend-up">&#8599;</span></td></tr>
-                    <tr><td>🇿🇦 South Africa</td><td>&#8358;6,860</td><td>7%</td><td><span class="trend-up">&#8599;</span></td></tr>
-                    <tr><td>&#127758; Others</td><td>&#8358;6,860</td><td>7%</td><td><span class="trend-neutral">&#8594;</span></td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="three-col">
-        <div class="card">
-            <h2 class="card-title">Revenue by Plan</h2>
-            <div class="plan-list">
-                <div class="plan-item">
-                    <span class="plan-lbl">Single Purchase</span>
-                    <div class="plan-bar-wrap"><div class="plan-bar" style="width:70%"></div></div>
-                    <span class="plan-val">&#8358;68,600</span>
-                    <span class="plan-pct">70%</span>
-                </div>
-                <div class="plan-item">
-                    <span class="plan-lbl">Premium Monthly</span>
-                    <div class="plan-bar-wrap"><div class="plan-bar" style="width:19%"></div></div>
-                    <span class="plan-val">&#8358;18,620</span>
-                    <span class="plan-pct">19%</span>
-                </div>
-                <div class="plan-item">
-                    <span class="plan-lbl">Premium Annual</span>
-                    <div class="plan-bar-wrap"><div class="plan-bar" style="width:11%"></div></div>
-                    <span class="plan-val">&#8358;10,780</span>
-                    <span class="plan-pct">11%</span>
-                </div>
-            </div>
-            <div class="plan-total">Total <strong>&#8358;98,000</strong></div>
-        </div>
-
-        <div class="card">
-            <h2 class="card-title">Top Revenue Days</h2>
-            <div class="top-days-list">
-                <div class="td-item"><span class="td-rank">1</span><span class="td-date">May 29, 2024</span><span class="td-amt">&#8358;7,850</span></div>
-                <div class="td-item"><span class="td-rank">2</span><span class="td-date">May 23, 2024</span><span class="td-amt">&#8358;6,420</span></div>
-                <div class="td-item"><span class="td-rank">3</span><span class="td-date">May 15, 2024</span><span class="td-amt">&#8358;5,780</span></div>
-                <div class="td-item"><span class="td-rank">4</span><span class="td-date">May 30, 2024</span><span class="td-amt">&#8358;5,410</span></div>
-                <div class="td-item"><span class="td-rank">5</span><span class="td-date">May 22, 2024</span><span class="td-amt">&#8358;4,980</span></div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2 class="card-title">Revenue Metrics</h2>
-            <div class="metrics-list">
-                <div class="metric-item">
-                    <span class="metric-icon mi-purple">&#128101;</span>
-                    <span class="metric-lbl">ARPU (Avg. Revenue Per User)</span>
-                    <span class="metric-val">&#8358;78.86</span>
-                    <span class="metric-change up">&#8593; 9%</span>
-                </div>
-                <div class="metric-item">
-                    <span class="metric-icon mi-orange">%</span>
-                    <span class="metric-lbl">Conversion Rate (Free &#8594; Paid)</span>
-                    <span class="metric-val">6.42%</span>
-                    <span class="metric-change up">&#8593; 0.8%</span>
-                </div>
-                <div class="metric-item">
-                    <span class="metric-icon mi-yellow">&#9888;</span>
-                    <span class="metric-lbl">Chargeback Rate</span>
-                    <span class="metric-val">0%</span>
-                    <span class="metric-change neutral">— 0%</span>
-                </div>
-                <div class="metric-item">
-                    <span class="metric-icon mi-green">&#128176;</span>
-                    <span class="metric-lbl">Net Revenue</span>
-                    <span class="metric-val">&#8358;98,000</span>
-                    <span class="metric-change up">&#8593; 10%</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <h2 class="card-title">Recent Transactions</h2>
-        <table class="data-table">
-            <thead>
-                <tr><th>User</th><th>Type</th><th>Amount</th><th>Date</th><th>Status</th><th></th></tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><div class="user-cell"><div class="avatar-sm av-purple">SO</div><div><div class="uc-name">Sarah O.</div><div class="uc-email">sarah@example.com</div></div></div></td>
-                    <td><span class="type-badge tb-purple">Paid Read</span></td>
-                    <td>&#8358;1,200</td>
-                    <td>May 31, 2024, 10:32 PM</td>
-                    <td><span class="badge badge-green">Completed</span></td>
-                    <td><button class="icon-btn">&#8250;</button></td>
-                </tr>
-                <tr>
-                    <td><div class="user-cell"><div class="avatar-sm av-teal">MT</div><div><div class="uc-name">Michael T.</div><div class="uc-email">michael@example.com</div></div></div></td>
-                    <td><span class="type-badge tb-blue">Premium Monthly</span></td>
-                    <td>&#8358;2,500</td>
-                    <td>May 31, 2024, 09:15 PM</td>
-                    <td><span class="badge badge-green">Completed</span></td>
-                    <td><button class="icon-btn">&#8250;</button></td>
-                </tr>
-                <tr>
-                    <td><div class="user-cell"><div class="avatar-sm av-blue">DL</div><div><div class="uc-name">David L.</div><div class="uc-email">david@example.com</div></div></div></td>
-                    <td><span class="type-badge tb-purple">Paid Read</span></td>
-                    <td>&#8358;1,200</td>
-                    <td>May 31, 2024, 08:47 PM</td>
-                    <td><span class="badge badge-green">Completed</span></td>
-                    <td><button class="icon-btn">&#8250;</button></td>
-                </tr>
-                <tr>
-                    <td><div class="user-cell"><div class="avatar-sm av-orange">ER</div><div><div class="uc-name">Emily R.</div><div class="uc-email">emily@example.com</div></div></div></td>
-                    <td><span class="type-badge tb-green">Premium Annual</span></td>
-                    <td>&#8358;25,000</td>
-                    <td>May 31, 2024, 07:33 PM</td>
-                    <td><span class="badge badge-green">Completed</span></td>
-                    <td><button class="icon-btn">&#8250;</button></td>
-                </tr>
-                <tr>
-                    <td><div class="user-cell"><div class="avatar-sm av-brown">AK</div><div><div class="uc-name">Aisha K.</div><div class="uc-email">aisha@example.com</div></div></div></td>
-                    <td><span class="type-badge tb-purple">Paid Read</span></td>
-                    <td>&#8358;1,200</td>
-                    <td>May 31, 2024, 06:21 PM</td>
-                    <td><span class="badge badge-green">Completed</span></td>
-                    <td><button class="icon-btn">&#8250;</button></td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="table-footer">
-            <span>Showing 1 to 5 of 25 transactions</span>
-            <div class="pagination">
-                <button class="pg-btn">&#8249;</button>
-                <button class="pg-btn active-pg">1</button>
-                <button class="pg-btn">2</button>
-                <button class="pg-btn">3</button>
-                <span class="pg-ellipsis">...</span>
-                <button class="pg-btn">5</button>
-                <button class="pg-btn">&#8250;</button>
-            </div>
-        </div>
-    </div>
-    <script src="~/js/getLibraryBook.js"></script>
 </div>

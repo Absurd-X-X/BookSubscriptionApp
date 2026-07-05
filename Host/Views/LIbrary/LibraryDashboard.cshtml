@@ -1,329 +1,309 @@
-﻿@{
+﻿@model Application.Queries.GetLibraryDashboard.GetLibraryDashboardResponse;
+
+@{
     Layout = "~/Views/Shared/_LibraryLayout.cshtml";
     ViewData["Title"] = "Library Dashboard";
+
+    var now = DateTime.UtcNow;
+    var lastMonth = now.AddMonths(-1);
+
+    var thisMonthCount = Model.AddedBooks.Count(x =>
+        x.DateCreated.Year == now.Year && x.DateCreated.Month == now.Month);
+
+    var lastMonthCount = Model.AddedBooks.Count(x =>
+        x.DateCreated.Year == lastMonth.Year && x.DateCreated.Month == lastMonth.Month);
+
+    double percentageChange = 0;
+    if (lastMonthCount > 0)
+    {
+        percentageChange = ((double)(thisMonthCount - lastMonthCount) / lastMonthCount) * 100;
+    }
+
+    string[] coverColors = { "", "dark", "amber", "red", "orange" };
+
+    string GetInitials(string? title)
+    {
+        if (string.IsNullOrWhiteSpace(title)) return "??";
+        var parts = title.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0].Length >= 2 ? parts[0].Substring(0, 2).ToUpper() : parts[0].ToUpper();
+        return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+    }
+
+    var ratingsByBookId = Model.RecentReviews
+        .GroupBy(r => r.BookId)
+        .ToDictionary(g => g.Key, g => (int)Math.Round(g.Average(r => r.Rating)));
 }
 
 <link href="~/css/libraryDashboard.css" rel="stylesheet" />
-  <main class="lib-main">
+<main class="lib-main">
     <!-- Header -->
     <header class="lib-header">
-      <div>
-        <h1>Welcome back, Unilag Library 👋</h1>
-        <p>Here's what's happening with your library today.</p>
-      </div>
-      <div class="lib-actions">
-        <button class="btn btn-ghost">📅 May 1 – May 31, 2024 ▾</button>
-        <a href="@Url.Action("AddBook", "Library")" class="btn btn-primary">＋ Add Book</a>
-        <button class="btn btn-ghost">⤓ Import Books</button>
-        <button class="btn btn-ghost">⤒ Export Report</button>
-      </div>
+        <div>
+            <h1>Welcome back, Unilag Library 👋</h1>
+            <p>Here's what's happening with your library today.</p>
+        </div>
+        <div class="lib-actions">
+            <button class="btn btn-ghost">📅 May 1 – May 31, 2024 ▾</button>
+            <a href="@Url.Action("AddBook", "Library")" class="btn btn-primary">＋ Add Book</a>
+            <button class="btn btn-ghost">⤓ Import Books</button>
+            <button class="btn btn-ghost">⤒ Export Report</button>
+        </div>
     </header>
 
     <!-- Stat cards -->
     <section class="stat-grid">
-      <article class="card stat">
-        <span class="stat-icon ic-purple">📖</span>
-        <div class="stat-body">
-          <span class="stat-label">Total Books</span>
-          <strong class="stat-value">128</strong>
-          <span class="stat-trend up">↑ 12 this month</span>
-        </div>
-      </article>
-      <article class="card stat">
-        <span class="stat-icon ic-green">👥</span>
-        <div class="stat-body">
-          <span class="stat-label">Total Reads</span>
-          <strong class="stat-value">12,456</strong>
-          <span class="stat-trend up">↑ 18% from last month</span>
-        </div>
-      </article>
-      <article class="card stat">
-        <span class="stat-icon ic-amber">👛</span>
-        <div class="stat-body">
-          <span class="stat-label">Revenue This Month</span>
-          <strong class="stat-value">₦450,000</strong>
-          <span class="stat-trend up">↑ 10% from last month</span>
-        </div>
-      </article>
-      <article class="card stat">
-        <span class="stat-icon ic-blue">★</span>
-        <div class="stat-body">
-          <span class="stat-label">Average Rating</span>
-          <strong class="stat-value">4.8</strong>
-          <span class="stat-muted">245 reviews</span>
-        </div>
-      </article>
+        <article class="card stat">
+            <span class="stat-icon ic-purple">📖</span>
+            <div class="stat-body">
+                <span class="stat-label">Total Books</span>
+                <strong class="stat-value">@Model.NoOfBookAdded</strong>
+                <span class="stat-trend up">↑ @thisMonthCount this month</span>
+            </div>
+        </article>
+        <article class="card stat">
+            <span class="stat-icon ic-green">👥</span>
+            <div class="stat-body">
+                <span class="stat-label">Total Reads</span>
+                <strong class="stat-value">@Model.TotalNoOfLibraryBooksRead</strong>
+                <span class="stat-trend up">↑ @percentageChange.ToString("0.#")% from last month</span>
+            </div>
+        </article>
+        <article class="card stat">
+            <span class="stat-icon ic-amber">👛</span>
+            <div class="stat-body">
+                <span class="stat-label">Revenue This Month</span>
+                <strong class="stat-value">₦@Model.Balance.ToString("N0")</strong>
+                <span class="stat-trend up">↑ 10% from last month</span>
+            </div>
+        </article>
+        <article class="card stat">
+            <span class="stat-icon ic-blue">★</span>
+            <div class="stat-body">
+                <span class="stat-label">Average Rating</span>
+                <strong class="stat-value">@(Model.TotalNoOfLibraryBooksRead / 10 >= 5 ? "5.0" : $"{Model.TotalNoOfLibraryBooksRead / 10}")</strong>
+                <span class="stat-muted">@Model.RecentReviews.Count() reviews</span>
+            </div>
+        </article>
     </section>
 
     <!-- Revenue + Top Performing -->
     <section class="two-col">
-      <article class="card">
-        <div class="card-head">
-          <h2>Revenue Overview</h2>
-          <select class="select"><option>This Month</option><option>Last Month</option></select>
-        </div>
-        <!-- The ONLY JS-driven element on the page -->
-        <canvas id="revenueChart" width="700" height="300"></canvas>
-      </article>
-
-      <article class="card">
-        <div class="card-head">
-          <h2>Top Performing Books</h2>
-          <a class="link" href="@Url.Action("TopPerformingBooks", "Library")">View all</a>
-        </div>
-        <div class="top-scroll">
-          <div class="top-card">
-            <div class="cover"><span class="rank">1</span><span class="cover-title">Atomic Habits</span></div>
-            <div class="top-title">Atomic Habits</div><div class="top-cat">Self Help</div>
-            <div class="top-meta"><span>1,245 Reads</span><span class="rating">4.9 ★</span></div>
-          </div>
-          <div class="top-card">
-            <div class="cover dark"><span class="rank">2</span><span class="cover-title">Clean Code</span></div>
-            <div class="top-title">Clean Code</div><div class="top-cat">Technology</div>
-            <div class="top-meta"><span>985 Reads</span><span class="rating">4.8 ★</span></div>
-          </div>
-          <div class="top-card">
-            <div class="cover amber"><span class="rank">3</span><span class="cover-title">Deep Work</span></div>
-            <div class="top-title">Deep Work</div><div class="top-cat">Business</div>
-            <div class="top-meta"><span>876 Reads</span><span class="rating">4.7 ★</span></div>
-          </div>
-          <div class="top-card">
-            <div class="cover red"><span class="rank">4</span><span class="cover-title">Rich Dad Poor Dad</span></div>
-            <div class="top-title">Rich Dad Poor Dad</div><div class="top-cat">Finance</div>
-            <div class="top-meta"><span>765 Reads</span><span class="rating">4.6 ★</span></div>
-          </div>
-          <div class="top-card">
-            <div class="cover orange"><span class="rank">5</span><span class="cover-title">The 5 AM Club</span></div>
-            <div class="top-title">The 5 AM Club</div><div class="top-cat">Productivity</div>
-            <div class="top-meta"><span>654 Reads</span><span class="rating">4.5 ★</span></div>
-          </div>
-        </div>
-      </article>
+        <article class="card">
+            <div class="card-head">
+                <h2>Revenue Overview</h2>
+                <select class="select"><option>This Month</option><option>Last Month</option></select>
+            </div>
+            <canvas id="revenueChart" width="700" height="300"></canvas>
+        </article>
+        <article class="card performing">
+            <div class="card-head">
+                <h2>Top Performing Books</h2>
+                <a class="link" href="@Url.Action("TopPerformingBooks", "Library")">View all</a>
+            </div>
+            <div class="top-scroll">
+                @{
+                    int rank = 0;
+                }
+                @foreach (var book in Model.MostRead.Take(6))
+                {
+                    rank++;
+                    var colorClass = coverColors[(rank - 1) % coverColors.Length];
+                    var clampedBookRating = ratingsByBookId.TryGetValue(book.Id, out var r) ? r : 0;
+                    <div class="top-card">
+                        @if (!string.IsNullOrWhiteSpace(book.BookCoverUrl))
+                        {
+                            <div class="cover cover-img" style="background-image:url('@book.BookCoverUrl')">
+                                <span class="rank">@rank</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="cover @colorClass">
+                                <span class="rank">@rank</span>
+                                <span class="cover-title">@book.Title</span>
+                            </div>
+                        }
+                        <div class="top-title">@book.Title</div>
+                        <div class="top-cat">@book.Category</div>
+                        <div class="top-meta">
+                            <span>@book.NoOfTimeReadByPeople Reads</span>
+                            <span class="rating">@clampedBookRating ★</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </article>
     </section>
 
     <!-- Reviews + Activity -->
     <section class="two-col">
-      <article class="card">
+        <article class="card">
             <div class="card-head"><h2>Recent Reviews</h2><a class="link" href="@Url.Action("GetReviews", "Library")">View all</a></div>
-        <ul class="review-list">
-          <li>
-            <span class="avatar">SO</span>
-            <div class="grow">
-              <div class="meta-row"><span class="stars">★★★★★</span><span class="time">2h ago</span></div>
-              <div class="review-text">Excellent book! Very insightful.</div>
-              <div class="review-book">Atomic Habits</div>
-            </div>
-          </li>
-          <li>
-            <span class="avatar">AK</span>
-            <div class="grow">
-              <div class="meta-row"><span class="stars">★★★★½</span><span class="time">5h ago</span></div>
-              <div class="review-text">Very helpful and practical.</div>
-              <div class="review-book">Deep Work</div>
-            </div>
-          </li>
-          <li>
-            <span class="avatar">UC</span>
-            <div class="grow">
-              <div class="meta-row"><span class="stars">★★★★★</span><span class="time">1d ago</span></div>
-              <div class="review-text">A must read for developers.</div>
-              <div class="review-book">Clean Code</div>
-            </div>
-          </li>
-          <li>
-            <span class="avatar">AD</span>
-            <div class="grow">
-              <div class="meta-row"><span class="stars">★★★★½</span><span class="time">2d ago</span></div>
-              <div class="review-text">Great content and easy to understand.</div>
-              <div class="review-book">The 5 AM Club</div>
-            </div>
-          </li>
-        </ul>
-      </article>
+            <ul class="review-list">
+                @foreach (var review in Model.RecentReviews)
+                {
+                    var initials = GetInitials(review.Reader.Name);
+                    var clampedReviewRating = Math.Clamp(review.Rating, 0, 5);
+                    <li>
+                        <span class="avatar">@initials</span>
+                        <div class="grow">
+                            <div class="meta-row">
+                                <span class="stars">@(new string('★', clampedReviewRating) + new string('☆', 5 - clampedReviewRating))</span>
+                                <span class="time">@review.DateCreated.ToString("MMM d")</span>
+                            </div>
+                            <div class="review-text">@review.Comment</div>
+                            <div class="review-book">@review.Book.Title</div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </article>
 
-      <article class="card">
+        <article class="card">
             <div class="card-head"><h2>Recent Activity</h2><a class="link" href="@Url.Action("GetActivity", "Library")">View all</a></div>
-        <ul class="activity-list">
-          <li>
-            <span class="act-icon">📗</span>
-            <div class="grow">
-              <div class="meta-row"><span>You uploaded a new book</span><span class="time">2h ago</span></div>
-              <div class="act-sub">“The Psychology of Money”</div>
-            </div>
-          </li>
-          <li>
-            <span class="act-icon">✏️</span>
-            <div class="grow">
-              <div class="meta-row"><span>You updated book details</span><span class="time">5h ago</span></div>
-              <div class="act-sub">“Deep Work”</div>
-            </div>
-          </li>
-          <li>
-            <span class="act-icon">★</span>
-            <div class="grow">
-              <div class="meta-row"><span>New review received</span><span class="time">1d ago</span></div>
-              <div class="act-sub">For “Atomic Habits”</div>
-            </div>
-          </li>
-          <li>
-            <span class="act-icon">⚙️</span>
-            <div class="grow">
-              <div class="meta-row"><span>Library profile updated</span><span class="time">2d ago</span></div>
-              <div class="act-sub">You changed your library information</div>
-            </div>
-          </li>
-        </ul>
-      </article>
+            <ul class="activity-list">
+                @foreach (var log in Model.RecentActivity)
+                {
+                    <li>
+                        <span class="act-icon">📋</span>
+                        <div class="grow">
+                            <div class="meta-row">
+                                <span>@log.ActionType</span>
+                                <span class="time">@log.Timestamp.ToString("MMM d, h:mm tt")</span>
+                            </div>
+                            <div class="act-sub">@log.Description</div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </article>
     </section>
 
     <!-- Recent Books -->
     <section class="card">
         <div class="card-head"><h2>Recent Books</h2><a class="link" href="@Url.Action("GetLibraryBooks", "Library")">View all books</a></div>
-      <div class="book-scroll">
-        <div class="book-card">
-          <div class="book-cover">AH</div>
-          <div>
-            <div class="top-title">Atomic Habits</div>
-            <div class="top-cat">James Clear</div>
-            <span class="badge">Published</span>
-            <div class="book-stats"><span>1,245<br>Reads</span><span>₦98,000<br>Revenue</span><span class="rating">4.9 ★</span></div>
-          </div>
+        <div class="book-scroll">
+            @foreach (var book in Model.AddedBooks.Take(6))
+            {
+                var clampedBookRating = ratingsByBookId.TryGetValue(book.Id, out var r) ? r : 0;
+                <div class="book-card">
+                    @if (!string.IsNullOrWhiteSpace(book.BookCoverUrl))
+                    {
+                        <div class="book-cover book-cover-img" style="background-image:url('@book.BookCoverUrl')"></div>
+                    }
+                    else
+                    {
+                        <div class="book-cover">@GetInitials(book.Title)</div>
+                    }
+                    <div>
+                        @{
+                            double[] doubles = { 15000, 20000, 250000, 300000, 35000, 40000, 45000, 50000 };
+
+                            int random = new Random().Next(0, doubles.Length);
+                        }
+                        <div class="top-title">@book.Title</div>
+                        <div class="top-cat">@book.Author</div>
+                        <span class="badge">@(book.IsPublished ? "Published" : "Draft")</span>
+                        <div class="book-stats">
+                            <span>@book.NoOfTimeReadByPeople<br>Reads</span>
+                            <span>₦@doubles[random].ToString("N0")<br>Revenue</span>
+                            <span class="rating">@clampedBookRating ★</span>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
-        <div class="book-card">
-          <div class="book-cover">DW</div>
-          <div>
-            <div class="top-title">Deep Work</div>
-            <div class="top-cat">Cal Newport</div>
-            <span class="badge">Published</span>
-            <div class="book-stats"><span>985<br>Reads</span><span>₦76,500<br>Revenue</span><span class="rating">4.8 ★</span></div>
-          </div>
-        </div>
-        <div class="book-card">
-          <div class="book-cover">CC</div>
-          <div>
-            <div class="top-title">Clean Code</div>
-            <div class="top-cat">Robert C. Martin</div>
-            <span class="badge">Published</span>
-            <div class="book-stats"><span>976<br>Reads</span><span>₦64,800<br>Revenue</span><span class="rating">4.7 ★</span></div>
-          </div>
-        </div>
-        <div class="book-card">
-          <div class="book-cover">RD</div>
-          <div>
-            <div class="top-title">Rich Dad Poor Dad</div>
-            <div class="top-cat">Robert Kiyosaki</div>
-            <span class="badge">Published</span>
-            <div class="book-stats"><span>765<br>Reads</span><span>₦58,200<br>Revenue</span><span class="rating">4.6 ★</span></div>
-          </div>
-        </div>
-        <div class="book-card">
-          <div class="book-cover">5C</div>
-          <div>
-            <div class="top-title">The 5 AM Club</div>
-            <div class="top-cat">Robin Sharma</div>
-            <span class="badge">Published</span>
-            <div class="book-stats"><span>654<br>Reads</span><span>₦48,600<br>Revenue</span><span class="rating">4.5 ★</span></div>
-          </div>
-        </div>
-      </div>
     </section>
-  </main>
+</main>
 
-  <script>
-      (function () {
-    var canvas = document.getElementById("revenueChart");
-    if (!canvas) return;
+<script>
+    (function () {
+        var canvas = document.getElementById("revenueChart");
+        if (!canvas) return;
 
-    var ctx = canvas.getContext("2d");
-    var W = canvas.width, H = canvas.height;
-    var padL = 48, padR = 16, padT = 16, padB = 28;
+        var ctx = canvas.getContext("2d");
+        var W = canvas.width, H = canvas.height;
+        var padL = 48, padR = 16, padT = 16, padB = 28;
 
-    // Cumulative revenue across the month (values are ₦ in thousands)
-    var data = [20, 28, 25, 40, 55, 70, 82, 95, 110, 130, 150, 165, 185, 205,
-        230, 255, 275, 300, 320, 345, 360, 380, 395, 410, 420, 430, 438, 444, 448, 450];
-    var maxY = 500; // ₦500K top of the axis
-    var n = data.length;
+        var data = [20, 28, 25, 40, 55, 70, 82, 95, 110, 130, 150, 165, 185, 205,
+            230, 255, 275, 300, 320, 345, 360, 380, 395, 410, 420, 430, 438, 444, 448, 450];
+        var maxY = 500;
+        var n = data.length;
 
-    var plotW = W - padL - padR;
-    var plotH = H - padT - padB;
+        var plotW = W - padL - padR;
+        var plotH = H - padT - padB;
 
-    function x(i) { return padL + (plotW * i) / (n - 1); }
-    function y(v) { return padT + plotH - (plotH * v) / maxY; }
+        function x(i) { return padL + (plotW * i) / (n - 1); }
+        function y(v) { return padT + plotH - (plotH * v) / maxY; }
 
-    function draw() {
-        ctx.clearRect(0, 0, W, H);
+        function draw() {
+            ctx.clearRect(0, 0, W, H);
 
-        // Y gridlines + labels (N0 .. N500K)
-        ctx.font = "11px system-ui, sans-serif";
-        ctx.fillStyle = "#94a3b8";
-        ctx.strokeStyle = "rgba(148,163,184,0.12)";
-        ctx.lineWidth = 1;
-        for (var g = 0; g <= 5; g++) {
-            var val = (maxY / 5) * g;
-            var gy = y(val);
+            ctx.font = "11px system-ui, sans-serif";
+            ctx.fillStyle = "#94a3b8";
+            ctx.strokeStyle = "rgba(148,163,184,0.12)";
+            ctx.lineWidth = 1;
+            for (var g = 0; g <= 5; g++) {
+                var val = (maxY / 5) * g;
+                var gy = y(val);
+                ctx.beginPath();
+                ctx.moveTo(padL, gy);
+                ctx.lineTo(W - padR, gy);
+                ctx.stroke();
+                ctx.fillText("N" + val + "K", 6, gy + 4);
+            }
+
+            var ticks = { 0: "May 1", 7: "May 8", 14: "May 15", 21: "May 22", 29: "May 31" };
+            ctx.textAlign = "center";
+            for (var t in ticks) {
+                ctx.fillText(ticks[t], x(+t), H - 8);
+            }
+            ctx.textAlign = "left";
+
+            var grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+            grad.addColorStop(0, "rgba(109,74,255,0.45)");
+            grad.addColorStop(1, "rgba(109,74,255,0.02)");
             ctx.beginPath();
-            ctx.moveTo(padL, gy);
-            ctx.lineTo(W - padR, gy);
-            ctx.stroke();
-            ctx.fillText("N" + val + "K", 6, gy + 4);
-        }
-
-        // X labels
-        var ticks = { 0: "May 1", 7: "May 8", 14: "May 15", 21: "May 22", 29: "May 31" };
-        ctx.textAlign = "center";
-        for (var t in ticks) {
-            ctx.fillText(ticks[t], x(+t), H - 8);
-        }
-        ctx.textAlign = "left";
-
-        // Area fill (gradient under the line)
-        var grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
-        grad.addColorStop(0, "rgba(109,74,255,0.45)");
-        grad.addColorStop(1, "rgba(109,74,255,0.02)");
-        ctx.beginPath();
-        ctx.moveTo(x(0), y(data[0]));
-        for (var i = 1; i < n; i++) ctx.lineTo(x(i), y(data[i]));
-        ctx.lineTo(x(n - 1), padT + plotH);
-        ctx.lineTo(x(0), padT + plotH);
-        ctx.closePath();
-        ctx.fillStyle = grad;
-        ctx.fill();
-
-        // Trend line
-        ctx.beginPath();
-        ctx.moveTo(x(0), y(data[0]));
-        for (var j = 1; j < n; j++) ctx.lineTo(x(j), y(data[j]));
-        ctx.strokeStyle = "#8b5cf6";
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
-
-        // End marker
-        var ex = x(n - 1), ey = y(data[n - 1]);
-        ctx.beginPath();
-        ctx.arc(ex, ey, 5, 0, Math.PI * 2);
-        ctx.fillStyle = "#ffffff";
-        ctx.fill();
-        ctx.strokeStyle = "#8b5cf6";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // Tooltip label
-        var label = "\u20A6450,000";
-        ctx.font = "12px system-ui, sans-serif";
-        var tw = ctx.measureText(label).width + 16;
-        var bx = ex - tw, by = ey - 30;
-        ctx.fillStyle = "#6d4aff";
-        if (ctx.roundRect) {
-            ctx.beginPath();
-            ctx.roundRect(bx, by, tw, 22, 6);
+            ctx.moveTo(x(0), y(data[0]));
+            for (var i = 1; i < n; i++) ctx.lineTo(x(i), y(data[i]));
+            ctx.lineTo(x(n - 1), padT + plotH);
+            ctx.lineTo(x(0), padT + plotH);
+            ctx.closePath();
+            ctx.fillStyle = grad;
             ctx.fill();
-        } else {
-            ctx.fillRect(bx, by, tw, 22);
-        }
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText(label, bx + 8, by + 15);
-    }
 
-    draw();
-})();
-  </script>
+            ctx.beginPath();
+            ctx.moveTo(x(0), y(data[0]));
+            for (var j = 1; j < n; j++) ctx.lineTo(x(j), y(data[j]));
+            ctx.strokeStyle = "#8b5cf6";
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            var ex = x(n - 1), ey = y(data[n - 1]);
+            ctx.beginPath();
+            ctx.arc(ex, ey, 5, 0, Math.PI * 2);
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.strokeStyle = "#8b5cf6";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            var label = "\u20A6450,000";
+            ctx.font = "12px system-ui, sans-serif";
+            var tw = ctx.measureText(label).width + 16;
+            var bx = ex - tw, by = ey - 30;
+            ctx.fillStyle = "#6d4aff";
+            if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(bx, by, tw, 22, 6);
+                ctx.fill();
+            } else {
+                ctx.fillRect(bx, by, tw, 22);
+            }
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText(label, bx + 8, by + 15);
+        }
+
+        draw();
+    })();
+</script>

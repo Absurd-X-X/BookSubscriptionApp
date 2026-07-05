@@ -1,365 +1,321 @@
-﻿@{
+﻿@model Application.Common.Pagenation.PagenatedList<Application.Queries.GetByLibraryId.GetByLibraryIdResponse>
+
+@{
     Layout = "~/Views/Shared/_LibraryLayout.cshtml";
     ViewData["Title"] = "Get Books";
+
+    int totalPages = Model.TotalCount == 0 ? 1 : (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+    int startItem = Model.TotalCount == 0 ? 0 : ((Model.Page - 1) * Model.PageSize) + 1;
+    long endItem = Math.Min(Model.Page * Model.PageSize, Model.TotalCount);
+
+    string[] coverClasses = { "cover-cream", "cover-yellow", "cover-dark", "cover-purple", "cover-orange", "cover-blue" };
+
+    string GetSearchKey(string title, string author) =>
+        $"{title} {author}".ToLower();
+
+    var currentSearch = Context.Request.Query["search"].ToString();
+    var currentCategoryId = Context.Request.Query["categoryId"].ToString();
+    var currentIsPublished = Context.Request.Query["isPublished"].ToString();
+    var currentSortBy = Context.Request.Query["sortBy"].ToString();
+    if (string.IsNullOrEmpty(currentSortBy)) currentSortBy = "newest";
+
+    var pagesToShow = new List<int?>();
+    int windowSize = 1;
+    for (int p = 1; p <= totalPages; p++)
+    {
+        bool isEdge = p == 1 || p == totalPages;
+        bool isNearCurrent = Math.Abs(p - Model.Page) <= windowSize;
+
+        if (isEdge || isNearCurrent)
+        {
+            pagesToShow.Add(p);
+        }
+        else if (pagesToShow.Count > 0 && pagesToShow[^1] != null)
+        {
+            pagesToShow.Add(null);
+        }
+    }
 }
-    <link rel="stylesheet" href="~/css/libraryBooks.css" />
-    <main class="lib-main">
-        <!-- Header -->
-        <header class="lib-header">
-            <div>
-                <h1>Books</h1>
-                <p>Manage and publish your digital book collection.</p>
-            </div>
-            <div class="lib-actions">
-                <div class="search-top">
-                    <span class="search-ic">⌕</span>
-                    <input type="text" placeholder="Search books..." aria-label="Search books" />
-                    <kbd>⌘K</kbd>
+<link rel="stylesheet" href="~/css/libraryBooks.css" />
+<main class="lib-main">
+    <!-- Header -->
+    <header class="lib-header">
+        <div>
+            <h1>Books</h1>
+            <p>Manage and publish your digital book collection.</p>
+        </div>
+        <div class="lib-actions">
+            <div class="search-top">
+                <span class="search-ic">⌕</span>
+                <input type="text" placeholder="Search books..." aria-label="Search books" />
+                <kbd>⌘K</kbd>
             </div>
             <a href="@Url.Action("AddBook", "Library")" class="btn-primary button">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-            Add Book
-        </a>
-                <button class="btn btn-ghost">⤓ Import Books</button>
-                <button class="btn btn-ghost">⤒ Export</button>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                Add Book
+            </a>
+            <button class="btn btn-ghost">⤓ Import Books</button>
+            <button class="btn btn-ghost">⤒ Export</button>
+        </div>
+    </header>
+
+    <!-- Stat cards -->
+    <section class="stat-grid">
+        <article class="card stat">
+            <span class="stat-icon ic-purple">📖</span>
+            <div class="stat-body">
+                <span class="stat-label">Total Books</span>
+                <strong class="stat-value">@Model.TotalCount</strong>
             </div>
-        </header>
-
-        <!-- Stat cards -->
-        <section class="stat-grid">
-            <article class="card stat">
-                <span class="stat-icon ic-purple">📖</span>
-                <div class="stat-body">
-                    <span class="stat-label">Total Books</span>
-                    <strong class="stat-value">128</strong>
-                    <span class="stat-trend up">↑ 12 this month</span>
-                </div>
-                <span class="stat-info">ⓘ</span>
-            </article>
-            <article class="card stat">
-                <span class="stat-icon ic-green">📗</span>
-                <div class="stat-body">
-                    <span class="stat-label">Published</span>
-                    <strong class="stat-value">115</strong>
-                    <span class="stat-trend up">↑ 10 this month</span>
-                </div>
-                <span class="stat-info">ⓘ</span>
-            </article>
-            <article class="card stat">
-                <span class="stat-icon ic-amber">📄</span>
-                <div class="stat-body">
-                    <span class="stat-label">Drafts</span>
-                    <strong class="stat-value">9</strong>
-                    <span class="stat-trend up">↑ 2 this month</span>
-                </div>
-                <span class="stat-info">ⓘ</span>
-            </article>
-            <article class="card stat">
-                <span class="stat-icon ic-red">🗄</span>
-                <div class="stat-body">
-                    <span class="stat-label">Archived</span>
-                    <strong class="stat-value">4</strong>
-                    <span class="stat-trend down">↓ 1 this month</span>
-                </div>
-                <span class="stat-info">ⓘ</span>
-            </article>
-        </section>
-
-        <!-- Filter bar -->
-        <section class="filter-bar card">
-            <div class="search-inline">
-                <span class="search-ic">⌕</span>
-                <input id="bookSearch" type="text" placeholder="Search books by title, author or ISBN..." aria-label="Filter books" />
+            <span class="stat-info">ⓘ</span>
+        </article>
+        <article class="card stat">
+            <span class="stat-icon ic-green">📗</span>
+            <div class="stat-body">
+                <span class="stat-label">Published</span>
+                <strong class="stat-value">@Model.Items.Count(x => x.IsPublished)</strong>
             </div>
-            <label class="field">
-                <span>Category</span>
-                <select><option>All Categories</option><option>Self Help</option><option>Technology</option><option>Business</option><option>Finance</option></select>
-            </label>
-            <label class="field">
-                <span>Status</span>
-                <select><option>All Status</option><option>Published</option><option>Draft</option><option>Archived</option></select>
-            </label>
-            <label class="field">
-                <span>Sort by</span>
-                <select><option>Newest First</option><option>Oldest First</option><option>Most Reads</option><option>Top Rated</option></select>
-            </label>
-            <button class="btn btn-ghost">⚲ Filter</button>
-        </section>
+            <span class="stat-info">ⓘ</span>
+        </article>
+        <article class="card stat">
+            <span class="stat-icon ic-amber">📄</span>
+            <div class="stat-body">
+                <span class="stat-label">Drafts</span>
+                <strong class="stat-value">@Model.Items.Count(x => !x.IsPublished)</strong>
+            </div>
+            <span class="stat-info">ⓘ</span>
+        </article>
+    </section>
 
-        <!-- Book grid -->
-        <section class="book-grid" id="bookGrid">
-            <!-- Row 1 -->
-            <article class="book-card" data-title="atomic habits james clear">
+    <!-- Filter bar -->
+    <form method="get" asp-action="GetLibraryBooks" asp-controller="Library" class="filter-bar card" id="filterForm">
+        <input type="hidden" name="pageSize" value="@Model.PageSize" />
+        <div class="search-inline">
+            <span class="search-ic">⌕</span>
+            <input id="bookSearch" name="search" type="text" value="@currentSearch"
+                   placeholder="Search books by title, author or ISBN..." aria-label="Filter books" />
+        </div>
+        <label class="field">
+            <span>Category</span>
+            <select name="categoryId" onchange="document.getElementById('filterForm').submit()">
+                <option value="">All Categories</option>
+                @foreach (var cat in Model.Items.Select(x => new { x.CategoryId, x.CategoryName }).Distinct())
+                {
+                    var isSelected = currentCategoryId == cat.CategoryId.ToString();
+                    @if (isSelected)
+                    {
+                        <option value="@cat.CategoryId" selected>@cat.CategoryName</option>
+                    }
+                    else
+                    {
+                        <option value="@cat.CategoryId">@cat.CategoryName</option>
+                    }
+                }
+            </select>
+        </label>
+        <label class="field">
+            <span>Status</span>
+            <select name="isPublished" onchange="document.getElementById('filterForm').submit()">
+                <option value="">All Status</option>
+                @if (currentIsPublished == "true")
+                {
+                    <option value="true" selected>Published</option>
+                }
+                else
+                {
+                    <option value="true">Published</option>
+                }
+                @if (currentIsPublished == "false")
+                {
+                    <option value="false" selected>Draft</option>
+                }
+                else
+                {
+                    <option value="false">Draft</option>
+                }
+            </select>
+        </label>
+        <label class="field">
+            <span>Sort by</span>
+            <select name="sortBy" onchange="document.getElementById('filterForm').submit()">
+                @if (currentSortBy == "newest")
+                {
+                    <option value="newest" selected>Newest First</option>
+                }
+                else
+                {
+                    <option value="newest">Newest First</option>
+                }
+                @if (currentSortBy == "oldest")
+                {
+                    <option value="oldest" selected>Oldest First</option>
+                }
+                else
+                {
+                    <option value="oldest">Oldest First</option>
+                }
+                @if (currentSortBy == "mostread")
+                {
+                    <option value="mostread" selected>Most Reads</option>
+                }
+                else
+                {
+                    <option value="mostread">Most Reads</option>
+                }
+            </select>
+        </label>
+        <button type="submit" class="btn btn-ghost">⚲ Filter</button>
+    </form>
+
+    <!-- Book grid -->
+    <section class="book-grid" id="bookGrid">
+        @{
+            int coverIdx = 0;
+        }
+        @foreach (var book in Model.Items)
+        {
+            var searchKey = GetSearchKey(book.Title, book.Author);
+            var coverClass = coverClasses[coverIdx % coverClasses.Length];
+            coverIdx++;
+            <article class="book-card" data-title="@searchKey">
                 <div class="book-top">
-                    <span class="badge badge-pub">Published</span>
+                    <span class="badge @(book.IsPublished ? "badge-pub" : "badge-draft")">@(book.IsPublished ? "Published" : "Draft")</span>
                     <button class="kebab" aria-label="More options">⋮</button>
                 </div>
-                <div class="cover cover-cream">
-                    <span class="cover-sub">Tiny Changes, Remarkable Results</span>
-                    <span class="cover-title">Atomic Habits</span>
-                    <span class="cover-author">James Clear</span>
+                @if (!string.IsNullOrWhiteSpace(book.BookCoverUrl))
+                {
+                    <div class="cover cover-img" style="background-image:url('@book.BookCoverUrl')"></div>
+                }
+                else
+                {
+                    <div class="cover @coverClass">
+                        <span class="cover-title">@book.Title</span>
+                        <span class="cover-author">@book.Author</span>
+                    </div>
+                }
+                <h3 class="b-title">@book.Title</h3>
+                <p class="b-author">@book.Author</p>
+                <div class="b-meta"><span>@book.NoOfTimeReadByPeople Reads</span><span>@book.EngagementPercent% Engagement</span></div>
+                <div class="b-actions">
+                    <a href="@Url.Action("GetLibraryBook", "Library", new { id = book.BookId })" aria-label="View">👁</a>
+                    <a href="@Url.Action("EditBook", "Library", new { id = book.BookId })" aria-label="Edit">✎</a>
+                    <button aria-label="More">⋯</button>
                 </div>
-                <h3 class="b-title">Atomic Habits</h3>
-                <p class="b-author">James Clear</p>
-                <p class="b-rating">★ 4.9 <span>(245)</span></p>
-                <div class="b-meta"><span>1,245 Reads</span><span>₦98,000 Revenue</span></div>
-                <div class="b-actions"><a href="@Url.Action("GetLibraryBook", "Library")" aria-label="View">👁</a>
-                    <a href="@Url.Action("EditBook", "Library")" aria-label="Edit">✎</a><button aria-label="More">⋯</button></div>
             </article>
-
-            <article class="book-card" data-title="deep work cal newport">
-                <div class="book-top"><span class="badge badge-pub">Published</span><button class="kebab" aria-label="More options">⋮</button></div>
-                <div class="cover cover-yellow"><span class="cover-title big">DEEP WORK</span><span class="cover-sub">Rules for Focused Success in a Distracted World</span></div>
-                <h3 class="b-title">Deep Work</h3>
-                <p class="b-author">Cal Newport</p>
-                <p class="b-rating">★ 4.8 <span>(198)</span></p>
-                <div class="b-meta"><span>985 Reads</span><span>₦76,500 Revenue</span></div>
-                <div class="b-actions"><a aria-label="View">👁</a><a aria-label="Edit">✎</a><button aria-label="More">⋯</button></div>
-            </article>
-
-            <article class="book-card" data-title="clean code robert martin">
-                <div class="book-top"><span class="badge badge-pub">Published</span><button class="kebab" aria-label="More options">⋮</button></div>
-                <div class="cover cover-dark"><span class="cover-title">Clean Code</span><span class="cover-author">Robert C. Martin</span></div>
-                <h3 class="b-title">Clean Code</h3>
-                <p class="b-author">Robert C. Martin</p>
-                <p class="b-rating">★ 4.7 <span>(156)</span></p>
-                <div class="b-meta"><span>876 Reads</span><span>₦64,800 Revenue</span></div>
-                <div class="b-actions"><button aria-label="View">👁</button><button aria-label="Edit">✎</button><button aria-label="More">⋯</button></div>
-            </article>
-
-            <article class="book-card" data-title="rich dad poor dad robert kiyosaki">
-                <div class="book-top"><span class="badge badge-pub">Published</span><button class="kebab" aria-label="More options">⋮</button></div>
-                <div class="cover cover-purple"><span class="cover-title big">RICH DAD POOR DAD</span><span class="cover-author">Robert Kiyosaki</span></div>
-                <h3 class="b-title">Rich Dad Poor Dad</h3>
-                <p class="b-author">Robert Kiyosaki</p>
-                <p class="b-rating">★ 4.6 <span>(132)</span></p>
-                <div class="b-meta"><span>765 Reads</span><span>₦58,200 Revenue</span></div>
-                <div class="b-actions"><button aria-label="View">👁</button><button aria-label="Edit">✎</button><button aria-label="More">⋯</button></div>
-            </article>
-
-            <article class="book-card" data-title="the 5 am club robin sharma">
-                <div class="book-top"><span class="badge badge-draft">Draft</span><button class="kebab" aria-label="More options">⋮</button></div>
-                <div class="cover cover-cream"><span class="cover-title big">The 5 AM CLUB</span><span class="cover-sub">Own Your Morning. Elevate Your Life.</span></div>
-                <h3 class="b-title">The 5 AM Club</h3>
-                <p class="b-author">Robin Sharma</p>
-                <p class="b-rating">★ 4.5 <span>(98)</span></p>
-                <div class="b-meta"><span>654 Reads</span><span>₦48,600 Revenue</span></div>
-                <div class="b-actions"><button aria-label="View">👁</button><button aria-label="Edit">✎</button><button aria-label="More">⋯</button></div>
-            </article>
-
-            <!-- Row 2 -->
-            <article class="book-card" data-title="the psychology of money morgan housel">
-                <div class="book-top"><span class="badge badge-pub">Published</span><button class="kebab" aria-label="More options">⋮</button></div>
-                <div class="cover cover-cream"><span class="cover-title">The Psychology of Money</span><span class="cover-author">Morgan Housel</span></div>
-                <h3 class="b-title">The Psychology of Money</h3>
-                <p class="b-author">Morgan Housel</p>
-                <p class="b-rating">★ 4.8 <span>(174)</span></p>
-                <div class="b-meta"><span>1,102 Reads</span><span>₦82,400 Revenue</span></div>
-                <div class="b-actions"><button aria-label="View">👁</button><button aria-label="Edit">✎</button><button aria-label="More">⋯</button></div>
-            </article>
-
-            <article class="book-card" data-title="think and grow rich napoleon hill">
-                <div class="book-top"><span class="badge badge-pub">Published</span><button class="kebab" aria-label="More options">⋮</button></div>
-                <div class="cover cover-cream border-gold"><span class="cover-title">THINK AND GROW RICH</span><span class="cover-author">Napoleon Hill</span></div>
-                <h3 class="b-title">Think and Grow Rich</h3>
-                <p class="b-author">Napoleon Hill</p>
-                <p class="b-rating">★ 4.7 <span>(121)</span></p>
-                <div class="b-meta"><span>732 Reads</span><span>₦42,300 Revenue</span></div>
-                <div class="b-actions"><button aria-label="View">👁</button><button aria-label="Edit">✎</button><button aria-label="More">⋯</button></div>
-            </article>
-
-            <article class="book-card" data-title="the subtle art of not giving a f*ck mark manson">
-                <div class="book-top"><span class="badge badge-pub">Published</span><button class="kebab" aria-label="More options">⋮</button></div>
-                <div class="cover cover-orange"><span class="cover-title big">THE SUBTLE ART OF NOT GIVING A F*CK</span><span class="cover-author">Mark Manson</span></div>
-                <h3 class="b-title">The Subtle Art of Not Giving a F*ck</h3>
-                <p class="b-author">Mark Manson</p>
-                <p class="b-rating">★ 4.6 <span>(113)</span></p>
-                <div class="b-meta"><span>673 Reads</span><span>₦39,700 Revenue</span></div>
-                <div class="b-actions"><button aria-label="View">👁</button><button aria-label="Edit">✎</button><button aria-label="More">⋯</button></div>
-            </article>
-
-            <article class="book-card" data-title="sapiens yuval noah harari">
-                <div class="book-top"><span class="badge badge-draft">Draft</span><button class="kebab" aria-label="More options">⋮</button></div>
-                <div class="cover cover-cream"><span class="cover-sub">Yuval Noah Harari</span><span class="cover-title">Sapiens</span><span class="cover-author">A Brief History of Humankind</span></div>
-                <h3 class="b-title">Sapiens</h3>
-                <p class="b-author">Yuval Noah Harari</p>
-                <p class="b-rating">★ 4.8 <span>(167)</span></p>
-                <div class="b-meta"><span>589 Reads</span><span>₦36,100 Revenue</span></div>
-                <div class="b-actions"><button aria-label="View">👁</button><button aria-label="Edit">✎</button><button aria-label="More">⋯</button></div>
-            </article>
-
-            <article class="book-card" data-title="the 4-hour body timothy ferriss">
-                <div class="book-top"><span class="badge badge-arch">Archived</span><button class="kebab" aria-label="More options">⋮</button></div>
-                <div class="cover cover-blue"><span class="cover-title big">The 4-Hour BODY</span><span class="cover-author">Timothy Ferriss</span></div>
-                <h3 class="b-title">The 4-Hour Body</h3>
-                <p class="b-author">Timothy Ferriss</p>
-                <p class="b-rating">★ 4.4 <span>(85)</span></p>
-                <div class="b-meta"><span>432 Reads</span><span>₦28,700 Revenue</span></div>
-                <div class="b-actions"><button aria-label="View">👁</button><button aria-label="Edit">✎</button><button aria-label="More">⋯</button></div>
-            </article>
-        </section>
-
-        <!-- Pagination -->
-        <footer class="pager">
-            <span class="pager-info">Showing 1 to 10 of 128 books</span>
-            <nav class="pager-nav" id="pager" aria-label="Pagination">
-                <button class="pg-btn" aria-label="Previous">‹</button>
-                <button class="pg-btn active">1</button>
-                <button class="pg-btn">2</button>
-                <button class="pg-btn">3</button>
-                <span class="pg-dots">…</span>
-                <button class="pg-btn">13</button>
-                <button class="pg-btn" aria-label="Next">›</button>
-            </nav>
-            <label class="pager-show">
-                Show
-                <select><option>10</option><option>20</option><option>50</option></select>
-                per page
-            </label>
-        </footer>
-    </main>
-
-    <script>
-            (function () {
-      // --- Live search filter ---
-      var search = document.getElementById("bookSearch");
-      var grid = document.getElementById("bookGrid");
-
-      if (search && grid) {
-        var cards = grid.querySelectorAll(".book-card");
-        search.addEventListener("input", function () {
-          var q = search.value.trim().toLowerCase();
-          cards.forEach(function (card) {
-            var hay = card.getAttribute("data-title") || "";
-            card.style.display = hay.indexOf(q) !== -1 ? "" : "none";
-          });
-        });
-      }
-
-      // --- Pagination active state ---
-      var pager = document.getElementById("pager");
-      if (pager) {
-        var pageButtons = pager.querySelectorAll(".pg-btn");
-        pageButtons.forEach(function (btn) {
-          btn.addEventListener("click", function () {
-            // Ignore the prev/next arrows for active highlighting
-            var label = btn.textContent.trim();
-            if (label === "\u2039" || label === "\u203a") return;
-            pageButtons.forEach(function (b) { b.classList.remove("active"); });
-            btn.classList.add("active");
-          });
-        });
-      }
-    })();
-
-
-    // --- Three-dot dropdown menu (vertical kebab + horizontal "More") ---
-var MENU_HTML =
-  '<button type="button" role="menuitem" class="kebab-item" data-action="edit">✎ Edit Book</button>' +
-  '<button type="button" role="menuitem" class="kebab-item" data-action="upload">⤓ Upload New Version</button>' +
-  '<button type="button" role="menuitem" class="kebab-item" data-action="duplicate">⧉ Duplicate Book</button>' +
-  '<button type="button" role="menuitem" class="kebab-item" data-action="share">↗ Share Link</button>' +
-  '<div class="kebab-sep"></div>' +
-  '<button type="button" role="menuitem" class="kebab-item" data-action="archive">🗄 Archive Book</button>' +
-  '<button type="button" role="menuitem" class="kebab-item danger" data-action="delete">🗑 Delete Book</button>';
-
-function attachMenu(trigger, alignClass) {
-  // Wrap the trigger in a positioned container and attach a menu
-  var wrap = document.createElement("div");
-  wrap.className = "kebab-wrap";
-  trigger.parentNode.insertBefore(wrap, trigger);
-  wrap.appendChild(trigger);
-
-  var menu = document.createElement("div");
-  menu.className = "kebab-menu" + (alignClass ? " " + alignClass : "");
-  menu.setAttribute("role", "menu");
-  menu.innerHTML = MENU_HTML;
-  wrap.appendChild(menu);
-
-  trigger.addEventListener("click", function (e) {
-    e.stopPropagation();
-    var isOpen = wrap.classList.contains("open");
-    // Close any other open menus first
-    document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
-      w.classList.remove("open");
-    });
-    if (!isOpen) wrap.classList.add("open");
-  });
-
-  menu.querySelectorAll(".kebab-item").forEach(function (item) {
-    item.addEventListener("click", function (e) {
-      e.stopPropagation();
-      wrap.classList.remove("open");
-      var card = trigger.closest(".book-card");
-      var title = card ? card.querySelector(".b-title").textContent : "";
-      var action = item.getAttribute("data-action");
-      console.log("[v0]", action, "clicked for:", title);
-    });
-  });
-}
-
-// Vertical kebab (top-right of each card) — menu opens downward to the right edge
-document.querySelectorAll(".kebab").forEach(function (kebab) {
-  attachMenu(kebab, "");
-});
-
-// Horizontal "More" button (bottom action row) — menu opens upward
-document.querySelectorAll('.b-actions button[aria-label="More"]').forEach(function (more) {
-  attachMenu(more, "menu-up");
-});
-
-// Close menus when clicking anywhere else
-document.addEventListener("click", function () {
-  document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
-    w.classList.remove("open");
-  });
-});
-
-    const modal =
-        document.getElementById("paymentModal");
-
-    const openBtn =
-        document.getElementById("openPaymentModal");
-
-    const closeBtn =
-        document.getElementById("closePaymentModal");
-
-    const cancelBtn =
-        document.getElementById("cancelPaymentModal");
-
-    /* Open */
-
-    openBtn.addEventListener("click", () => {
-
-        modal.classList.add("show");
-
-    });
-
-    /* Close Button */
-
-    closeBtn.addEventListener("click", () => {
-
-        modal.classList.remove("show");
-
-    });
-
-    /* Cancel Button */
-
-    cancelBtn.addEventListener("click", () => {
-
-        modal.classList.remove("show");
-
-    });
-
-    /* Click Outside */
-
-    modal.addEventListener("click", (e) => {
-
-        if (e.target === modal) {
-
-            modal.classList.remove("show");
-
         }
+        @if (!Model.Items.Any())
+        {
+            <p>No books found.</p>
+        }
+    </section>
 
+    <!-- Pagination -->
+    <footer class="pager">
+        <span class="pager-info">Showing @startItem to @endItem of @Model.TotalCount books</span>
+        <nav class="pager-nav" id="pager" aria-label="Pagination">
+            <a class="pg-btn" aria-label="Previous"
+               href="@Url.Action("GetLibraryBooks", "Library", new
+               {
+                   page = Math.Max(1, Model.Page - 1),
+                   pageSize = Model.PageSize,
+                   search = currentSearch,
+                   categoryId = currentCategoryId,
+                   isPublished = currentIsPublished,
+                   sortBy = currentSortBy
+               })">‹</a>
+            @foreach (var p in pagesToShow)
+            {
+                if (p == null)
+                {
+                    <span class="pg-dots">…</span>
+                }
+                else
+                {
+                    <a class="pg-btn @(p == Model.Page ? "active" : "")"
+                       href="@Url.Action("GetLibraryBooks", "Library", new
+                       {
+                           page = p,
+                           pageSize = Model.PageSize,
+                           search = currentSearch,
+                           categoryId = currentCategoryId,
+                           isPublished = currentIsPublished,
+                           sortBy = currentSortBy
+                       })">@p</a>
+                }
+            }
+            <a class="pg-btn" aria-label="Next"
+               href="@Url.Action("GetLibraryBooks", "Library", new
+               {
+                   page = Math.Min(totalPages, Model.Page + 1),
+                   pageSize = Model.PageSize,
+                   search = currentSearch,
+                   categoryId = currentCategoryId,
+                   isPublished = currentIsPublished,
+                   sortBy = currentSortBy
+               })">›</a>
+        </nav>
+        <label class="pager-show">
+            Show
+            <select><option>10</option><option>20</option><option>50</option></select>
+            per page
+        </label>
+    </footer>
+</main>
+
+<script>
+    var MENU_HTML =
+        '<button type="button" role="menuitem" class="kebab-item" data-action="edit">✎ Edit Book</button>' +
+        '<button type="button" role="menuitem" class="kebab-item" data-action="upload">⤓ Upload New Version</button>' +
+        '<button type="button" role="menuitem" class="kebab-item" data-action="duplicate">⧉ Duplicate Book</button>' +
+        '<button type="button" role="menuitem" class="kebab-item" data-action="share">↗ Share Link</button>' +
+        '<div class="kebab-sep"></div>' +
+        '<button type="button" role="menuitem" class="kebab-item" data-action="archive">🗄 Archive Book</button>' +
+        '<button type="button" role="menuitem" class="kebab-item danger" data-action="delete">🗑 Delete Book</button>';
+
+    function attachMenu(trigger, alignClass) {
+        var wrap = document.createElement("div");
+        wrap.className = "kebab-wrap";
+        trigger.parentNode.insertBefore(wrap, trigger);
+        wrap.appendChild(trigger);
+
+        var menu = document.createElement("div");
+        menu.className = "kebab-menu" + (alignClass ? " " + alignClass : "");
+        menu.setAttribute("role", "menu");
+        menu.innerHTML = MENU_HTML;
+        wrap.appendChild(menu);
+
+        trigger.addEventListener("click", function (e) {
+            e.stopPropagation();
+            var isOpen = wrap.classList.contains("open");
+            document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
+                w.classList.remove("open");
+            });
+            if (!isOpen) wrap.classList.add("open");
+        });
+
+        menu.querySelectorAll(".kebab-item").forEach(function (item) {
+            item.addEventListener("click", function (e) {
+                e.stopPropagation();
+                wrap.classList.remove("open");
+                var card = trigger.closest(".book-card");
+                var title = card ? card.querySelector(".b-title").textContent : "";
+                var action = item.getAttribute("data-action");
+                console.log("[v0]", action, "clicked for:", title);
+            });
+        });
+    }
+
+    document.querySelectorAll(".kebab").forEach(function (kebab) {
+        attachMenu(kebab, "");
     });
-    </script>
+
+    document.querySelectorAll('.b-actions button[aria-label="More"]').forEach(function (more) {
+        attachMenu(more, "menu-up");
+    });
+
+    document.addEventListener("click", function () {
+        document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
+            w.classList.remove("open");
+        });
+    });
+</script>

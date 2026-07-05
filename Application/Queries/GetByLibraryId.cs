@@ -5,29 +5,38 @@ using MediatR;
 
 namespace Application.Queries
 {
-    public class GetAllBook
+    public class GetByLibraryId
     {
-        public record GetAllBookQuery(
+        public record GetByLibraryIdQuery(
+            Guid LibraryId,
             int Page,
-            int PageSize
-            ) : IRequest<Result<PagenatedList<GetAllBookResponse>>>;
+            int PageSize,
+            string? Search = null,
+            Guid? CategoryId = null,
+            bool? IsPublished = null,
+            string? SortBy = null
+            ) : IRequest<Result<PagenatedList<GetByLibraryIdResponse>>>;
 
-        public class GetAllBookHandler(
+        public class GetByLibraryIdHandler(
             IBookRepository bookRepository
-            ) : IRequestHandler<GetAllBookQuery, Result<PagenatedList<GetAllBookResponse>>>
+            ) : IRequestHandler<GetByLibraryIdQuery, Result<PagenatedList<GetByLibraryIdResponse>>>
         {
-            async Task<Result<PagenatedList<GetAllBookResponse>>> IRequestHandler<GetAllBookQuery, Result<PagenatedList<GetAllBookResponse>>>.
-                Handle(GetAllBookQuery request, CancellationToken cancellationToken)
+            public async Task<Result<PagenatedList<GetByLibraryIdResponse>>> Handle(GetByLibraryIdQuery request, CancellationToken cancellationToken)
             {
-                PageRequest page = new PageRequest
-                {
-                    Page = request.Page,
-                    PageSize = request.PageSize
-                };
+                var books = await bookRepository.GetBookByLibraryIdAsync(
+                    request.LibraryId,
+                    new PageRequest
+                    {
+                        Page = request.Page,
+                        PageSize = request.PageSize
+                    },
+                    true,
+                    request.Search,
+                    request.CategoryId,
+                    request.IsPublished,
+                    request.SortBy);
 
-                var books = await bookRepository.GetAllAsync(page, true);
-
-                var bookData = books.Items.Where(x => !x.IsDeleted).Select(x => new GetAllBookResponse(
+                var bookData = books.Items.Select(x => new GetByLibraryIdResponse(
                     x.Id,
                     x.Title,
                     x.Author,
@@ -47,7 +56,7 @@ namespace Application.Queries
                     x.IsPublished
                     )).ToList();
 
-                var pagedData = new PagenatedList<GetAllBookResponse>
+                var pagedData = new PagenatedList<GetByLibraryIdResponse>
                 {
                     Items = bookData,
                     Page = request.Page,
@@ -55,11 +64,11 @@ namespace Application.Queries
                     TotalCount = books.TotalCount
                 };
 
-                return Result<PagenatedList<GetAllBookResponse>>.Success(pagedData, "Retrieved");
+                return Result<PagenatedList<GetByLibraryIdResponse>>.Success(pagedData, "Retrieved");
             }
         }
 
-        public record GetAllBookResponse(
+        public record GetByLibraryIdResponse(
             Guid BookId, string Title,
             string Author, int PublicationYear,
             string Isbn, string Genre,

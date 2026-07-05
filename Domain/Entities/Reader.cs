@@ -12,6 +12,7 @@
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
         public DateTime DateModified { get; set; }
         public bool IsDeleted { get; set; }
+        public ICollection<Review> Reviews { get; set; } = new HashSet<Review>();
         public ICollection<ReadingProgress> ReadingProgresses { get; set; } = new HashSet<ReadingProgress>();
     }
 }

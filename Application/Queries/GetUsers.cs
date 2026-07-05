@@ -22,7 +22,7 @@ namespace Application.Queries
                     u.Id,
                     u.ImageUrl ?? "none",
                     u.UserName,
-                    u.Reader?.Name ?? u.Library?.Name! ?? "Administator",
+                    u.UserName! ?? "Administator",
                     u.Email,
                     u.Role,
                     u.DateCreated,
@@ -49,6 +49,6 @@ namespace Application.Queries
             string Role,
             DateTime DateJoined,
             bool Status
-            );
+        );
     }
 }

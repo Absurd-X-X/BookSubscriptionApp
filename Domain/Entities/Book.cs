@@ -17,10 +17,13 @@
         public string FileType { get; set; } = default!;
         public string BookCoverUrl { get; set; } = default!;
         public int NoOfTimeReadByPeople { get; set; }
+        public string About { get; set; } = default!;
         public string CreatedBy { get; set; } = default!;
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
         public DateTime DateModified { get; set; }
         public bool IsDeleted { get; set; }
+        public bool IsPublished { get; set; }
+        public ICollection<Review> Reviews { get; set; } = new HashSet<Review>();
         public ICollection<ReadingProgress> ReadingProgresses { get; set; } = new HashSet<ReadingProgress>();
     }
 }

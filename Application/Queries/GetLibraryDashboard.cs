@@ -13,7 +13,9 @@ namespace Application.Queries
 
         public class GetLibraryDashboardHandler(
             IBookRepository bookRepository,
-            IUserRepository userRepository) : 
+            IUserRepository userRepository,
+            IAuditLogRepository auditLogRepository,
+            IReviewRepository reviewRepo) : 
                 IRequestHandler<GetLibraryDashboardQuery, Result<GetLibraryDashboardResponse>>
         {
             public async Task<Result<GetLibraryDashboardResponse>> Handle(GetLibraryDashboardQuery request, CancellationToken cancellationToken)
@@ -25,6 +27,18 @@ namespace Application.Queries
                 }, false);
 
                 var user = await userRepository.GetAsync(request.UserId);
+                var audits = await auditLogRepository.GetAllAsync(new PageRequest
+                {
+                    Page = 1,
+                    PageSize = 5
+                }, false);
+
+                var reviews = await reviewRepo.GetByLibraryIdAsync(new PageRequest
+                {
+                    Page = 1,
+                    PageSize = 5
+                }, false, request.LibraryId);
+
                 if (user is null)
                     return Result<GetLibraryDashboardResponse>.Failure("You are not found");
 
@@ -41,7 +55,16 @@ namespace Application.Queries
 
                     books.Items
                     .OrderByDescending(v => v.NoOfTimeReadByPeople)
-                    .Count(x => x.LibraryId == request.LibraryId && !x.IsDeleted && x.NoOfTimeReadByPeople != 0)
+                    .Where(x => x.LibraryId == request.LibraryId && !x.IsDeleted && x.DateCreated.Month == DateTime.UtcNow.Month),
+
+                    books.Items
+                    .OrderByDescending(v => v.NoOfTimeReadByPeople)
+                    .Count(x => x.LibraryId == request.LibraryId && !x.IsDeleted && x.NoOfTimeReadByPeople != 0),
+
+                    [.. audits.Items.OrderByDescending(x => x.Timestamp).Take(5)],
+
+                    [.. reviews.Items.OrderByDescending(x => x.DateCreated).Take(5)]
+
                     ), "Retrived");
             }
         }
@@ -51,7 +74,10 @@ namespace Application.Queries
             decimal Balance,
             IEnumerable<Book> AddedBooks,
             IEnumerable<Book> MostRead,
-            int TotalNoOfLibraryBooksRead
+            IEnumerable<Book> BookCreatedThisMonth,
+            int TotalNoOfLibraryBooksRead,
+            IEnumerable<AuditLog> RecentActivity,
+            IEnumerable<Review> RecentReviews
             );
     }
 }

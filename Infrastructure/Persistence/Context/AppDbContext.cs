@@ -25,6 +25,7 @@ namespace Infrastructure.Persistence.Context
         public DbSet<UserConversation> UserConversations { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<WalletTransaction> WalletTransactions { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

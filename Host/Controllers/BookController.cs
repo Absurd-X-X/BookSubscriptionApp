@@ -8,6 +8,7 @@ using static Application.Queries.GetAllBook;
 using static Application.Queries.GetBookByCategoryId;
 using static Application.Queries.GetBookById;
 using static Application.Queries.GetBookByLibraryId;
+using static Application.Queries.GetByLibraryId;
 using static Application.Queries.GetCategoryByName;
 using static Application.Queries.SearchBookByTitle;
 
@@ -103,18 +104,29 @@ namespace Host.Controllers
             return View(result.Data);
         }
         [HttpGet]
-        public async Task<IActionResult> GetByLIbrary(Guid libraryId)
+        public async Task<IActionResult> GetByLibrary(
+        int page = 1,
+        int pageSize = 10,
+        string? search = null,
+        Guid? categoryId = null,
+        bool? isPublished = null,
+        string? sortBy = null)
         {
-            var result = await mediator.Send(new GetBookByLibraryIdQuery(libraryId));
+            var libraryId = ClaimsHelper.GetCustomerId(User);
+            var userId = ClaimsHelper.GetUserId(User);
 
-            if (!result.Status)
+            var response = await mediator.Send(new GetByLibraryIdQuery(
+                libraryId, page, pageSize, search, categoryId, isPublished, sortBy));
+
+            if (!response.Status)
             {
-                TempData["Error"] = result.Message;
-                return RedirectToAction(nameof(GetBooks));
+                TempData["Error"] = response.Message;
+                return View(response.Data);
             }
 
-            TempData["success"] = result.Message;
-            return View(result.Data);
+            TempData["Success"] = response.Message;
+
+            return View(response.Data);
         }
 
         [HttpGet]

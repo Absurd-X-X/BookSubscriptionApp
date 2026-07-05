@@ -162,7 +162,7 @@
           </thead>
           <tbody>
 
-            <tr>
+            <tr data-category="Readers">
               <td>
                 <div class="al-activity-cell">
                   <div class="al-activity-icon violet">
@@ -193,7 +193,7 @@
               <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
             </tr>
 
-            <tr>
+            <tr data-category="Books">
               <td>
                 <div class="al-activity-cell">
                   <div class="al-activity-icon blue">
@@ -232,7 +232,7 @@
               <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
             </tr>
 
-            <tr>
+            <tr data-category="Reviews">
               <td>
                 <div class="al-activity-cell">
                   <div class="al-activity-icon gold">
@@ -271,7 +271,7 @@
               <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
             </tr>
 
-            <tr>
+            <tr data-category="System">
               <td>
                 <div class="al-activity-cell">
                   <div class="al-activity-icon violet">
@@ -302,7 +302,7 @@
               <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
             </tr>
 
-            <tr>
+            <tr data-category="Readers">
               <td>
                 <div class="al-activity-cell">
                   <div class="al-activity-icon green">
@@ -333,7 +333,7 @@
               <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
             </tr>
 
-            <tr>
+            <tr data-category="Reviews">
               <td>
                 <div class="al-activity-cell">
                   <div class="al-activity-icon red">
@@ -372,7 +372,7 @@
               <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
             </tr>
 
-            <tr>
+            <tr data-category="Books">
               <td>
                 <div class="al-activity-cell">
                   <div class="al-activity-icon amber">
@@ -411,7 +411,7 @@
               <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
             </tr>
 
-            <tr>
+            <tr data-category="System">
               <td>
                 <div class="al-activity-cell">
                   <div class="al-activity-icon violet">
@@ -442,7 +442,7 @@
               <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
             </tr>
 
-            <tr>
+            <tr data-category="System">
               <td>
                 <div class="al-activity-cell">
                   <div class="al-activity-icon indigo">
@@ -473,7 +473,7 @@
               <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
             </tr>
 
-            <tr>
+            <tr data-category="System">
               <td>
                 <div class="al-activity-cell">
                   <div class="al-activity-icon orange">
@@ -666,14 +666,6 @@
 </main>
 
 <script>
-  /* ===========================================================
-   Activity Logs — chart + interactivity
-   The table rows live directly in the HTML (not built by JS).
-   This file only does three things:
-     1. Draws the donut chart
-     2. Filters/searches the rows that are already on the page
-     3. Handles pagination + date-filter button states (UI only)
-   =========================================================== */
 
 (function () {
   "use strict";
@@ -722,13 +714,6 @@
       }
     });
   }
-
-  /* ---------------------------------------------------------
-     2. Search + dropdown filtering
-     Reads the text already inside each <tr> instead of a
-     separate data array — so it always matches what's on screen,
-     and editing a row in the HTML is all you need to do.
-  --------------------------------------------------------- */
   function applyFilters() {
     const q = document.getElementById("al-search-input").value.trim().toLowerCase();
     const actionFilter = document.getElementById("al-filter-action").value;
@@ -813,15 +798,80 @@
   /* ---------------------------------------------------------
      5. Init
   --------------------------------------------------------- */
-  document.addEventListener("DOMContentLoaded", () => {
+  
+    document.addEventListener("DOMContentLoaded", () => {
     renderDonutChart();
     setupPagination();
     setupDateFilters();
+    setupRowMenus();
 
     document.getElementById("al-search-input").addEventListener("input", applyFilters);
     document.getElementById("al-filter-action").addEventListener("change", applyFilters);
     document.getElementById("al-filter-user").addEventListener("change", applyFilters);
     document.getElementById("al-filter-resource").addEventListener("change", applyFilters);
-  });
+    });
+
+    function positionMenu(trigger, menu) {
+    menu.classList.remove("al-menu-up");
+    menu.style.visibility = "hidden";
+    menu.style.display = "block";
+
+    const rect = trigger.getBoundingClientRect();
+    const menuHeight = menu.offsetHeight;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+
+    if (spaceBelow < menuHeight && spaceAbove > menuHeight) {
+    menu.classList.add("al-menu-up");
+    }
+
+    menu.style.display = "";
+    menu.style.visibility = "";
+    }
+
+    function setupRowMenus() {
+    const MENU_HTML = `
+    <button type="button" class="al-menu-item" data-action="view">View Details</button>
+    <button type="button" class="al-menu-item" data-action="export">Export Entry</button>
+    <div class="al-menu-sep"></div>
+    <button type="button" class="al-menu-item danger" data-action="flag">Flag Activity</button>
+    `;
+
+    document.querySelectorAll(".al-row-menu").forEach((btn) => {
+    const wrap = document.createElement("div");
+    wrap.className = "al-menu-wrap";
+    btn.parentNode.insertBefore(wrap, btn);
+    wrap.appendChild(btn);
+
+    const menu = document.createElement("div");
+    menu.className = "al-row-dropdown";
+    menu.innerHTML = MENU_HTML;
+    wrap.appendChild(menu);
+
+    btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = wrap.classList.contains("open");
+    document.querySelectorAll(".al-menu-wrap.open").forEach((w) => w.classList.remove("open"));
+    if (!isOpen) {
+    positionMenu(btn, menu);
+    wrap.classList.add("open");
+    }
+    });
+
+    menu.querySelectorAll(".al-menu-item").forEach((item) => {
+    item.addEventListener("click", (e) => {
+    e.stopPropagation();
+    wrap.classList.remove("open");
+    const row = btn.closest("tr");
+    const title = row.querySelector(".al-activity-title")?.textContent || "";
+    console.log("[activity-log]", item.dataset.action, "for:", title);
+    });
+    });
+    });
+
+    document.addEventListener("click", () => {
+    document.querySelectorAll(".al-menu-wrap.open").forEach((w) => w.classList.remove("open"));
+    });
+    }
 })();
 </script>

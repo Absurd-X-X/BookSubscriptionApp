@@ -331,10 +331,12 @@ namespace Infrastructure.Migrations
                     FileType = table.Column<string>(type: "longtext", nullable: false),
                     BookCoverUrl = table.Column<string>(type: "longtext", nullable: false),
                     NoOfTimeReadByPeople = table.Column<int>(type: "int", nullable: false),
+                    About = table.Column<string>(type: "longtext", nullable: false),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     DateModified = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsPublished = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -447,15 +449,49 @@ namespace Infrastructure.Migrations
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "Reviews",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    BookId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    ReaderId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: false),
+                    Comment = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: false),
+                    IsApproved = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    HelpfulCount = table.Column<int>(type: "int", nullable: false),
+                    EditedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "longtext", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reviews", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Readers_ReaderId",
+                        column: x => x.ReaderId,
+                        principalTable: "Readers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedBy", "DateCreated", "DateModified", "Email", "HashPassword", "ImageUrl", "IsDeleted", "IsVerified", "Role", "UserName", "VerificationToken", "VerificationTokenExpiry" },
-                values: new object[] { new Guid("c117635d-96e0-409b-9fae-72976ec9c42a"), "system", new DateTime(2026, 6, 29, 7, 17, 9, 214, DateTimeKind.Utc).AddTicks(5911), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@gmail.com", "AQAAAAIAAYagAAAAEGtOxH1neKuhVziqVKi+CvKxseUlKEmhjdsLulwR/bqB+9ofuPgz8Osj/J0dSM8paw==", null, false, true, "admin", "admin", null, null });
+                values: new object[] { new Guid("c117635d-96e0-409b-9fae-72976ec9c42a"), "system", new DateTime(2026, 7, 5, 17, 26, 45, 193, DateTimeKind.Utc).AddTicks(4505), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@gmail.com", "AQAAAAIAAYagAAAAELdkhUcNFQS8TaxwURfRSwZCVI86FX27p6vK6ggf4Rd4WxBHS5ArL9bWgHJjtwkUGQ==", null, false, true, "admin", "admin", null, null });
 
             migrationBuilder.InsertData(
                 table: "Wallets",
                 columns: new[] { "Id", "Balance", "CreatedBy", "DateCreated", "DateModified", "IsDeleted", "UserId" },
-                values: new object[] { new Guid("eb84f382-3404-4a18-9c59-c5514d4850f1"), 0m, "admin@gmail.com", new DateTime(2026, 6, 29, 7, 17, 9, 291, DateTimeKind.Utc).AddTicks(8723), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, new Guid("c117635d-96e0-409b-9fae-72976ec9c42a") });
+                values: new object[] { new Guid("21374ad6-2754-4af2-8f57-7f1e60ecc1d3"), 0m, "admin@gmail.com", new DateTime(2026, 7, 5, 17, 26, 45, 275, DateTimeKind.Utc).AddTicks(3222), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, new Guid("c117635d-96e0-409b-9fae-72976ec9c42a") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AuditLogs_UserId",
@@ -515,6 +551,16 @@ namespace Infrastructure.Migrations
                 column: "ReaderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reviews_BookId",
+                table: "Reviews",
+                column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_ReaderId",
+                table: "Reviews",
+                column: "ReaderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Subscriptions_ReaderId",
                 table: "Subscriptions",
                 column: "ReaderId");
@@ -564,6 +610,9 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "ReadingProgresses");
+
+            migrationBuilder.DropTable(
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "Subscriptions");

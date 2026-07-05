@@ -627,6 +627,10 @@ kbd {
     color: var(--fg);
     cursor: pointer;
     font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
 }
 
     .pg-btn.active {
@@ -738,3 +742,10 @@ kbd {
     .b-actions .kebab-wrap > button {
         flex: 1;
     }
+
+
+.cover.cover-img {
+    background-size: cover;
+    background-position: center;
+    background-color: transparent;
+}
