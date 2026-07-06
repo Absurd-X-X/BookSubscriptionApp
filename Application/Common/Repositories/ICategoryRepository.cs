@@ -9,7 +9,6 @@ namespace Application.Common.Repositories
         Task<Category?> GetCategoryAsync(Guid id);
         Task<bool> IsExistAsync(string name);
         Task<ICollection<Category>> GetAllCategoriesAsync();
-
         Task<PagenatedList<Category>> GetCategoriesAsync(bool usepaging, PageRequest request);
         Task<ICollection<Category>> GetByNameAsync(string name);
     }

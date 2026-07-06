@@ -132,6 +132,19 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("AccessLevel")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("AllowCopyPaste")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("AllowDownload")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("AllowPrint")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("Author")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -158,6 +171,9 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("DateModified")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("FileType")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -177,6 +193,10 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<Guid>("LibraryId")
                         .HasColumnType("char(36)");
 
@@ -186,8 +206,25 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Pages")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PricingType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<int>("PublicationYear")
                         .HasColumnType("int");
+
+                    b.Property<string>("Publisher")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("RequireLogin")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Subtitle")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -201,6 +238,52 @@ namespace Infrastructure.Migrations
                     b.HasIndex("LibraryId");
 
                     b.ToTable("Books");
+                });
+
+            modelBuilder.Entity("Domain.Entities.BookVersion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<long>("FileSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<bool>("IsCurrent")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ReleaseNote")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UploadedBy")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("VersionNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("BookVersions");
                 });
 
             modelBuilder.Entity("Domain.Entities.Category", b =>
@@ -690,10 +773,10 @@ namespace Infrastructure.Migrations
                         {
                             Id = new Guid("c117635d-96e0-409b-9fae-72976ec9c42a"),
                             CreatedBy = "system",
-                            DateCreated = new DateTime(2026, 7, 5, 17, 26, 45, 193, DateTimeKind.Utc).AddTicks(4505),
+                            DateCreated = new DateTime(2026, 7, 6, 11, 3, 59, 260, DateTimeKind.Utc).AddTicks(4160),
                             DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
-                            HashPassword = "AQAAAAIAAYagAAAAELdkhUcNFQS8TaxwURfRSwZCVI86FX27p6vK6ggf4Rd4WxBHS5ArL9bWgHJjtwkUGQ==",
+                            HashPassword = "AQAAAAIAAYagAAAAEEq8nioWJRX3ALiEhElFr6siecuL+XH/M1GMuLyJ2+GyJ//neNCAv8k5JsBe6PmMHw==",
                             IsDeleted = false,
                             IsVerified = true,
                             Role = "admin",
@@ -743,6 +826,9 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<DateTime>("LastPayoutDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
@@ -756,12 +842,13 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("21374ad6-2754-4af2-8f57-7f1e60ecc1d3"),
+                            Id = new Guid("fa5d2a3a-7b76-4022-96db-5472046b673f"),
                             Balance = 0m,
                             CreatedBy = "admin@gmail.com",
-                            DateCreated = new DateTime(2026, 7, 5, 17, 26, 45, 275, DateTimeKind.Utc).AddTicks(3222),
+                            DateCreated = new DateTime(2026, 7, 6, 11, 3, 59, 339, DateTimeKind.Utc).AddTicks(3619),
                             DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
+                            LastPayoutDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             UserId = new Guid("c117635d-96e0-409b-9fae-72976ec9c42a")
                         });
                 });
@@ -862,6 +949,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Library");
+                });
+
+            modelBuilder.Entity("Domain.Entities.BookVersion", b =>
+                {
+                    b.HasOne("Domain.Entities.Book", "Book")
+                        .WithMany("Versions")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
                 });
 
             modelBuilder.Entity("Domain.Entities.Library", b =>
@@ -1019,6 +1117,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("ReadingProgresses");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("Versions");
                 });
 
             modelBuilder.Entity("Domain.Entities.Category", b =>

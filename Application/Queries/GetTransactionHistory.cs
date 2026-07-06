@@ -22,6 +22,7 @@ namespace Application.Queries
             {
                 var wallet = await walletRepository
                     .GetByUserIdAsync(request.UserId);
+
                 if (wallet is null)
                     return Result<PagenatedList<GetTransactionHistoryResponse>>
                         .Failure("Wallet not found");
@@ -42,7 +43,7 @@ namespace Application.Queries
                     Items = response,
                     Page = request.Page,
                     PageSize = request.PageSize,
-                    TotalCount = response.Count,
+                    TotalCount = transactions.TotalCount,
                 };
 
                 return Result<PagenatedList<GetTransactionHistoryResponse>>

@@ -4,6 +4,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Transactions;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -227,6 +228,63 @@ namespace Infrastructure.Persistence.Repositories
                 Items = await query.Include(x => x.Wallet).ToListAsync(),
                 TotalCount = totalCount
             };
+        }
+
+        public async Task<decimal> GetSumByDateRangeAsync(
+        Guid walletId,
+        DateTime startDate,
+        DateTime endDate,
+        CancellationToken cancellationToken = default)
+        {
+            // Include the full end day (e.g. May 31 23:59:59.999)
+            var inclusiveEnd = endDate.Date.AddDays(1).AddTicks(-1);
+
+            return await context.WalletTransactions
+                .Where(t => t.WalletId == walletId
+                            && t.DateCreated >= startDate.Date
+                            && t.DateCreated <= inclusiveEnd
+                            && t.Type == TransactionType.Credit
+                            && t.Status == WalletTransactionStatus.Successful)
+                .SumAsync(t => (decimal?)t.Balance, cancellationToken) ?? 0m;
+        }
+
+        public async Task<decimal> GetPendingPayoutAsync(Guid walletId)
+        {
+            var wallet = await context.Wallets.FirstOrDefaultAsync(w => w.Id == walletId);
+            var since = wallet?.LastPayoutDate;
+
+            return await context.WalletTransactions
+                .Where(t => t.WalletId == walletId
+                         && t.Type == TransactionType.Credit
+                         && (since == null || t.DateCreated > since))
+                .SumAsync(t => t.Balance);
+        }
+
+        public async Task<decimal> GetPendingPayoutAmountAsync(Guid walletId)
+        {
+            return await context.WalletTransactions
+                .Where(t => t.WalletId == walletId
+                         && t.Type == TransactionType.Payout
+                         && t.Status == WalletTransactionStatus.Pending)
+                .SumAsync(t => t.Balance);
+        }
+
+        public async Task<int> GetUnpaidMonthsCountAsync(Guid walletId)
+        {
+            return await context.WalletTransactions
+                .CountAsync(t => t.WalletId == walletId
+                               && t.Type == TransactionType.Payout
+                               && t.Status == WalletTransactionStatus.Pending);
+        }
+
+        public async Task<WalletTransaction?> GetLastPaidPayoutAsync(Guid walletId)
+        {
+            return await context.WalletTransactions
+                .Where(t => t.WalletId == walletId
+                         && t.Type == TransactionType.Payout
+                         && t.Status == WalletTransactionStatus.Successful)
+                .OrderByDescending(t => t.DateCreated)
+                .FirstOrDefaultAsync();
         }
     }
 }

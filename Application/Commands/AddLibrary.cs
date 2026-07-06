@@ -39,7 +39,7 @@ namespace Application.Command
                 var user = new User
                 {
                     Email = request.Email,
-                    IsVerified = true,
+                    IsVerified = false,
                     VerificationToken = token,
                     VerificationTokenExpiry = DateTime.UtcNow.AddMinutes(5),
                     UserName = request.UserName,

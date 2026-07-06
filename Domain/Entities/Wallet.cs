@@ -9,6 +9,7 @@
         public ICollection<WalletTransaction> Transactions { get; set; } = new HashSet<WalletTransaction>();
         public string CreatedBy { get; set; } = default!;
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
+        public DateTime LastPayoutDate { get; set; }
         public DateTime DateModified { get; set; }
         public bool IsDeleted { get; set; }
     }

@@ -12,6 +12,7 @@ namespace Infrastructure.Persistence.Context
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<BankAccount> BankAccounts { get; set; }
         public DbSet<Book> Books { get; set; }
+        public DbSet<BookVersion> BookVersions { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Conversation> Conversations { get; set; }
         public DbSet<Library> Libraries { get; set; }

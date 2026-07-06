@@ -1,14 +1,12 @@
-﻿using Application.Commands;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Web.Helpers;
 using static Application.Command.AddBook;
-using static Application.Commands.UploadProfilePIcs;
 using static Application.Queries.GetAllBook;
 using static Application.Queries.GetBookByCategoryId;
 using static Application.Queries.GetBookById;
-using static Application.Queries.GetBookByLibraryId;
 using static Application.Queries.GetByLibraryId;
+using static Application.Queries.GetCategories;
 using static Application.Queries.GetCategoryByName;
 using static Application.Queries.SearchBookByTitle;
 
@@ -20,45 +18,88 @@ namespace Host.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> AddBook()
+        {
+            var result = await mediator.Send(new GetCategoriesQuery());
+            ViewBag.Categories = result.Data ?? new List<GetCategoriesResponse>();
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddBook(
             [FromForm] IFormFile bookFile,
             [FromForm] IFormFile bookCover,
-            [FromForm] string title, string isbn, string genre, int publishYear,
-            int page, Guid categoryId, string author)
-
+            [FromForm] string title,
+            [FromForm] string? subtitle,
+            [FromForm] string author,
+            [FromForm] string publisher,
+            [FromForm] int publicationYear,
+            [FromForm] string language,
+            [FromForm] string isbn,
+            [FromForm] string genre,
+            [FromForm] string about,
+            [FromForm] int pages,
+            [FromForm] Guid categoryId,
+            [FromForm] string pricingType,
+            [FromForm] decimal price,
+            [FromForm] decimal discount,
+            [FromForm] string accessLevel,
+            [FromForm] bool requireLogin,
+            [FromForm] bool allowDownload,
+            [FromForm] bool allowPrint,
+            [FromForm] bool allowCopyPaste)
         {
+            if (bookFile is null || bookFile.Length == 0)
+            {
+                TempData["Error"] = "Please select a book file to upload.";
+                return RedirectToAction(nameof(AddBook));
+            }
+
+            if (bookCover is null || bookCover.Length == 0)
+            {
+                TempData["Error"] = "Please select a book cover image to upload.";
+                return RedirectToAction(nameof(AddBook));
+            }
+
             var userId = ClaimsHelper.GetUserId(User);
+
             var result = await mediator.Send(new AddBookCommand(
                 userId,
-                author,
                 title,
+                subtitle,
+                author,
+                publisher,
+                publicationYear,
+                language,
                 isbn,
                 genre,
-                publishYear,
-                page,
+                about,
+                pages,
+                categoryId,
+                pricingType,
+                price,
+                discount,
+                accessLevel,
+                requireLogin,
+                allowDownload,
+                allowPrint,
+                allowCopyPaste,
                 bookFile.FileName,
                 bookCover.FileName,
                 bookFile.OpenReadStream(),
-                bookCover.OpenReadStream(),
-                categoryId
+                bookCover.OpenReadStream()
                 ));
+
             if (!result.Status)
             {
                 TempData["Error"] = result.Message;
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(AddBook));
             }
 
             TempData["Success"] = result.Message;
-            return View(result.Data);
-        }
-
-
-        [HttpGet]
-
-        public async Task<IActionResult> AddBook()
-        {
-            return View();
+            return RedirectToAction(nameof(GetByLibrary));
         }
 
         [HttpGet]

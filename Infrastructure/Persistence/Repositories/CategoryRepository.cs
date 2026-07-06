@@ -24,7 +24,7 @@ namespace Infrastructure.Persistence.Repositories
 
             => await context.Categories
             .Include(x => x.Books)
-            .FirstOrDefaultAsync(v => !v.IsDeleted);
+            .FirstOrDefaultAsync(v => !v.IsDeleted && v.Id == id);
 
 
         public async Task<ICollection<Category>> GetByNameAsync(string name)

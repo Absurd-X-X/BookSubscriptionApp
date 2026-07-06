@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class MakeNewChanges : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -299,6 +299,7 @@ namespace Infrastructure.Migrations
                     Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    LastPayoutDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     DateModified = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
@@ -320,18 +321,29 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false),
                     Title = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    Subtitle = table.Column<string>(type: "longtext", nullable: true),
                     Author = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
-                    Isbn = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
-                    Pages = table.Column<int>(type: "int", nullable: false),
+                    Publisher = table.Column<string>(type: "longtext", nullable: false),
                     PublicationYear = table.Column<int>(type: "int", nullable: false),
-                    Genre = table.Column<string>(type: "longtext", nullable: false),
-                    LibraryId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Language = table.Column<string>(type: "longtext", nullable: false),
+                    Isbn = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     CategoryId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Genre = table.Column<string>(type: "longtext", nullable: false),
+                    About = table.Column<string>(type: "longtext", nullable: false),
+                    Pages = table.Column<int>(type: "int", nullable: false),
+                    PricingType = table.Column<string>(type: "longtext", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    AccessLevel = table.Column<string>(type: "longtext", nullable: false),
+                    RequireLogin = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    AllowDownload = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    AllowPrint = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    AllowCopyPaste = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     BookFileUrl = table.Column<string>(type: "longtext", nullable: false),
                     FileType = table.Column<string>(type: "longtext", nullable: false),
                     BookCoverUrl = table.Column<string>(type: "longtext", nullable: false),
+                    LibraryId = table.Column<Guid>(type: "char(36)", nullable: false),
                     NoOfTimeReadByPeople = table.Column<int>(type: "int", nullable: false),
-                    About = table.Column<string>(type: "longtext", nullable: false),
                     CreatedBy = table.Column<string>(type: "longtext", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     DateModified = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -419,6 +431,33 @@ namespace Infrastructure.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "BookVersions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    BookId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    VersionNumber = table.Column<string>(type: "longtext", nullable: false),
+                    FileUrl = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
+                    FileType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    FileSizeBytes = table.Column<long>(type: "bigint", nullable: false),
+                    ReleaseNote = table.Column<string>(type: "longtext", nullable: true),
+                    UploadedBy = table.Column<string>(type: "longtext", nullable: false),
+                    UploadedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    IsCurrent = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookVersions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BookVersions_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "ReadingProgresses",
                 columns: table => new
                 {
@@ -486,12 +525,12 @@ namespace Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedBy", "DateCreated", "DateModified", "Email", "HashPassword", "ImageUrl", "IsDeleted", "IsVerified", "Role", "UserName", "VerificationToken", "VerificationTokenExpiry" },
-                values: new object[] { new Guid("c117635d-96e0-409b-9fae-72976ec9c42a"), "system", new DateTime(2026, 7, 5, 17, 26, 45, 193, DateTimeKind.Utc).AddTicks(4505), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@gmail.com", "AQAAAAIAAYagAAAAELdkhUcNFQS8TaxwURfRSwZCVI86FX27p6vK6ggf4Rd4WxBHS5ArL9bWgHJjtwkUGQ==", null, false, true, "admin", "admin", null, null });
+                values: new object[] { new Guid("c117635d-96e0-409b-9fae-72976ec9c42a"), "system", new DateTime(2026, 7, 6, 11, 3, 59, 260, DateTimeKind.Utc).AddTicks(4160), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@gmail.com", "AQAAAAIAAYagAAAAEEq8nioWJRX3ALiEhElFr6siecuL+XH/M1GMuLyJ2+GyJ//neNCAv8k5JsBe6PmMHw==", null, false, true, "admin", "admin", null, null });
 
             migrationBuilder.InsertData(
                 table: "Wallets",
-                columns: new[] { "Id", "Balance", "CreatedBy", "DateCreated", "DateModified", "IsDeleted", "UserId" },
-                values: new object[] { new Guid("21374ad6-2754-4af2-8f57-7f1e60ecc1d3"), 0m, "admin@gmail.com", new DateTime(2026, 7, 5, 17, 26, 45, 275, DateTimeKind.Utc).AddTicks(3222), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, new Guid("c117635d-96e0-409b-9fae-72976ec9c42a") });
+                columns: new[] { "Id", "Balance", "CreatedBy", "DateCreated", "DateModified", "IsDeleted", "LastPayoutDate", "UserId" },
+                values: new object[] { new Guid("fa5d2a3a-7b76-4022-96db-5472046b673f"), 0m, "admin@gmail.com", new DateTime(2026, 7, 6, 11, 3, 59, 339, DateTimeKind.Utc).AddTicks(3619), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new Guid("c117635d-96e0-409b-9fae-72976ec9c42a") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AuditLogs_UserId",
@@ -512,6 +551,11 @@ namespace Infrastructure.Migrations
                 name: "IX_Books_LibraryId",
                 table: "Books",
                 column: "LibraryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BookVersions_BookId",
+                table: "BookVersions",
+                column: "BookId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Libraries_UserId",
@@ -601,6 +645,9 @@ namespace Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "BankAccounts");
+
+            migrationBuilder.DropTable(
+                name: "BookVersions");
 
             migrationBuilder.DropTable(
                 name: "Messages");

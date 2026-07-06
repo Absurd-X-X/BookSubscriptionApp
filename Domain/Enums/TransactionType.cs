@@ -4,6 +4,7 @@
     {
         Debit = 1,
         Credit,
-        Withdaw
+        Withdaw,
+        Payout
     }
 }
