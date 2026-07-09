@@ -9,7 +9,7 @@
         public Reader Reader { get; set; } = default!;
         public int Rating { get; set; }
         public string Comment { get; set; } = default!;
-        public bool IsApproved { get; set; }
+        public ReviewStatus Status { get; set; } = ReviewStatus.Pending;
         public int HelpfulCount { get; set; }
         public DateTime? EditedAt { get; set; }
         public string CreatedBy { get; set; } = default!;

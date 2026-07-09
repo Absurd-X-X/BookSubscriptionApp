@@ -14,14 +14,12 @@ namespace Application.Queries
 
         public class GetTransactionsHandler(
             IWalletTransactionRepository walletTransactionRepository)
-            : IRequestHandler<GetTransactionsQuery,
-                Result<PagenatedList<GetTransactionsResponse>>>
+            : IRequestHandler<GetTransactionsQuery, Result<PagenatedList<GetTransactionsResponse>>>
         {
             public async Task<Result<PagenatedList<GetTransactionsResponse>>> Handle(
                 GetTransactionsQuery request,
                 CancellationToken cancellationToken)
             {
-
                 var transactions = await walletTransactionRepository
                     .GetAllAsync(new PageRequest
                     {
@@ -30,26 +28,27 @@ namespace Application.Queries
                     }, true);
 
                 var response = transactions.Items.Select(transaction =>
-                    new GetTransactionsResponse(transaction.Id,
-                    transaction.WalletId,
-                    transaction.Balance,
-                    transaction.Type,
-                    transaction.Status,
-                    transaction.PaystackReference,
-                    transaction.Description,
-                    transaction.BalanceBefore,
-                    transaction.BalanceAfter,
-                    transaction.CreatedBy,
-                    transaction.DateCreated,
-                    transaction.Wallet))
+                    new GetTransactionsResponse(
+                        transaction.Id,
+                        transaction.WalletId,
+                        transaction.Balance,
+                        transaction.Type,
+                        transaction.Status,
+                        transaction.PaystackReference,
+                        transaction.Description,
+                        transaction.BalanceBefore,
+                        transaction.BalanceAfter,
+                        transaction.CreatedBy,
+                        transaction.DateCreated,
+                        transaction.Wallet))
                     .ToList();
 
                 var transactionsResponse = new PagenatedList<GetTransactionsResponse>
                 {
                     Items = response,
-                    TotalCount = response.Count,
-                    Page = 1,
-                    PageSize = response.Count
+                    TotalCount = transactions.TotalCount,
+                    Page = request.Page,
+                    PageSize = request.PageSize
                 };
 
                 return Result<PagenatedList<GetTransactionsResponse>>
@@ -69,6 +68,10 @@ namespace Application.Queries
             decimal BalanceAfter,
             string CreatedBy,
             DateTime DateCreated,
-            Wallet Wallet);
+            Wallet Wallet)
+        {
+            public string DisplayId =>
+                $"TXN-{DateCreated.Year}-{Math.Abs(Id.GetHashCode()) % 100000:D5}";
+        }
     }
 }

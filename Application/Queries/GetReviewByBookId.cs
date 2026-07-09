@@ -1,6 +1,7 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Pagenation;
 using Application.Common.Repositories;
+using Domain.Entities;
 using MediatR;
 
 namespace Application.Queries
@@ -27,7 +28,7 @@ namespace Application.Queries
                     x.ReaderId,
                     x.Rating,
                     x.Comment,
-                    x.IsApproved,
+                    x.Status,
                     x.HelpfulCount
                     ));
 
@@ -49,7 +50,7 @@ namespace Application.Queries
             Guid ReaderId,
             int Rating,
             string Comment,
-            bool IsApproved,
+            ReviewStatus Status,
             int HelpfulCount
             );
     }

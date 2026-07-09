@@ -19,5 +19,17 @@ namespace Infrastructure.Persistence.Repositories
                 .Include(rp => rp.Book)
                 .FirstOrDefaultAsync(x => x.ReaderId == ReaderId && x.BookId == BookId  && !x.IsDeleted);
         }
+
+        public async Task<List<ReadingProgress>> GetByLibraryIdAsync(Guid libraryId, DateTime start, DateTime end)
+        {
+            return await context.ReadingProgresses
+                .Where(x => !x.IsDeleted
+                    && x.Book.LibraryId == libraryId
+                    && x.LastReadAt >= start
+                    && x.LastReadAt <= end)
+                .Include(x => x.Reader)
+                .Include(x => x.Book)
+                .ToListAsync();
+        }
     }
 }

@@ -1,13 +1,16 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Repositories;
+using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Commands
 {
     public class UploadProfilePIcs
     {
         public record UploadProfilePicsCommand(Guid UserId, Stream ProfilePic, string FileName) : IRequest<Result<string>>;
-        public class UploadProfilePicsHandler(IUnitOfWork _unitOfWork, IUserRepository userRepository) : IRequestHandler<UploadProfilePicsCommand, Result<string>>
+        public class UploadProfilePicsHandler(IUnitOfWork _unitOfWork, IUserRepository userRepository,
+            IAuditLogRepository auditLogRepository, IHttpContextAccessor httpContextAccessor) : IRequestHandler<UploadProfilePicsCommand, Result<string>>
         {
             public async Task<Result<string>> Handle(UploadProfilePicsCommand request, CancellationToken cToken)
             {
@@ -34,6 +37,29 @@ namespace Application.Commands
                 }
 
                 user.ImageUrl = $"/uploads/profilepics/{unique}";
+
+
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Create",
+                    Description = $"Notification was archived successfully",
+                    Icon = "🔔",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    UserId = user.Id,
+                    ResourceType = ResourceType.System,
+                    ResourceId = null,
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 await _unitOfWork.SaveAsync();
 

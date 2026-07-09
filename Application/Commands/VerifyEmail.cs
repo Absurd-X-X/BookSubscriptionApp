@@ -60,9 +60,11 @@ namespace Application.Commands
                     UserId = user.Id,
                     ActionType = "Verify Email",
                     Icon = "🚦",
-                    Description = $"User Added: {user.Library?.Name ?? user.Reader?.Name}({user.UserName})",
+                    Description = $"Verify Email : {user.Library?.Name ?? user.Reader?.Name}({user.UserName})",
                     IpAddress = "",
-                    UserRole = user.Role
+                    UserRole = user.Role,
+                    ResourceType = ResourceType.System,
+                    ResourceId = user.Id,
                 });
 
                 await unitOfWork.SaveAsync();

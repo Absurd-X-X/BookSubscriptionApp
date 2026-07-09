@@ -1,330 +1,323 @@
-﻿@{
+﻿@model Application.Queries.GetNotificationById.GetNotificationByIdResponse
+@{
     Layout = "~/Views/Shared/_LibraryLayout.cshtml";
     ViewData["Title"] = "Notification";
 }
 <link href="~/css/notification.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 
+<main class="main-content">
 
-    <main class="main-content">
-
-        <!-- ============ Top bar ============ -->
-        <div class="detail-topbar">
-            <a href="#" class="back-link">
-                <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
-                    <line x1="19" y1="12" x2="5" y2="12"></line>
-                    <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
-                Back to Notifications
-            </a>
-            <div class="header-actions">
-                <button class="date-range-btn">
-                    May 1 – May 31, 2024
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                </button>
-                <button class="btn-primary">
+    <div class="detail-topbar">
+        <a asp-action="Notifications" class="back-link">
+            <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Notifications
+        </a>
+        <div class="header-actions">
+            <form method="post" asp-action="ToggleNotificationRead">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="hidden" name="read" value="@(!Model.IsRead)" />
+                <button type="submit" class="btn-primary">
                     <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Mark as Read
-                    <svg class="icon chev" viewBox="0 0 24 24">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    @(Model.IsRead ? "Mark as Unread" : "Mark as Read")
                 </button>
+            </form>
+        </div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div style="background:#3a1a1a;color:#f87171;padding:10px 14px;border-radius:8px;margin-bottom:16px;font-size:13px">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="page-header-block">
+        <h1>Notification Details</h1>
+        <p>View complete information about this notification and take action.</p>
+    </div>
+
+    <div class="content-grid">
+
+        <!-- LEFT column -->
+        <div class="left-col">
+
+            <!-- Notification summary banner -->
+            <div class="side-card notif-summary">
+                <div class="icon-circle purple">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                </div>
+                <div class="notif-main">
+                    <span class="badge badge-tag">@Model.RefType Notification</span>
+                    <h2 class="notif-title">@Model.Title</h2>
+                    <p class="notif-desc">@Model.Message</p>
+                </div>
+                <div class="notif-side">
+                    <span class="status @(Model.IsRead ? "status-read" : "status-unread")">@(Model.IsRead ? "Read" : "Unread")</span>
+                    <span class="notif-date">@Model.DateCreated.ToString("MMM d, yyyy")<br>@Model.DateCreated.ToString("h:mm tt")</span>
+                </div>
             </div>
-        </div>
 
-        <!-- ============ Page header ============ -->
-        <div class="page-header-block">
-            <h1>Notification Details</h1>
-            <p>View complete information about this notification and take action.</p>
-        </div>
-
-        <!-- ============ Content grid ============ -->
-        <div class="content-grid">
-
-            <!-- LEFT column -->
-            <div class="left-col">
-
-                <!-- Notification summary banner -->
-                <div class="side-card notif-summary">
-                    <div class="icon-circle purple">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-                            </polygon>
-                        </svg>
+            <!-- Overview -->
+            <div class="side-card">
+                <h3>Overview</h3>
+                <p class="overview-text">
+                    @Model.Message
+                </p>
+                <div class="overview-grid">
+                    <div class="overview-item">
+                        <div class="overview-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <div class="overview-text-col">
+                            <span class="overview-label">Notification ID</span>
+                            <span class="overview-value">@Model.Id</span>
+                        </div>
                     </div>
-                    <div class="notif-main">
-                        <span class="badge badge-tag">Review Notification</span>
-                        <h2 class="notif-title">New review received for "Atomic Habits"</h2>
-                        <p class="notif-desc">A new review has been submitted by Sarah Johnson for the book "Atomic Habits".</p>
+                    <div class="overview-item">
+                        <div class="overview-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.59 13.41 11 22 2 13l8.59-8.59A2 2 0 0 1 12 4h7a2 2 0 0 1 2 2v7a2 2 0 0 1-.41 1.41z"></path>
+                                <circle cx="13.5" cy="9.5" r="1"></circle>
+                            </svg>
+                        </div>
+                        <div class="overview-text-col">
+                            <span class="overview-label">Category</span>
+                            <span class="overview-value">@Model.RefType</span>
+                        </div>
                     </div>
-                    <div class="notif-side">
-                        <span class="status status-unread">Unread</span>
-                        <span class="notif-date">May 31, 2024<br>10:15 AM</span>
+                    <!-- PLACEHOLDER: Priority isn't tracked on Notification yet -->
+                    <div class="overview-item">
+                        <div class="overview-icon">
+                            <span class="dot dot-orange"></span>
+                        </div>
+                        <div class="overview-text-col">
+                            <span class="overview-label">Priority</span>
+                            <span class="overview-value">Medium</span>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Overview -->
-                <div class="side-card">
-                    <h3>Overview</h3>
-                    <p class="overview-text">
-                        A new review has been submitted by a reader. Please review and moderate the
-                        content before it is visible to other readers.
-                    </p>
-                    <div class="overview-grid">
-                        <div class="overview-item">
-                            <div class="overview-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                </svg>
-                            </div>
-                            <div class="overview-text-col">
-                                <span class="overview-label">Notification ID</span>
-                                <span class="overview-value">NTF-2024-000128</span>
-                            </div>
+                    <div class="overview-item">
+                        <div class="overview-icon">
+                            <span class="dot dot-purple"></span>
                         </div>
-                        <div class="overview-item">
-                            <div class="overview-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round">
-                                    <path d="M20.59 13.41 11 22 2 13l8.59-8.59A2 2 0 0 1 12 4h7a2 2 0 0 1 2 2v7a2 2 0 0 1-.41 1.41z">
-                                    </path>
-                                    <circle cx="13.5" cy="9.5" r="1"></circle>
-                                </svg>
-                            </div>
-                            <div class="overview-text-col">
-                                <span class="overview-label">Category</span>
-                                <span class="overview-value">Reviews</span>
-                            </div>
+                        <div class="overview-text-col">
+                            <span class="overview-label">Status</span>
+                            <span class="overview-value">@(Model.IsRead ? "Read" : "Unread")</span>
                         </div>
-                        <div class="overview-item">
-                            <div class="overview-icon">
-                                <span class="dot dot-orange"></span>
-                            </div>
-                            <div class="overview-text-col">
-                                <span class="overview-label">Priority</span>
-                                <span class="overview-value">Medium</span>
-                            </div>
+                    </div>
+                    <!-- PLACEHOLDER: Source isn't tracked on Notification yet -->
+                    <div class="overview-item">
+                        <div class="overview-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
                         </div>
-                        <div class="overview-item">
-                            <div class="overview-icon">
-                                <span class="dot dot-purple"></span>
-                            </div>
-                            <div class="overview-text-col">
-                                <span class="overview-label">Status</span>
-                                <span class="overview-value">Unread</span>
-                            </div>
-                        </div>
-                        <div class="overview-item">
-                            <div class="overview-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <div class="overview-text-col">
-                                <span class="overview-label">Source</span>
-                                <span class="overview-value">Web Application</span>
-                            </div>
+                        <div class="overview-text-col">
+                            <span class="overview-label">Source</span>
+                            <span class="overview-value">Web Application</span>
                         </div>
                     </div>
                 </div>
+            </div>
 
+            @if (Model.RelatedReview is not null)
+            {
+                var r = Model.RelatedReview;
+                var initials = string.Join("", r.ReviewerName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0])).ToUpper();
                 <!-- Related Review -->
                 <div class="side-card">
                     <h3>Related Review</h3>
                     <div class="related-review-grid">
 
                         <div class="reviewer-col">
-                            <div class="avatar-circle">SJ</div>
-                            <span class="reviewer-name">Sarah Johnson</span>
-                            <span class="reviewer-email">sarah.j@email.com</span>
-                            <span class="badge badge-verified">Verified Reader</span>
+                            <div class="avatar-circle">@initials</div>
+                            <span class="reviewer-name">@r.ReviewerName</span>
+                            <span class="reviewer-email">@r.ReviewerEmail</span>
+                            <span class="badge badge-verified">Reader</span>
                         </div>
 
                         <div class="book-col">
                             <div class="book-cover">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                                 </svg>
                             </div>
                             <div class="book-info">
-                                <span class="book-title">Atomic Habits</span>
-                                <span class="book-author">by James Clear</span>
+                                <span class="book-title">@r.BookTitle</span>
+                                <span class="book-author">by @r.BookAuthor</span>
                                 <div class="rating">
-                                    <span class="stars">
-                                        <svg viewBox="0 0 24 24" fill="currentColor">
-                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-                                            </polygon>
-                                        </svg>
-                                        <svg viewBox="0 0 24 24" fill="currentColor">
-                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-                                            </polygon>
-                                        </svg>
-                                        <svg viewBox="0 0 24 24" fill="currentColor">
-                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-                                            </polygon>
-                                        </svg>
-                                        <svg viewBox="0 0 24 24" fill="currentColor">
-                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-                                            </polygon>
-                                        </svg>
-                                        <svg viewBox="0 0 24 24" fill="currentColor">
-                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-                                            </polygon>
-                                        </svg>
-                                    </span>
-                                    <span class="score">5.0</span>
+                                    <span class="stars">@(new string('★', r.Rating))@(new string('☆', 5 - r.Rating))</span>
+                                    <span class="score">@r.Rating.0</span>
                                 </div>
-                                <span class="submitted-on">Submitted on May 31, 2024 10:14 AM</span>
+                                <span class="submitted-on">Submitted on @r.SubmittedOn.ToString("MMM d, yyyy h:mm tt")</span>
                             </div>
                         </div>
 
                         <div class="meta-col">
-                            <div class="meta-row"><span>Review ID</span><span>REV-2024-005678</span></div>
+                            <div class="meta-row"><span>Review ID</span><span>@r.ReviewId</span></div>
                             <div class="meta-row"><span>Review Type</span><span>Public Review</span></div>
                             <div class="meta-row">
-                                <span>Visibility</span><span class="badge badge-pending">Pending Approval</span>
+                                <span>Visibility</span><span class="badge badge-pending">@r.Status</span>
                             </div>
                             <div class="meta-row">
                                 <span>Helpful Votes</span><span>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                     stroke-linejoin="round">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"></path>
                                     <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
                                 </svg>
-                                0
+                                @r.HelpfulCount
                             </span>
                         </div>
-                        <div class="meta-row">
-                            <span>Report Count</span><span>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round">
-                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                                <line x1="4" y1="22" x2="4" y2="15"></line>
-                            </svg>
-                            0
-                        </span>
                     </div>
                 </div>
 
+                <span class="review-label">Review Content</span>
+                <p class="review-content-text">@r.Comment</p>
+
+                <a href="@Url.Action("GetReview", "Library", new { id = r.ReviewId })" class="btn-outline-purple">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    View Full Review
+                </a>
             </div>
+        }
 
-            <span class="review-label">Review Title</span>
-            <p class="review-title-text">Life-changing book! The small habits approach really works.</p>
+        @if (Model.RelatedReader is not null)
+        {
+            var rd = Model.RelatedReader;
+            <div class="side-card">
+                <h3>Related Reader</h3>
+                <div class="add-row"><span>Name</span><span>@rd.Name</span></div>
+                <div class="add-row"><span>Email</span><span>@rd.Email</span></div>
+                <div class="add-row"><span>Member Since</span><span>@rd.MemberSince.ToString("MMM d, yyyy")</span></div>
+            </div>
+        }
 
-            <span class="review-label">Review Content</span>
-            <p class="review-content-text">
-                This book completely changed the way I think about building habits. The
-                author does an excellent job breaking down complex concepts into simple, actionable steps. I especially
-                loved the habit stacking technique and the emphasis on systems over goals. I've been applying these
-                principles for the past 3 months and have seen remarkable improvements in my productivity and overall
-                well-being. Highly recommended for anyone looking to make positive changes in their life!
-            </p>
+        @if (Model.RelatedBook is not null)
+        {
+            var b = Model.RelatedBook;
+            <div class="side-card">
+                <h3>Related Book</h3>
+                <div class="add-row"><span>Title</span><span>@b.Title</span></div>
+                <div class="add-row"><span>Author</span><span>@b.Author</span></div>
+                <div class="add-row"><span>Times Read</span><span>@b.TimesRead.ToString("N0")</span></div>
+            </div>
+        }
 
-            <button class="btn-outline-purple">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                     stroke-linejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-                View Full Review
-            </button>
-        </div>
+        @if (Model.RelatedSubscription is not null)
+        {
+            var s = Model.RelatedSubscription;
+            <div class="side-card">
+                <h3>Related Subscription</h3>
+                <div class="add-row"><span>Subscription ID</span><span>@s.SubscriptionId</span></div>
+                <div class="add-row"><span>Expiry Date</span><span>@s.ExpiryDate.ToString("MMM d, yyyy")</span></div>
+            </div>
+        }
 
-        <!-- Additional Details -->
+        @if (Model.RelatedChat is not null)
+        {
+            var c = Model.RelatedChat;
+            <div class="side-card">
+                <h3>Related Conversation</h3>
+                <div class="add-row"><span>Title</span><span>@c.Title</span></div>
+                <div class="add-row"><span>Last Message</span><span>@c.LastMessageAt.ToString("MMM d, yyyy h:mm tt")</span></div>
+                <a href="@Url.Action("Chat", "Support", new { id = c.ConversationId })" class="btn-outline-purple">Open Conversation</a>
+            </div>
+        }
+
+        <!-- Additional Details — PLACEHOLDER: none of this is tracked yet -->
         <div class="side-card">
             <h3>Additional Details</h3>
             <div class="additional-grid">
                 <div class="additional-col">
-                    <div class="add-row"><span>Triggered By</span><span>New review submission</span></div>
-                    <div class="add-row"><span>IP Address</span><span>192.168.1.45</span></div>
+                    <div class="add-row"><span>Triggered By</span><span>@Model.RefType notification</span></div>
+                    <div class="add-row"><span>IP Address</span><span>—</span></div>
+                    <div class="add-row"><span>User Agent</span><span>—</span></div>
+                </div>
+                <div class="additional-col">
+                    <div class="add-row"><span>Browser</span><span>—</span></div>
                     <div class="add-row">
-                        <span>User Agent</span><span>
-                        Mozilla/5.0 (Windows NT 10.0; Win64; x64)
-                        AppleWebKit/537.36
+                        <span>Device</span><span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                        —
                     </span>
                 </div>
-            </div>
-            <div class="additional-col">
                 <div class="add-row">
-                    <span>Browser</span><span>
-                    <span class="browser-icon"></span>Chrome
-                    124.0.0.0
+                    <span>Location</span><span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    —
                 </span>
             </div>
-            <div class="add-row">
-                <span>Device</span><span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                     stroke-linejoin="round">
-                    <rect x="2" y="3" width="20" height="14" rx="2"></rect>
-                    <line x1="8" y1="21" x2="16" y2="21"></line>
-                    <line x1="12" y1="17" x2="12" y2="21"></line>
-                </svg>
-                Desktop
-            </span>
         </div>
-        <div class="add-row">
-            <span>Location</span><span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                 stroke-linejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-            New York, USA
-        </span>
     </div>
-</div>
-</div>
 </div>
 
 <!-- Action bar -->
 <div class="action-bar">
-    <button class="btn-action approve">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-             stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-        Approve Review
-    </button>
-    <button class="btn-action reject">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-             stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="15" y1="9" x2="9" y2="15"></line>
-            <line x1="9" y1="9" x2="15" y2="15"></line>
-        </svg>
-        Reject Review
-    </button>
-    <button class="btn-action neutral">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-             stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-        Mark as Read
-    </button>
+    @if (Model.RelatedReview is not null)
+    {
+        <form method="post" asp-action="ApproveReview" asp-route-id="@Model.RelatedReview.ReviewId" style="display:inline">
+            <button type="submit" class="btn-action approve">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Approve Review
+            </button>
+        </form>
+        <form method="post" asp-action="RejectReview" asp-route-id="@Model.RelatedReview.ReviewId" style="display:inline">
+            <button type="submit" class="btn-action reject">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+                Reject Review
+            </button>
+        </form>
+    }
+    <form method="post" asp-action="ToggleNotificationRead" style="display:inline">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <input type="hidden" name="read" value="@(!Model.IsRead)" />
+        <button type="submit" class="btn-action neutral">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            @(Model.IsRead ? "Mark as Unread" : "Mark as Read")
+        </button>
+    </form>
     <span class="spacer"></span>
-    <button class="btn-action archive">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-             stroke-linejoin="round">
-            <polyline points="21 8 21 21 3 21 3 8"></polyline>
-            <rect x="1" y="3" width="22" height="5"></rect>
-            <line x1="10" y1="12" x2="14" y2="12"></line>
-        </svg>
-        Archive Notification
-    </button>
+    <form method="post" asp-action="ArchiveNotification" style="display:inline">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit" class="btn-action archive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                <rect x="1" y="3" width="22" height="5"></rect>
+                <line x1="10" y1="12" x2="14" y2="12"></line>
+            </svg>
+            Archive Notification
+        </button>
+    </form>
 </div>
 
 </div>
@@ -336,80 +329,99 @@
     <div class="side-card">
         <h3>Related Information</h3>
 
-        <div class="related-info-item">
-            <div class="book-cover" style="width:38px;height:50px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                     stroke-linejoin="round" style="width:15px;height:15px;">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                </svg>
-            </div>
-            <div class="related-info-text">
-                <span class="related-info-title">Atomic Habits</span>
-                <span class="related-info-sub">by James Clear</span>
-                <a href="#" class="related-info-link">
-                    View Book
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                         stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
+        @if (Model.RelatedBook is not null)
+        {
+            <div class="related-info-item">
+                <div class="book-cover" style="width:38px;height:50px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                     </svg>
-                </a>
+                </div>
+                <div class="related-info-text">
+                    <span class="related-info-title">@Model.RelatedBook.Title</span>
+                    <span class="related-info-sub">by @Model.RelatedBook.Author</span>
+                    <a href="#" class="related-info-link">
+                        View Book
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
             </div>
-        </div>
+        }
+        else if (Model.RelatedReview is not null)
+        {
+            <div class="related-info-item">
+                <div class="book-cover" style="width:38px;height:50px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                </div>
+                <div class="related-info-text">
+                    <span class="related-info-title">@Model.RelatedReview.BookTitle</span>
+                    <span class="related-info-sub">by @Model.RelatedReview.BookAuthor</span>
+                </div>
+            </div>
+        }
 
-        <div class="related-info-item">
-            <div class="avatar-circle" style="margin-bottom:0;">SJ</div>
-            <div class="related-info-text">
-                <span class="related-info-title">Sarah Johnson</span>
-                <span class="related-info-sub">Verified Reader</span>
-                <a href="#" class="related-info-link">
-                    View Reader
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                         stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </a>
+        @if (Model.RelatedReader is not null)
+        {
+            var rdInitials = string.Join("", Model.RelatedReader.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0])).ToUpper();
+            <div class="related-info-item">
+                <div class="avatar-circle" style="margin-bottom:0;">@rdInitials</div>
+                <div class="related-info-text">
+                    <span class="related-info-title">@Model.RelatedReader.Name</span>
+                    <span class="related-info-sub">Reader</span>
+                    <a href="#" class="related-info-link">
+                        View Reader
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
             </div>
-        </div>
+        }
+        else if (Model.RelatedReview is not null)
+        {
+            var rvInitials = string.Join("", Model.RelatedReview.ReviewerName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0])).ToUpper();
+            <div class="related-info-item">
+                <div class="avatar-circle" style="margin-bottom:0;">@rvInitials</div>
+                <div class="related-info-text">
+                    <span class="related-info-title">@Model.RelatedReview.ReviewerName</span>
+                    <span class="related-info-sub">Reader</span>
+                    <a href="#" class="related-info-link">
+                        View Reader
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        }
 
-        <div class="related-info-item">
-            <div class="icon-circle orange" style="width:38px;height:38px;">
-                <svg viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-                    </polygon>
-                </svg>
-            </div>
-            <div class="related-info-text">
-                <span class="related-info-title">All Reviews for this Book</span>
-                <span class="related-info-sub">1,250 reviews</span>
-                <a href="#" class="related-info-link">
-                    View All Reviews
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                         stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </a>
-            </div>
-        </div>
+        @if (Model.RelatedReview is null && Model.RelatedReader is null && Model.RelatedBook is null && Model.RelatedSubscription is null && Model.RelatedChat is null)
+        {
+            <p style="font-size:13px;color:var(--text-dim)">No related records for this notification.</p>
+        }
     </div>
 
-    <!-- Quick Actions -->
+    <!-- Quick Actions — PLACEHOLDER: static links, not wired to real routes yet -->
     <div class="side-card">
         <h3>Quick Actions</h3>
         <div class="quick-action">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                 stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
             </svg>
             View Review Details
         </div>
         <div class="quick-action">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                 stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                 <circle cx="9" cy="7" r="4"></circle>
                 <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -418,16 +430,14 @@
             View Reader Profile
         </div>
         <div class="quick-action">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                 stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
             </svg>
             View Book Details
         </div>
         <div class="quick-action">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                 stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
                 <line x1="12" y1="18" x2="12" y2="12"></line>
@@ -436,8 +446,7 @@
             Add Note
         </div>
         <div class="quick-action">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                 stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
                 <line x1="4" y1="22" x2="4" y2="15"></line>
             </svg>
@@ -445,45 +454,34 @@
         </div>
     </div>
 
-    <!-- Notification History -->
+    <!-- Notification History — PLACEHOLDER: no NotificationEvent table yet, shows only Created -->
     <div class="side-card">
         <h3>Notification History</h3>
 
         <div class="timeline-item">
             <div class="timeline-marker">
                 <span class="timeline-dot"></span>
-                <span class="timeline-line"></span>
             </div>
             <div class="timeline-content">
                 <strong>Notification Created</strong>
-                <span class="timeline-date">May 31, 2024, 10:15 AM</span>
+                <span class="timeline-date">@Model.DateCreated.ToString("MMM d, yyyy, h:mm tt")</span>
                 <span class="timeline-actor">System</span>
             </div>
         </div>
 
-        <div class="timeline-item">
-            <div class="timeline-marker">
-                <span class="timeline-dot blue"></span>
-                <span class="timeline-line"></span>
+        @if (Model.IsRead)
+        {
+            <div class="timeline-item">
+                <div class="timeline-marker">
+                    <span class="timeline-dot blue"></span>
+                </div>
+                <div class="timeline-content">
+                    <strong>Marked as Read</strong>
+                    <span class="timeline-date">—</span>
+                    <span class="timeline-actor">Admin</span>
+                </div>
             </div>
-            <div class="timeline-content">
-                <strong>Review Submitted</strong>
-                <span class="timeline-date">May 31, 2024, 10:14 AM</span>
-                <span class="timeline-actor">Sarah Johnson</span>
-            </div>
-        </div>
-
-        <div class="timeline-item">
-            <div class="timeline-marker">
-                <span class="timeline-dot hollow"></span>
-            </div>
-            <div class="timeline-content">
-                <strong>Notification Sent</strong>
-                <span class="timeline-date">May 31, 2024, 10:15 AM</span>
-                <span class="timeline-actor">System</span>
-            </div>
-        </div>
-
+        }
     </div>
 
 </aside>

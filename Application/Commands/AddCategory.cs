@@ -2,6 +2,7 @@
 using Application.Common.Repositories;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Command
 {
@@ -15,6 +16,8 @@ namespace Application.Command
             ICategoryRepository categoryRepository,
             IUnitOfWork unitOfWork,
             IUserRepository userRepository,
+            IHttpContextAccessor httpContextAccessor,
+            IAuditLogRepository auditLogRepository,
             ICurrentUser currentUser) : 
             IRequestHandler<AddCategoryCommand, Result<string>>
         {
@@ -37,6 +40,26 @@ namespace Application.Command
                      Description = request.Description,
                      CreatedBy = user.Email
                 };
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Create",
+                    Description = $"{category.Name} was added successfully",
+                    Icon = "📖",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    ResourceType = ResourceType.System,
+                    ResourceId = category.Id
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 await categoryRepository.AddAsync(category);
                 await unitOfWork.SaveAsync();

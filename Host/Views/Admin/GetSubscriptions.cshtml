@@ -7,6 +7,9 @@
 }
 
 <link href="~/css/getUsers.css" rel="stylesheet" />
+<link href="~/css/notify.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/modal.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/toast.css" rel="stylesheet" asp-append-version="true" />
 
 <section class="main-container">
     <h2>System Subscription Management</h2>
@@ -68,59 +71,81 @@
                         stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                         Add Sub Type
                     </button>
+                    <div id="paymentModal"
+                         class="modal-overlay">
 
-                    <div id="paymentModal" class="modal-overlay">
-
-                        <div class="payment-modal modal-content">
+                        <div class="modal-content"
+                             style="--modal-width:900px;">
 
                             <div class="modal-header">
-                                <h2>Add New Subscription Type</h2>
 
-                                <button id="closePaymentModal" class="close-btn">
+                                <h2>Add New Library</h2>
+
+                                <button type="button"
+                                        id="closePaymentModal"
+                                        class="close-btn">
+
                                     &times;
-                                </button>
-                            </div>
 
-                            <div class="modal-body">
-
-                                <div class="form-group">
-                                    <label>Subscription Type Name</label>
-
-                                    <input type="text" 
-                                        placeholder="Type name e.g Pro, Beginner etc"/>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Billing cycle</label>
-
-                                    <select>
-                                        <option>Monthly</option>
-                                        <option>Annually</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Cost (₦)</label>
-
-                                    <input type="number"
-                                           placeholder="Enter the cost for this sub type" />
-                                </div>
-                            </div>
-
-                            <div class="modal-footer">
-
-                                <button id="cancelPaymentModal"
-                                        class="btn-cancel">
-                                    Cancel
                                 </button>
 
-                                <button class="btn-save">
-                                    Add Type
-                                </button>
                             </div>
+
+                            <form class="form" id="loginForm" asp-controller="Admin"
+                                  asp-action="AddSubType" 
+                                  method="post">
+
+                                <div class="modal-body">
+
+                                    <div class="form-group">
+                                        <label>Subscription Type Name</label>
+
+                                        <input type="text"
+                                               placeholder="Type name e.g Pro, Beginner etc" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Billing cycle</label>
+
+                                        <select>
+                                            <option>Monthly</option>
+                                            <option>Annually</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Cost (₦)</label>
+
+                                        <input type="number"
+                                               placeholder="Enter the cost for this sub type" />
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+
+                                    <button type="button"
+                                            id="cancelPaymentModal"
+                                            class="btn-cancel">
+
+                                        Cancel
+
+                                    </button>
+
+                                    <button type="submit"
+                                            class="btn-save">
+                                        Create Library
+
+                                    </button>
+
+                                </div>
+
+                            </form>
 
                         </div>
+
                     </div>
+
+                    <script src="~/js/modal.js"></script>
                 </div>
 
                 </div>
@@ -175,9 +200,9 @@
                                     Invoices
                                 </a>
 
-                                <a href="@Url.Action("", "Admin", new { id = sub.Id })"
+                                <a href="javascript:void(0)"
                                    class="action-link delete"
-                                   onclick="return confirm('Remove this book from library catalog records?')">
+                                   onclick="confirmDeleteAction('@Url.Action("", "Admin", new { id = sub.Id })')">
                                     Cancel
                                 </a>
                             </td>
@@ -228,5 +253,51 @@
         </div>
     </div>
     <script src="~/js/myJsFile.js"></script>
+    <script src="~/js/modal.js"></script>
+    <script src="~/js/toast.js"></script>
+
+    <script>
+
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        Modal.show('loading', { title: 'Creating Sub Type...', message: 'Please wait.' });
+
+        try {
+        const response = await fetch('@Url.Action("AddSubType", "Admin")', { method: 'POST', body: formData });
+        const data = await response.json();
+
+        if (data.success) {
+        Modal.show('success', { title: 'Created Successfully!', message: 'You`ve now added a new Sub Type ' });
+        setTimeout(() => window.location.href = data.redirectUrl, 1000);
+
+        } else if (data.redirectUrl) {
+        // e.g. "not verified" case — redirect instead of just showing an error
+        window.location.href = data.redirectUrl;
+        }
+
+        else {
+        Modal.show('error', { title: 'Failed To Create!', message: data.message });
+        }
+        } catch (err) {
+        Modal.show('error', { title: 'Network error', message: 'Could not reach the server.' });
+        }
+        });
+
+        function confirmDeleteAction(actionUrl) {
+        Modal.show('confirmDelete', {
+        title: 'Remove from catalog',
+        message: 'This will permanently remove this book from the library catalog records. This cannot be undone.',
+        requiredText: 'DELETE',
+        confirmLabel: 'Delete',
+        formAction: actionUrl,
+        formMethod: 'post'
+        });
+        }
+
+    </script>
+
 
 </section>

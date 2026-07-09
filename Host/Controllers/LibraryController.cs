@@ -1,16 +1,27 @@
-﻿using Domain.Entities;
+﻿using Application.Command;
+using Application.Commands;
+using Application.Common.Dtos;
+using Application.Common.Pagenation;
+using Application.Queries;
+using Application.Query;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Web.Helpers;
 using static Application.Command.AddBook;
+using static Application.Commands.MarkAllNotificationsRead;
+using static Application.Commands.MarkNotificationRead;
 using static Application.Commands.UploadProfilePIcs;
+using static Application.Queries.GetBookById;
 using static Application.Queries.GetBookByLibraryId;
 using static Application.Queries.GetByLibraryId;
 using static Application.Queries.GetCategories;
 using static Application.Queries.GetConversationByUserId;
+using static Application.Queries.GetLibraryAnalytics;
+using static Application.Queries.GetLibraryAnalytics.GetLibraryAnalyticsHandler;
+using static Application.Queries.GetLibraryAuditLogs;
 using static Application.Queries.GetLibraryById;
 using static Application.Queries.GetLibraryDashboard;
-using static Application.Queries.GetTransactionHistory;
+using static Application.Queries.GetReviewById;
 
 namespace Host.Controllers
 {
@@ -234,16 +245,108 @@ namespace Host.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> GetLibraryBook()
+        public async Task<IActionResult> GetLibraryBook(Guid bookId)
         {
-            return View();
+            var result = await mediator.Send(new GetBookByIdQuery(bookId));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction(nameof(GetLibraryBooks));
+            }
+            TempData["Success"] = result.Message;
+            return View(result.Data);
         }
 
         [HttpGet]
-
-        public async Task<IActionResult> EditBook()
+        public async Task<IActionResult> EditBook(Guid id)
         {
-            return View();
+            var result = await mediator.Send(new GetBookEdit.GetBookEditQuery(id));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction("Books", "Library");
+            }
+
+            return View(result.Data);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditBook(UpdateBookViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Please fill in all required fields.";
+                return RedirectToAction("EditBook", new { id = model.BookId });
+            }
+
+            var command = new UpdateBook.UpdateBookCommand(
+                model.BookId,
+                model.Title,
+                model.Subtitle,
+                model.Author,
+                model.Genre,
+                model.Language,
+                model.Isbn,
+                model.About,
+                model.Publisher,
+                model.PublicationYear,
+                model.Edition,
+                model.Pages,
+                model.IsPublished,
+                model.AccessLevel,
+                model.CategoryId,
+                model.AdditionalCategories,
+                model.Tags,
+                model.PricingType,
+                model.Price,
+                model.CompareAtPrice,
+                model.Discount,
+                model.MembershipAccess,
+                model.RentalOption,
+                model.AccessType,
+                model.AllowOnlineReading,
+                model.AllowDownload,
+                model.LimitToOneDevice,
+                model.DripContent,
+                model.PreviewType,
+                model.FreeChapterCount,
+                model.AllowReviews,
+                model.AllowRatings,
+                model.AllowComments,
+                model.ShowReviewCount,
+                model.ShowReadCount,
+                model.ShowAverageRating,
+                model.DisableUserFeedback,
+                model.PromotionStatus,
+                model.HomepageCarousel,
+                model.TrendingSection,
+                model.StaffPicks,
+                model.EditorsChoice,
+                model.ShowInSearch,
+                model.FeaturedBook,
+                model.ShowInRecommendations,
+                model.ShowInCategoryListings,
+                model.AllowSocialSharing,
+                model.HideFromCatalog,
+                model.AdultContentWarning,
+                model.SeoTitle,
+                model.SeoSlug,
+                model.SeoDescription,
+                model.SeoKeywords
+            );
+
+            var result = await mediator.Send(command);
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction("EditBook", new { id = model.BookId });
+            }
+
+            TempData["Success"] = "Book updated successfully.";
+            return RedirectToAction("EditBook", new { id = model.BookId });
         }
 
         [HttpGet]
@@ -254,59 +357,193 @@ namespace Host.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetRevenue(int page = 1, int PageSize = 5)
+        public async Task<IActionResult> GetRevenue(int page = 1, int pageSize = 5)
         {
             var userId = ClaimsHelper.GetUserId(User);
-            var result = await mediator.Send(new GetTransactionHistoryQuery(userId, page, PageSize));
+            var libraryId = ClaimsHelper.GetCustomerId(User);
+
+            var result = await mediator.Send(
+                new GetRevenueDashboard.GetRevenueDashboardQuery(userId, page, pageSize, libraryId));
 
             if (!result.Status)
             {
                 TempData["Error"] = result.Message;
                 return View(result.Data);
             }
-            TempData["Success"] = result.Message;
 
             return View(result.Data);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Analysis()
+        public async Task<IActionResult> Analysis(string? start, string? end, int page = 1, int pageSize = 10)
         {
-            return View();
+            var libraryId = ClaimsHelper.GetCustomerId(User);
+            var userId = ClaimsHelper.GetUserId(User);
+
+            var now = DateTime.UtcNow;
+            var defaultStart = new DateTime(now.Year, now.Month, 1);
+            var defaultEnd = defaultStart.AddMonths(1).AddDays(-1);
+
+            var startDate = DateTime.TryParse(start, out var parsedStart) ? parsedStart : defaultStart;
+            var endDate = DateTime.TryParse(end, out var parsedEnd) ? parsedEnd : defaultEnd;
+
+            if (endDate < startDate)
+            {
+                (startDate, endDate) = (endDate, startDate);
+            }
+
+            var result = await mediator.Send(new GetLibraryAnalyticsQuery(
+                userId, libraryId, startDate, endDate, page, pageSize));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return View(new LibraryAnalyticsResponse(
+                    startDate, endDate,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    new List<string>(), new List<int>(),
+                    null, 0, 0, null, 0, 0, 0, null, 0,
+                    0, 0, 0, 0, 0, 0,
+                    new ReadingTimeDistributionDto(0, 0, 0, 0, 0),
+                    new List<FunnelStepDto>(),
+                    new List<TopBookDto>(),
+                    new DemographicsDto(0, 0, 0, 0),
+                    new DeviceBreakdownDto(0, 0, 0),
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    new RatingsDistributionDto(0, 0, 0, 0, 0),
+                    new List<LocationStatDto>()
+                ));
+            }
+
+            return View(result.Data);
         }
 
         [HttpGet]
-
-        public async Task<IActionResult> GetReviews()
+        public async Task<IActionResult> GetReviews(string? start, string? end, int page = 1, int pageSize = 10)
         {
-            return View();
+            var libraryId = ClaimsHelper.GetCustomerId(User);
+
+            var now = DateTime.UtcNow;
+            var defaultStart = new DateTime(now.Year, now.Month, 1);
+            var defaultEnd = defaultStart.AddMonths(1).AddDays(-1);
+
+            var startDate = DateTime.TryParse(start, out var parsedStart) ? parsedStart : defaultStart;
+            var endDate = DateTime.TryParse(end, out var parsedEnd) ? parsedEnd : defaultEnd;
+
+            if (endDate < startDate)
+            {
+                (startDate, endDate) = (endDate, startDate);
+            }
+
+            var result = await mediator.Send(new GetLibraryReviews.GetLibraryReviewsQuery(
+                libraryId, startDate, endDate, page, pageSize));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return View(new GetLibraryReviews.LibraryReviewsResponse(
+                    startDate, endDate,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    new GetLibraryReviews.RatingDistributionDto(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+                    new List<GetLibraryReviews.TopReviewedBookDto>(),
+                    new PagenatedList<GetLibraryReviews.ReviewRowDto> { Items = new List<GetLibraryReviews.ReviewRowDto>(), Page = page, PageSize = pageSize, TotalCount = 0 }
+                ));
+            }
+
+            return View(result.Data);
         }
 
         [HttpGet]
-
-        public async Task<IActionResult> GetReview()
+        public async Task<IActionResult> GetReview(Guid id)
         {
-            return View();
-        }
-        [HttpGet]
+            var result = await mediator.Send(new GetReviewByIdQuery(id));
 
-        public async Task<IActionResult> GetActivity()
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction("Reviews");
+            }
+
+            return View(result.Data);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetActivity(int page = 1, int pageSize = 10)
         {
-            return View();
+            var result = await mediator.Send(new GetLibraryAuditLogsQuery(page, pageSize));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return View(result.Data);
         }
 
         [HttpGet]
-
         public async Task<IActionResult> GetNotifications()
         {
-            return View();
+            var userId = ClaimsHelper.GetUserId(User);
+            var result = await mediator.Send(new GetAllNotificationByUserId.GetAllNotificationQuery(userId));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return View(new GetAllNotificationByUserId.NotificationPageResponse(
+                0, 0, 0, 0, 0,
+                new List<GetAllNotificationByUserId.GetAllNotificationResponse>(),
+                new List<GetAllNotificationByUserId.CategoryCountDto>()
+));
+            }
+
+            return View(result.Data);
+        }
+
+        public class ToggleReadRequest { public Guid Id { get; set; } public bool Read { get; set; } }
+        public class IdRequest { public Guid Id { get; set; } }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleNotificationRead([FromBody] ToggleReadRequest req)
+        {
+            var userId = ClaimsHelper.GetUserId(User);
+            await mediator.Send(new MarkNotificationReadCommand(req.Id, userId, req.Read));
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteNotification([FromBody] IdRequest req)
+        {
+            await mediator.Send(new DeleteNotification.DeleteNotificationCommand(req.Id));
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ArchiveNotification([FromBody] IdRequest req)
+        {
+            await mediator.Send(new ArchiveNotification.ArchiveNotificationCommand(req.Id));
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkAllNotificationsRead()
+        {
+            var userId = ClaimsHelper.GetUserId(User);
+            await mediator.Send(new MarkAllNotificationsReadCommand(userId));
+            return Ok();
         }
 
         [HttpGet]
-
-        public async Task<IActionResult> GetNotification()
+        public async Task<IActionResult> GetNotification(Guid id)
         {
-            return View();
+            var result = await mediator.Send(new GetNotificationById.GetNotificationByIdQuery(id));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction("Notifications");
+            }
+
+            return View(result.Data);
         }
 
         [HttpGet]

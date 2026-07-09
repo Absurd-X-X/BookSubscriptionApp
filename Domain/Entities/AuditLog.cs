@@ -29,6 +29,11 @@ namespace Domain.Entities
         public string ActionType { get; set; } = default!; // e.g., "Create", "Update", "Delete"
 
         [Required]
+        public ResourceType ResourceType { get; set; }
+
+        public Guid? ResourceId { get; set; }
+
+        [Required]
         [StringLength(1000)]
         public string Description { get; set; } = default!; // Detailed log message
 

@@ -14,13 +14,17 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<Subscription?> GetAsync(Guid id)
 
             => await context.Subscriptions
+                .Include(v => v.Types)
                 .Include(x => x.Reader)
+                .ThenInclude(x => x.User)
                 .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
 
         public Task<Subscription?> GetByReaderIdAsync(Guid readerId, bool isActive)
 
             => context.Subscriptions
+                .Include(v => v.Types)
                 .Include(x => x.Reader)
+                .ThenInclude(x => x.User)
                 .FirstOrDefaultAsync(x => x.ReaderId == readerId &&
                 x.IsActive == isActive && !x.IsDeleted);
 
@@ -29,6 +33,7 @@ namespace Infrastructure.Persistence.Repositories
             var query = context.Subscriptions
                 .Include(v => v.Types)
                 .Include(x => x.Reader)
+                .ThenInclude(x => x.User)
                 .AsQueryable();
 
 

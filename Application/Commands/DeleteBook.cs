@@ -1,6 +1,9 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Repositories;
+using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Application.Command
 {
@@ -12,6 +15,8 @@ namespace Application.Command
             ICurrentUser _currentUser,
             IBookRepository _bookRepository,
             IUserRepository userRepository,
+            IAuditLogRepository auditLogRepository,
+            IHttpContextAccessor httpContextAccessor,
             IUnitOfWork _unitOfWork) : IRequestHandler<DeleteBookCommand, Result<string>>
         {
             public async Task<Result<string>> Handle(DeleteBookCommand request, CancellationToken cancellationToken)
@@ -32,6 +37,27 @@ namespace Application.Command
                 
                 check.IsDeleted = true;
                 check.DateModified = DateTime.UtcNow;
+
+                string? ipAddress = httpContextAccessor
+              .HttpContext?
+              .Connection
+              .RemoteIpAddress?
+              .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Delete",
+                    Description = $"{check.Title} was deleted successfully",
+                    Icon = "❌",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    UserId = user.Id,
+                    ResourceType = ResourceType.System,
+                    ResourceId = check.Id,
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 await _unitOfWork.SaveAsync();
 

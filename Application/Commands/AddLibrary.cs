@@ -54,8 +54,7 @@ namespace Application.Command
                 string cleanRef = request.Name.Replace(" ", "");
                 string shortCode = cleanRef.Length >= 3 ? cleanRef[..3] : "LIB";
 
-
-                await libraryRepository.AddAsync(new Library
+                Library library = new Library
                 {
                     Name = request.Name,
                     Email = request.Email,
@@ -63,7 +62,9 @@ namespace Application.Command
                     PhoneNumber = request.PhoneNumber,
                     RefNumber = $"Absourd{shortCode.ToUpper()}",
                     CreatedBy = user.Id.ToString()
-                });
+                };
+
+                await libraryRepository.AddAsync(library);
 
                 await walletRepository.AddAsync(new Wallet
                 {
@@ -84,11 +85,13 @@ namespace Application.Command
                 await auditLogRepository.AddAsync(new AuditLog
                 {
                     UserId = user.Id,
-                    ActionType = "Added New User (Library)",
+                    ActionType = "Added New User",
                     Icon = "👤",
                     Description = $"User Added: {request.Name}({request.UserName})",
                     IpAddress = "",
-                    UserRole = user.Role
+                    UserRole = user.Role,
+                    ResourceType = ResourceType.System,
+                    ResourceId = library.Id
                 });
 
                 await unitOfWork.SaveAsync();

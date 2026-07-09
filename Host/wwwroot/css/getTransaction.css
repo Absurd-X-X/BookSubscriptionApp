@@ -2,9 +2,9 @@
 
 :root {
     --bg-page: #0f1117;
-    --bg-card: #0d1730;
+    --bg-card: #13122a;
     --bg-input: #1e2135;
-    --border: #2d3148;
+    --border: #2d2b72;
     --border-light: #252840;
     --text-primary: #ffffff;
     --text-muted: #8b8fa8;
@@ -21,9 +21,9 @@
     --red-text: #f87171;
     --orange-border: #ea580c;
     --orange-text: #fb923c;
-    --radius-sm: 6px;
+    --radius-sm: 5px;
     --radius-md: 5px;
-    --radius-lg: 7px;
+    --radius-lg: 5px;
 }
 
 
@@ -33,9 +33,10 @@
 }
 
 
-    .main::-webkit-scrollbar {
-        display: none;
-    }
+
+.main::-webkit-scrollbar {
+    display: none;
+}
 
 /* PAGE HEADER */
 .page-header {
@@ -89,6 +90,7 @@
     padding: 1.25rem 1.25rem;
     display: flex;
     align-items: flex-start;
+    border: 1px solid var(--border);
     gap: 14px;
 }
 
@@ -222,6 +224,7 @@
 .section-card {
     background: var(--bg-card);
     border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
     padding: 1.4rem;
 }
 

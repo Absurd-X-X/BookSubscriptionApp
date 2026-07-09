@@ -24,6 +24,8 @@ namespace Infrastructure.Persistence.Repositories
 
             => await context.Categories
             .Include(x => x.Books)
+            .ThenInclude(x => x.Library)
+            .ThenInclude(x => x.User)
             .FirstOrDefaultAsync(v => !v.IsDeleted && v.Id == id);
 
 

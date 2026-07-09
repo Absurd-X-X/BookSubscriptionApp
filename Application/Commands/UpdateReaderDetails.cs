@@ -1,6 +1,8 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Repositories;
+using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Command
 {
@@ -15,6 +17,8 @@ namespace Application.Command
         public class UpdateReaderHandler(
             IReaderRepository readerRepository,
             IUserRepository userRepository,
+            IHttpContextAccessor httpContextAccessor,
+            IAuditLogRepository auditLogRepository,
             IUnitOfWork unitOfWork
             ) : IRequestHandler<UpdateReaderCommand, Result<string>>
         {
@@ -36,6 +40,29 @@ namespace Application.Command
                 reader.Name = request.Name;
                 reader.Email = request.Email;
                 reader.CreatedBy = request.Email;
+
+
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Update",
+                    Description = $"Reader Details updated successfully",
+                    Icon = "📚",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    UserId = user.Id,
+                    ResourceType = ResourceType.Reader,
+                    ResourceId = reader.Id
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 await unitOfWork.SaveAsync();
                 return Result<string>.Success("Updated", "Successfully");

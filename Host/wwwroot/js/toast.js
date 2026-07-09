@@ -1,14 +1,4 @@
-﻿/* ==========================================================================
-   Toast notification logic
-   Usage:
-     Toast.show('success', { title: 'Saved', message: 'Your changes are saved.' });
-     Toast.show('error',   { title: 'Failed', message: 'Try again.' });
-
-     // Loading / uploading toasts don't auto-dismiss — you control them:
-     const id = Toast.show('loading', { title: 'Loading...', message: 'Please wait...' });
-     Toast.update(id, { progress: 45 });   // optional, for uploading state
-     Toast.dismiss(id);                    // close it manually when done
-   ========================================================================== */
+﻿
 
 const Toast = (() => {
     const TYPE_CONFIG = {

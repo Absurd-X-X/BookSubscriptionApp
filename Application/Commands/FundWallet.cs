@@ -4,6 +4,7 @@ using Application.Services;
 using Domain.Entities;
 using Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Commands
 {
@@ -18,6 +19,8 @@ namespace Application.Commands
             IWalletRepository walletRepository,
             IWalletTransactionRepository walletTransactionRepository,
             IPaystackService paystackService,
+            IHttpContextAccessor httpContextAccessor,
+            IAuditLogRepository auditLogRepository,
             IUnitOfWork unitOfWork)
             : IRequestHandler<FundWalletCommand, Result<FundWalletResponse>>
         {
@@ -58,6 +61,28 @@ namespace Application.Commands
                     BalanceAfter = wallet.Balance += request.Amount,
                     CreatedBy = customer.Email
                 });
+
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Fund Wallet",
+                    Description = $"Wallet Funded successfully",
+                    Icon = "🔔",
+                    IpAddress = ipAddress!,
+                    UserRole = customer.Role,
+                    UserId = customer.Id,
+                    ResourceType = ResourceType.System,
+                    ResourceId = null,
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 await unitOfWork.SaveAsync();
 

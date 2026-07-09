@@ -5,6 +5,7 @@ using Domain.Enums;
 using Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
+using static Application.Queries.GetRevenueDashboard.GetRevenueDashboardHandler;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -285,6 +286,23 @@ namespace Infrastructure.Persistence.Repositories
                          && t.Status == WalletTransactionStatus.Successful)
                 .OrderByDescending(t => t.DateCreated)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<PayoutStatusOverviewDto> GetPayoutStatusOverviewAsync(Guid walletId)
+        {
+            var payouts = await context.WalletTransactions
+                .Where(t => t.WalletId == walletId && t.Type == TransactionType.Payout)
+                .ToListAsync();
+
+            var paid = payouts.Where(p => p.Status == WalletTransactionStatus.Successful).ToList();
+            var pending = payouts.Where(p => p.Status == WalletTransactionStatus.Pending).ToList();
+
+            return new PayoutStatusOverviewDto(
+                PaidMonthsCount: paid.Count,
+                PendingMonthsCount: pending.Count,
+                TotalPaidAmount: paid.Sum(p => p.Balance),
+                TotalPendingAmount: pending.Sum(p => p.Balance)
+            );
         }
     }
 }

@@ -1,8 +1,7 @@
 ﻿using Application.Common.Pagenation;
 using Domain.Entities;
 using Domain.Enums;
-using Org.BouncyCastle.Asn1.Ocsp;
-using System.Transactions;
+using static Application.Queries.GetRevenueDashboard.GetRevenueDashboardHandler;
 
 namespace Application.Common.Repositories
 {
@@ -25,5 +24,6 @@ namespace Application.Common.Repositories
         Task<decimal> GetPendingPayoutAmountAsync(Guid walletId);
         Task<int> GetUnpaidMonthsCountAsync(Guid walletId);
         Task<WalletTransaction?> GetLastPaidPayoutAsync(Guid walletId);
+        Task<PayoutStatusOverviewDto> GetPayoutStatusOverviewAsync(Guid walletId);
     }
 }

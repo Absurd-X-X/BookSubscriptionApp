@@ -1,5 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Repositories;
+using Domain.Entities;
 using MediatR;
 
 namespace Application.Queries
@@ -21,29 +22,66 @@ namespace Application.Queries
                     return Result<GetReviewByIdResponse>.Failure("Data not found");
                 }
 
+                var reviewerTotalReviews = await reviewRepository.CountByReaderIdAsync(review.ReaderId);
+                var bookReviewCount = await reviewRepository.CountByBookIdAsync(review.BookId);
+                var bookAvgRating = await reviewRepository.GetAverageRatingForBookAsync(review.BookId);
+
                 var reviewData = new GetReviewByIdResponse(
-                    review.Id,
-                    review.BookId,
-                    review.ReaderId,
-                    review.Rating,
-                    review.Comment,
-                    review.IsApproved,
-                    review.HelpfulCount
+                    ReviewId: review.Id,
+                    Rating: review.Rating,
+                    Comment: review.Comment,
+                    Status: review.Status,
+                    HelpfulCount: review.HelpfulCount,
+                    NotHelpfulCount: 0,
+                    DateCreated: review.DateCreated,
+                    EditedAt: review.EditedAt,
+
+                    BookId: review.Book.Id,
+                    BookTitle: review.Book.Title,
+                    BookAuthor: review.Book.Author,
+                    BookCoverUrl: review.Book.BookCoverUrl,
+                    BookCategory: review.Book.Category?.Name ?? "N/A",
+                    BookPublicationYear: review.Book.PublicationYear,
+                    BookAverageRating: Math.Round(bookAvgRating, 1),
+                    BookReviewCount: bookReviewCount,
+
+                    ReaderId: review.Reader.Id,
+                    ReaderName: review.Reader.Name,
+                    ReaderEmail: review.Reader.Email,
+                    ReaderMemberSince: review.Reader.DateCreated,
+                    ReaderTotalReviews: reviewerTotalReviews,
+                    ReaderLocation: "N/A"
                     );
 
                 return Result<GetReviewByIdResponse>.Success(reviewData, "Retrived");
             }
         }
-    }
 
-    public record GetReviewByIdResponse(
+        public record GetReviewByIdResponse(
         Guid ReviewId,
-        Guid BookId,
-        Guid ReaderId,
         int Rating,
         string Comment,
-        bool IsApproved,
-        int HelpfulCount
-        );
-}
+        ReviewStatus Status,
+        int HelpfulCount,
+        int NotHelpfulCount,
+        DateTime DateCreated,
+        DateTime? EditedAt,
 
+        Guid BookId,
+        string BookTitle,
+        string BookAuthor,
+        string? BookCoverUrl,
+        string BookCategory,
+        int BookPublicationYear,
+        double BookAverageRating,
+        int BookReviewCount,
+
+        Guid ReaderId,
+        string ReaderName,
+        string ReaderEmail,
+        DateTime ReaderMemberSince,
+        int ReaderTotalReviews,
+        string ReaderLocation
+        );
+    }
+}

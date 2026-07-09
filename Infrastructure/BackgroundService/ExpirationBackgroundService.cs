@@ -51,7 +51,8 @@ namespace BackGroundApi.BackgroundServices
                         Message = "Your present subscription will outdated in the next three days",
                         CreatedBy = user.Email,
                         Type = NotificationType.Others,
-                        Ref = user.Id.ToString()
+                        Ref = item.Id.ToString(),
+                        RefType = NotificationRefType.Reminder
                     };
 
                     await notificationScope.AddAsync(notification);

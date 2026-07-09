@@ -2,6 +2,7 @@
 using Application.Common.Repositories;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Command
 {
@@ -17,6 +18,8 @@ namespace Application.Command
             IUserRepository userRepository,
             IReaderRepository readerRepository,
             ISubscriptionTypeRepository subscriptionTypeRepository,
+            IAuditLogRepository auditLogRepository,
+            IHttpContextAccessor httpContextAccessor,
             IUnitOfWork unitOfWork
             ) : IRequestHandler<SubscribeCommand, Result<string>>
         {
@@ -48,6 +51,7 @@ namespace Application.Command
 
                 user.Wallet.Balance -= subscriptionType.Cost;
                 getAdmin.Wallet!.Balance += subscriptionType.Cost;
+                subscriptionType.SubscriptionDate = DateTime.UtcNow;
 
                 var sub = await subscriptionRepository.GetByReaderIdAsync(reader.Id, true);
 
@@ -67,6 +71,31 @@ namespace Application.Command
                      ReaderId = reader.Id,
                      SubscriptionTypeId = request.SubscriptionTypeId
                 });
+
+                
+
+
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Subscribe",
+                    Description = $"Subscription created successfully",
+                    Icon = "👆",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    UserId = user.Id,
+                    ResourceType = ResourceType.Reader,
+                    ResourceId = reader.Id,
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 await unitOfWork.SaveAsync();
                 return Result<string>.Success("Subscribe", "Successfully");

@@ -49,13 +49,14 @@ namespace Application.Command
 
                 await userRepository.AddAsync(user);
 
-                await readerRepository.AddAsync(new Reader
+                Reader reader = new Reader
                 {
                     Name = request.Name,
                     Email = request.Email,
                     CreatedBy = user.Id.ToString(),
                     UserId = user.Id
-                });
+                };
+                await readerRepository.AddAsync(reader);
 
 
                 await walletRepository.AddAsync(new Wallet
@@ -78,11 +79,13 @@ namespace Application.Command
                 await auditLogRepository.AddAsync(new AuditLog
                 {
                     UserId = user.Id,
-                    ActionType = "Added New User (Reader)",
+                    ActionType = "Added New User",
                     Icon = "👤",
                     Description = $"User Added: {request.Name}({request.UserName})",
                     IpAddress = "",
-                    UserRole = user.Role 
+                    UserRole = user.Role,
+                    ResourceType = ResourceType.Reader,
+                    ResourceId = reader.Id
                 });
 
                 await unitOfWork.SaveAsync();

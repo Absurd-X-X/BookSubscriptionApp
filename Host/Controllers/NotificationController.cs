@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Helpers;
-using static Application.Command.MarkNotificationAsRead;
+using static Application.Commands.MarkAllNotificationsRead;
 using static Application.Queries.GetMyNotifications;
 
 namespace Host.Controllers
@@ -29,11 +29,13 @@ namespace Host.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MarkAsRead(Guid notificationId)
+        public async Task<IActionResult> MarkAsRead()
         {
             var userId = ClaimsHelper.GetUserId(User);
+
             var result = await mediator.Send(
-                new MarkNotificationAsReadCommand(notificationId, true));
+                new MarkAllNotificationsReadCommand(userId));
+
             return Json(new { success = result.Status });
         }
     }

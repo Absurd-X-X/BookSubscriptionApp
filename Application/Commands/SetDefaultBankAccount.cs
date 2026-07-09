@@ -1,6 +1,8 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Repositories;
+using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Commands
 {
@@ -12,6 +14,9 @@ namespace Application.Commands
 
         public class SetDefaultBankAccountHandler(
             IBankAccountRepository bankAccountRepository,
+            IHttpContextAccessor httpContextAccessor,
+            IAuditLogRepository auditLogRepository,
+            IUserRepository userRepository,
             IUnitOfWork unitOfWork)
             : IRequestHandler<SetDefaultBankAccountCommand, Result<string>>
         {
@@ -19,6 +24,10 @@ namespace Application.Commands
                 SetDefaultBankAccountCommand request,
                 CancellationToken cancellationToken)
             {
+                var user = await userRepository.GetAsync(request.UserId);
+                if (user == null)
+                    return Result<string>.Failure("User not found");
+
                 var accounts = await bankAccountRepository
                     .GetAllAccountByUserAsync(request.UserId);
 
@@ -36,6 +45,29 @@ namespace Application.Commands
 
                 target.IsDefault = true;
                 target.DateModified = DateTime.UtcNow;
+
+
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Set Default Bank Account",
+                    Description = $"Default bank account updated for user {user.UserName}",
+                    Icon = "👍",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    UserId = user.Id,
+                    ResourceType = ResourceType.System,
+                    ResourceId = target.Id,
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 await unitOfWork.SaveAsync();
 

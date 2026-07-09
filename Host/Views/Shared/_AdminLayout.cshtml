@@ -106,6 +106,8 @@
         <main class="main">
             @RenderBody()
         </main>
+        
+        <script src="~/js/myJsFile.js"></script>
         <script src="~/js/toast.js"></script>
         <script src="~/js/modal.js"></script>
     </div>
@@ -150,5 +152,29 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    @if (TempData["Success"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            Toast.show("success", {
+                title: "Success",
+                message: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"]))
+            });
+        });
+    </script>
+}
+
+@if (TempData["Error"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            Toast.show("error", {
+                title: "Error",
+                message: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"]))
+            });
+        });
+    </script>
+}
 </body>
 </html>

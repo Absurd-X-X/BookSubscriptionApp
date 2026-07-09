@@ -3,6 +3,7 @@ using Application.Common.Repositories;
 using Domain.Entities;
 using Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Commands
 {
@@ -17,6 +18,8 @@ namespace Application.Commands
             IUserRepository userRepository,
             IWalletRepository walletRepository,
             IWalletTransactionRepository walletTransactionRepository,
+            IHttpContextAccessor httpContextAccessor,
+            IAuditLogRepository auditLogRepository,
             IUnitOfWork unitOfWork) : IRequestHandler<RecordManualPaymentCommand, Result<RecordManualPaymentResponse>>
 {
             public async Task<Result<RecordManualPaymentResponse>> Handle(RecordManualPaymentCommand request, CancellationToken cancellationToken)
@@ -105,6 +108,30 @@ namespace Application.Commands
                     BalanceAfter = recipientwallet.Balance,
                     CreatedBy = user.Id.ToString()
                 });
+
+
+
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Bank Payment",
+                    Description = $"Manual payment recorded successfully",
+                    Icon = "💰",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    UserId = user.Id,
+                    ResourceType = ResourceType.System,
+                    ResourceId = null,
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 await unitOfWork.SaveAsync();
 

@@ -8,6 +8,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="~/css/verifyEmail.css" rel="stylesheet" />
+    <link href="~/css/login.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/notify.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/modal.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/toast.css" rel="stylesheet" asp-append-version="true" />
 </head>
 <body>
 
@@ -92,6 +96,9 @@
         </p>
         <p class="footer-copyright">© 2024 Atomic Habits Reader. All rights reserved.</p>
 
+        
+        <script src="~/js/toast.js"></script>
+        <script src="~/js/modal.js"></script>
     </div>
 
     <script>
@@ -222,6 +229,34 @@
             });
 
             startResendCooldown();
+
+        document.getElementById('otpForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        Modal.show('loading', { title: 'Verifying...', message: 'Please wait.' });
+
+        try {
+        const response = await fetch('@Url.Action("VerifyEmail", "Auth")', { method: 'POST', body: formData });
+        const data = await response.json();
+
+        if (data.success) {
+        Modal.show('success', { title: 'Email verified!', message: 'Your email has been verified.' });
+        setTimeout(() => window.location.href = data.redirectUrl, 1200);
+
+        } else if (data.redirectUrl) {
+        // e.g. "not verified" case — redirect instead of just showing an error
+        window.location.href = data.redirectUrl;
+        }
+
+        else {
+        Modal.show('error', { title: 'Verification failed', message: data.message });
+        }
+        } catch (err) {
+        Modal.show('error', { title: 'Network error', message: 'Could not reach the server.' });
+        }
+        });
     </script>
 
 </body>

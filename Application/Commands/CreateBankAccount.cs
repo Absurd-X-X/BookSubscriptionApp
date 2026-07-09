@@ -3,6 +3,8 @@ using Application.Common.Repositories;
 using Application.Services;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Application.Commands
 {
@@ -19,6 +21,8 @@ namespace Application.Commands
         public class AddBankAccountHandler(
             IBankAccountRepository bankAccountRepository,
             IPaystackService paystackService,
+            IHttpContextAccessor httpContextAccessor,
+            IAuditLogRepository auditLogRepository,
             IUnitOfWork unitOfWork,
             IUserRepository userRepository
             )
@@ -59,6 +63,27 @@ namespace Application.Commands
                     IsDefault = request.IsDefault,
                     CreatedBy = user.Id.ToString()
                 });
+
+                string? ipAddress = httpContextAccessor
+              .HttpContext?
+              .Connection
+              .RemoteIpAddress?
+              .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Create",
+                    Description = $"Bank account was created successfully",
+                    Icon = "➕",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    UserId = user.Id,
+                    ResourceType = ResourceType.System,
+                    ResourceId = null,
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 await unitOfWork.SaveAsync();
 

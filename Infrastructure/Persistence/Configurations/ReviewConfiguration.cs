@@ -18,7 +18,7 @@ namespace Infrastructure.Persistence.Configurations
 
             builder.Property(x => x.Rating);
 
-            builder.Property(x => x.IsApproved);
+            builder.Property(x => x.Status);
             
             builder.HasOne(x => x.Reader)
                 .WithMany(x => x.Reviews)

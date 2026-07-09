@@ -2,7 +2,9 @@
 using Application.Common.Dtos;
 using Application.Common.Repositories;
 using Application.Services;
+using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Command
 {
@@ -13,7 +15,9 @@ namespace Application.Command
         public class ForgotPasswordHAndler(
             IUserRepository userRepository,
             IUnitOfWork unitOfWork,
-            IEmailService emailServices
+            IEmailService emailServices,
+            IHttpContextAccessor httpContextAccessor,
+            IAuditLogRepository auditLogRepository
             ) : IRequestHandler<ForgotPasswordCommand, Result<string>>
         {
             public async Task<Result<string>> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
@@ -28,6 +32,29 @@ namespace Application.Command
                 user.VerificationToken = token;
                 user.DateModified = DateTime.UtcNow;
                 user.VerificationTokenExpiry = DateTime.UtcNow.AddMinutes(5);
+
+
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Reset Password",
+                    Description = $"Notification was archived successfully",
+                    Icon = "🔄",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    UserId = user.Id,
+                    ResourceType = ResourceType.System,
+                    ResourceId = null,
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 await unitOfWork.SaveAsync();
 

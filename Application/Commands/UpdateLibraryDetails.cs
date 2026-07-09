@@ -1,6 +1,8 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Repositories;
+using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Command
 {
@@ -17,7 +19,9 @@ namespace Application.Command
         public class UpdateLibraryHandler(
             ILibraryRepository libraryRepository,
             IUnitOfWork unitOfWork,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IHttpContextAccessor httpContextAccessor,
+            IAuditLogRepository auditLogRepository
             ) : IRequestHandler<UpdateLibraryComand, Result<string>>
         {
             public async Task<Result<string>> Handle(UpdateLibraryComand request, CancellationToken cancellationToken)
@@ -41,6 +45,29 @@ namespace Application.Command
                 library.Email = request.Email;
                 library.PhoneNumber = request.PhoneNumber;
                 library.CreatedBy = request.Email;
+
+
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Update",
+                    Description = $"library Details updated successfully",
+                    Icon = "🏷️",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    UserId = user.Id,
+                    ResourceType = ResourceType.System,
+                    ResourceId = library.Id,
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 await unitOfWork.SaveAsync();
                 return Result<string>.Success("Updated", "Successfully");

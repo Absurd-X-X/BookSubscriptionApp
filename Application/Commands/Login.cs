@@ -2,6 +2,7 @@
 using Application.Common.Repositories;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Commands
@@ -20,6 +21,7 @@ namespace Application.Commands
             IReaderRepository readerRepository,
             ILibraryRepository libraryRepository,
             IAuditLogRepository auditLogRepository,
+            IHttpContextAccessor httpContextAccessor,
             IUnitOfWork unitOfWork
             ) : IRequestHandler<LoginCommand, Result<LoginResponse>>
         {
@@ -66,6 +68,13 @@ namespace Application.Commands
                     Role: user.Role
                 );
 
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
                 await auditLogRepository.AddAsync(new AuditLog
                 {
                     UserId = user.Id,
@@ -73,7 +82,9 @@ namespace Application.Commands
                     Icon = "🔑",
                     Description = $"User Added: {user.Library?.Name ?? user.Reader?.Name}({user.UserName})",
                     IpAddress = "",
-                    UserRole = user.Role
+                    UserRole = user.Role,
+                    ResourceType = ResourceType.System,
+                    ResourceId = null,
                 });
 
                 await unitOfWork.SaveAsync();

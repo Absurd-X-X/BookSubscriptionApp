@@ -99,7 +99,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var log in Model.Items)
+                    @foreach (var log in Model.Items.Where(v => v.ActionType.
+                    ToLower() != "logged in" && v.ActionType.ToLower() != "reset password" &&
+                    v.ActionType.ToLower() != "verify email" &&
+                    v.ActionType.ToLower() != "bank payment" &&
+                    v.ActionType.ToLower() != "vrify" &&
+                    v.ActionType.ToLower() != "resend" &&
+                    v.ActionType.ToLower() != "add new user" ) )
                     {
                         <tr>
                             <td><div class="act-icon icon-green"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg></div></td>
@@ -220,7 +226,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var log in Model.Items)
+                    @foreach (var log in Model.Items.Where(v => v.ActionType.
+                    ToLower() == "logged in" || v.ActionType.ToLower() == "reset password" ||
+                    v.ActionType.ToLower() == "verify email" ||
+                    v.ActionType.ToLower() == "bank payment" ||
+                    v.ActionType.ToLower() == "verify" ||
+                    v.ActionType.ToLower() == "resend" ||
+                    v.ActionType.ToLower() == "add new user"))
                     {
                         <tr>
                             <td><div class="dt-date">@log.Timestamp.ToString("MMM dd, yyyy")</div><div class="dt-time">@log.Timestamp.ToString("hh:mm tt")</div></td>
@@ -252,13 +264,18 @@
 
                             }
                             <td><div class="user-cell"><div class="user-avatar avatar-@userInitials">@(firstInitial)@(secondInitial)</div><div><div class="user-name">@(log.UserName)</div><div class="user-role">@(log.UserRole)</div></div></div></td>
-                            <td><span class="audit-badge badge-create">CREATE</span></td>
+                            <td><span class="audit-badge badge-create">@log.ActionType</span></td>
                             <td><div class="module-cell"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg> Support</div></td>
                             <td>@log.ActionType</td>
                             <td><span class="entity-id">TKT-2025-00231</span></td>
                             <td><div class="det-main">@log.Description</div></td>
                             <td><span class="ip-addr">197.159.112.48</span></td>
-                            <td><button class="view-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg> View</button></td>
+                            <td>
+                                <a href="@Url.Action("GetActivity", "Admin", new { id = log.Id })" class="view-btn" style="text-decoration: none;">
+                                    <svg width="13" height="13"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+                                stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" /></svg> View</a></td>
                         </tr>
 
                     }

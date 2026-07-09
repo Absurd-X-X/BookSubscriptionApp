@@ -213,8 +213,8 @@
                 <p class="b-author">@book.Author</p>
                 <div class="b-meta"><span>@book.NoOfTimeReadByPeople Reads</span><span>@book.EngagementPercent% Engagement</span></div>
                 <div class="b-actions">
-                    <a href="@Url.Action("GetLibraryBook", "Library", new { id = book.BookId })" aria-label="View">👁</a>
-                    <a href="@Url.Action("EditBook", "Library", new { id = book.BookId })" aria-label="Edit">✎</a>
+                    <a href="@Url.Action("GetLibraryBook", "Library", new { bookId = book.BookId })" aria-label="View">👁</a>
+                    <a href="@Url.Action("EditBook", "Library", new { bookId = book.BookId })" aria-label="Edit">✎</a>
                     <button aria-label="More">⋯</button>
                 </div>
             </article>

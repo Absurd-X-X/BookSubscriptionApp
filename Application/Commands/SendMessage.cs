@@ -2,6 +2,7 @@
 using Application.Common.Repositories;
 using Application.Repositories;
 using Domain.Entities;
+using Domain.Enums;
 using MediatR;
 
 namespace Application.Commands
@@ -56,9 +57,10 @@ namespace Application.Commands
                     {
                         UserId = adminParticipant.UserId,
                         Title = "New Support Message",
+                        RefType = NotificationRefType.ChatMessage,
                         Message = $"New message in: {conversation.Title}",
-                        Type = Domain.Enums.NotificationType.Others,
-                        Ref = $"/chat/{conversation.Id}",
+                        Type = NotificationType.Others,
+                        Ref = conversation.Id.ToString(),
                         CreatedBy = request.SenderId.ToString()
                     });
 

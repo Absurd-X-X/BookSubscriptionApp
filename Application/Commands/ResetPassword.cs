@@ -48,11 +48,13 @@ namespace Application.Commands
                 await auditLogRepository.AddAsync(new AuditLog
                 {
                     UserId = user.Id,
-                    ActionType = "Password re-set",
+                    ActionType = "Reset Password",
                     Icon = "🔑",
                     Description = $"User Added: {user.Library?.Name ?? user.Reader?.Name}({user.UserName})",
                     IpAddress = "",
-                    UserRole = user.Role
+                    UserRole = user.Role,
+                    ResourceType = ResourceType.System,
+                    ResourceId = user.Id,
                 });
 
                 await unitOfWork.SaveAsync();

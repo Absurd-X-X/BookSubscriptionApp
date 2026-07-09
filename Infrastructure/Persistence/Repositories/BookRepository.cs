@@ -76,19 +76,22 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<PagenatedList<Book>> GetByLibraryIdAsync(Guid libraryId, PageRequest request, bool usePaging)
         {
-            var books = await context.Books.
-                Where(x => x.LibraryId == libraryId && !x.IsDeleted).ToListAsync();
+            var query = context.Books
+    .Where(x => x.LibraryId == libraryId && !x.IsDeleted)
+    .Include(x => x.Category)
+    .Include(x => x.Library);
 
-            var query = books.AsQueryable();
             var totalCount = await query.CountAsync();
 
             if (usePaging)
             {
-                var set = query.Skip((request.Page - 1) * request.PageSize).Take(request.PageSize);
-
                 return new PagenatedList<Book>
                 {
-                    Items = set.Include(x => x.Category).Include(x => x.Library),
+                    Items = await query
+                        .Skip((request.Page - 1) * request.PageSize)
+                        .Take(request.PageSize)
+                        .ToListAsync(),
+
                     Page = request.Page,
                     PageSize = request.PageSize,
                     TotalCount = totalCount
@@ -97,7 +100,7 @@ namespace Infrastructure.Persistence.Repositories
 
             return new PagenatedList<Book>
             {
-                Items = query.Include(x => x.Category).Include(x => x.Library),
+                Items = await query.ToListAsync(),
                 TotalCount = totalCount
             };
         }

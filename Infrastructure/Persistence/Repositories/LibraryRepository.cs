@@ -14,7 +14,10 @@ namespace Infrastructure.Persistence.Repositories
 
         public async Task<PagenatedList<Library>> GetAllAsync(PageRequest request, bool usePaging)
         {
-            var query = context.Libraries.Where(x => !x.IsDeleted).AsQueryable();
+            var query = context.Libraries.Where(x => !x.IsDeleted)
+                    .Include(x => x.Books)
+                    .Include(x => x.User)
+                    .AsQueryable();
             var totalCount = await query.CountAsync();
 
             if (usePaging)
@@ -24,6 +27,7 @@ namespace Infrastructure.Persistence.Repositories
 
                 var set = query
                     .Include(x => x.Books)
+                    .Include(x => x.User)
                     .Skip((currentPage - 1) * pageSize)
                     .Take(pageSize);
 
@@ -46,7 +50,7 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<Library?> GetAsync(Guid id)
 
             => await context.Libraries
-            .Include(n => n.Books)
+            .Include(n => n.Books).Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
         public async Task<Library?> GetLibraryAsync(string email)

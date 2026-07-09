@@ -19,6 +19,21 @@ namespace Infrastructure.Persistence.Repositories
             return  context.Reviews.Count(x => x.BookId == bookId);
         }
 
+        public async Task<int> CountByReaderIdAsync(Guid readerId)
+        {
+            return context.Reviews.Count(x => x.ReaderId == readerId);
+        }
+
+        public async Task<double> GetAverageRatingForBookAsync(Guid bookId)
+        {
+            var ratings = await context.Reviews
+                .Where(x => !x.IsDeleted && x.BookId == bookId)
+                .Select(x => x.Rating)
+                .ToListAsync();
+
+            return ratings.Any() ? ratings.Average() : 0;
+        }
+
         public async Task<PagenatedList<Review>> GetAllAsync(PageRequest request, bool usePaging)
         {
             var query = context.Reviews.Where(x => !x.IsDeleted).AsQueryable();
@@ -127,6 +142,18 @@ namespace Infrastructure.Persistence.Repositories
                 Items = await query.Include(x => x.Reader).Include(x => x.Book).ToListAsync(),
                 TotalCount = totalCount
             };
+        }
+
+        public async Task<List<Review>> GetByLibraryIdAndDateRangeAsync(Guid libraryId, DateTime start, DateTime end)
+        {
+            return await context.Reviews
+                .Where(x => !x.IsDeleted
+                    && x.Book.LibraryId == libraryId
+                    && x.DateCreated >= start
+                    && x.DateCreated <= end)
+                .Include(x => x.Reader)
+                .Include(x => x.Book)
+                .ToListAsync();
         }
     }
 }

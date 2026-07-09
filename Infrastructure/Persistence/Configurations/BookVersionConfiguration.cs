@@ -16,8 +16,7 @@ namespace Infrastructure.Persistence.Configurations
                 .HasMaxLength(100);
 
             builder.Property(x => x.FileUrl)
-                .IsRequired()
-                .HasMaxLength(20);
+                .IsRequired();
 
             builder.Property(x => x.UploadedBy)
                 .IsRequired();

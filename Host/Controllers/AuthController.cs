@@ -10,6 +10,7 @@ using static Application.Commands.Login;
 using static Application.Commands.ResendVerification;
 using static Application.Commands.ResetPassword;
 using static Application.Commands.VerifyEmail;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Host.Controllers
 {
@@ -67,18 +68,35 @@ namespace Host.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyEmail(string email, string token)
         {
+            if (!ModelState.IsValid)
+                return Json(new
+                {
+                    success = false,
+                    message =
+                    string.Join(",", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)))
+                });
+
             var result = await mediator.Send(
                 new VerifyEmailCommand(email, token));
 
             if (!result.Status)
             {
                 TempData["Error"] = result.Message;
-                ViewBag.Email = email;
-                return View();
+                ViewBag.Email = email; 
+                return Json(new
+                {
+                    success = false,
+                    message = result.Message,
+                });
             }
 
-            TempData["Success"] = result.Message;
-            return RedirectToAction(nameof(Login));
+            TempData["Success"] = result.Message; 
+            return Json(new
+            {
+                success = false,
+                message = result.Message,
+                redirectUrl = Url.Action(nameof(Login))
+            });
         }
 
         [HttpGet]
@@ -103,25 +121,25 @@ namespace Host.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            if (User.Identity is { IsAuthenticated: true })
-            {
-                if (User.IsInRole("admin"))
-                {
-                    return RedirectToAction("Index", "Admin");
-                }
+            //if (User.Identity is { IsAuthenticated: true })
+            //{
+            //    if (User.IsInRole("admin"))
+            //    {
+            //        return RedirectToAction("Index", "Admin");
+            //    }
 
-                if (User.IsInRole("library"))
-                {
-                    return RedirectToAction("LibraryDashboard", "Library");
-                }
+            //    if (User.IsInRole("library"))
+            //    {
+            //        return RedirectToAction("LibraryDashboard", "Library");
+            //    }
 
-                if (User.IsInRole("reader"))
-                {
-                    return RedirectToAction("ReaderDashboard", "Reader");
-                }
+            //    if (User.IsInRole("reader"))
+            //    {
+            //        return RedirectToAction("ReaderDashboard", "Reader");
+            //    }
 
-                return RedirectToAction("Index", "Home");
-            }
+            //    return RedirectToAction("Index", "Home");
+            //}
 
             return View();
         }

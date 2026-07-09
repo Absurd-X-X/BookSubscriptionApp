@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Application.Queries.GetLibraryReviews.LibraryReviewsResponse
+@{
     Layout = "~/Views/Shared/_LibraryLayout.cshtml";
     ViewData["Title"] = "Library Book Reviews";
 }
@@ -14,10 +15,21 @@
             <p class="reviews-subtitle">Manage and moderate reader reviews for all books in your library.</p>
         </div>
         <div class="header-actions">
-            <button class="date-range-btn">&#128197; May 1 – May 31, 2024</button>
+            <form method="get" asp-action="Reviews" style="display:flex;gap:8px;align-items:center">
+                <input type="date" name="start" value="@Model.PeriodStart.ToString("yyyy-MM-dd")" class="date-range-btn" />
+                <input type="date" name="end" value="@Model.PeriodEnd.ToString("yyyy-MM-dd")" class="date-range-btn" />
+                <button type="submit" class="export-btn">Apply</button>
+            </form>
             <button class="export-btn">&#11015; Export Reviews &#9662;</button>
         </div>
     </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div style="background:#3a1a1a;color:#f87171;padding:10px 14px;border-radius:8px;margin-bottom:16px;font-size:13px">
+            @TempData["Error"]
+        </div>
+    }
 
     <!-- Stat Cards -->
     <div class="stats-row">
@@ -25,40 +37,40 @@
             <div class="stat-icon purple">&#9733;</div>
             <div class="help-hold">
                 <div class="stat-label">Total Reviews</div>
-                <div class="stat-value">2,845</div>
-                <div class="stat-delta"><span class="up">&#8593; 18.7%</span> vs Apr 1 – Apr 30</div>
+                <div class="stat-value">@Model.TotalReviews.ToString("N0")</div>
+                <div class="stat-delta"><span class="@(Model.TotalReviewsGrowthPercent >= 0 ? "up" : "down")">@(Model.TotalReviewsGrowthPercent >= 0 ? "↑" : "↓") @Math.Abs(Model.TotalReviewsGrowthPercent)%</span> vs prior period</div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon green">&#128197;</div>
             <div class="help-hold">
                 <div class="stat-label">Approved Reviews</div>
-                <div class="stat-value">2,412</div>
-                <div class="stat-delta"><span class="up">&#8593; 16.3%</span> vs Apr 1 – Apr 30</div>
+                <div class="stat-value">@Model.ApprovedReviews.ToString("N0")</div>
+                <div class="stat-delta"><span class="@(Model.ApprovedReviewsGrowthPercent >= 0 ? "up" : "down")">@(Model.ApprovedReviewsGrowthPercent >= 0 ? "↑" : "↓") @Math.Abs(Model.ApprovedReviewsGrowthPercent)%</span> vs prior period</div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon amber">&#128336;</div>
             <div class="help-hold">
                 <div class="stat-label">Pending Reviews</div>
-                <div class="stat-value">128</div>
-                <div class="stat-delta"><span class="up">&#8593; 8.4%</span> vs Apr 1 – Apr 30</div>
+                <div class="stat-value">@Model.PendingReviews.ToString("N0")</div>
+                <div class="stat-delta"><span class="@(Model.PendingReviewsGrowthPercent >= 0 ? "up" : "down")">@(Model.PendingReviewsGrowthPercent >= 0 ? "↑" : "↓") @Math.Abs(Model.PendingReviewsGrowthPercent)%</span> vs prior period</div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon red">&#128683;</div>
             <div class="help-hold">
                 <div class="stat-label">Rejected Reviews</div>
-                <div class="stat-value">305</div>
-                <div class="stat-delta"><span class="up">&#8593; 21.5%</span> vs Apr 1 – Apr 30</div>
+                <div class="stat-value">@Model.RejectedReviews.ToString("N0")</div>
+                <div class="stat-delta"><span class="@(Model.RejectedReviewsGrowthPercent <= 0 ? "up" : "down")">@(Model.RejectedReviewsGrowthPercent <= 0 ? "↓" : "↑") @Math.Abs(Model.RejectedReviewsGrowthPercent)%</span> vs prior period</div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon blue">&#11088;</div>
             <div class="help-hold">
                 <div class="stat-label">Average Rating</div>
-                <div class="stat-value">4.6 <span class="of-five">/ 5</span></div>
-                <div class="stat-delta"><span class="up">&#8593; 0.2</span> vs Apr 1 – Apr 30</div>
+                <div class="stat-value">@Model.AverageRating.ToString("0.0") <span class="of-five">/ 5</span></div>
+                <div class="stat-delta"><span class="@(Model.AverageRatingChange >= 0 ? "up" : "down")">@(Model.AverageRatingChange >= 0 ? "↑" : "↓") @Math.Abs(Model.AverageRatingChange)</span> vs prior period</div>
             </div>
         </div>
     </div>
@@ -74,13 +86,13 @@
                     <span class="icon">&#128269;</span>
                 </div>
                 <select class="filter-select">
-                    <option>All Books</option>
+                    <option value="">All Books</option>
                 </select>
                 <select class="filter-select">
-                    <option>All Ratings</option>
+                    <option value="">All Ratings</option>
                 </select>
                 <select class="filter-select">
-                    <option>All Status</option>
+                    <option value="">All Status</option>
                 </select>
                 <button class="filters-btn">&#9881; Filters</button>
             </div>
@@ -98,268 +110,76 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>
-                            <div class="reviewer-cell">
-                                <div class="avatar" style="background:#7c3aed;">SJ</div>
-                                <div>
-                                    <div class="reviewer-name">Sarah Johnson</div>
-                                    <div class="reviewer-email">sarah.j@email.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="book-cell">
-                                <div class="book-cover"></div>
-                                <div>
-                                    <div class="book-title">Atomic Habits</div>
-                                    <div class="book-author">James Clear</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
-                        <td><span class="review-text">Life-changing book! The small habits approach really works.</span></td>
-                        <td><span class="status-badge approved">Approved</span></td>
-                        <td><span class="date-cell">May 31, 2024<br>10:15 AM</span></td>
-                        <td>
-                            <div class="actions-cell">
-                                <button class="action-icon-btn">&#128065;</button>
-                                <button class="action-icon-btn">&#8942;</button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <div class="reviewer-cell">
-                                <div class="avatar" style="background:#0d9488;">MC</div>
-                                <div>
-                                    <div class="reviewer-name">Michael Chen</div>
-                                    <div class="reviewer-email">m.chen@email.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="book-cell">
-                                <div class="book-cover"></div>
-                                <div>
-                                    <div class="book-title">Deep Work</div>
-                                    <div class="book-author">Cal Newport</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
-                        <td><span class="review-text">Excellent insights on focus and productivity. Highly recommended.</span></td>
-                        <td><span class="status-badge approved">Approved</span></td>
-                        <td><span class="date-cell">May 31, 2024<br>9:42 AM</span></td>
-                        <td>
-                            <div class="actions-cell">
-                                <a href="@Url.Action("GetReview", "Library")" class="action-icon-btn">&#128065;</a>
-                                <button class="action-icon-btn" aria-label="More">&#8942;</button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <div class="reviewer-cell">
-                                <div class="avatar"><img src="" alt="" style="background:#374151;"></div>
-                                <div>
-                                    <div class="reviewer-name">Emily Rodriguez</div>
-                                    <div class="reviewer-email">emily.r@email.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="book-cell">
-                                <div class="book-cover"></div>
-                                <div>
-                                    <div class="book-title">Rich Dad Poor Dad</div>
-                                    <div class="book-author">Robert Kiyosaki</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span></td>
-                        <td><span class="review-text">Great book about financial education. Very practical advice.</span></td>
-                        <td><span class="status-badge approved">Approved</span></td>
-                        <td><span class="date-cell">May 30, 2024<br>8:30 PM</span></td>
-                        <td>
-                            <div class="actions-cell">
-                                <button class="action-icon-btn">&#128065;</button>
-                                <button class="action-icon-btn" aria-label="More">&#8942;</button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <div class="reviewer-cell">
-                                <div class="avatar" style="background:#b45309;">DW</div>
-                                <div>
-                                    <div class="reviewer-name">David Wilson</div>
-                                    <div class="reviewer-email">david.w@email.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="book-cell">
-                                <div class="book-cover"></div>
-                                <div>
-                                    <div class="book-title">Think and Grow Rich</div>
-                                    <div class="book-author">Napoleon Hill</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span></td>
-                        <td><span class="review-text">Classic book with timeless principles. Worth reading.</span></td>
-                        <td><span class="status-badge pending">Pending</span></td>
-                        <td><span class="date-cell">May 30, 2024<br>6:20 PM</span></td>
-                        <td>
-                            <div class="actions-cell">
-                                <button class="action-icon-btn">&#128065;</button>
-                                <button class="action-icon-btn">&#8942;</button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <div class="reviewer-cell">
-                                <div class="avatar" style="background:#be123c;">LP</div>
-                                <div>
-                                    <div class="reviewer-name">Lisa Park</div>
-                                    <div class="reviewer-email">lisa.p@email.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="book-cell">
-                                <div class="book-cover"></div>
-                                <div>
-                                    <div class="book-title">The 5 AM Club</div>
-                                    <div class="book-author">Robin Sharma</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="stars">&#9733;&#9733;&#9733;&#9734;&#9734;</span></td>
-                        <td><span class="review-text">Good concepts but some parts felt repetitive.</span></td>
-                        <td><span class="status-badge pending">Pending</span></td>
-                        <td><span class="date-cell">May 30, 2024<br>5:15 PM</span></td>
-                        <td>
-                            <div class="actions-cell">
-                                <button class="action-icon-btn">&#128065;</button>
-                                <button class="action-icon-btn">&#8942;</button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <div class="reviewer-cell">
-                                <div class="avatar" style="background:#1d4ed8;">JT</div>
-                                <div>
-                                    <div class="reviewer-name">James Thompson</div>
-                                    <div class="reviewer-email">james.t@email.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="book-cell">
-                                <div class="book-cover"></div>
-                                <div>
-                                    <div class="book-title">Atomic Habits</div>
-                                    <div class="book-author">James Clear</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
-                        <td><span class="review-text">Best book I've read this year! Transformed my daily routine.</span></td>
-                        <td><span class="status-badge approved">Approved</span></td>
-                        <td><span class="date-cell">May 29, 2024<br>3:45 PM</span></td>
-                        <td>
-                            <div class="actions-cell">
-                                <button class="action-icon-btn">&#128065;</button>
-                                <button class="action-icon-btn">&#8942;</button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <div class="reviewer-cell">
-                                <div class="avatar"><img src="" alt="" style="background:#374151;"></div>
-                                <div>
-                                    <div class="reviewer-name">Maria Garcia</div>
-                                    <div class="reviewer-email">maria.g@email.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="book-cell">
-                                <div class="book-cover"></div>
-                                <div>
-                                    <div class="book-title">Deep Work</div>
-                                    <div class="book-author">Cal Newport</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span></td>
-                        <td><span class="review-text">Very helpful for remote work. Improved my productivity.</span></td>
-                        <td><span class="status-badge rejected">Rejected</span></td>
-                        <td><span class="date-cell">May 29, 2024<br>2:10 PM</span></td>
-                        <td>
-                            <div class="actions-cell">
-                                <button class="action-icon-btn">&#128065;</button>
-                                <button class="action-icon-btn">&#8942;</button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>
-                            <div class="reviewer-cell">
-                                <div class="avatar" style="background:#0e7490;">RB</div>
-                                <div>
-                                    <div class="reviewer-name">Robert Brown</div>
-                                    <div class="reviewer-email">robert.b@email.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="book-cell">
-                                <div class="book-cover"></div>
-                                <div>
-                                    <div class="book-title">Rich Dad Poor Dad</div>
-                                    <div class="book-author">Robert Kiyosaki</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span></td>
-                        <td><span class="review-text">Good financial advice for beginners.</span></td>
-                        <td><span class="status-badge approved">Approved</span></td>
-                        <td><span class="date-cell">May 28, 2024<br>11:30 AM</span></td>
-                        <td>
-                            <div class="actions-cell">
-                                <button class="action-icon-btn">&#128065;</button>
-                                <button class="action-icon-btn">&#8942;</button>
-                            </div>
-                        </td>
-                    </tr>
+                    @if (Model.Reviews.Items.Any())
+                    {
+                        @foreach (var r in Model.Reviews.Items)
+                        {
+                            var initials = string.Join("", r.ReviewerName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0])).ToUpper();
+                            var statusClass = r.Status.ToLower();
+                            <tr>
+                                <td>
+                                    <div class="reviewer-cell">
+                                        <div class="avatar" style="background:#7c3aed;">@initials</div>
+                                        <div>
+                                            <div class="reviewer-name">@r.ReviewerName</div>
+                                            <div class="reviewer-email">@r.ReviewerEmail</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="book-cell">
+                                        <div class="book-cover" style="@(string.IsNullOrEmpty(r.BookCoverUrl) ? "" : $"background-image:url('{r.BookCoverUrl}')")"></div>
+                                        <div>
+                                            <div class="book-title">@r.BookTitle</div>
+                                            <div class="book-author">@r.BookAuthor</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="stars">@(new string('★', r.Rating))@(new string('☆', 5 - r.Rating))</span></td>
+                                <td><span class="review-text">@r.Comment</span></td>
+                                <td><span class="status-badge @statusClass">@r.Status</span></td>
+                                <td><span class="date-cell">@r.DateCreated.ToString("MMM d, yyyy")<br>@r.DateCreated.ToString("h:mm tt")</span></td>
+                                <td>
+                                    <div class="actions-cell">
+                                        <a href="@Url.Action("GetReview", "Library", new { id = r.ReviewId })" class="action-icon-btn">&#128065;</a>
+                                        <button class="action-icon-btn" aria-label="More" data-review-id="@r.ReviewId">&#8942;</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="7" style="text-align:center;color:#7878a0;font-size:12px;padding:20px">No reviews found for this period</td></tr>
+                    }
                 </tbody>
             </table>
 
             <div class="table-footer">
-                <span class="showing-text">Showing 1 to 8 of 2,845 reviews</span>
+                <span class="showing-text">
+                    @{
+                        var startIdx = Model.Reviews.TotalCount == 0 ? 0 : ((Model.Reviews.Page - 1) * Model.Reviews.PageSize) + 1;
+                        var endIdx = Math.Min(Model.Reviews.Page * Model.Reviews.PageSize, Model.Reviews.TotalCount);
+                    }
+                    Showing @startIdx to @endIdx of @Model.Reviews.TotalCount.ToString("N0") reviews
+                </span>
                 <div class="pagination">
-                    <button class="page-btn">&#8249;</button>
-                    <button class="page-btn active">1</button>
-                    <button class="page-btn">2</button>
-                    <button class="page-btn">3</button>
-                    <span class="page-btn dots">...</span>
-                    <button class="page-btn">356</button>
-                    <button class="page-btn">&#8250;</button>
-                    <select class="per-page-select">
-                        <option>10 per page</option>
+                    @{
+                        var totalPages = Math.Max(1, (int)Math.Ceiling((double)Model.Reviews.TotalCount / Model.Reviews.PageSize));
+                    }
+                    <a class="page-btn @(Model.Reviews.Page <= 1 ? "disabled" : "")"
+                       asp-action="Reviews" asp-route-start="@Model.PeriodStart.ToString("yyyy-MM-dd")" asp-route-end="@Model.PeriodEnd.ToString("yyyy-MM-dd")" asp-route-page="@(Model.Reviews.Page - 1)" asp-route-pageSize="@Model.Reviews.PageSize">&#8249;</a>
+                    @for (int p = 1; p <= totalPages; p++)
+                    {
+                        <a class="page-btn @(p == Model.Reviews.Page ? "active" : "")"
+                           asp-action="Reviews" asp-route-start="@Model.PeriodStart.ToString("yyyy-MM-dd")" asp-route-end="@Model.PeriodEnd.ToString("yyyy-MM-dd")" asp-route-page="@p" asp-route-pageSize="@Model.Reviews.PageSize">@p</a>
+                    }
+                    <a class="page-btn @(Model.Reviews.Page >= totalPages ? "disabled" : "")"
+                       asp-action="Reviews" asp-route-start="@Model.PeriodStart.ToString("yyyy-MM-dd")" asp-route-end="@Model.PeriodEnd.ToString("yyyy-MM-dd")" asp-route-page="@(Model.Reviews.Page + 1)" asp-route-pageSize="@Model.Reviews.PageSize">&#8250;</a>
+                    <select class="per-page-select" onchange="location.href='@Url.Action("Reviews")?start=@Model.PeriodStart.ToString("yyyy-MM-dd")&end=@Model.PeriodEnd.ToString("yyyy-MM-dd")&page=1&pageSize=' + this.value">
+                        <option value="10" selected="@(Model.Reviews.PageSize == 10)">10 per page</option>
+                        <option value="25" selected="@(Model.Reviews.PageSize == 25)">25 per page</option>
+                        <option value="50" selected="@(Model.Reviews.PageSize == 50)">50 per page</option>
                     </select>
                 </div>
             </div>
@@ -373,104 +193,60 @@
 
                 <div class="rating-row">
                     <span class="rating-label">5 Stars</span>
-                    <div class="rating-bar-track">
-                        <div class="rating-bar-fill" style="width:57%;"></div>
-                    </div>
-                    <span class="rating-count">1,624 (57%)</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" style="width:@(Model.RatingDistribution.FiveStarPct)%;"></div></div>
+                    <span class="rating-count">@Model.RatingDistribution.FiveStar.ToString("N0") (@Model.RatingDistribution.FiveStarPct%)</span>
                 </div>
                 <div class="rating-row">
                     <span class="rating-label">4 Stars</span>
-                    <div class="rating-bar-track">
-                        <div class="rating-bar-fill" style="width:25%;"></div>
-                    </div>
-                    <span class="rating-count">723 (25%)</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" style="width:@(Model.RatingDistribution.FourStarPct)%;"></div></div>
+                    <span class="rating-count">@Model.RatingDistribution.FourStar.ToString("N0") (@Model.RatingDistribution.FourStarPct%)</span>
                 </div>
                 <div class="rating-row">
                     <span class="rating-label">3 Stars</span>
-                    <div class="rating-bar-track">
-                        <div class="rating-bar-fill" style="width:10%;"></div>
-                    </div>
-                    <span class="rating-count">285 (10%)</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" style="width:@(Model.RatingDistribution.ThreeStarPct)%;"></div></div>
+                    <span class="rating-count">@Model.RatingDistribution.ThreeStar.ToString("N0") (@Model.RatingDistribution.ThreeStarPct%)</span>
                 </div>
                 <div class="rating-row">
                     <span class="rating-label">2 Stars</span>
-                    <div class="rating-bar-track">
-                        <div class="rating-bar-fill" style="width:5%;"></div>
-                    </div>
-                    <span class="rating-count">142 (5%)</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" style="width:@(Model.RatingDistribution.TwoStarPct)%;"></div></div>
+                    <span class="rating-count">@Model.RatingDistribution.TwoStar.ToString("N0") (@Model.RatingDistribution.TwoStarPct%)</span>
                 </div>
                 <div class="rating-row">
                     <span class="rating-label">1 Star</span>
-                    <div class="rating-bar-track">
-                        <div class="rating-bar-fill" style="width:3%;"></div>
-                    </div>
-                    <span class="rating-count">71 (3%)</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" style="width:@(Model.RatingDistribution.OneStarPct)%;"></div></div>
+                    <span class="rating-count">@Model.RatingDistribution.OneStar.ToString("N0") (@Model.RatingDistribution.OneStarPct%)</span>
                 </div>
 
                 <div class="rating-total">
                     <span>Total</span>
-                    <strong>2,845</strong>
+                    <strong>@Model.TotalReviews.ToString("N0")</strong>
                 </div>
             </div>
 
             <div class="side-card">
                 <div class="side-card-title">Top Reviewed Books</div>
 
-                <div class="top-book-row">
-                    <div class="book-cover"></div>
-                    <div class="top-book-info">
-                        <div class="top-book-title">Atomic Habits</div>
-                        <div class="top-book-sub">892 reviews</div>
-                    </div>
-                    <div class="top-book-stats">
-                        <div class="top-book-count">892</div>
-                        <div class="top-book-rating">&#9733; 4.8</div>
-                    </div>
-                </div>
-                <div class="top-book-row">
-                    <div class="book-cover"></div>
-                    <div class="top-book-info">
-                        <div class="top-book-title">Deep Work</div>
-                        <div class="top-book-sub">654 reviews</div>
-                    </div>
-                    <div class="top-book-stats">
-                        <div class="top-book-count">654</div>
-                        <div class="top-book-rating">&#9733; 4.6</div>
-                    </div>
-                </div>
-                <div class="top-book-row">
-                    <div class="book-cover"></div>
-                    <div class="top-book-info">
-                        <div class="top-book-title">Rich Dad Poor Dad</div>
-                        <div class="top-book-sub">489 reviews</div>
-                    </div>
-                    <div class="top-book-stats">
-                        <div class="top-book-count">489</div>
-                        <div class="top-book-rating">&#9733; 4.4</div>
-                    </div>
-                </div>
-                <div class="top-book-row">
-                    <div class="book-cover"></div>
-                    <div class="top-book-info">
-                        <div class="top-book-title">Think and Grow Rich</div>
-                        <div class="top-book-sub">421 reviews</div>
-                    </div>
-                    <div class="top-book-stats">
-                        <div class="top-book-count">421</div>
-                        <div class="top-book-rating">&#9733; 4.5</div>
-                    </div>
-                </div>
-                <div class="top-book-row">
-                    <div class="book-cover"></div>
-                    <div class="top-book-info">
-                        <div class="top-book-title">The 5 AM Club</div>
-                        <div class="top-book-sub">389 reviews</div>
-                    </div>
-                    <div class="top-book-stats">
-                        <div class="top-book-count">389</div>
-                        <div class="top-book-rating">&#9733; 4.3</div>
-                    </div>
-                </div>
+                @if (Model.TopReviewedBooks.Any())
+                {
+                    @foreach (var book in Model.TopReviewedBooks)
+                    {
+                        <div class="top-book-row">
+                            <div class="book-cover"></div>
+                            <div class="top-book-info">
+                                <div class="top-book-title">@book.Title</div>
+                                <div class="top-book-sub">@book.ReviewCount.ToString("N0") reviews</div>
+                            </div>
+                            <div class="top-book-stats">
+                                <div class="top-book-count">@book.ReviewCount</div>
+                                <div class="top-book-rating">&#9733; @book.AverageRating.ToString("0.0")</div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p style="font-size:12px;color:#7878a0">No reviews yet.</p>
+                }
 
                 <button class="view-all-btn">View All Books</button>
             </div>
@@ -510,7 +286,6 @@
 
 <script>
     (function () {
-        // ── DATA: pull rows into JS for filtering ──
         var tbody = document.querySelector(".reviews-table tbody");
         var allRows = Array.from(tbody.querySelectorAll("tr"));
 
@@ -518,18 +293,12 @@
         var bookFilter = document.querySelectorAll(".filter-select")[0];
         var ratingFilter = document.querySelectorAll(".filter-select")[1];
         var statusFilter = document.querySelectorAll(".filter-select")[2];
-        var showingText = document.querySelector(".showing-text");
-        var perPageSelect = document.querySelector(".per-page-select");
-        var paginationWrap = document.querySelector(".pagination");
 
-        var currentPage = 1;
-        var perPage = 10;
-
-        // Populate "All Books" dropdown dynamically from table rows
         function populateBookFilter() {
             var titles = Array.from(new Set(allRows.map(function (r) {
-                return r.querySelector(".book-title").textContent.trim();
-            })));
+                var el = r.querySelector(".book-title");
+                return el ? el.textContent.trim() : null;
+            }).filter(Boolean)));
             titles.forEach(function (title) {
                 var opt = document.createElement("option");
                 opt.value = title;
@@ -537,10 +306,8 @@
                 bookFilter.appendChild(opt);
             });
         }
-        bookFilter.querySelector("option").value = "";
         populateBookFilter();
 
-        ratingFilter.querySelector("option").value = "";
         [5, 4, 3, 2, 1].forEach(function (n) {
             var opt = document.createElement("option");
             opt.value = n;
@@ -548,7 +315,6 @@
             ratingFilter.appendChild(opt);
         });
 
-        statusFilter.querySelector("option").value = "";
         ["Approved", "Pending", "Rejected"].forEach(function (s) {
             var opt = document.createElement("option");
             opt.value = s;
@@ -557,7 +323,9 @@
         });
 
         function getRowRating(row) {
-            var filled = row.querySelectorAll(".stars")[0].textContent.match(/★/g);
+            var el = row.querySelector(".stars");
+            if (!el) return 0;
+            var filled = el.textContent.match(/★/g);
             return filled ? filled.length : 0;
         }
         function getRowStatus(row) {
@@ -571,117 +339,21 @@
             var rating = ratingFilter.value;
             var status = statusFilter.value;
 
-            var filtered = allRows.filter(function (row) {
-                var title = row.querySelector(".book-title").textContent.toLowerCase();
-                var reviewer = row.querySelector(".reviewer-name").textContent.toLowerCase();
+            allRows.forEach(function (row) {
+                var titleEl = row.querySelector(".book-title");
+                var reviewerEl = row.querySelector(".reviewer-name");
+                if (!titleEl || !reviewerEl) { row.style.display = "none"; return; }
+
+                var title = titleEl.textContent.toLowerCase();
+                var reviewer = reviewerEl.textContent.toLowerCase();
                 var matchesSearch = !q || title.indexOf(q) !== -1 || reviewer.indexOf(q) !== -1;
-                var matchesBook = !book || row.querySelector(".book-title").textContent.trim() === book;
+                var matchesBook = !book || titleEl.textContent.trim() === book;
                 var matchesRating = !rating || getRowRating(row) === parseInt(rating, 10);
                 var matchesStatus = !status || getRowStatus(row) === status;
-                return matchesSearch && matchesBook && matchesRating && matchesStatus;
+
+                row.style.display = (matchesSearch && matchesBook && matchesRating && matchesStatus) ? "" : "none";
             });
-
-            currentPage = 1;
-            renderPage(filtered);
         }
-
-        function renderPage(filtered) {
-            var total = filtered.length;
-            var totalPages = Math.max(1, Math.ceil(total / perPage));
-            if (currentPage > totalPages) currentPage = totalPages;
-
-            var start = (currentPage - 1) * perPage;
-            var end = Math.min(start + perPage, total);
-            var pageRows = filtered.slice(start, end);
-
-            // Hide all, show only current page's matching rows
-            allRows.forEach(function (r) { r.style.display = "none"; });
-            pageRows.forEach(function (r) { r.style.display = ""; });
-
-            showingText.textContent = total === 0
-                ? "No reviews found"
-                : "Showing " + (start + 1) + " to " + end + " of " + total + " reviews";
-
-            renderPagination(totalPages, filtered);
-        }
-
-        function renderPagination(totalPages, filtered) {
-            // Clear old page buttons but keep prev/next/select structure
-            paginationWrap.innerHTML = "";
-
-            var prevBtn = document.createElement("button");
-            prevBtn.className = "page-btn";
-            prevBtn.innerHTML = "&#8249;";
-            prevBtn.disabled = currentPage === 1;
-            prevBtn.addEventListener("click", function () {
-                if (currentPage > 1) { currentPage--; renderPage(filtered); }
-            });
-            paginationWrap.appendChild(prevBtn);
-
-            var pagesToShow = getPageList(currentPage, totalPages);
-            pagesToShow.forEach(function (p) {
-                if (p === "...") {
-                    var dots = document.createElement("span");
-                    dots.className = "page-btn dots";
-                    dots.textContent = "...";
-                    paginationWrap.appendChild(dots);
-                } else {
-                    var btn = document.createElement("button");
-                    btn.className = "page-btn" + (p === currentPage ? " active" : "");
-                    btn.textContent = p;
-                    btn.addEventListener("click", function () {
-                        currentPage = p;
-                        renderPage(filtered);
-                    });
-                    paginationWrap.appendChild(btn);
-                }
-            });
-
-            var nextBtn = document.createElement("button");
-            nextBtn.className = "page-btn";
-            nextBtn.innerHTML = "&#8250;";
-            nextBtn.disabled = currentPage === totalPages;
-            nextBtn.addEventListener("click", function () {
-                if (currentPage < totalPages) { currentPage++; renderPage(filtered); }
-            });
-            paginationWrap.appendChild(nextBtn);
-
-            paginationWrap.appendChild(perPageSelect);
-        }
-
-        function getPageList(current, total) {
-            var pages = [];
-            if (total <= 7) {
-                for (var i = 1; i <= total; i++) pages.push(i);
-                return pages;
-            }
-            pages.push(1);
-            if (current > 3) pages.push("...");
-            var start = Math.max(2, current - 1);
-            var end = Math.min(total - 1, current + 1);
-            for (var j = start; j <= end; j++) pages.push(j);
-            if (current < total - 2) pages.push("...");
-            pages.push(total);
-            return pages;
-        }
-
-        // ── Event bindings ──
-        searchInput.addEventListener("input", debounce(applyFilters, 200));
-        bookFilter.addEventListener("change", applyFilters);
-        ratingFilter.addEventListener("change", applyFilters);
-        statusFilter.addEventListener("change", applyFilters);
-
-        perPageSelect.innerHTML = "";
-        [10, 25, 50, 100].forEach(function (n) {
-            var opt = document.createElement("option");
-            opt.value = n;
-            opt.textContent = n + " per page";
-            perPageSelect.appendChild(opt);
-        });
-        perPageSelect.addEventListener("change", function () {
-            perPage = parseInt(perPageSelect.value, 10);
-            applyFilters();
-        });
 
         function debounce(fn, delay) {
             var timer;
@@ -692,14 +364,16 @@
             };
         }
 
-        // ── Filters button (toggle a simple expanded state — hook up as needed) ──
+        searchInput.addEventListener("input", debounce(applyFilters, 200));
+        bookFilter.addEventListener("change", applyFilters);
+        ratingFilter.addEventListener("change", applyFilters);
+        statusFilter.addEventListener("change", applyFilters);
+
         var filtersBtn = document.querySelector(".filters-btn");
         filtersBtn.addEventListener("click", function () {
-            // Placeholder: expand an advanced filter panel if/when you add one
             filtersBtn.classList.toggle("active");
         });
 
-        // ── Row actions: view + kebab menu ──
         var MENU_HTML =
             '<button type="button" role="menuitem" class="kebab-item" data-action="view">👁 View Full Review</button>' +
             '<button type="button" role="menuitem" class="kebab-item" data-action="edit">✎ Edit Review</button>' +
@@ -720,54 +394,51 @@
             menu.innerHTML = MENU_HTML;
             wrap.appendChild(menu);
 
-                function positionMenu(trigger, menu) {
-        // Reset to default (down) first so we can measure correctly
-        menu.classList.remove("menu-up");
-        menu.style.visibility = "hidden";
-        menu.style.display = "block";
+            function positionMenu(trigger, menu) {
+                menu.classList.remove("menu-up");
+                menu.style.visibility = "hidden";
+                menu.style.display = "block";
 
-        var triggerRect = trigger.getBoundingClientRect();
-        var menuHeight = menu.offsetHeight;
-        var spaceBelow = window.innerHeight - triggerRect.bottom;
-        var spaceAbove = triggerRect.top;
+                var triggerRect = trigger.getBoundingClientRect();
+                var menuHeight = menu.offsetHeight;
+                var spaceBelow = window.innerHeight - triggerRect.bottom;
+                var spaceAbove = triggerRect.top;
 
-        if (spaceBelow < menuHeight && spaceAbove > menuHeight) {
-            menu.classList.add("menu-up");
-        }
+                if (spaceBelow < menuHeight && spaceAbove > menuHeight) {
+                    menu.classList.add("menu-up");
+                }
 
-        menu.style.display = "";
-        menu.style.visibility = "";
-    }
+                menu.style.display = "";
+                menu.style.visibility = "";
+            }
 
-         trigger.addEventListener("click", function (e) {
-        e.stopPropagation();
-        var isOpen = wrap.classList.contains("open");
-        document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
-            w.classList.remove("open");
-        });
-        if (!isOpen) {
-            positionMenu(trigger, menu);
-            wrap.classList.add("open");
-        }
-    });
+            trigger.addEventListener("click", function (e) {
+                e.stopPropagation();
+                var isOpen = wrap.classList.contains("open");
+                document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
+                    w.classList.remove("open");
+                });
+                if (!isOpen) {
+                    positionMenu(trigger, menu);
+                    wrap.classList.add("open");
+                }
+            });
 
             menu.querySelectorAll(".kebab-item").forEach(function (item) {
                 item.addEventListener("click", function (e) {
                     e.stopPropagation();
                     wrap.classList.remove("open");
                     var row = trigger.closest("tr");
-                    var reviewer = row ? row.querySelector(".reviewer-name").textContent : "";
+                    var reviewId = trigger.getAttribute("data-review-id");
                     var action = item.getAttribute("data-action");
-                    handleRowAction(action, row, reviewer);
+                    handleRowAction(action, row, reviewId);
                 });
             });
         }
 
-        function handleRowAction(action, row, reviewer) {
-            console.log("[reviews]", action, "for:", reviewer);
-            // Hook up real endpoints/modals here as needed, e.g.:
-            // if (action === "delete") { openDeleteConfirm(row); }
-            // if (action === "approve") { updateStatusBadge(row, "approved"); }
+        function handleRowAction(action, row, reviewId) {
+            console.log("[reviews]", action, "for review:", reviewId);
+            // TODO: wire to real endpoints, e.g. POST /Library/UpdateReviewStatus
             if (action === "approve" || action === "reject") {
                 var badge = row.querySelector(".status-badge");
                 badge.className = "status-badge " + (action === "approve" ? "approved" : "rejected");
@@ -775,37 +446,18 @@
             }
         }
 
-        // Attach kebab menus to every "more" button in the actions column
         document.querySelectorAll(".actions-cell .action-icon-btn:last-child").forEach(function (btn) {
             attachMenu(btn, "menu-up");
         });
 
-        // View (eye icon) buttons — currently plain buttons/links, log for now
-        document.querySelectorAll(".actions-cell .action-icon-btn:first-child").forEach(function (btn) {
-            btn.addEventListener("click", function (e) {
-                var row = btn.closest("tr");
-                if (btn.tagName === "A") return; // let real links navigate normally
-                var reviewer = row.querySelector(".reviewer-name").textContent;
-                console.log("[reviews] view review for:", reviewer);
-            });
-        });
-
-        // Close menus when clicking anywhere else
         document.addEventListener("click", function () {
             document.querySelectorAll(".kebab-wrap.open").forEach(function (w) {
                 w.classList.remove("open");
             });
         });
 
-        // ── Date range + export buttons (placeholders wired for future use) ──
-        document.querySelector(".date-range-btn").addEventListener("click", function () {
-            console.log("[reviews] open date range picker");
-        });
         document.querySelector(".export-btn").addEventListener("click", function () {
             console.log("[reviews] export reviews clicked");
         });
-
-        // ── Init ──
-        renderPage(allRows);
     })();
 </script>

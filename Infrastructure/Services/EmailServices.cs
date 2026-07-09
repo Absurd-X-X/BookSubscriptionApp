@@ -43,7 +43,12 @@ namespace Infrastructure.Services
 
             try
             {
-                await smtp.ConnectAsync(_settings.Host, _settings.Port, SecureSocketOptions.StartTls);
+                smtp.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
+                Console.WriteLine($"Sending to: {string.Join(", ", to)}");
+
+
+                await smtp.ConnectAsync(_settings.Host, _settings.Port, SecureSocketOptions.SslOnConnect);
                 await smtp.AuthenticateAsync(_settings.From, _settings.Password);
                 await smtp.SendAsync(email);
                 await smtp.DisconnectAsync(true);

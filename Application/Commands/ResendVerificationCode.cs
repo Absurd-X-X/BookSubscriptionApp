@@ -2,7 +2,9 @@
 using Application.Common.Dtos;
 using Application.Common.Repositories;
 using Application.Services;
+using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Commands
 {
@@ -15,6 +17,8 @@ namespace Application.Commands
         public class ResendVerificationHandler(
             IUserRepository userRepository,
             IEmailService emailService,
+            IHttpContextAccessor httpContextAccessor,
+            IAuditLogRepository auditLogRepository,
             IUnitOfWork unitOfWork)
             : IRequestHandler<ResendVerificationCommand, Result<string>>
         {
@@ -45,6 +49,28 @@ namespace Application.Commands
 
                 if (!emailResult.Success)
                     return Result<string>.Failure("Failed to send verification email due to network error");
+
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Resend",
+                    Description = $"Verification code resent to {user.Email}",
+                    Icon = "🔄",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    UserId = user.Id,
+                    ResourceType = ResourceType.System,
+                    ResourceId = null
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 return Result<string>.Success(
                     "New verification code sent to your email", "sent");

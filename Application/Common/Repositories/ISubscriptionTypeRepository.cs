@@ -9,5 +9,6 @@ namespace Application.Common.Repositories
         Task<SubscriptionType?> GetByIdAsync(Guid id);
         Task<ICollection<SubscriptionType>> GetByCycleAsync(BillingCycle cycle);
         Task<ICollection<SubscriptionType>> GetAllAsync();
+        Task<SubscriptionType?> IsExistAsync(string typeName, BillingCycle cycle);
     }
 }

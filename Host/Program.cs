@@ -46,7 +46,8 @@ public partial class Program
         builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         builder.Services.AddScoped<IReadingProgressRepository, ReadingProgressRepository>();
         builder.Services.AddScoped<IReviewRepository, ReviewRepository>(); 
-        builder.Services.AddScoped<IBookVersionRepository, BookVersionRepository>();
+        builder.Services.AddScoped<IBookVersionRepository, BookVersionRepository>(); 
+        builder.Services.AddHttpContextAccessor();
 
         builder.Services.AddTransient<IPasswordHasher<string>, PasswordHasher<string>>();
         // Services

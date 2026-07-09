@@ -2,8 +2,10 @@
 using Application.Common.Dtos;
 using Application.Common.Repositories;
 using Application.Services;
+using Domain.Entities;
 using Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Commands
 {
@@ -18,6 +20,8 @@ namespace Application.Commands
             IWalletTransactionRepository walletTransactionRepository,
             IPaystackService paystackService,
             IEmailService emailService,
+            IHttpContextAccessor httpContextAccessor,
+            IAuditLogRepository auditLogRepository,
             IUnitOfWork unitOfWork)
             : IRequestHandler<VerifyFundingCommand, Result<string>>
         {
@@ -68,6 +72,29 @@ namespace Application.Commands
 
                 if (!emailResult.Success)
                     return Result<string>.Failure("Failed to send funding confirmation email due to network error");
+
+
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Verify",
+                    Description = $"You verified your funding",
+                    Icon = "🏷️",
+                    IpAddress = ipAddress!,
+                    UserRole = wallet.User.Role,
+                    UserId = wallet.User.Id,
+                    ResourceType = ResourceType.System,
+                    ResourceId = null,
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 return Result<string>.Success(
                     "Wallet funded successfully!", "funded");

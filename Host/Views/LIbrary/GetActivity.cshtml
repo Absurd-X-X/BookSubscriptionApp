@@ -1,6 +1,37 @@
-﻿@{
+﻿@using static Application.Queries.GetLibraryAuditLogs
+@model GetAllAuditLogResponse
+
+@{
     Layout = "~/Views/Shared/_LibraryLayout.cshtml";
     ViewData["Title"] = "Library Activity";
+
+    int totalPages = Model.TotalCount == 0 ? 1 : (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+    int startItem = Model.TotalCount == 0 ? 0 : ((Model.Page - 1) * Model.PageSize) + 1;
+    int endItem = Math.Min(Model.Page * Model.PageSize, Model.TotalCount);
+
+    string TrendClass(double pct) => pct >= 0 ? "up" : "down";
+    string TrendArrowPath(double pct) => pct >= 0 ? "M12 19V5M5 12l7-7 7 7" : "M12 5v14M19 12l-7 7-7-7";
+    string FormatPct(double pct) => (pct >= 0 ? "" : "") + Math.Abs(pct).ToString("0.0") + "%";
+
+    string PillClass(string actionType) => actionType?.ToLower() switch
+    {
+        "create" => "created",
+        "update" => "updated",
+        "approve" => "approved",
+        "reject" => "rejected",
+        "withdrawal" => "withdrawal",
+        "generate" => "generated",
+        "earn" => "earned",
+        _ => "updated"
+    };
+
+    string InitialsFrom(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "??";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0].Length >= 2 ? parts[0].Substring(0, 2).ToUpper() : parts[0].ToUpper();
+        return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+    }
 }
 
 <link href="~/css/getActivity.css" rel="stylesheet" />
@@ -8,808 +39,402 @@
 
 <main class="al-main">
 
-  <div class="al-header-row">
-    <div>
-      <h1>Activity Logs</h1>
-      <p>Track all important actions and events in your library.</p>
-    </div>
-    <div class="al-header-actions">
-      <button class="al-date-btn">
-        May 1 – May 31, 2024
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-      </button>
-      <button class="al-export-btn">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
-        Export Logs
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- ---- Stat cards ---- -->
-  <div class="al-stats-row">
-
-    <div class="al-stat-card">
-      <div class="al-stat-icon purple">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l4-6 4 3 5-8 5 6"/></svg>
-      </div>
-      <div class="al-stat-body">
-        <div class="al-stat-label">Total Activities</div>
-        <div class="al-stat-value">1,248</div>
-        <div class="al-stat-delta up">
-          <svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-          15.3% vs Apr 1 – Apr 30
+    <div class="al-header-row">
+        <div>
+            <h1>Activity Logs</h1>
+            <p>Track all important actions and events in your library.</p>
         </div>
-      </div>
-    </div>
-
-    <div class="al-stat-card">
-      <div class="al-stat-icon blue">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>
-      </div>
-      <div class="al-stat-body">
-        <div class="al-stat-label">Book Activities</div>
-        <div class="al-stat-value">328</div>
-        <div class="al-stat-delta up">
-          <svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-          12.6% vs Apr 1 – Apr 30
-        </div>
-      </div>
-    </div>
-
-    <div class="al-stat-card">
-      <div class="al-stat-icon green">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="8" r="2.6"/><path d="M15.5 14.7c2.4.4 4.5 2.3 4.5 5.3"/></svg>
-      </div>
-      <div class="al-stat-body">
-        <div class="al-stat-label">Reader Activities</div>
-        <div class="al-stat-value">512</div>
-        <div class="al-stat-delta up">
-          <svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-          18.7% vs Apr 1 – Apr 30
-        </div>
-      </div>
-    </div>
-
-    <div class="al-stat-card">
-      <div class="al-stat-icon gold">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"/></svg>
-      </div>
-      <div class="al-stat-body">
-        <div class="al-stat-label">Review Activities</div>
-        <div class="al-stat-value">248</div>
-        <div class="al-stat-delta up">
-          <svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-          9.4% vs Apr 1 – Apr 30
-        </div>
-      </div>
-    </div>
-
-    <div class="al-stat-card">
-      <div class="al-stat-icon violet">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-      </div>
-      <div class="al-stat-body">
-        <div class="al-stat-label">System Activities</div>
-        <div class="al-stat-value">160</div>
-        <div class="al-stat-delta up">
-          <svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-          14.2% vs Apr 1 – Apr 30
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ---- Main grid: table + sidebar ---- -->
-  <div class="al-grid">
-
-    <!-- LEFT: table column -->
-    <div class="al-table-col">
-
-      <div class="al-toolbar">
-        <div class="al-search">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-          <input id="al-search-input" type="text" placeholder="Search activities by action, user or details...">
-        </div>
-        <div class="al-select-wrap">
-          <select id="al-filter-action">
-            <option>All Actions</option>
-            <option>Created</option>
-            <option>Updated</option>
-            <option>Approved</option>
-            <option>Rejected</option>
-            <option>Withdrawal</option>
-            <option>Generated</option>
-            <option>Earned</option>
-          </select>
-        </div>
-        <div class="al-select-wrap">
-          <select id="al-filter-user">
-            <option>All Users</option>
-            <option>John Library</option>
-            <option>Emily Johnson</option>
-            <option>Michael Chen</option>
-          </select>
-        </div>
-        <div class="al-select-wrap">
-          <select id="al-filter-resource">
-            <option>All Resources</option>
-            <option>Books</option>
-            <option>Readers</option>
-            <option>Reviews</option>
-            <option>System</option>
-          </select>
-        </div>
-        <button class="al-filters-btn">
-          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
-          Filters
-        </button>
-      </div>
-
-      <div class="al-table-card">
-        <table class="al-table" id="al-activity-table">
-          <thead>
-            <tr>
-              <th>Activity</th>
-              <th>User</th>
-              <th>Resource</th>
-              <th>Action</th>
-              <th>Date &amp; Time</th>
-              <th>IP Address</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-
-            <tr data-category="Readers">
-              <td>
-                <div class="al-activity-cell">
-                  <div class="al-activity-icon violet">
-                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M19 8v4M21 10h-4"/></svg>
-                  </div>
-                  <div>
-                    <div class="al-activity-title">New reader registered</div>
-                    <div class="al-activity-desc">A new reader joined your library</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-user-cell">
-                  <div class="al-avatar-wrap">
-                    <div class="al-user-avatar-initials">EJ</div>
-                    <span class="al-status-dot"></span>
-                  </div>
-                  <div>
-                    <div class="al-user-name">Emily Johnson</div>
-                    <div class="al-user-email">emily.j@email.com</div>
-                  </div>
-                </div>
-              </td>
-              <td><span class="al-resource-dash">—</span></td>
-              <td><span class="al-pill created">Created</span></td>
-              <td><div class="al-date-cell">May 31, 2024<br>10:15 AM</div></td>
-              <td><span class="al-ip-cell">192.168.1.45</span></td>
-              <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
-            </tr>
-
-            <tr data-category="Books">
-              <td>
-                <div class="al-activity-cell">
-                  <div class="al-activity-icon blue">
-                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>
-                  </div>
-                  <div>
-                    <div class="al-activity-title">Book updated</div>
-                    <div class="al-activity-desc">Atomic Habits book information updated</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-user-cell">
-                  <div class="al-avatar-wrap">
-                    <div class="al-user-avatar-initials">JL</div>
-                    <span class="al-status-dot"></span>
-                  </div>
-                  <div>
-                    <div class="al-user-name">John Library</div>
-                    <div class="al-user-email">you@library.com</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-resource-cell">
-                  <img class="al-resource-thumb" src="https://m.media-amazon.com/images/I/51-nXsSRfZL._SY445_SX342_.jpg" alt="">
-                  <div>
-                    <div class="al-resource-title">Atomic Habits</div>
-                    <div class="al-resource-author">by James Clear</div>
-                  </div>
-                </div>
-              </td>
-              <td><span class="al-pill updated">Updated</span></td>
-              <td><div class="al-date-cell">May 31, 2024<br>9:42 AM</div></td>
-              <td><span class="al-ip-cell">192.168.1.45</span></td>
-              <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
-            </tr>
-
-            <tr data-category="Reviews">
-              <td>
-                <div class="al-activity-cell">
-                  <div class="al-activity-icon gold">
-                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"/></svg>
-                  </div>
-                  <div>
-                    <div class="al-activity-title">Review approved</div>
-                    <div class="al-activity-desc">A review has been approved</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-user-cell">
-                  <div class="al-avatar-wrap">
-                    <div class="al-user-avatar-initials">JL</div>
-                    <span class="al-status-dot"></span>
-                  </div>
-                  <div>
-                    <div class="al-user-name">John Library</div>
-                    <div class="al-user-email">you@library.com</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-resource-cell">
-                  <img class="al-resource-thumb" src="https://m.media-amazon.com/images/I/41bMVNYRQGL._SY445_SX342_.jpg" alt="">
-                  <div>
-                    <div class="al-resource-title">Deep Work</div>
-                    <div class="al-resource-author">by Cal Newport</div>
-                  </div>
-                </div>
-              </td>
-              <td><span class="al-pill approved">Approved</span></td>
-              <td><div class="al-date-cell">May 31, 2024<br>9:30 AM</div></td>
-              <td><span class="al-ip-cell">192.168.1.45</span></td>
-              <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
-            </tr>
-
-            <tr data-category="System">
-              <td>
-                <div class="al-activity-cell">
-                  <div class="al-activity-icon violet">
-                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20M16 14h2"/></svg>
-                  </div>
-                  <div>
-                    <div class="al-activity-title">Earnings withdrawn</div>
-                    <div class="al-activity-desc">Earnings withdrawal request processed</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-user-cell">
-                  <div class="al-avatar-wrap">
-                    <div class="al-user-avatar-initials">JL</div>
-                    <span class="al-status-dot"></span>
-                  </div>
-                  <div>
-                    <div class="al-user-name">John Library</div>
-                    <div class="al-user-email">you@library.com</div>
-                  </div>
-                </div>
-              </td>
-              <td><span class="al-resource-dash">—</span></td>
-              <td><span class="al-pill withdrawal">Withdrawal</span></td>
-              <td><div class="al-date-cell">May 30, 2024<br>6:20 PM</div></td>
-              <td><span class="al-ip-cell">192.168.1.45</span></td>
-              <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
-            </tr>
-
-            <tr data-category="Readers">
-              <td>
-                <div class="al-activity-cell">
-                  <div class="al-activity-icon green">
-                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="8" r="2.6"/><path d="M15.5 14.7c2.4.4 4.5 2.3 4.5 5.3"/></svg>
-                  </div>
-                  <div>
-                    <div class="al-activity-title">Reader updated</div>
-                    <div class="al-activity-desc">Reader profile information updated</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-user-cell">
-                  <div class="al-avatar-wrap">
-                    <div class="al-user-avatar-initials">MC</div>
-                    <span class="al-status-dot"></span>
-                  </div>
-                  <div>
-                    <div class="al-user-name">Michael Chen</div>
-                    <div class="al-user-email">m.chen@email.com</div>
-                  </div>
-                </div>
-              </td>
-              <td><span class="al-resource-dash">—</span></td>
-              <td><span class="al-pill updated">Updated</span></td>
-              <td><div class="al-date-cell">May 30, 2024<br>5:15 PM</div></td>
-              <td><span class="al-ip-cell">192.168.1.22</span></td>
-              <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
-            </tr>
-
-            <tr data-category="Reviews">
-              <td>
-                <div class="al-activity-cell">
-                  <div class="al-activity-icon red">
-                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0l-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
-                  </div>
-                  <div>
-                    <div class="al-activity-title">Review rejected</div>
-                    <div class="al-activity-desc">A review has been rejected</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-user-cell">
-                  <div class="al-avatar-wrap">
-                    <div class="al-user-avatar-initials">JL</div>
-                    <span class="al-status-dot"></span>
-                  </div>
-                  <div>
-                    <div class="al-user-name">John Library</div>
-                    <div class="al-user-email">you@library.com</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-resource-cell">
-                  <img class="al-resource-thumb" src="https://m.media-amazon.com/images/I/81bsw6fnUiL._SY445_SX342_.jpg" alt="">
-                  <div>
-                    <div class="al-resource-title">Rich Dad Poor Dad</div>
-                    <div class="al-resource-author">by Robert Kiyosaki</div>
-                  </div>
-                </div>
-              </td>
-              <td><span class="al-pill rejected">Rejected</span></td>
-              <td><div class="al-date-cell">May 30, 2024<br>4:10 PM</div></td>
-              <td><span class="al-ip-cell">192.168.1.45</span></td>
-              <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
-            </tr>
-
-            <tr data-category="Books">
-              <td>
-                <div class="al-activity-cell">
-                  <div class="al-activity-icon amber">
-                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/><path d="M9 7v5M6.5 9.5h5"/></svg>
-                  </div>
-                  <div>
-                    <div class="al-activity-title">Book added</div>
-                    <div class="al-activity-desc">New book added to your library</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-user-cell">
-                  <div class="al-avatar-wrap">
-                    <div class="al-user-avatar-initials">JL</div>
-                    <span class="al-status-dot"></span>
-                  </div>
-                  <div>
-                    <div class="al-user-name">John Library</div>
-                    <div class="al-user-email">you@library.com</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-resource-cell">
-                  <img class="al-resource-thumb" src="https://m.media-amazon.com/images/I/71nB6THsCdL._SY445_SX342_.jpg" alt="">
-                  <div>
-                    <div class="al-resource-title">The 5 AM Club</div>
-                    <div class="al-resource-author">by Robin Sharma</div>
-                  </div>
-                </div>
-              </td>
-              <td><span class="al-pill created">Created</span></td>
-              <td><div class="al-date-cell">May 29, 2024<br>3:45 PM</div></td>
-              <td><span class="al-ip-cell">192.168.1.45</span></td>
-              <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
-            </tr>
-
-            <tr data-category="System">
-              <td>
-                <div class="al-activity-cell">
-                  <div class="al-activity-icon violet">
-                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-                  </div>
-                  <div>
-                    <div class="al-activity-title">Settings updated</div>
-                    <div class="al-activity-desc">Library settings have been updated</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-user-cell">
-                  <div class="al-avatar-wrap">
-                    <div class="al-user-avatar-initials">JL</div>
-                    <span class="al-status-dot"></span>
-                  </div>
-                  <div>
-                    <div class="al-user-name">John Library</div>
-                    <div class="al-user-email">you@library.com</div>
-                  </div>
-                </div>
-              </td>
-              <td><span class="al-resource-dash">—</span></td>
-              <td><span class="al-pill updated">Updated</span></td>
-              <td><div class="al-date-cell">May 29, 2024<br>2:30 PM</div></td>
-              <td><span class="al-ip-cell">192.168.1.45</span></td>
-              <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
-            </tr>
-
-            <tr data-category="System">
-              <td>
-                <div class="al-activity-cell">
-                  <div class="al-activity-icon indigo">
-                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l4-6 4 3 5-8 5 6"/></svg>
-                  </div>
-                  <div>
-                    <div class="al-activity-title">Report generated</div>
-                    <div class="al-activity-desc">Reader engagement report generated</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-user-cell">
-                  <div class="al-avatar-wrap">
-                    <div class="al-user-avatar-initials">JL</div>
-                    <span class="al-status-dot"></span>
-                  </div>
-                  <div>
-                    <div class="al-user-name">John Library</div>
-                    <div class="al-user-email">you@library.com</div>
-                  </div>
-                </div>
-              </td>
-              <td><span class="al-resource-dash">—</span></td>
-              <td><span class="al-pill generated">Generated</span></td>
-              <td><div class="al-date-cell">May 28, 2024<br>11:20 AM</div></td>
-              <td><span class="al-ip-cell">192.168.1.45</span></td>
-              <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
-            </tr>
-
-            <tr data-category="System">
-              <td>
-                <div class="al-activity-cell">
-                  <div class="al-activity-icon orange">
-                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5a2.5 2.5 0 0 1 2.5-1.5c1.4 0 2.5.8 2.5 2s-1 1.7-2.5 2-2.5.8-2.5 2 1.1 2 2.5 2a2.5 2.5 0 0 0 2.5-1.5"/></svg>
-                  </div>
-                  <div>
-                    <div class="al-activity-title">Earnings earned</div>
-                    <div class="al-activity-desc">New earnings added to your account</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="al-user-cell">
-                  <div class="al-avatar-wrap">
-                    <div class="al-user-avatar-initials">JL</div>
-                    <span class="al-status-dot"></span>
-                  </div>
-                  <div>
-                    <div class="al-user-name">John Library</div>
-                    <div class="al-user-email">you@library.com</div>
-                  </div>
-                </div>
-              </td>
-              <td><span class="al-resource-dash">—</span></td>
-              <td><span class="al-pill earned">Earned</span></td>
-              <td><div class="al-date-cell">May 28, 2024<br>9:05 AM</div></td>
-              <td><span class="al-ip-cell">192.168.1.45</span></td>
-              <td><button class="al-row-menu" aria-label="More options">&#8943;</button></td>
-            </tr>
-
-          </tbody>
-        </table>
-
-        <div class="al-table-footer">
-          <span id="al-showing-text">Showing 1 to 10 of 1,248 activities</span>
-          <div class="al-pagination" id="al-pagination">
-            <button class="al-page-arrow" id="al-prev-page" aria-label="Previous page">
-              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        <div class="al-header-actions">
+            <button class="al-date-btn">
+                This Month
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
             </button>
-            <button class="al-page-num active" data-page="1">1</button>
-            <button class="al-page-num" data-page="2">2</button>
-            <button class="al-page-num" data-page="3">3</button>
-            <span class="al-page-ellipsis">…</span>
-            <button class="al-page-num" data-page="125">125</button>
-            <button class="al-page-arrow" id="al-next-page" aria-label="Next page">
-              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            <button class="al-export-btn">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" /></svg>
+                Export Logs
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" /></svg>
             </button>
-          </div>
-          <div class="al-select-wrap small">
-            <select id="al-per-page">
-              <option>10 per page</option>
-              <option>25 per page</option>
-              <option>50 per page</option>
-            </select>
-          </div>
         </div>
-      </div>
+    </div>
+
+    <!-- ---- Stat cards ---- -->
+    <div class="al-stats-row">
+
+        <div class="al-stat-card">
+            <div class="al-stat-icon purple">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l4-6 4 3 5-8 5 6" /></svg>
+            </div>
+            <div class="al-stat-body">
+                <div class="al-stat-label">Total Activities</div>
+                <div class="al-stat-value">@Model.TotalActivities.ToString("N0")</div>
+                <div class="al-stat-delta @TrendClass(Model.TotalActivitiesChangePercent)">
+                    <svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="@TrendArrowPath(Model.TotalActivitiesChangePercent)" /></svg>
+                    @FormatPct(Model.TotalActivitiesChangePercent) vs last month
+                </div>
+            </div>
+        </div>
+
+        <div class="al-stat-card">
+            <div class="al-stat-icon blue">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z" /></svg>
+            </div>
+            <div class="al-stat-body">
+                <div class="al-stat-label">Book Activities</div>
+                <div class="al-stat-value">@Model.BookActivities.ToString("N0")</div>
+                <div class="al-stat-delta @TrendClass(Model.BookActivitiesChangePercent)">
+                    <svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="@TrendArrowPath(Model.BookActivitiesChangePercent)" /></svg>
+                    @FormatPct(Model.BookActivitiesChangePercent) vs last month
+                </div>
+            </div>
+        </div>
+
+        <div class="al-stat-card">
+            <div class="al-stat-icon green">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2" /><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" /><circle cx="17" cy="8" r="2.6" /><path d="M15.5 14.7c2.4.4 4.5 2.3 4.5 5.3" /></svg>
+            </div>
+            <div class="al-stat-body">
+                <div class="al-stat-label">Reader Activities</div>
+                <div class="al-stat-value">@Model.ReaderActivities.ToString("N0")</div>
+                <div class="al-stat-delta @TrendClass(Model.ReaderActivitiesChangePercent)">
+                    <svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="@TrendArrowPath(Model.ReaderActivitiesChangePercent)" /></svg>
+                    @FormatPct(Model.ReaderActivitiesChangePercent) vs last month
+                </div>
+            </div>
+        </div>
+
+        <div class="al-stat-card">
+            <div class="al-stat-icon gold">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z" /></svg>
+            </div>
+            <div class="al-stat-body">
+                <div class="al-stat-label">Review Activities</div>
+                <div class="al-stat-value">@Model.ReviewActivities.ToString("N0")</div>
+                <div class="al-stat-delta @TrendClass(Model.ReviewActivitiesChangePercent)">
+                    <svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="@TrendArrowPath(Model.ReviewActivitiesChangePercent)" /></svg>
+                    @FormatPct(Model.ReviewActivitiesChangePercent) vs last month
+                </div>
+            </div>
+        </div>
+
+        <div class="al-stat-card">
+            <div class="al-stat-icon violet">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></svg>
+            </div>
+            <div class="al-stat-body">
+                <div class="al-stat-label">System Activities</div>
+                <div class="al-stat-value">@Model.SystemActivities.ToString("N0")</div>
+                <div class="al-stat-delta @TrendClass(Model.SystemActivitiesChangePercent)">
+                    <svg class="ic-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="@TrendArrowPath(Model.SystemActivitiesChangePercent)" /></svg>
+                    @FormatPct(Model.SystemActivitiesChangePercent) vs last month
+                </div>
+            </div>
+        </div>
 
     </div>
 
-    <!-- RIGHT: sidebar -->
-    <div class="al-sidebar">
+    <!-- ---- Main grid: table + sidebar ---- -->
+    <div class="al-grid">
 
-      <div class="al-card">
-        <h3>Filter by Date</h3>
-        <div class="al-date-filter-list" id="al-date-filter-list">
-          <button class="al-date-filter-item" data-range="today">Today</button>
-          <button class="al-date-filter-item" data-range="yesterday">Yesterday</button>
-          <button class="al-date-filter-item" data-range="7d">Last 7 Days</button>
-          <button class="al-date-filter-item active" data-range="30d">Last 30 Days</button>
-          <button class="al-date-filter-item" data-range="month">This Month</button>
-          <button class="al-date-filter-item" data-range="lastmonth">Last Month</button>
-          <button class="al-date-filter-item" data-range="custom">
-            Custom Range
-            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-          </button>
+        <!-- LEFT: table column -->
+        <div class="al-table-col">
+
+            <div class="al-toolbar">
+                <div class="al-search">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
+                    <input id="al-search-input" type="text" placeholder="Search activities by action, user or details...">
+                </div>
+                <div class="al-select-wrap">
+                    <select id="al-filter-action">
+                        <option>All Actions</option>
+                        <option>Created</option>
+                        <option>Updated</option>
+                        <option>Approved</option>
+                        <option>Rejected</option>
+                    </select>
+                </div>
+                <div class="al-select-wrap">
+                    <select id="al-filter-resource">
+                        <option>All Resources</option>
+                        <option>Book</option>
+                        <option>Reader</option>
+                        <option>Review</option>
+                        <option>System</option>
+                    </select>
+                </div>
+                <button class="al-filters-btn">
+                    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4" /></svg>
+                    Filters
+                </button>
+            </div>
+
+            <div class="al-table-card">
+                <table class="al-table" id="al-activity-table">
+                    <thead>
+                        <tr>
+                            <th>Activity</th>
+                            <th>User</th>
+                            <th>Resource</th>
+                            <th>Action</th>
+                            <th>Date &amp; Time</th>
+                            <th>IP Address</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var log in Model.Items)
+                        {
+                            <tr data-category="@log.ResourceType" data-log-id="@log.Id">
+                                <td>
+                                    <div class="al-activity-cell">
+                                        <div class="al-activity-icon violet">@log.Icon</div>
+                                        <div>
+                                            <div class="al-activity-title">@log.Description</div>
+                                            <div class="al-activity-desc">@log.ActionType &middot; @log.ResourceType</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="al-user-cell">
+                                        <div class="al-avatar-wrap">
+                                            <div class="al-user-avatar-initials">@InitialsFrom(log.UserName)</div>
+                                            <span class="al-status-dot"></span>
+                                        </div>
+                                        <div>
+                                            <div class="al-user-name">@log.UserName</div>
+                                            <div class="al-user-email">@log.Role</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(log.ResourceTitle))
+                                    {
+                                        <div class="al-resource-cell">
+                                            <div>
+                                                <div class="al-resource-title">@log.ResourceTitle</div>
+                                                @if (!string.IsNullOrWhiteSpace(log.ResourceAuthor))
+                                                {
+                                                    <div class="al-resource-author">by @log.ResourceAuthor</div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="al-resource-dash">&mdash;</span>
+                                    }
+                                </td>
+                                <td><span class="al-pill @PillClass(log.ActionType)">@log.ActionType</span></td>
+                                <td><div class="al-date-cell">@log.Timestamp.ToString("MMM d, yyyy")<br>@log.Timestamp.ToString("h:mm tt")</div></td>
+                                <td><span class="al-ip-cell">@log.IpAddress</span></td>
+                                <td><button class="al-row-menu" aria-label="More options" data-log-id="@log.Id">&#8943;</button></td>
+                            </tr>
+                        }
+                        @if (!Model.Items.Any())
+                        {
+                            <tr><td colspan="7" style="text-align:center;padding:24px">No activity found.</td></tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="al-table-footer">
+                    <span id="al-showing-text">Showing @startItem to @endItem of @Model.TotalCount.ToString("N0") activities</span>
+                    <div class="al-pagination" id="al-pagination">
+                        <a class="al-page-arrow" aria-label="Previous page"
+                           href="@Url.Action("AdminActivity", "Admin", new { page = Math.Max(1, Model.Page - 1), pageSize = Model.PageSize })">
+                            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" /></svg>
+                        </a>
+                        @{
+                            var pagesToShow = new List<int?>();
+                            int windowSize = 1;
+                            for (int p = 1; p <= totalPages; p++)
+                            {
+                                bool isEdge = p == 1 || p == totalPages;
+                                bool isNearCurrent = Math.Abs(p - Model.Page) <= windowSize;
+                                if (isEdge || isNearCurrent)
+                                {
+                                    pagesToShow.Add(p);
+                                }
+                                else if (pagesToShow.Count > 0 && pagesToShow[^1] != null)
+                                {
+                                    pagesToShow.Add(null);
+                                }
+                            }
+                        }
+                        @foreach (var p in pagesToShow)
+                        {
+                            if (p == null)
+                            {
+                                <span class="al-page-ellipsis">&hellip;</span>
+                            }
+                            else
+                            {
+                                <a class="al-page-num @(p == Model.Page ? "active" : "")"
+                                   href="@Url.Action("AdminActivity", "Admin", new { page = p, pageSize = Model.PageSize })">@p</a>
+                            }
+                        }
+                        <a class="al-page-arrow" aria-label="Next page"
+                           href="@Url.Action("AdminActivity", "Admin", new { page = Math.Min(totalPages, Model.Page + 1), pageSize = Model.PageSize })">
+                            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6" /></svg>
+                        </a>
+                    </div>
+                    <div class="al-select-wrap small">
+                        <select id="al-per-page">
+                            <option selected="@(Model.PageSize == 10)">10 per page</option>
+                            <option selected="@(Model.PageSize == 25)">25 per page</option>
+                            <option selected="@(Model.PageSize == 50)">50 per page</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
         </div>
-      </div>
 
-      <div class="al-card">
-        <h3>Activity Summary</h3>
-        <div class="al-donut-wrap">
-          <canvas id="al-donut-chart" width="220" height="220"></canvas>
-          <div class="al-donut-center">
-            <div class="al-donut-total">1,248</div>
-            <div class="al-donut-total-label">Total</div>
-          </div>
-        </div>
-        <div class="al-legend">
-          <div class="al-legend-row">
-            <span class="al-legend-dot" style="background:#3b82f6"></span>
-            <span class="al-legend-label">Book Activities</span>
-            <span class="al-legend-value">328 (26%)</span>
-          </div>
-          <div class="al-legend-row">
-            <span class="al-legend-dot" style="background:#22c55e"></span>
-            <span class="al-legend-label">Reader Activities</span>
-            <span class="al-legend-value">512 (41%)</span>
-          </div>
-          <div class="al-legend-row">
-            <span class="al-legend-dot" style="background:#f59e0b"></span>
-            <span class="al-legend-label">Review Activities</span>
-            <span class="al-legend-value">248 (20%)</span>
-          </div>
-          <div class="al-legend-row">
-            <span class="al-legend-dot" style="background:#8b5cf6"></span>
-            <span class="al-legend-label">System Activities</span>
-            <span class="al-legend-value">160 (13%)</span>
-          </div>
-        </div>
-      </div>
+        <!-- RIGHT: sidebar -->
+        <div class="al-sidebar">
 
-      <div class="al-card">
-        <h3>Top Active Users</h3>
-        <div class="al-top-users">
-
-          <div class="al-top-user-row">
-            <div class="al-user-avatar-initials">JL</div>
-            <div class="al-top-user-info">
-              <div class="al-top-user-name">John Library</div>
-              <div class="al-top-user-count">880 activities</div>
-              <div class="al-top-user-bar-track">
-                <div class="al-top-user-bar-fill" style="width:100%"></div>
-              </div>
+            <div class="al-card">
+                <h3>Filter by Date</h3>
+                <div class="al-date-filter-list" id="al-date-filter-list">
+                    <button class="al-date-filter-item" data-range="today">Today</button>
+                    <button class="al-date-filter-item" data-range="yesterday">Yesterday</button>
+                    <button class="al-date-filter-item" data-range="7d">Last 7 Days</button>
+                    <button class="al-date-filter-item active" data-range="30d">Last 30 Days</button>
+                    <button class="al-date-filter-item" data-range="month">This Month</button>
+                    <button class="al-date-filter-item" data-range="lastmonth">Last Month</button>
+                </div>
             </div>
-          </div>
 
-          <div class="al-top-user-row">
-            <div class="al-user-avatar-initials">EJ</div>
-            <div class="al-top-user-info">
-              <div class="al-top-user-name">Emily Johnson</div>
-              <div class="al-top-user-count">156 activities</div>
-              <div class="al-top-user-bar-track">
-                <div class="al-top-user-bar-fill" style="width:18%"></div>
-              </div>
+            <div class="al-card">
+                <h3>Activity Summary</h3>
+                <div class="al-donut-wrap">
+                    <canvas id="al-donut-chart" width="220" height="220"></canvas>
+                    <div class="al-donut-center">
+                        <div class="al-donut-total">@Model.TotalActivities.ToString("N0")</div>
+                        <div class="al-donut-total-label">Total</div>
+                    </div>
+                </div>
+                <div class="al-legend">
+                    <div class="al-legend-row">
+                        <span class="al-legend-dot" style="background:#3b82f6"></span>
+                        <span class="al-legend-label">Book Activities</span>
+                        <span class="al-legend-value">@Model.BookActivities.ToString("N0") (@(Model.TotalActivities == 0 ? 0 : Math.Round(Model.BookActivities * 100.0 / Model.TotalActivities))%)</span>
+                    </div>
+                    <div class="al-legend-row">
+                        <span class="al-legend-dot" style="background:#22c55e"></span>
+                        <span class="al-legend-label">Reader Activities</span>
+                        <span class="al-legend-value">@Model.ReaderActivities.ToString("N0") (@(Model.TotalActivities == 0 ? 0 : Math.Round(Model.ReaderActivities * 100.0 / Model.TotalActivities))%)</span>
+                    </div>
+                    <div class="al-legend-row">
+                        <span class="al-legend-dot" style="background:#f59e0b"></span>
+                        <span class="al-legend-label">Review Activities</span>
+                        <span class="al-legend-value">@Model.ReviewActivities.ToString("N0") (@(Model.TotalActivities == 0 ? 0 : Math.Round(Model.ReviewActivities * 100.0 / Model.TotalActivities))%)</span>
+                    </div>
+                    <div class="al-legend-row">
+                        <span class="al-legend-dot" style="background:#8b5cf6"></span>
+                        <span class="al-legend-label">System Activities</span>
+                        <span class="al-legend-value">@Model.SystemActivities.ToString("N0") (@(Model.TotalActivities == 0 ? 0 : Math.Round(Model.SystemActivities * 100.0 / Model.TotalActivities))%)</span>
+                    </div>
+                </div>
             </div>
-          </div>
 
-          <div class="al-top-user-row">
-            <div class="al-user-avatar-initials">MC</div>
-            <div class="al-top-user-info">
-              <div class="al-top-user-name">Michael Chen</div>
-              <div class="al-top-user-count">98 activities</div>
-              <div class="al-top-user-bar-track">
-                <div class="al-top-user-bar-fill" style="width:11%"></div>
-              </div>
+            <div class="al-card">
+                <h3>Top Active Users</h3>
+                <div class="al-top-users">
+                    @foreach (var u in Model.TopUsers)
+                    {
+                        <div class="al-top-user-row">
+                            <div class="al-user-avatar-initials">@InitialsFrom(u.UserName)</div>
+                            <div class="al-top-user-info">
+                                <div class="al-top-user-name">@u.UserName</div>
+                                <div class="al-top-user-count">@u.Count.ToString("N0") activities</div>
+                                <div class="al-top-user-bar-track">
+                                    <div class="al-top-user-bar-fill" style="width:@(u.PercentOfMax)%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (!Model.TopUsers.Any())
+                    {
+                        <p style="color:#7878a0;font-size:13px">No activity yet.</p>
+                    }
+                </div>
             </div>
-          </div>
-
-          <div class="al-top-user-row">
-            <div class="al-user-avatar-initials">SJ</div>
-            <div class="al-top-user-info">
-              <div class="al-top-user-name">Sarah Johnson</div>
-              <div class="al-top-user-count">84 activities</div>
-              <div class="al-top-user-bar-track">
-                <div class="al-top-user-bar-fill" style="width:10%"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="al-top-user-row">
-            <div class="al-user-avatar-initials">ZJ</div>
-            <div class="al-top-user-info">
-              <div class="al-top-user-name">Zach Johnson</div>
-              <div class="al-top-user-count">72 activities</div>
-              <div class="al-top-user-bar-track">
-                <div class="al-top-user-bar-fill" style="width:8%"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="al-top-user-row">
-            <div class="al-user-avatar-initials">DW</div>
-            <div class="al-top-user-info">
-              <div class="al-top-user-name">David Wilson</div>
-              <div class="al-top-user-count">32 activities</div>
-              <div class="al-top-user-bar-track">
-                <div class="al-top-user-bar-fill" style="width:4%"></div>
-              </div>
-            </div>
-          </div>
 
         </div>
-      </div>
 
     </div>
-
-  </div>
 
 </main>
 
 <script>
+    (function () {
+    "use strict";
 
-(function () {
-  "use strict";
-
-  /* ---------------------------------------------------------
-     1. Donut chart (Chart.js)
-  --------------------------------------------------------- */
-  function renderDonutChart() {
+    function renderDonutChart() {
     const ctx = document.getElementById("al-donut-chart");
     if (!ctx || typeof Chart === "undefined") return;
 
     new Chart(ctx, {
-      type: "doughnut",
-      data: {
-        labels: ["Book Activities", "Reader Activities", "Review Activities", "System Activities"],
-        datasets: [{
-          data: [328, 512, 248, 160],
-          backgroundColor: ["#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6"],
-          borderColor: "#151728",
-          borderWidth: 3,
-          hoverOffset: 6
-        }]
-      },
-      options: {
-        cutout: "72%",
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: "#1a1c30",
-            titleColor: "#f3f4f8",
-            bodyColor: "#d4d5e3",
-            borderColor: "#232640",
-            borderWidth: 1,
-            padding: 10,
-            callbacks: {
-              label: (ctx) => {
-                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                const pct = Math.round((ctx.raw / total) * 100);
-                return ` ${ctx.label}: ${ctx.raw} (${pct}%)`;
-              }
-            }
-          }
-        }
-      }
+    type: "doughnut",
+    data: {
+    labels: ["Book Activities", "Reader Activities", "Review Activities", "System Activities"],
+    datasets: [{
+    data: [@Model.BookActivities, @Model.ReaderActivities, @Model.ReviewActivities, @Model.SystemActivities],
+    backgroundColor: ["#3b82f6", "#22c55e", "#f59e0b", "#8b5cf6"],
+    borderColor: "#151728",
+    borderWidth: 3,
+    hoverOffset: 6
+    }]
+    },
+    options: {
+    cutout: "72%",
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+    legend: { display: false },
+    tooltip: {
+    backgroundColor: "#1a1c30",
+    titleColor: "#f3f4f8",
+    bodyColor: "#d4d5e3",
+    borderColor: "#232640",
+    borderWidth: 1,
+    padding: 10,
+    callbacks: {
+    label: (ctx) => {
+    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+    const pct = total === 0 ? 0 : Math.round((ctx.raw / total) * 100);
+    return ` ${ctx.label}: ${ctx.raw} (${pct}%)`;
+    }
+    }
+    }
+    }
+    }
     });
-  }
-  function applyFilters() {
+    }
+
+    function applyFilters() {
     const q = document.getElementById("al-search-input").value.trim().toLowerCase();
     const actionFilter = document.getElementById("al-filter-action").value;
-    const userFilter = document.getElementById("al-filter-user").value;
     const resourceFilter = document.getElementById("al-filter-resource").value;
 
-    const rows = document.querySelectorAll("#al-activity-table tbody tr");
+    const rows = document.querySelectorAll("#al-activity-table tbody tr[data-log-id]");
     let visibleCount = 0;
 
     rows.forEach((row) => {
-      const title = row.querySelector(".al-activity-title")?.textContent.toLowerCase() || "";
-      const desc = row.querySelector(".al-activity-desc")?.textContent.toLowerCase() || "";
-      const userName = row.querySelector(".al-user-name")?.textContent.trim() || "";
-      const resourceTitle = row.querySelector(".al-resource-title")?.textContent.toLowerCase() || "";
-      const actionText = row.querySelector(".al-pill")?.textContent.trim() || "";
+    const title = row.querySelector(".al-activity-title")?.textContent.toLowerCase() || "";
+    const userName = row.querySelector(".al-user-name")?.textContent.trim() || "";
+    const actionText = row.querySelector(".al-pill")?.textContent.trim() || "";
+    const category = row.getAttribute("data-category") || "";
 
-      const matchesQuery = !q ||
-        title.includes(q) || desc.includes(q) || userName.toLowerCase().includes(q) || resourceTitle.includes(q);
+    const matchesQuery = !q || title.includes(q) || userName.toLowerCase().includes(q);
+    const matchesAction = actionFilter === "All Actions" || actionText === actionFilter;
+    const matchesResource = resourceFilter === "All Resources" || category === resourceFilter;
 
-      const matchesAction = actionFilter === "All Actions" || actionText === actionFilter;
-      const matchesUser = userFilter === "All Users" || userName === userFilter;
-
-      // "Resource" filter: add a data-category="Books|Readers|Reviews|System"
-      // attribute to each <tr> in the HTML for an exact match. Left as a
-      // pass-through here since the static markup doesn't carry that yet.
-      const matchesResource = resourceFilter === "All Resources" || true;
-
-      const show = matchesQuery && matchesAction && matchesUser && matchesResource;
-      row.style.display = show ? "" : "none";
-      if (show) visibleCount++;
+    const show = matchesQuery && matchesAction && matchesResource;
+    row.style.display = show ? "" : "none";
+    if (show) visibleCount++;
     });
-
-    const showingText = document.getElementById("al-showing-text");
-    const isFiltering = q || actionFilter !== "All Actions" || userFilter !== "All Users" || resourceFilter !== "All Resources";
-    showingText.textContent = isFiltering
-      ? `Showing ${visibleCount} of ${visibleCount} activities (filtered)`
-      : "Showing 1 to 10 of 1,248 activities";
-  }
-
-  /* ---------------------------------------------------------
-     3. Pagination (visual state only)
-     Swap the comment below for a real fetch/render call when
-     you wire this up to a backend.
-  --------------------------------------------------------- */
-  function setupPagination() {
-    const pageButtons = document.querySelectorAll(".al-page-num");
-    pageButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        pageButtons.forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        // e.g. loadActivityPage(btn.dataset.page)
-      });
-    });
-
-    document.getElementById("al-prev-page").addEventListener("click", () => {
-      const allBtns = Array.from(pageButtons);
-      const idx = allBtns.indexOf(document.querySelector(".al-page-num.active"));
-      if (idx > 0) allBtns[idx - 1].click();
-    });
-
-    document.getElementById("al-next-page").addEventListener("click", () => {
-      const allBtns = Array.from(pageButtons);
-      const idx = allBtns.indexOf(document.querySelector(".al-page-num.active"));
-      if (idx < allBtns.length - 1) allBtns[idx + 1].click();
-    });
-  }
-
-  /* ---------------------------------------------------------
-     4. Date filter sidebar (single-select highlight)
-  --------------------------------------------------------- */
-  function setupDateFilters() {
-    const items = document.querySelectorAll(".al-date-filter-item");
-    items.forEach((item) => {
-      item.addEventListener("click", () => {
-        items.forEach((i) => i.classList.remove("active"));
-        item.classList.add("active");
-        // e.g. loadActivitiesForRange(item.dataset.range)
-      });
-    });
-  }
-
-  /* ---------------------------------------------------------
-     5. Init
-  --------------------------------------------------------- */
-  
-    document.addEventListener("DOMContentLoaded", () => {
-    renderDonutChart();
-    setupPagination();
-    setupDateFilters();
-    setupRowMenus();
-
-    document.getElementById("al-search-input").addEventListener("input", applyFilters);
-    document.getElementById("al-filter-action").addEventListener("change", applyFilters);
-    document.getElementById("al-filter-user").addEventListener("change", applyFilters);
-    document.getElementById("al-filter-resource").addEventListener("change", applyFilters);
-    });
+    }
 
     function positionMenu(trigger, menu) {
     menu.classList.remove("al-menu-up");
@@ -833,8 +458,6 @@
     const MENU_HTML = `
     <button type="button" class="al-menu-item" data-action="view">View Details</button>
     <button type="button" class="al-menu-item" data-action="export">Export Entry</button>
-    <div class="al-menu-sep"></div>
-    <button type="button" class="al-menu-item danger" data-action="flag">Flag Activity</button>
     `;
 
     document.querySelectorAll(".al-row-menu").forEach((btn) => {
@@ -862,9 +485,10 @@
     item.addEventListener("click", (e) => {
     e.stopPropagation();
     wrap.classList.remove("open");
-    const row = btn.closest("tr");
-    const title = row.querySelector(".al-activity-title")?.textContent || "";
-    console.log("[activity-log]", item.dataset.action, "for:", title);
+    const logId = btn.getAttribute("data-log-id");
+    if (item.dataset.action === "view") {
+    window.location.href = '@Url.Action("GetActivityDetails", "Admin")' + '?id=' + encodeURIComponent(logId);
+    }
     });
     });
     });
@@ -873,5 +497,14 @@
     document.querySelectorAll(".al-menu-wrap.open").forEach((w) => w.classList.remove("open"));
     });
     }
-})();
+
+    document.addEventListener("DOMContentLoaded", () => {
+    renderDonutChart();
+    setupRowMenus();
+
+    document.getElementById("al-search-input").addEventListener("input", applyFilters);
+    document.getElementById("al-filter-action").addEventListener("change", applyFilters);
+    document.getElementById("al-filter-resource").addEventListener("change", applyFilters);
+    });
+    })();
 </script>

@@ -442,6 +442,7 @@
 }
 
 .page-btn {
+    text-decoration: none;
     background: #0d0d14;
     border: 1px solid #20202a;
     color: #c4c4d0;

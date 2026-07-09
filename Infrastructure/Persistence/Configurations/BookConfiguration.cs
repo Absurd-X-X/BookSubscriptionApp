@@ -25,7 +25,8 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(x => x.Pages)
                 .IsRequired();
                         builder.Property(c => c.BookFileUrl)
-                .IsRequired();
+                .IsRequired()
+                .HasMaxLength(500);
 
             builder.HasOne(x => x.Library)
                 .WithMany(x => x.Books)

@@ -12,7 +12,7 @@ namespace Domain.Entities
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
         public DateTime DateModified { get; set; }
         public bool IsDeleted { get; set; }
-        public DateTime SubscriptionDate { get; set; } = DateTime.UtcNow;
+        public DateTime SubscriptionDate { get; set; }
         public ICollection<Subscription> Subscriptions { get; set; } = new HashSet<Subscription>();
         public DateTime ExpiryDate => Cycle switch
         {

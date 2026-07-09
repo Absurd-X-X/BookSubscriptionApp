@@ -47,6 +47,12 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<Guid?>("ResourceId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("ResourceType")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime(6)");
 
@@ -156,7 +162,8 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("BookFileUrl")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("char(36)");
@@ -199,6 +206,10 @@ namespace Infrastructure.Migrations
 
                     b.Property<Guid>("LibraryId")
                         .HasColumnType("char(36)");
+
+                    b.Property<string>("MimeType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<int>("NoOfTimeReadByPeople")
                         .HasColumnType("int");
@@ -259,11 +270,14 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("FileUrl")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsCurrent")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("MimeType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ReleaseNote")
                         .HasColumnType("longtext");
@@ -468,6 +482,9 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("DateModified")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
@@ -483,6 +500,9 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");
+
+                    b.Property<int>("RefType")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -612,9 +632,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("HelpfulCount")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsApproved")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
@@ -623,6 +640,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<Guid>("ReaderId")
                         .HasColumnType("char(36)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -773,10 +793,10 @@ namespace Infrastructure.Migrations
                         {
                             Id = new Guid("c117635d-96e0-409b-9fae-72976ec9c42a"),
                             CreatedBy = "system",
-                            DateCreated = new DateTime(2026, 7, 6, 11, 3, 59, 260, DateTimeKind.Utc).AddTicks(4160),
+                            DateCreated = new DateTime(2026, 7, 8, 13, 25, 18, 487, DateTimeKind.Utc).AddTicks(5489),
                             DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
-                            HashPassword = "AQAAAAIAAYagAAAAEEq8nioWJRX3ALiEhElFr6siecuL+XH/M1GMuLyJ2+GyJ//neNCAv8k5JsBe6PmMHw==",
+                            HashPassword = "AQAAAAIAAYagAAAAEFmzEno+8ej3IDVssOM5OKNSDHesHVxN+TJYYgHC77FDcaugc5q0LYXCAIWHzCAbAg==",
                             IsDeleted = false,
                             IsVerified = true,
                             Role = "admin",
@@ -842,10 +862,10 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("fa5d2a3a-7b76-4022-96db-5472046b673f"),
+                            Id = new Guid("6bff2f97-13ac-49f9-85fa-eeef73ff249b"),
                             Balance = 0m,
                             CreatedBy = "admin@gmail.com",
-                            DateCreated = new DateTime(2026, 7, 6, 11, 3, 59, 339, DateTimeKind.Utc).AddTicks(3619),
+                            DateCreated = new DateTime(2026, 7, 8, 13, 25, 18, 569, DateTimeKind.Utc).AddTicks(8213),
                             DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             LastPayoutDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

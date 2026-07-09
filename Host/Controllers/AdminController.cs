@@ -2,14 +2,17 @@
 using Application.Common.Pagenation;
 using Application.Queries;
 using Application.ViewModels;
+using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using MySqlX.XDevAPI.Common;
 using Web.Helpers;
 using static Application.Command.AddCategory;
 using static Application.Command.AddLibrary;
 using static Application.Command.DeleteLibrary;
 using static Application.Command.UpdateCategory;
 using static Application.Command.UpdateLibraryDetails;
+using static Application.Commands.AddSubscriptionType;
 using static Application.Commands.DeleteCategory;
 using static Application.Commands.UploadProfilePIcs;
 using static Application.Queries.GetActivityById;
@@ -32,8 +35,6 @@ using static Application.Queries.GetSubscriptionById;
 using static Application.Queries.GetSubscriptionByUserId;
 using static Application.Queries.GetSubscriptions;
 using static Application.Queries.GetTransactionById;
-using static Application.Queries.GetTransactionHistory;
-using static Application.Queries.GetTransactions;
 using static Application.Queries.GetUserDetails;
 using static Application.Queries.GetUsers;
 
@@ -224,11 +225,13 @@ namespace Host.Controllers
 
 
 
+
         [HttpDelete]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCategory(Guid id)
         {
-            var result = await mediator.Send(new DeleteCategoryCommand(id));
+            var userId = ClaimsHelper.GetUserId(User);
+            var result = await mediator.Send(new DeleteCategoryCommand(id, userId));
 
             TempData[result.Status ? "Success" : "Error"] = result.Message;
 
@@ -301,12 +304,12 @@ namespace Host.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTransactions(int page = 1, int pageSize = 10)
         {
-            var result = await mediator.Send(new GetTransactionsQuery(page, pageSize));
+            var result = await mediator.Send(new GetTransactions.GetTransactionsQuery(page, pageSize));
 
             if (!result.Status)
             {
                 TempData["Error"] = result.Message;
-                return View(result);
+                return View(result.Data);
             }
 
             return View(result.Data);
@@ -373,6 +376,45 @@ namespace Host.Controllers
             });
         }
 
+
+        [HttpPost]
+
+        public async Task<IActionResult> AddSubType(string typeName, decimal cost, BillingCycle cycle)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message =
+                    string.Join(",", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)))
+                });
+            }
+
+            var userId = ClaimsHelper.GetUserId(User);
+
+            var response = await mediator.Send(new AddSubscriptionTypeCommand(userId, typeName, cycle, cost));
+
+            if (!response.Status)
+            {
+                TempData["Error"] = response.Message;
+
+                return Json(new
+                {
+                    success = false,
+                    message = response.Message
+                });
+            }
+
+            TempData["Success"] = response.Message; 
+            return Json(new
+            {
+                success = true,
+                message = response.Message,
+                redirectUrl = Url.Action(nameof(GetSubscriptions))
+            });
+        }
+
         [HttpDelete]
         public async Task<IActionResult> DeleteLibrary(Guid id)
         {
@@ -431,7 +473,8 @@ namespace Host.Controllers
         [HttpPost]
         public async Task<IActionResult> EditCategory(Guid id, string name, string description)
         {
-            var result = await mediator.Send(new UpdateCategoryCommand(id, name, description));
+            var userId = ClaimsHelper.GetUserId(User);
+            var result = await mediator.Send(new UpdateCategoryCommand(userId, id, name, description));
 
             if (!result.Status)
             {

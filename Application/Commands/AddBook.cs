@@ -2,6 +2,7 @@
 using Application.Common.Repositories;
 using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Command
 {
@@ -38,7 +39,9 @@ namespace Application.Command
             IBookVersionRepository _bookVersionRepository,
             ILibraryRepository _libraryRepository,
             IUnitOfWork _unitOfWork,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IHttpContextAccessor httpContextAccessor,
+            IAuditLogRepository auditLogRepository
             ) : IRequestHandler<AddBookCommand, Result<string>>
         {
             public async Task<Result<string>> Handle(AddBookCommand request, CancellationToken cToken)
@@ -143,6 +146,27 @@ namespace Application.Command
                 };
 
                 await _bookRepository.AddAsync(book);
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Create",
+                    Description = $"{book.Title} was added successfully",
+                    Icon = "📖",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    UserId = user.Id,
+                    ResourceType = ResourceType.Book,
+                    ResourceId = book.Id,
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 var version = new BookVersion
                 {

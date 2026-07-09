@@ -48,7 +48,7 @@ namespace Application.Queries
                 var lastPayout = await walletTransactionRepository.GetLastPaidPayoutAsync(wallet.Id);
 
                 // --- Payout status overview (replaces old category breakdown) ---
-                //var payoutStatusOverview = await walletTransactionRepository.GetPayoutStatusOverviewAsync(wallet.Id);
+                var payoutStatusOverview = await walletTransactionRepository.GetPayoutStatusOverviewAsync(wallet.Id);
 
                 // --- Books sold this month (vs previous) ---
                 var booksSoldThisMonth = await walletTransactionRepository
@@ -111,7 +111,7 @@ namespace Application.Queries
                     BooksSoldGrowthPercent: booksSoldGrowth,
                     CurrentMonthEarnings: totalEarnings,
                     BestPerformingBook: bestBook is null ? null : new BestBookDto(bestBook.Title, 200000000),
-                    //PayoutStatusOverview: payoutStatusOverview,
+                    PayoutStatusOverview: payoutStatusOverview,
                     TopEarningBooks: topBooks.Select(b => new TopBookDto(b.Title, b.BookCoverUrl, 150000)).ToList(),
                     TrendLabels: trendLabels,
                     TrendData: trendData,
@@ -134,7 +134,7 @@ namespace Application.Queries
                 decimal BooksSoldGrowthPercent,
                 decimal CurrentMonthEarnings,
                 BestBookDto? BestPerformingBook,
-                //PayoutStatusOverviewDto PayoutStatusOverview,
+                PayoutStatusOverviewDto PayoutStatusOverview,
                 List<TopBookDto> TopEarningBooks,
                 List<string> TrendLabels,
                 List<decimal> TrendData,

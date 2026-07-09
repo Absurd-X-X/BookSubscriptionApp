@@ -1,6 +1,8 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Repositories;
+using Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Command
 {
@@ -17,7 +19,9 @@ namespace Application.Command
             IBankAccountRepository bankAccountRepository,
             IUnitOfWork unitOfWork,
             ICurrentUser currentUser,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IHttpContextAccessor httpContextAccessor,
+            IAuditLogRepository auditLogRepository
             ) : IRequestHandler<UpdateAcountCommand, Result<string>>
         {
             public async Task<Result<string>> Handle(UpdateAcountCommand request, CancellationToken cancellationToken)
@@ -40,6 +44,29 @@ namespace Application.Command
                 account.AccountName = request.AccountName;
                 account.BankName = request.BankName;
                 account.DateModified = DateTime.UtcNow;
+
+
+
+                string? ipAddress = httpContextAccessor
+                .HttpContext?
+                .Connection
+                .RemoteIpAddress?
+                .ToString();
+
+
+                var audit = new AuditLog
+                {
+                    ActionType = "Update",
+                    Description = $"Bank account was updated successfully",
+                    Icon = "✔️",
+                    IpAddress = ipAddress!,
+                    UserRole = user.Role,
+                    UserId = user.Id,
+                    ResourceType = ResourceType.System,
+                    ResourceId = account.Id,
+                };
+
+                await auditLogRepository.AddAsync(audit);
 
                 await unitOfWork.SaveAsync();
                 return Result<string>.Success("Updated", "Successfully");

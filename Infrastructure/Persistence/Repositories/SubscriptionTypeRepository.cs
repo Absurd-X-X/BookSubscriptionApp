@@ -29,5 +29,11 @@ namespace Infrastructure.Persistence.Repositories
             return await context.SubscriptionTypes
                 .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
         }
+
+        public async Task<SubscriptionType?> IsExistAsync(string typeName, BillingCycle cycle)
+        {
+            return await context.SubscriptionTypes
+                .FirstOrDefaultAsync(x => x.TypeName == typeName && x.Cycle == cycle && !x.IsDeleted);
+        }
     }
 }
