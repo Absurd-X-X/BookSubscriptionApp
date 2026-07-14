@@ -4,7 +4,7 @@
 @{
 
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    ViewBag["Title"] = "Edit Library";
+    ViewData["Title"] = "Edit Library";
 }
 <link href="~/css/addCategory.css" rel="stylesheet" />
 <div class="category-page-container">
@@ -16,7 +16,7 @@
 
         <form class="form" asp-controller="Admin" asp-action="EditLibrary" method="post">
             @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="Id" name="Id" value="@Model.Id" />
+            <input type="hidden" asp-for="Id" name="id" value="@Model.Id" />
 
             <div class="input-group">
                 <label for="Name">Library Name</label>
@@ -38,7 +38,7 @@
 
             <div class="input-group">
                 <label for="PhoneNumber">Tel </label>
-                <input type="tel" id="PhoneNumber" name="PhoneNumber"
+                <input type="tel" id="PhoneNumber" name="Phone"
                        value="@Model.PhoneNumber" required autocomplete="off"/>
             </div>
 

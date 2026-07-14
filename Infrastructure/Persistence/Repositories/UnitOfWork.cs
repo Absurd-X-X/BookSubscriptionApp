@@ -1,12 +1,16 @@
 ﻿using Application.Common.Repositories;
 using Infrastructure.Persistence.Context;
+using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 
 namespace Infrastructure.Persistence.Repositories
 {
     public class UnitOfWork(AppDbContext context) : IUnitOfWork
     {
         public async Task<int> SaveAsync()
-
-            => await context.SaveChangesAsync();
+        {
+                return await context.SaveChangesAsync();
+            
+        }
     }
 }

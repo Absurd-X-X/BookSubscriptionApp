@@ -31,6 +31,7 @@ namespace Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(c => c.UserName == userName && c.IsDeleted);
         }
 
+
         public async Task<PagenatedList<User>> GetUsersAsync(PageRequest pageRequest, bool usePaging)
         {
             var query = context.Users.Include(x => x.Wallet)
@@ -64,5 +65,10 @@ namespace Infrastructure.Persistence.Repositories
 
             => await context.Users
                 .AnyAsync(x => x.Email == email);
+
+        public void Update(User user)
+        {
+            context.Update(user);
+        }
     }
 }

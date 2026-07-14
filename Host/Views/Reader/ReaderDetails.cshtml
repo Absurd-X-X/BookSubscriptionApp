@@ -1,0 +1,1086 @@
+﻿@model Application.Queries.GetReaderDetails.GetReaderDetailsResponse
+@{
+    ViewData["Title"] = "Reader Details";
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/readerDetails.css" />
+<link href="~/css/notify.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/modal.css" rel="stylesheet" asp-append-version="true" />
+<link href="~/css/toast.css" rel="stylesheet" asp-append-version="true" />
+
+<div class="ud-wrap">
+
+    <div class="ud-breadcrumb">
+        <a href="@Url.Action("Users", "Admin")">Users</a>
+        <i class="ti ti-chevron-right"></i>
+        <span class="current">User Details</span>
+    </div>
+
+    <div class="ud-title-row">
+        <div>
+            <h1>User Details</h1>
+            <p>View and manage user information, subscription, wallet and activity.</p>
+        </div>
+        <div class="ud-title-actions">
+            <a class="ud-btn-primary" href="@Url.Action("ReaderPersonal", "Reader")" style="text-decoration: none;"><i class="ti ti-edit"></i> Edit User</a>
+        </div>
+    </div>
+
+    <!-- USER SUMMARY CARD -->
+    <div class="ud-card ud-user-summary">
+        <div class="ud-user-left">
+            @if (!string.IsNullOrEmpty(Model.Header.AvatarUrl))
+            {
+                <img src="@Model.Header.AvatarUrl" alt="@Model.Header.UserName" class="ud-avatar" />
+            }
+            else
+            {
+                <img src="https://i.pravatar.cc/64?u=@Model.Header.UserId" alt="@Model.Header.UserName" class="ud-avatar" />
+            }
+            <div>
+                <div class="ud-user-name-row">
+                    <h2>@Model.Header.UserName</h2>
+                    <span class="ud-badge role">@Model.Header.Role</span>
+                    <span class="ud-badge @(Model.Header.IsActive ? "active" : "inactive")">@(Model.Header.IsActive ? "Active" : "Inactive")</span>
+                </div>
+                <div class="ud-user-contact">@Model.Header.Email</div>
+
+                <div class="ud-meta-grid">
+                    <div class="ud-meta-item">
+                        <i class="ti ti-calendar"></i>
+                        <div><span class="ud-meta-label">Joined</span><span class="ud-meta-value">@Model.Header.JoinedDate.ToString("MMM d, yyyy")</span></div>
+                    </div>
+                    <div class="ud-meta-item">
+                        <i class="ti ti-clock"></i>
+                        <!-- MOCK: no LastActive tracking yet -->
+                        <div><span class="ud-meta-label">Last Active</span><span class="ud-meta-value">@(Model.Header.LastActive?.ToString("MMM d, yyyy h:mm tt") ?? "—")</span></div>
+                    </div>
+                    <div class="ud-meta-item">
+                        <i class="ti ti-mail"></i>
+                        <div><span class="ud-meta-label">Email Verified</span><span class="ud-meta-value @(Model.Header.IsEmailVerified ? "verified" : "")">@(Model.Header.IsEmailVerified ? "Yes" : "No")</span></div>
+                    </div>
+                    <div class="ud-meta-item">
+                        <i class="ti ti-shield"></i>
+                        <!-- MOCK: no 2FA field on User yet -->
+                        <div><span class="ud-meta-label">2FA Status</span><span class="ud-meta-value verified">@(Model.Header.TwoFactorEnabled ? "Enabled" : "Disabled")</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ud-quick-actions">
+            <div class="ud-quick-actions-label">Quick Actions</div>
+            <div class="ud-qa-grid">
+                <button class="ud-qa-btn" id="openPaymentModal"><i class="ti ti-key"></i> Reset Password</button>
+
+                <div id="paymentModal"
+                     class="modal-overlay">
+
+                    <div class="modal-content"
+                         style="--modal-width:900px;">
+
+                        <div class="modal-header">
+
+                            <h2>Change Password</h2>
+
+                            <button type="button"
+                                    id="closePaymentModal"
+                                    class="close-btn">
+
+                                &times;
+
+                            </button>
+
+                        </div>
+
+                        <form class="form" id="changePasswordForm"
+                              asp-controller="Reader"
+                              asp-action="ChangePassword"
+                              method="post">
+
+                            <div class="modal-body">
+
+                                <div class="form-group">
+
+                                    <label for="Password">
+                                        Your Initial Password
+                                    </label>
+
+                                    <div class="password-wrapper">
+
+                                        <input type="password"
+                                               id="Password"
+                                               name="initialPassword"
+                                               placeholder="Your initial password here..."
+                                               required />
+
+                                        <button type="button"
+                                                class="toggle-password-btn"
+                                                data-target="Password"
+                                                aria-label="Toggle password visibility">
+
+                                            <svg class="eyeIcon"
+                                                 viewBox="0 0 24 24"
+                                                 fill="none"
+                                                 stroke="#8A94A6"
+                                                 stroke-width="2"
+                                                 stroke-linecap="round"
+                                                 stroke-linejoin="round">
+
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+
+                                                <circle cx="12"
+                                                        cy="12"
+                                                        r="3"></circle>
+
+                                            </svg>
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+
+                                    <label for="newPassword">
+                                        Your New Password
+                                    </label>
+
+                                    <div class="password-wrapper">
+
+                                        <input type="password"
+                                               id="newPassword"
+                                               name="newPassword"
+                                               placeholder="Your new password here..."
+                                               required />
+
+                                        <button type="button"
+                                                class="toggle-password-btn"
+                                                data-target="newPassword"
+                                                aria-label="Toggle password visibility">
+
+                                            <svg class="eyeIcon"
+                                                 viewBox="0 0 24 24"
+                                                 fill="none"
+                                                 stroke="#8A94A6"
+                                                 stroke-width="2"
+                                                 stroke-linecap="round"
+                                                 stroke-linejoin="round">
+
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+
+                                                <circle cx="12"
+                                                        cy="12"
+                                                        r="3"></circle>
+
+                                            </svg>
+
+                                        </button>
+
+                                    </div>
+
+                                    <div class="pw-strength-meter" style="margin-top:8px;">
+                                        <div class="pw-strength-bar"><div id="pwStrengthFill" class="pw-strength-fill"></div></div>
+                                        <span id="pwStrengthLabel" class="ud-mock-note" style="font-style:normal;"></span>
+                                    </div>
+
+                                    <div class="field-validation-error" id="newPasswordError" style="display:none;"></div>
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label for="confirmPassword">
+                                        Confirm New Password
+                                    </label>
+
+                                    <div class="password-wrapper">
+
+                                        <input type="password"
+                                               id="confirmPassword"
+                                               name="confirmPassword"
+                                               placeholder="Confirm your new password..."
+                                               required />
+
+                                        <button type="button"
+                                                class="toggle-password-btn"
+                                                data-target="confirmPassword"
+                                                aria-label="Toggle password visibility">
+
+                                            <svg class="eyeIcon"
+                                                 viewBox="0 0 24 24"
+                                                 fill="none"
+                                                 stroke="#8A94A6"
+                                                 stroke-width="2"
+                                                 stroke-linecap="round"
+                                                 stroke-linejoin="round">
+
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+
+                                                <circle cx="12"
+                                                        cy="12"
+                                                        r="3"></circle>
+
+                                            </svg>
+
+                                        </button>
+
+                                    </div>
+
+                                    <div class="field-validation-error" id="confirmPasswordError" style="display:none;"></div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="modal-footer">
+
+                                <button type="button"
+                                        id="cancelPaymentModal"
+                                        class="btn-cancel">
+
+                                    Cancel
+
+                                </button>
+
+                                <button type="submit"
+                                        class="btn-save">
+                                    Save Password
+
+                                </button>
+
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="ud-tabs">
+        <button class="ud-tab-btn active" data-tab="overview"><i class="ti ti-layout-dashboard"></i> Overview</button>
+        <button class="ud-tab-btn" data-tab="subscription"><i class="ti ti-crown"></i> Subscription</button>
+        <button class="ud-tab-btn" data-tab="wallet"><i class="ti ti-wallet"></i> Wallet</button>
+        <button class="ud-tab-btn" data-tab="reading"><i class="ti ti-book"></i> Reading Activity</button>
+        <button class="ud-tab-btn" data-tab="permissions"><i class="ti ti-lock"></i> Permissions</button>
+        <button class="ud-tab-btn" data-tab="audit"><i class="ti ti-file-text"></i> Audit Logs</button>
+    </div>
+
+    <!--  OVERVIEW -->
+    <div class="ud-tab-panel active" data-tab-panel="overview">
+        <div class="ud-body-grid">
+            <div class="ud-main-col">
+
+                <div class="ud-stat-grid">
+                    <div class="ud-stat-card">
+                        <div class="ud-stat-icon purple"><i class="ti ti-book"></i></div>
+                        <div class="camp">
+                            <div class="ud-stat-value">@Model.Overview.BooksRead</div>
+                            <div class="ud-stat-label">Books Read</div>
+                            <div class="ud-stat-delta">vs last 30 days</div>
+                        </div>
+                    </div>
+                    <div class="ud-stat-card">
+                        <div class="ud-stat-icon blue"><i class="ti ti-flame"></i></div>
+                        <div class="camp">
+                            <div class="ud-stat-value">@Model.Overview.ReadingStreakDays</div>
+                            <div class="ud-stat-label">Day Streak</div>
+                            <div class="ud-stat-delta">current streak</div>
+                        </div>
+                    </div>
+                    <div class="ud-stat-card">
+                        <div class="ud-stat-icon green"><i class="ti ti-star"></i></div>
+                        <div class="camp">
+                            <div class="ud-stat-value">@Model.Overview.ReviewCount</div>
+                            <div class="ud-stat-label">Reviews</div>
+                            <div class="ud-stat-delta">vs last 30 days</div>
+                        </div>
+                    </div>
+                    <div class="ud-stat-card">
+                        <div class="ud-stat-icon orange"><i class="ti ti-clock"></i></div>
+                        <div class="camp">
+                            <div class="ud-stat-value">@(Model.Overview.TotalMinutesRead / 60)h @(Model.Overview.TotalMinutesRead % 60)m</div>
+                            <div class="ud-stat-label">Time Spent</div>
+                            <div class="ud-stat-delta">vs last 30 days</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ud-card">
+                    <div class="ud-sec-title">Reading Progress</div>
+                    <div class="ud-sec-sub">Breakdown of this user's book statuses.</div>
+                    @{
+                        var total = Math.Max(1, Model.Overview.ReadingProgress.Total);
+                        var completedPct = Math.Round((double)Model.Overview.ReadingProgress.Completed / total * 100);
+                        var inProgressPct = 100 - completedPct;
+                        var circumference = 251.3;
+                        var completedDash = circumference * completedPct / 100;
+                    }
+                    <div class="ud-donut-row">
+                        <svg width="110" height="110" viewBox="0 0 110 110">
+                            <circle cx="55" cy="55" r="40" fill="none" stroke="#1C2541" stroke-width="14" />
+                            <circle cx="55" cy="55" r="40" fill="none" stroke="#7c6af7" stroke-width="14"
+                                    stroke-dasharray="@completedDash.ToString("0.0") @circumference"
+                                    transform="rotate(-90 55 55)" stroke-linecap="round" />
+                        </svg>
+                        <div class="ud-donut-legend">
+                            <div class="ud-legend-item"><span class="ud-legend-dot" style="background:#7c6af7"></span> Completed <b>@completedPct%</b></div>
+                            <div class="ud-legend-item"><span class="ud-legend-dot" style="background:#1C2541"></span> In Progress <b>@inProgressPct%</b></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Trend  -->
+                <div class="ud-card">
+                    <div class="ud-sec-title">Activity Trend</div>
+                    <div class="ud-sec-sub">Mocked — no per-day reading log exists yet.</div>
+                    <svg viewBox="0 0 460 140" width="100%" height="140" preserveAspectRatio="none">
+                        <polyline fill="none" stroke="#7c6af7" stroke-width="2"
+                                  points="0,90 60,70 120,95 180,60 240,80 300,50 360,75 420,55 460,65" />
+                        <polyline fill="rgba(124,106,247,.08)" stroke="none"
+                                  points="0,90 60,70 120,95 180,60 240,80 300,50 360,75 420,55 460,65 460,140 0,140" />
+                    </svg>
+                </div>
+
+                <div class="ud-card">
+                    <div class="ud-sec-title">Recent Activity</div>
+                    @if (!Model.Overview.RecentActivity.Any())
+                    {
+                        <p class="ud-mock-note">No recent activity.</p>
+                    }
+                    else
+                    {
+                        @foreach (var a in Model.Overview.RecentActivity.
+                        Where(v => v.ActionType.ToLower() != "logged in" && 
+                        v.ActionType.ToLower() != "reset password" &&
+                        v.ActionType.ToLower() != "verify email" &&
+                        v.ActionType.ToLower() != "bank payment" &&
+                        v.ActionType.ToLower() != "vrify" &&
+                        v.ActionType.ToLower() != "resend" &&
+                        v.ActionType.ToLower() != "add new user"))
+                        {
+                            <div class="ud-activity-item">
+                                <div class="ud-activity-icon"><i class="@a.Icon"></i></div>
+                                <div>
+                                    <div class="ud-activity-title">@a.ActionType</div>
+                                    <div class="ud-activity-sub">@a.Description</div>
+                                </div>
+                                <div class="ud-activity-time">@a.Timestamp.ToString("MMM d")<br />@a.Timestamp.ToString("h:mm tt")</div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="ud-aside-col">
+                <div class="ud-card">
+                    <div class="ud-aside-title">Account Summary</div>
+                    <div class="ud-aside-row"><span class="lbl">Account Status</span><span class="val green">@(Model.Header.IsActive ? "Active" : "Inactive")</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Account Type</span><span class="val">@Model.Header.Role</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Total Books Read</span><span class="val">@Model.Overview.BooksRead</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Reading Streak</span><span class="val">@Model.Overview.ReadingStreakDays days</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Member Since</span><span class="val">@Model.Header.JoinedDate.ToString("MMM d, yyyy")</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Total Reviews</span><span class="val">@Model.Overview.ReviewCount</span></div>
+                    <button class="ud-btn-outline ud-btn-full">View Full Profile</button>
+                </div>
+
+                <div class="ud-card">
+                    <div class="ud-aside-title">Subscription Info</div>
+                    <div class="ud-aside-row"><span class="lbl">Plan</span><span class="val purple">@Model.Overview.PlanName</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Status</span><span class="val @(Model.Overview.IsSubscribed ? "green" : "")">@(Model.Overview.IsSubscribed ? "Active" : "Free")</span></div>
+                    @if (Model.Overview.SubscriptionRenewsOn.HasValue)
+                    {
+                        <div class="ud-aside-row"><span class="lbl">Renews On</span><span class="val">@Model.Overview.SubscriptionRenewsOn.Value.ToString("MMM d, yyyy")</span></div>
+                    }
+                    <button class="ud-btn-outline ud-btn-full">Manage Subscription</button>
+                </div>
+
+                <div class="ud-card">
+                    <div class="ud-aside-title">Wallet Balance</div>
+                    <div class="ud-aside-row"><span class="lbl">Current Balance</span><span class="val green">@Model.Overview.WalletBalance.ToString("C")</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Total Transactions</span><span class="val">@Model.Overview.WalletTransactionCount</span></div>
+                    <button class="ud-btn-outline ud-btn-full">View Wallet History</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUBSCRIPTION -->
+    <div class="ud-tab-panel" data-tab-panel="subscription">
+        <div class="ud-body-grid">
+            <div class="ud-main-col">
+                <div class="ud-card">
+                    <div class="ud-sec-title">Subscription Overview</div>
+                    <div class="ud-donut-row" style="align-items:center; justify-content:space-between; margin-bottom:16px;">
+                        <div>
+                            <div style="font-size:18px; font-weight:700;">@Model.Subscription.PlanName</div>
+                            <div class="ud-mock-note" style="font-style:normal;">@Model.Subscription.Cost.ToString("C") / @Model.Subscription.Cycle</div>
+                        </div>
+                        <span class="ud-pill @(Model.Subscription.IsActive ? "successful" : "pending")">@(Model.Subscription.IsActive ? "Active" : "Inactive")</span>
+                    </div>
+                    <div class="ud-meta-grid" style="margin-top:0;">
+                        <div class="ud-meta-item"><div><span class="ud-meta-label">Current Period</span><span class="ud-meta-value">@(Model.Subscription.CurrentPeriodStart?.ToString("MMM d") ?? "—") - @(Model.Subscription.CurrentPeriodEnd?.ToString("MMM d, yyyy") ?? "—")</span></div></div>
+                        <div class="ud-meta-item"><div><span class="ud-meta-label">Auto Renew</span><span class="ud-meta-value @(Model.Subscription.AutoRenew ? "verified" : "")">@(Model.Subscription.AutoRenew ? "Enabled" : "Disabled")</span></div></div>
+                    </div>
+                    <div style="display:flex; gap:8px; margin-top:16px;">
+                        <button class="ud-btn-primary">Change Plan</button>
+                        <button class="ud-btn-outline">Extend Subscription</button>
+                        <button class="ud-btn-outline" style="color:var(--red); border-color:rgba(248,113,113,.3);">Cancel Subscription</button>
+                    </div>
+                </div>
+
+                <!-- subscription-event history entity exists yet -->
+                <div class="ud-card">
+                    <div class="ud-sec-title">Subscription Timeline</div>
+                    <div class="ud-timeline">
+                        <div class="ud-timeline-item">
+                            <div class="ud-timeline-dot done"></div>
+                            <div class="ud-timeline-body">
+                                <div class="ud-timeline-date">@(Model.Subscription.CurrentPeriodStart?.ToString("MMM d, yyyy") ?? "—")</div>
+                                <div class="ud-timeline-title">Subscription Renewed</div>
+                                <div class="ud-mock-note">Next renewal on @(Model.Subscription.CurrentPeriodEnd?.ToString("MMM d, yyyy") ?? "—")</div>
+                            </div>
+                            <div class="ud-timeline-amt">+@Model.Subscription.Cost.ToString("C")</div>
+                        </div>
+                        <div class="ud-timeline-item">
+                            <div class="ud-timeline-dot"></div>
+                            <div class="ud-timeline-body">
+                                <div class="ud-timeline-date">@(Model.Subscription.PurchasedOn?.ToString("MMM d, yyyy") ?? "—")</div>
+                                <div class="ud-timeline-title">Subscription Started</div>
+                                <div class="ud-mock-note">Initial subscription</div>
+                            </div>
+                            <div class="ud-timeline-amt">+@Model.Subscription.Cost.ToString("C")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MOCK: no invoice/payment entity exists yet -->
+                <div class="ud-card">
+                    <div class="ud-sec-title">Payment History</div>
+                    <table class="ud-table">
+                        <thead>
+                            <tr><th>Date</th><th>Invoice ID</th><th>Amount</th><th>Status</th><th>Payment Method</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>@(Model.Subscription.CurrentPeriodStart?.ToString("MMM d, yyyy") ?? "—")</td>
+                                <td>INV-MOCK-0001</td>
+                                <td>@Model.Subscription.Cost.ToString("C")</td>
+                                <td><span class="ud-pill paid">Paid</span></td>
+                                <td>—</td>
+                                <td><i class="ti ti-download" style="color:var(--text-muted)"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="ud-mock-note">Mocked row — no invoice entity exists yet to list real payment history.</p>
+                </div>
+            </div>
+
+            <div class="ud-aside-col">
+                <div class="ud-card">
+                    <div class="ud-aside-title">Subscription Details</div>
+                    <div class="ud-aside-row"><span class="lbl">Plan Name</span><span class="val">@Model.Subscription.PlanName</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Billing Cycle</span><span class="val">@Model.Subscription.Cycle</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Price</span><span class="val">@Model.Subscription.Cost.ToString("C")</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Payment Method</span><span class="val">—</span></div> <!-- MOCK -->
+                    <div class="ud-aside-row"><span class="lbl">Purchased On</span><span class="val">@(Model.Subscription.PurchasedOn?.ToString("MMM d, yyyy") ?? "—")</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Last Payment</span><span class="val">@(Model.Subscription.CurrentPeriodStart?.ToString("MMM d, yyyy") ?? "—")</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Next Payment</span><span class="val">@(Model.Subscription.CurrentPeriodEnd?.ToString("MMM d, yyyy") ?? "—")</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Status</span><span class="val @(Model.Subscription.IsActive ? "green" : "")">@(Model.Subscription.IsActive ? "Active" : "Inactive")</span></div>
+                    <button class="ud-btn-outline ud-btn-full">View All Invoices</button>
+                </div>
+
+                <!-- MOCK: benefits are plan-static, not stored per subscription -->
+                <div class="ud-card">
+                    <div class="ud-aside-title">Subscription Benefits</div>
+                    <ul class="ud-benefit-list">
+                        <li><i class="ti ti-check"></i> Unlimited access to all books</li>
+                        <li><i class="ti ti-check"></i> Offline reading</li>
+                        <li><i class="ti ti-check"></i> Early access to new releases</li>
+                        <li><i class="ti ti-check"></i> Ad-free experience</li>
+                        <li><i class="ti ti-check"></i> Priority customer support</li>
+                    </ul>
+                </div>
+
+                <div class="ud-card">
+                    <div class="ud-aside-title">Admin Actions</div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="ud-qa-btn"><i class="ti ti-refresh"></i> Manual Renewal</button>
+                        <button class="ud-qa-btn warn"><i class="ti ti-receipt-refund"></i> Refund</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WALLET  -->
+    <div class="ud-tab-panel" data-tab-panel="wallet">
+        <div class="ud-body-grid">
+            <div class="ud-main-col">
+                <div class="ud-stat-grid">
+                    <div class="ud-stat-card">
+                        <div class="ud-stat-icon purple"><i class="ti ti-wallet"></i></div>
+                        <div class="ud-stat-value">@Model.Wallet.CurrentBalance.ToString("C")</div>
+                        <div class="ud-stat-label">Current Balance</div>
+                    </div>
+                    <div class="ud-stat-card">
+                        <div class="ud-stat-icon blue"><i class="ti ti-arrow-down"></i></div>
+                        <div class="ud-stat-value">@Model.Wallet.TotalAdded.ToString("C")</div>
+                        <div class="ud-stat-label">Total Added</div>
+                    </div>
+                    <div class="ud-stat-card">
+                        <div class="ud-stat-icon green"><i class="ti ti-arrow-up"></i></div>
+                        <div class="ud-stat-value">@Model.Wallet.TotalSpent.ToString("C")</div>
+                        <div class="ud-stat-label">Total Spent</div>
+                    </div>
+                    <div class="ud-stat-card">
+                        <div class="ud-stat-icon orange"><i class="ti ti-arrows-exchange"></i></div>
+                        <div class="ud-stat-value">@Model.Wallet.TotalTransactions</div>
+                        <div class="ud-stat-label">Total Transactions</div>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:8px;">
+                    <button type="button" class="ud-btn-primary" id="openFundWalletTop"><i class="ti ti-plus"></i> Add Money</button>
+                    <button class="ud-btn-outline">Deduct Funds</button>
+                    <button class="ud-btn-outline">Transfer</button>
+                </div>
+
+                <div class="ud-card">
+                    <div class="ud-sec-title">Transaction History</div>
+                    @if (!Model.Wallet.RecentTransactions.Any())
+                    {
+                        <p class="ud-mock-note">No transactions yet.</p>
+                    }
+                    else
+                    {
+                        <table class="ud-table">
+                            <thead>
+                                <tr><th>Date & Time</th><th>Transaction ID</th><th>Type</th><th>Description</th><th>Amount</th><th>Status</th><th>Balance</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var t in Model.Wallet.RecentTransactions)
+                                {
+                                    <tr>
+                                        <td>@t.DateCreated.ToString("MMM d, yyyy")<br /><span class="ud-mock-note">@t.DateCreated.ToString("h:mm tt")</span></td>
+                                        <td>@t.Id.ToString().Substring(0, 8).ToUpper()</td>
+                                        <td><span class="ud-pill @t.Type.ToLower()">@t.Type</span></td>
+                                        <td>@t.Description</td>
+                                        <td>@t.Amount.ToString("C")</td>
+                                        <td><span class="ud-pill @t.Status.ToLower()">@t.Status</span></td>
+                                        <td>@t.BalanceAfter.ToString("C")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="ud-pagination">
+                            <span class="ud-mock-note">Showing 1 to @Model.Wallet.RecentTransactions.Count of @Model.Wallet.TransactionTotalCount transactions</span>
+                            <div class="ud-pagination-btns">
+                                <button class="ud-page-btn" disabled><i class="ti ti-chevron-left"></i></button>
+                                <button class="ud-page-btn active">1</button>
+                                <button class="ud-page-btn"><i class="ti ti-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="ud-aside-col">
+                <div class="ud-card">
+                    <div class="ud-aside-title">Wallet Summary</div>
+                    <div class="ud-aside-row"><span class="lbl">Current Balance</span><span class="val green">@Model.Wallet.CurrentBalance.ToString("C")</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Pending Amount</span><span class="val">$0.00</span></div> <!-- MOCK -->
+                    <div class="ud-aside-row"><span class="lbl">Total Transactions</span><span class="val">@Model.Wallet.TotalTransactions</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Wallet Status</span><span class="val green">Active</span></div>
+                    <button class="ud-btn-outline ud-btn-full">View Wallet Statement</button>
+                </div>
+
+                <!-- MOCK: no payment-method entity exists yet -->
+                <div class="ud-card">
+                    <div class="ud-aside-title">Top-up Methods</div>
+                    <div class="ud-topup-row">
+                        <div class="ud-topup-icon"><i class="ti ti-credit-card"></i></div>
+                        <div>
+                            <div style="font-size:12.5px; font-weight:600;">Paystack •••• 4242</div>
+                            <div class="ud-mock-note" style="font-style:normal;">Default</div>
+                        </div>
+                    </div>
+                    <button class="ud-btn-outline ud-btn-full"><i class="ti ti-plus"></i> Add Top-up Method</button>
+                </div>
+
+                <!-- MOCK: no low-balance-alert / threshold field exists yet -->
+                <div class="ud-card">
+                    <div class="ud-aside-title">Wallet Settings</div>
+                    <div class="ud-aside-row"><span class="lbl">Low Balance Alert</span><span class="val green">Enabled</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Alert Threshold</span><span class="val">$10.00</span></div>
+                    <button class="ud-btn-outline ud-btn-full">Edit Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  READING ACTIVITY  -->
+    <div class="ud-tab-panel" data-tab-panel="reading">
+        <div class="ud-body-grid">
+            <div class="ud-main-col">
+                <div class="ud-stat-grid">
+                    <div class="ud-stat-card">
+                        <div class="ud-stat-icon purple"><i class="ti ti-books"></i></div>
+                        <div class="ud-stat-value">@Model.ReadingActivity.BooksStarted</div>
+                        <div class="ud-stat-label">Books Started</div>
+                    </div>
+                    <div class="ud-stat-card">
+                        <div class="ud-stat-icon green"><i class="ti ti-circle-check"></i></div>
+                        <div class="ud-stat-value">@Model.ReadingActivity.BooksCompleted</div>
+                        <div class="ud-stat-label">Books Completed</div>
+                    </div>
+                    <div class="ud-stat-card">
+                        <div class="ud-stat-icon blue"><i class="ti ti-bookmark"></i></div>
+                        <div class="ud-stat-value">@Model.ReadingActivity.CurrentlyReading</div>
+                        <div class="ud-stat-label">Currently Reading</div>
+                    </div>
+                    <div class="ud-stat-card">
+                        <div class="ud-stat-icon orange"><i class="ti ti-flame"></i></div>
+                        <div class="ud-stat-value">@Model.ReadingActivity.ReadingStreakDays</div>
+                        <div class="ud-stat-label">Reading Streak</div>
+                    </div>
+                </div>
+
+                <div class="ud-card">
+                    <div class="ud-sec-title">Reading Logs</div>
+                    @if (!Model.ReadingActivity.ReadingLogs.Any())
+                    {
+                        <p class="ud-mock-note">No reading logs yet.</p>
+                    }
+                    else
+                    {
+                        <table class="ud-table">
+                            <thead>
+                                <tr><th>Date & Time</th><th>Book</th><th>Action</th><th>Progress</th><th>Duration</th><th>Status</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var log in Model.ReadingActivity.ReadingLogs)
+                                {
+                                    <tr>
+                                        <td>@(log.LastReadDate?.ToString("MMM d, yyyy") ?? "—")<br /><span class="ud-mock-note">@(log.LastReadDate?.ToString("h:mm tt") ?? "")</span></td>
+                                        <td>@log.Title<br /><span class="ud-mock-note">@log.Author</span></td>
+                                        <td><span class="ud-pill @(log.IsCompleted ? "completed" : "pending")">@(log.IsCompleted ? "Completed" : "Continued")</span></td>
+                                        <td>@log.ProgressPercentage.ToString("0")%</td>
+                                        <td>@log.TotalMinutesRead min</td>
+                                        <td><span class="ud-pill @(log.IsCompleted ? "completed" : "pending")">@(log.IsCompleted ? "Finished" : "Active")</span></td>
+                                        <td><i class="ti ti-eye" style="color:var(--text-muted)"></i></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="ud-pagination">
+                            <span class="ud-mock-note">Showing 1 to @Model.ReadingActivity.ReadingLogs.Count logs</span>
+                            <div class="ud-pagination-btns">
+                                <button class="ud-page-btn" disabled><i class="ti ti-chevron-left"></i></button>
+                                <button class="ud-page-btn active">1</button>
+                                <button class="ud-page-btn"><i class="ti ti-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="ud-aside-col">
+                <div class="ud-card">
+                    <div class="ud-aside-title">Reading Summary</div>
+                    <div class="ud-aside-row"><span class="lbl">Total Books Read</span><span class="val">@Model.ReadingActivity.BooksCompleted</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Total Reading Hours</span><span class="val">@((Model.ReadingActivity.ReadingLogs.Sum(x => x.TotalMinutesRead)) / 60)h @((Model.ReadingActivity.ReadingLogs.Sum(x => x.TotalMinutesRead)) % 60)m</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Average Session Time</span><span class="val">—</span></div> <!-- MOCK: no per-session log -->
+                    <div class="ud-aside-row"><span class="lbl">Longest Session</span><span class="val">—</span></div> <!-- MOCK -->
+                    <div class="ud-aside-row"><span class="lbl">Reading Streak</span><span class="val">@Model.ReadingActivity.ReadingStreakDays days</span></div>
+                    <button class="ud-btn-outline ud-btn-full">View Full Reading Insights</button>
+                </div>
+
+                <div class="ud-card">
+                    <div class="ud-aside-title">Current Book</div>
+                    @if (Model.ReadingActivity.CurrentBook is null)
+                    {
+                        <p class="ud-mock-note">No book currently in progress.</p>
+                    }
+                    else
+                    {
+                        <div class="ud-current-book">
+                            @if (!string.IsNullOrEmpty(Model.ReadingActivity.CurrentBook.BookCoverUrl))
+                            {
+                                <img src="@Model.ReadingActivity.CurrentBook.BookCoverUrl" alt="@Model.ReadingActivity.CurrentBook.Title" />
+                            }
+                            <div>
+                                <div style="font-weight:600; font-size:13px;">@Model.ReadingActivity.CurrentBook.Title</div>
+                                <div class="ud-mock-note" style="font-style:normal;">@Model.ReadingActivity.CurrentBook.Author</div>
+                                <div style="font-size:12px; margin-top:4px;">@Model.ReadingActivity.CurrentBook.ProgressPercentage.ToString("0")% complete</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:8px; margin-top:12px;">
+                            <button class="ud-btn-primary" style="flex:1;">Resume Reading</button>
+                            <button class="ud-btn-outline" style="flex:1;">View Book Details</button>
+                        </div>
+                    }
+                </div>
+
+                <!-- MOCK: no per-reader preferences entity exists yet -->
+                <div class="ud-card">
+                    <div class="ud-aside-title">Reading Preferences</div>
+                    <div class="ud-aside-row"><span class="lbl">Preferred Genre</span><span class="val">—</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Daily Reading Goal</span><span class="val">—</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Reminder</span><span class="val">—</span></div>
+                    <button class="ud-btn-outline ud-btn-full">Edit Preferences</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ PERMISSIONS (fully mocked, static) ═══════════ -->
+    <div class="ud-tab-panel" data-tab-panel="permissions">
+        <div class="ud-body-grid">
+            <div class="ud-main-col">
+                <div class="ud-card">
+                    <div class="ud-sec-title">Permissions Management</div>
+                    <div class="ud-sec-sub">Manage user role and assign specific permissions. Mocked — no permissions data available yet.</div>
+
+                    <div class="ud-perm-role-row">
+                        <select class="ud-perm-select">
+                            <option>Reader — System Role</option>
+                        </select>
+                        <button class="ud-btn-outline">Manage Overrides (2)</button>
+                    </div>
+
+                    <div class="ud-perm-table-wrap">
+                        <div class="ud-perm-group-head">Books & Library</div>
+                        <div class="ud-perm-row">
+                            <div class="perm-name">View books<span class="perm-sub">Can view and search books</span></div>
+                            <div class="ud-perm-check"><i class="ti ti-check" style="color:var(--green)"></i></div>
+                        </div>
+                        <div class="ud-perm-row">
+                            <div class="perm-name">Read books<span class="perm-sub">Can read online books</span></div>
+                            <div class="ud-perm-check"><i class="ti ti-check" style="color:var(--green)"></i></div>
+                        </div>
+                        <div class="ud-perm-row">
+                            <div class="perm-name">Download books<span class="perm-sub">Can download books for offline reading</span></div>
+                            <div class="ud-perm-check"><i class="ti ti-x" style="color:var(--red)"></i></div>
+                        </div>
+                        <div class="ud-perm-group-head">Reading & Progress</div>
+                        <div class="ud-perm-row">
+                            <div class="perm-name">Manage reading progress<span class="perm-sub">Can track and manage reading progress</span></div>
+                            <div class="ud-perm-check"><i class="ti ti-check" style="color:var(--green)"></i></div>
+                        </div>
+                        <div class="ud-perm-row">
+                            <div class="perm-name">Add to collection<span class="perm-sub">Can add books to personal collection</span></div>
+                            <div class="ud-perm-check"><i class="ti ti-check" style="color:var(--green)"></i></div>
+                        </div>
+                        <div class="ud-perm-row">
+                            <div class="perm-name">Add reviews<span class="perm-sub">Can write and submit book reviews</span></div>
+                            <div class="ud-perm-check"><i class="ti ti-check" style="color:var(--green)"></i></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ud-aside-col">
+                <div class="ud-card">
+                    <div class="ud-aside-title">Role Summary</div>
+                    <div class="ud-aside-row"><span class="lbl">Current Role</span><span class="val purple">Reader</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Role Type</span><span class="val">System Role</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Assigned On</span><span class="val">May 10, 2025</span></div>
+                    <div class="ud-aside-row"><span class="lbl">Assigned By</span><span class="val">Admin User</span></div>
+                    <button class="ud-btn-outline ud-btn-full">Change Role</button>
+                </div>
+
+                <div class="ud-card">
+                    <div class="ud-aside-title">Permissions Overview</div>
+                    <div class="ud-donut-row">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="36" fill="none" stroke="#1C2541" stroke-width="12" />
+                            <circle cx="50" cy="50" r="36" fill="none" stroke="#22c55e" stroke-width="12" stroke-dasharray="169.6 226.2" transform="rotate(-90 50 50)" />
+                            <circle cx="50" cy="50" r="36" fill="none" stroke="#f0a824" stroke-width="12" stroke-dasharray="24.9 226.2" stroke-dashoffset="-169.6" transform="rotate(-90 50 50)" />
+                            <circle cx="50" cy="50" r="36" fill="none" stroke="#f87171" stroke-width="12" stroke-dasharray="31.7 226.2" stroke-dashoffset="-194.5" transform="rotate(-90 50 50)" />
+                            <text x="50" y="46" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">28</text>
+                            <text x="50" y="60" text-anchor="middle" font-size="8" fill="#8888a8">Total</text>
+                        </svg>
+                        <div class="ud-donut-legend">
+                            <div class="ud-legend-item"><span class="ud-legend-dot" style="background:#22c55e"></span> Full Access <b>21 (75%)</b></div>
+                            <div class="ud-legend-item"><span class="ud-legend-dot" style="background:#f0a824"></span> Partial Access <b>3 (11%)</b></div>
+                            <div class="ud-legend-item"><span class="ud-legend-dot" style="background:#f87171"></span> No Access <b>4 (14%)</b></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ud-card">
+                    <div class="ud-aside-title">Recent Permission Changes</div>
+                    <div class="ud-aside-row" style="align-items:flex-start;">
+                        <div><span class="val green">Enabled</span><br /><span class="ud-mock-note" style="font-style:normal;">Download books</span></div>
+                        <span class="ud-mock-note">Jun 7, 2025</span>
+                    </div>
+                    <div class="ud-aside-row" style="align-items:flex-start;">
+                        <div><span class="val" style="color:var(--orange)">Limited</span><br /><span class="ud-mock-note" style="font-style:normal;">Manage comments</span></div>
+                        <span class="ud-mock-note">Jun 5, 2025</span>
+                    </div>
+                    <div class="ud-aside-row" style="align-items:flex-start;">
+                        <div><span class="val" style="color:var(--red)">Disabled</span><br /><span class="ud-mock-note" style="font-style:normal;">Delete reviews</span></div>
+                        <span class="ud-mock-note">Jun 3, 2025</span>
+                    </div>
+                    <button class="ud-btn-outline ud-btn-full">View All Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ AUDIT LOGS ═══════════ -->
+    <div class="ud-tab-panel" data-tab-panel="audit">
+        <div class="ud-card">
+            <div class="ud-sec-title">Audit Logs</div>
+            <div class="ud-sec-sub">@Model.AuditLogs.TotalCount total log entries.</div>
+            @if (!Model.AuditLogs.Logs.Any())
+            {
+                <p class="ud-mock-note">No audit log entries.</p>
+            }
+            else
+            {
+                @foreach (var log in Model.AuditLogs.Logs)
+                {
+                    <div class="ud-activity-item">
+                        <div class="ud-activity-icon"><i class="@log.Icon"></i></div>
+                        <div>
+                            <div class="ud-activity-title">@log.ActionType</div>
+                            <div class="ud-activity-sub">@log.Description</div>
+                        </div>
+                        <div class="ud-activity-time">@log.Timestamp.ToString("MMM d, yyyy")<br />@log.Timestamp.ToString("h:mm tt")</div>
+                    </div>
+                }
+                <div class="ud-pagination">
+                    <span class="ud-mock-note">Showing @Model.AuditLogs.Logs.Count of @Model.AuditLogs.TotalCount entries</span>
+                    <div class="ud-pagination-btns">
+                        <button class="ud-page-btn" disabled><i class="ti ti-chevron-left"></i></button>
+                        <button class="ud-page-btn active">1</button>
+                        <button class="ud-page-btn"><i class="ti ti-chevron-right"></i></button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <script src="~/js/myJsFile.js"></script>
+    <script src="~/js/modal.js"></script>
+    <script src="~/js/toast.js"></script>
+</div>
+
+<script>
+    (function () {
+        'use strict';
+
+        // ── TAB SWITCHING ──
+        var tabBtns = document.querySelectorAll('.ud-tab-btn');
+        var tabPanels = document.querySelectorAll('.ud-tab-panel');
+
+        tabBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var target = btn.getAttribute('data-tab');
+
+                tabBtns.forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+
+                tabPanels.forEach(function (panel) {
+                    panel.classList.toggle('active', panel.getAttribute('data-tab-panel') === target);
+                });
+            });
+        });
+    })();
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ── PASSWORD VISIBILITY TOGGLE (handles all three fields in the Change Password modal) ──
+        var toggleButtons = document.querySelectorAll('.toggle-password-btn');
+
+        toggleButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var targetId = btn.getAttribute('data-target');
+                var input = document.getElementById(targetId);
+                var icon = btn.querySelector('.eyeIcon');
+
+                if (!input || !icon) return;
+
+                var isPassword = input.getAttribute('type') === 'password';
+                input.setAttribute('type', isPassword ? 'text' : 'password');
+
+                if (isPassword) {
+                    icon.innerHTML =
+                        '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>' +
+                        '<line x1="1" y1="1" x2="23" y2="23"></line>';
+                } else {
+                    icon.innerHTML =
+                        '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>' +
+                        '<circle cx="12" cy="12" r="3"></circle>';
+                }
+            });
+        });
+
+        // ── STRONG PASSWORD + CONFIRM MATCH VALIDATION ──
+        var form = document.getElementById('changePasswordForm');
+        if (!form) return;
+
+        var newPasswordInput = document.getElementById('newPassword');
+        var confirmPasswordInput = document.getElementById('confirmPassword');
+        var initialPasswordInput = document.getElementById('Password');
+
+        var newPasswordError = document.getElementById('newPasswordError');
+        var confirmPasswordError = document.getElementById('confirmPasswordError');
+
+        var strengthFill = document.getElementById('pwStrengthFill');
+        var strengthLabel = document.getElementById('pwStrengthLabel');
+
+        var MIN_LENGTH = 8;
+
+        function checkPasswordRules(pw) {
+            return {
+                length: pw.length >= MIN_LENGTH,
+                upper: /[A-Z]/.test(pw),
+                lower: /[a-z]/.test(pw),
+                number: /[0-9]/.test(pw),
+                special: /[^A-Za-z0-9]/.test(pw)
+            };
+        }
+
+        function getStrengthScore(rules) {
+            var score = 0;
+            for (var key in rules) {
+                if (rules[key]) score++;
+            }
+            return score; // 0–5
+        }
+
+        function updateStrengthMeter(pw) {
+            if (!strengthFill || !strengthLabel) return;
+
+            if (!pw) {
+                strengthFill.style.width = '0%';
+                strengthFill.className = 'pw-strength-fill';
+                strengthLabel.textContent = '';
+                return;
+            }
+
+            var rules = checkPasswordRules(pw);
+            var score = getStrengthScore(rules);
+
+            var pct = (score / 5) * 100;
+            strengthFill.style.width = pct + '%';
+
+            var tier, label;
+            if (score <= 2) { tier = 'weak'; label = 'Weak'; }
+            else if (score === 3) { tier = 'fair'; label = 'Fair'; }
+            else if (score === 4) { tier = 'good'; label = 'Good'; }
+            else { tier = 'strong'; label = 'Strong'; }
+
+            strengthFill.className = 'pw-strength-fill ' + tier;
+            strengthLabel.textContent = label;
+        }
+
+        function showError(el, message) {
+            if (!el) return;
+            el.textContent = message;
+            el.style.display = 'block';
+        }
+
+        function clearError(el) {
+            if (!el) return;
+            el.textContent = '';
+            el.style.display = 'none';
+        }
+
+        function validateNewPassword() {
+            var pw = newPasswordInput.value;
+            var rules = checkPasswordRules(pw);
+
+            if (!pw) {
+                showError(newPasswordError, 'New password is required.');
+                return false;
+            }
+            if (!rules.length) {
+                showError(newPasswordError, 'Password must be at least ' + MIN_LENGTH + ' characters.');
+                return false;
+            }
+            if (!rules.upper) {
+                showError(newPasswordError, 'Password must include an uppercase letter.');
+                return false;
+            }
+            if (!rules.lower) {
+                showError(newPasswordError, 'Password must include a lowercase letter.');
+                return false;
+            }
+            if (!rules.number) {
+                showError(newPasswordError, 'Password must include a number.');
+                return false;
+            }
+            if (!rules.special) {
+                showError(newPasswordError, 'Password must include a special character.');
+                return false;
+            }
+            if (initialPasswordInput && pw === initialPasswordInput.value) {
+                showError(newPasswordError, 'New password must be different from your current password.');
+                return false;
+            }
+
+            clearError(newPasswordError);
+            return true;
+        }
+
+        function validateConfirmPassword() {
+            if (!confirmPasswordInput.value) {
+                showError(confirmPasswordError, 'Please confirm your new password.');
+                return false;
+            }
+            if (confirmPasswordInput.value !== newPasswordInput.value) {
+                showError(confirmPasswordError, 'Passwords do not match.');
+                return false;
+            }
+
+            clearError(confirmPasswordError);
+            return true;
+        }
+
+        newPasswordInput.addEventListener('input', function () {
+            updateStrengthMeter(newPasswordInput.value);
+            validateNewPassword();
+            if (confirmPasswordInput.value) validateConfirmPassword();
+        });
+
+        confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+
+        form.addEventListener('submit', function (e) {
+            var isNewValid = validateNewPassword();
+            var isConfirmValid = validateConfirmPassword();
+
+            if (!isNewValid || !isConfirmValid) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    (function () {
+    'use strict';
+
+    var postUrl = '@Url.Action("Fund", "Reader")';
+    var tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+    var token = tokenInput ? tokenInput.value : '';
+
+    function openFundWalletModal() {
+    Modal.showFundWallet({ postUrl: postUrl, antiForgeryToken: token });
+    }
+
+    var topBtn = document.getElementById('openFundWalletTop');
+    var tileBtn = document.getElementById('openFundWalletTile');
+
+    if (topBtn) topBtn.addEventListener('click', openFundWalletModal);
+    if (tileBtn) tileBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    openFundWalletModal();
+    });
+    })();
+</script>

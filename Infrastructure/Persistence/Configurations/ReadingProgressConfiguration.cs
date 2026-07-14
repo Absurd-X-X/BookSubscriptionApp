@@ -10,21 +10,25 @@ namespace Infrastructure.Persistence.Configurations
         {
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Percentage)
+            builder.Property(x => x.ProgressPercentage)
                 .IsRequired().
                 HasMaxLength(100);
 
 
-            builder.Property(x => x.CurrentLocation)
+            builder.Property(x => x.CurrentChapter)
                 .IsRequired().
                 HasMaxLength(20);
+
+
+            builder.Property(x => x.CurrentPage)
+                .IsRequired();
 
 
             builder.Property(x => x.IsCompleted)
                 .HasMaxLength(50);
 
 
-            builder.Property(x => x.LastReadAt)
+            builder.Property(x => x.LastReadDate)
                 .IsRequired()
                 .HasMaxLength(100);
 

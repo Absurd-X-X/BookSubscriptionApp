@@ -12,6 +12,9 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <link rel="stylesheet" href="~/css/libraryLayout.css" asp-append-version="true" />
+    <link href="~/css/toast.css" rel="stylesheet" />
+    <link href="~/css/notify.css" rel="stylesheet" />
+    <link href="~/css/modal.css" rel="stylesheet" />
 </head>
 <body>
     <div class="container">
@@ -21,8 +24,8 @@
                     <img src="~/lib/images/mypics.jpg" alt="Alternate Text" />
                 </div>
                 <div class="contains-name">
-                    <p style="font-size: 14px; font-weight: 400;">Unilag Library</p>
-                    <small style="font-size: 11px; font-weight: 300; color : #cccecf">Library Admin </small>
+                    <p style="font-size: 14px; font-weight: 400;">Library Admin</p>
+                    <small style="font-size: 11px; font-weight: 300; color : #cccecf">Administrator </small>
                 </div>
 
                 <div class="chevron" onclick="toggleProfileMenu(event)">
@@ -85,8 +88,8 @@
                     <img src="~/lib/images/report.png" alt="">ACTIVITY
                 </a>
 
-                <a href="@Url.Action("Index", "Wallet")"
-                   class="nav-item @(controller == "Wallet" && action == "Index" ? "active" : "")">
+                <a href="@Url.Action("GetWallet", "Library")"
+                   class="nav-item @(controller == "Library" && action == "GetWallet" ? "active" : "")">
                     <img src="~/lib/images/pay.png" alt="">WALLET
                 </a>
 
@@ -158,6 +161,9 @@
         <main class="main">
             @RenderBody()
         </main>
+        <script src="~/js/myJsFile.js"></script>
+        <script src="~/js/toast.js"></script>
+        <script src="~/js/modal.js"></script>
     </div>
 
     <script>
@@ -200,5 +206,29 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    @if (TempData["Success"] != null)
+    {
+        <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    Toast.show("success", {
+                        title: "Success",
+                        message: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"]))
+                    });
+                });
+        </script>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    Toast.show("error", {
+                        title: "Error",
+                        message: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"]))
+                    });
+                });
+        </script>
+    }
 </body>
 </html>

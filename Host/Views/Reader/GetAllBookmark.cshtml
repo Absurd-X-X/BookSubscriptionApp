@@ -1,0 +1,215 @@
+﻿@using Application.Common.Pagenation
+@using Application.Queries
+@model PagenatedList<GetAllPagenatedBookmarks.GetAllPagenatedBookmarksResponse>
+@{
+    ViewData["Title"] = "All Bookmarks";
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+
+    var search = Context.Request.Query["search"].ToString();
+    var sortBy = Context.Request.Query["sortBy"].ToString();
+    if (string.IsNullOrEmpty(sortBy)) sortBy = "recent";
+
+    int totalPages = (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize);
+    if (totalPages < 1) totalPages = 1;
+
+    string? PageUrl(int targetPage) => Url.Action("BookmarksAll", "Reader", new
+    {
+        page = targetPage,
+        pageSize = Model.PageSize,
+        search,
+        sortBy
+    });
+}
+<link href="~/css/readerBookmarks.css" rel="stylesheet" />
+
+<div class="bkm-header">
+    <i class="ti ti-bookmark-filled bkm-header-icon"></i>
+    <h1>All Bookmarks</h1>
+</div>
+<p class="bkm-sub">Important pages and passages you've saved.</p>
+<p class="bkm-count">@Model.TotalCount bookmarks</p>
+
+<form method="get" asp-action="BookmarksAll" asp-controller="Reader" class="bkm-toolbar">
+    <div class="bkm-search-box">
+        <input type="text" name="search" value="@search" placeholder="Search bookmarks..." />
+        <button type="submit" class="bkm-search-btn"><i class="ti ti-search"></i></button>
+    </div>
+
+    <select class="bkm-select" disabled title="Not wired yet">
+        <option>All Books</option>
+    </select>
+
+    <select class="bkm-select" disabled title="Not wired yet">
+        <option>All Notes</option>
+    </select>
+
+    <select name="sortBy" class="bkm-select" onchange="this.form.submit()">
+        <option value="recent" selected="@(sortBy == "recent")">Date Added (Newest)</option>
+        <option value="title" selected="@(sortBy == "title")">Book Title (A–Z)</option>
+        <option value="page" selected="@(sortBy == "page")">Page Number</option>
+    </select>
+
+    <input type="hidden" name="page" value="1" />
+    <input type="hidden" name="pageSize" value="@Model.PageSize" />
+
+    <div class="bkm-view-toggle">
+        <button type="button" class="view-btn active" data-view="list"><i class="ti ti-list"></i></button>
+        <button type="button" class="view-btn" data-view="grid"><i class="ti ti-layout-grid"></i></button>
+    </div>
+
+    @* Export — no backend implemented yet *@
+    <button type="button" class="btn-export" title="Not wired yet"><i class="ti ti-upload"></i> Export</button>
+</form>
+
+<div class="bkm-table-wrap">
+    <table class="bkm-table">
+        <thead>
+            <tr>
+                <th>Book</th>
+                <th>Page</th>
+                <th>Highlight / Passage</th>
+                <th>Note</th>
+                <th>Date Added</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Items.Any())
+            {
+                <tr><td colspan="6" class="bkm-empty">No bookmarks match your search.</td></tr>
+            }
+            else
+            {
+                @foreach (var b in Model.Items)
+                {
+                    <tr data-bookmark-id="@b.BookmarkId">
+                        <td>
+                            <div class="bkm-book-cell">
+                                <img class="bkm-book-thumb" src="@b.BookCoverUrl" alt="@b.BookTitle cover" />
+                                <div>
+                                    <div class="bkm-book-name">@b.BookTitle</div>
+                                    <div class="bkm-book-author">@b.BookAuthor</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="bkm-page-pill"><i class="ti ti-bookmark-filled"></i> Page @b.PageNumber</div>
+                        </td>
+                        <td>
+                            <div class="bkm-quote">"@b.Quote"</div>
+                        </td>
+                        <td><span class="bkm-note-tag" data-note-text>@b.Note</span></td>
+                        <td><div class="bkm-date">@b.DateAdded.ToString("MMM d, yyyy")<br>@b.DateAdded.ToString("h:mm tt")</div></td>
+                        <td>
+                            <div class="bkm-actions">
+                                <a href="/Reader/BookDetails/@b.BookId" class="bkm-action-btn" title="Open"><i class="ti ti-external-link"></i></a>
+                                <button type="button" class="bkm-action-btn" data-edit-note title="Edit"><i class="ti ti-pencil"></i></button>
+                                <button type="button" class="bkm-action-btn danger" data-remove-bookmark title="Delete"><i class="ti ti-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="bkm-pagination">
+    <span>
+        Showing @(((Model.Page - 1) * Model.PageSize) + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalCount) of @Model.TotalCount bookmarks
+    </span>
+    <div class="bkm-page-controls">
+        <a class="@(Model.Page <= 1 ? "disabled" : "")" href="@(Model.Page > 1 ? PageUrl(Model.Page - 1) : "#")">
+            <i class="ti ti-chevron-left"></i>
+        </a>
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <a class="@(i == Model.Page ? "active" : "")" href="@PageUrl(i)">@i</a>
+        }
+        <a class="@(Model.Page >= totalPages ? "disabled" : "")" href="@(Model.Page < totalPages ? PageUrl(Model.Page + 1) : "#")">
+            <i class="ti ti-chevron-right"></i>
+        </a>
+    </div>
+    <form method="get" asp-action="BookmarksAll" asp-controller="Reader" class="bkm-page-size">
+        Bookmarks per page
+        <input type="hidden" name="page" value="1" />
+        <input type="hidden" name="search" value="@search" />
+        <input type="hidden" name="sortBy" value="@sortBy" />
+        <select name="pageSize" onchange="this.form.submit()">
+            <option value="8" selected="@(Model.PageSize == 8)">8</option>
+            <option value="10" selected="@(Model.PageSize == 10)">10</option>
+            <option value="25" selected="@(Model.PageSize == 25)">25</option>
+        </select>
+    </form>
+</div>
+
+<div class="bkm-banner">
+    <div class="bkm-banner-text">
+        <i class="ti ti-bookmark-filled bkm-banner-icon"></i>
+        <div>
+            <h3>Collect the moments that move you.</h3>
+            <p>Your bookmarks help you revisit what truly matters.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/modal.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+        document.querySelectorAll('.view-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+        document.querySelectorAll('.view-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        document.querySelector('.bkm-table-wrap').classList.toggle('grid-view', btn.dataset.view === 'grid');
+        });
+        });
+
+        document.querySelectorAll('[data-remove-bookmark]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+        var row = btn.closest('tr[data-bookmark-id]');
+        var bookmarkId = row ? row.getAttribute('data-bookmark-id') : null;
+        if (!bookmarkId) return;
+
+        fetch('/Reader/RemoveBookmark', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'bookmarkId=' + encodeURIComponent(bookmarkId)
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (result) {
+        if (result.success) row.remove();
+        });
+        });
+        });
+
+        document.querySelectorAll('[data-edit-note]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+        var row = btn.closest('tr[data-bookmark-id]');
+        var bookmarkId = row ? row.getAttribute('data-bookmark-id') : null;
+        var noteEl = row ? row.querySelector('[data-note-text]') : null;
+        if (!bookmarkId || !noteEl) return;
+
+        Modal.showEditNote({
+        title: 'Edit Note',
+        initialValue: noteEl.textContent.trim(),
+        saveLabel: 'Save',
+        onSave: function (newNote) {
+        fetch('/Reader/UpdateBookmarkNote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'bookmarkId=' + encodeURIComponent(bookmarkId) + '&note=' + encodeURIComponent(newNote)
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (result) {
+        if (result.success) noteEl.textContent = newNote;
+        else Modal.show('error', { title: 'Update failed', message: result.message || 'Something went wrong.' });
+        });
+        }
+        });
+        });
+        });
+        });
+    </script>
+}

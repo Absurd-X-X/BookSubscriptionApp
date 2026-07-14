@@ -108,7 +108,9 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<Book?> GetByIdAsync(Guid id)
 
             => await context.Books.
-                FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+                Include(x => x.Library)
+                .Include(v => v.Category)
+                .FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
 
         public async Task<bool> IsExistAsync(string title, string author)
 
@@ -209,6 +211,51 @@ namespace Infrastructure.Persistence.Repositories
                 Items = await query.ToListAsync(),
                 TotalCount = totalCount
             };
+        }
+
+        public async Task<List<Book>> GetRecommendedForReaderAsync(
+    Guid readerId,
+    List<Guid>? excludeBookIds,
+    int take)
+        {
+            excludeBookIds ??= new List<Guid>();
+
+            var readerCategoryIds = await context.ReadingProgresses
+                .Where(x => x.ReaderId == readerId)
+                .Select(x => x.Book.CategoryId)
+                .Distinct()
+                .ToListAsync();
+
+            var query = context.Books
+                .Where(x => !x.IsDeleted && x.IsPublished);
+
+            if (excludeBookIds.Any())
+            {
+                query = query.Where(x => !excludeBookIds.Contains(x.Id));
+            }
+
+            if (readerCategoryIds.Any())
+            {
+                query = query.Where(x => readerCategoryIds.Contains(x.CategoryId));
+            }
+
+            return await query
+                .Include(x => x.Category)
+                .Include(x => x.Library)
+                .OrderByDescending(x => x.NoOfTimeReadByPeople)
+                .Take(take)
+                .ToListAsync();
+        }
+
+        public async Task<List<Book>> GetNewArrivalsAsync(int take)
+        {
+            return await context.Books
+                .Where(x => !x.IsDeleted && x.IsPublished)
+                .Include(x => x.Category)
+                .Include(x => x.Library)
+                .OrderByDescending(x => x.DateCreated)
+                .Take(take)
+                .ToListAsync();
         }
     }
 }

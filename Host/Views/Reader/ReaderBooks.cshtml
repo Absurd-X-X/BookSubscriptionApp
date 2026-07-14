@@ -1,8 +1,37 @@
-﻿@{
+﻿@model Application.Features.ReaderBooks.Queries.GetReaderBooksPage.ReaderBooksPageVm
+
+@{
     Layout = "~/Views/Shared/_ReaderLayout.cshtml";
     ViewData["Title"] = "Reader Books";
     ViewData["ScrollPage"] = "books";
 }
+
+@functions {
+    string RenderStars(double rating)
+    {
+        var full = (int)Math.Floor(rating);
+        var hasHalf = (rating - full) >= 0.25 && (rating - full) < 0.75;
+        var hasExtraFull = (rating - full) >= 0.75;
+        if (hasExtraFull) full++;
+
+        var stars = new string('★', full);
+        if (hasHalf) stars += "½";
+        return stars;
+    }
+
+    string GetCategoryIcon(string name) => name?.ToLower() switch
+    {
+        var n when n != null && n.Contains("personal") => "ti ti-trending-up",
+        var n when n != null && n.Contains("product") => "ti ti-target",
+        var n when n != null && n.Contains("mind") => "ti ti-brain",
+        var n when n != null && n.Contains("lead") => "ti ti-users",
+        var n when n != null && n.Contains("financ") => "ti ti-coins",
+        var n when n != null && n.Contains("health") => "ti ti-heartbeat",
+        var n when n != null && n.Contains("psych") => "ti ti-puzzle",
+        _ => "ti ti-books"
+    };
+}
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
@@ -28,151 +57,83 @@
             </button>
             <div class="dropdown-panel notif-panel" id="notifPanel">
                 <div class="dropdown-header">Notifications</div>
-                <div class="notif-item">
-                    <div class="notif-icon blue"><i class="fa-solid fa-book-open"></i></div>
-                    <div class="notif-body">
-                        <p><b>Deep Work</b> marked as completed</p>
-                        <span>2 hours ago</span>
-                    </div>
-                </div>
-                <div class="notif-item">
-                    <div class="notif-icon purple"><i class="fa-solid fa-calendar"></i></div>
-                    <div class="notif-body">
-                        <p>Book Club Discussion starts soon</p>
-                        <span>5 hours ago</span>
-                    </div>
-                </div>
-                <div class="notif-item">
-                    <div class="notif-icon orange"><i class="fa-solid fa-fire"></i></div>
-                    <div class="notif-body">
-                        <p>You're on a 12-day reading streak!</p>
-                        <span>1 day ago</span>
-                    </div>
-                </div>
                 <a class="dropdown-footer" href="#">View all notifications</a>
             </div>
         </div>
         <div class="dropdown-wrap">
             <button class="profile-chip" id="profileBtn">
-                <img src="https://i.pravatar.cc/64?img=12" alt="John Doe">
+                <img src="https://i.pravatar.cc/64?img=12" alt="Profile">
                 <i class="fa-solid fa-chevron-down"></i>
             </button>
             <div class="dropdown-panel profile-panel" id="profilePanel">
-                <div class="dropdown-profile-head">
-                    <img src="https://i.pravatar.cc/64?img=12" alt="John Doe">
-                    <div>
-                        <div class="dp-name">John Doe</div>
-                        <div class="dp-email">john.doe@email.com</div>
-                    </div>
-                </div>
                 <a class="dropdown-link" href="#"><i class="fa-regular fa-user"></i> Profile</a>
                 <a class="dropdown-link" href="#"><i class="fa-solid fa-gear"></i> Settings</a>
                 <a class="dropdown-link" href="#"><i class="fa-regular fa-credit-card"></i> Subscription</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-link danger" href="#">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                    Logout
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
                 </a>
             </div>
         </div>
     </div>
 </header>
 
-
 <!-- ── HERO / EDITOR'S PICK ── -->
-<div class="page-section" id="section-hero">
-    <div class="hero-card">
-
-        <!-- Left: text + buttons -->
-        <div class="hero-left">
-            <div class="hero-eyebrow">
-                <i class="ti ti-award"></i> Editor's Pick
-            </div>
-            <div class="hero-title">Atomic Habits</div>
-            <div class="hero-author">James Clear</div>
-            <div class="hero-stars">
-                <span class="stars">★★★★★</span>
-                <span class="rating">4.8</span>
-                <span class="count">(12.4K reviews)</span>
-            </div>
-            <div class="hero-desc">
-                An Easy &amp; Proven Way to Build Good Habits &amp; Break Bad Ones.
-            </div>
-            <div class="hero-actions">
-                <a href="#" class="btn-read-now">Read Now</a>
-                <a href="#" class="btn-add-to-list">+ Add to List</a>
-            </div>
-        </div>
-
-        <!-- Right: book cover + quote -->
-        <div class="hero-right">
-            <div class="hero-cover">
-                <!-- Replace with: <img src="/lib/images/atomic-habits.jpg" alt="Atomic Habits" /> -->
-                <div class="hero-cover-placeholder">
-                    <i class="ti ti-book-2"></i>
+@if (Model.HeroBook != null)
+{
+    var hero = Model.HeroBook;
+    <div class="page-section" id="section-hero">
+        <div class="hero-card">
+            <div class="hero-left">
+                <div class="hero-eyebrow"><i class="ti ti-award"></i> Editor's Pick</div>
+                <div class="hero-title">@hero.Title</div>
+                <div class="hero-author">@hero.Author</div>
+                <div class="hero-stars">
+                    <span class="stars">@RenderStars(hero.AverageRating)</span>
+                    <span class="rating">@hero.AverageRating.ToString("0.0")</span>
+                    <span class="count">(@hero.ReviewCount reviews)</span>
+                </div>
+                <div class="hero-desc">
+                    @(hero.About?.Length > 160 ? hero.About.Substring(0, 160) + "…" : hero.About)
+                </div>
+                <div class="hero-actions">
+                    <a href="/Reader/BookDetails/@hero.Id" class="btn-read-now">Read Now</a>
+                    <a href="#" class="btn-add-to-list" data-book-id="@hero.Id">+ Add to List</a>
                 </div>
             </div>
-            <div class="camp">
-                <div class="hero-quote-block">
-                    <div class="hero-quote-icon">"</div>
-                    <div class="hero-quote-text">
-                        You do not rise to the level of your goals. You fall to the level of your systems.
-                    </div>
-                    <div class="hero-quote-cite">— James Clear</div>
-                </div>
-
-                <!-- Carousel dots -->
-                <div class="hero-dots">
-                    <div class="hero-dot"></div>
-                    <div class="hero-dot"></div>
-                    <div class="hero-dot"></div>
-                    <div class="hero-dot active"></div>
+            <div class="hero-right">
+                <div class="hero-cover">
+                    @if (!string.IsNullOrWhiteSpace(hero.CoverImageUrl))
+                    {
+                        <img src="@hero.CoverImageUrl" alt="@hero.Title" />
+                    }
+                    else
+                    {
+                        <div class="hero-cover-placeholder"><i class="ti ti-book-2"></i></div>
+                    }
                 </div>
             </div>
         </div>
-
     </div>
-
-</div>
-
+}
 
 <!-- ── CATEGORIES ── -->
 <div class="page-section" id="section-categories">
     <div class="lib-section-header">
         <span class="lib-section-title">Categories</span>
-        <a href="#" class="lib-view-all">View all</a>
+        <a href="/Reader/Categories" class="lib-view-all">View all</a>
     </div>
     <div class="categories-row">
-        <a href="#" class="cat-pill">
-            <div class="cat-pill-icon"><i class="ti ti-trending-up"></i></div><span class="cat-pill-name">
-            Personal
-            Development
-        </span><span class="cat-pill-count">124 books</span>
-    </a>
-    <a href="#" class="cat-pill">
-        <div class="cat-pill-icon"><i class="ti ti-target"></i></div><span class="cat-pill-name">Productivity</span><span class="cat-pill-count">98 books</span>
-    </a>
-    <a href="#" class="cat-pill">
-        <div class="cat-pill-icon"><i class="ti ti-brain"></i></div><span class="cat-pill-name">Mindfulness</span><span class="cat-pill-count">76 books</span>
-    </a>
-    <a href="#" class="cat-pill">
-        <div class="cat-pill-icon"><i class="ti ti-users"></i></div><span class="cat-pill-name">Leadership</span><span class="cat-pill-count">64 books</span>
-    </a>
-    <a href="#" class="cat-pill">
-        <div class="cat-pill-icon"><i class="ti ti-coins"></i></div><span class="cat-pill-name">Finance</span><span class="cat-pill-count">58 books</span>
-    </a>
-    <a href="#" class="cat-pill">
-        <div class="cat-pill-icon"><i class="ti ti-heartbeat"></i></div><span class="cat-pill-name">
-        Health &amp;
-        Fitness
-    </span><span class="cat-pill-count">52 books</span>
-</a>
-<a href="#" class="cat-pill">
-    <div class="cat-pill-icon"><i class="ti ti-puzzle"></i></div><span class="cat-pill-name">Psychology</span><span class="cat-pill-count">40 books</span>
-</a>
+        @foreach (var cat in Model.Categories)
+        {
+            <a href="/Reader/Books?categoryId=@cat.Id" class="cat-pill">
+                <div class="cat-pill-icon"><i class="@GetCategoryIcon(cat.Name)"></i></div>
+                <span class="cat-pill-name">@cat.Name</span>
+                <span class="cat-pill-count">@cat.BookCount books</span>
+            </a>
+        }
+    </div>
 </div>
-</div>
-
 
 <!-- ── NEW ARRIVALS ── -->
 <div class="page-section" id="section-new-arrivals">
@@ -182,133 +143,44 @@
     </div>
     <div class="row-wrapper">
         <div class="books-scroll-row" id="newArrivalsRow">
-            <div class="book-card">
-                <div class="book-cover">
-                    <div class="book-cover-ph"><i class="ti ti-book"></i></div><span class="badge-new">New</span><button class="btn-bookmark">
-                    <i class="ti ti-bookmark"></i>
-                </button>
-            </div>
-            <div class="book-title">The Let Them Theory</div>
-            <div class="book-author">Mel Robbins</div>
-            <div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-            <i class="ti ti-plus"></i> Add to List
+            @foreach (var book in Model.NewArrivals)
+            {
+                <div class="book-card" data-book-id="@book.Id">
+                    <div class="book-cover">
+                        @if (!string.IsNullOrWhiteSpace(book.CoverImageUrl))
+                        {
+                            <img src="@book.CoverImageUrl" alt="@book.Title" />
+                        }
+                        else
+                        {
+                            <div class="book-cover-ph"><i class="ti ti-book"></i></div>
+                        }
+                        @if (book.IsNew)
+                        {
+                            <span class="badge-new">New</span>
+                        }
+                        <button class="btn-bookmark @(book.IsInReadingList ? "active" : "")"
+                                data-book-id="@book.Id" title="Save for later">
+                            <i class="ti ti-bookmark"></i>
+                        </button>
+                    </div>
+                    <div class="book-title">@book.Title</div>
+                    <div class="book-author">@book.Author</div>
+                    <div class="book-stars">
+                        <span class="stars">@RenderStars(book.AverageRating)</span>
+                        <span class="val">@book.AverageRating.ToString("0.0")</span>
+                    </div>
+                    <button class="btn-card-add @(book.IsFavorite ? "active" : "")" data-book-id="@book.Id">
+                        <i class="ti ti-plus"></i> @(book.IsFavorite ? "In Favorites" : "Add to List")
+                    </button>
+                </div>
+            }
+        </div>
+        <button class="scroll-arrow right" onclick="scrollRow('newArrivalsRow',1)">
+            <i class="ti ti-chevron-right"></i>
         </button>
     </div>
-    <div class="book-card">
-        <div class="book-cover">
-            <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-            <i class="ti ti-bookmark"></i>
-        </button>
-    </div>
-    <div class="book-title">Deep Work</div>
-    <div class="book-author">Cal Newport</div>
-    <div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-    <i class="ti ti-plus"></i> Add to List
-</button>
 </div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Deep Work</div>
-<div class="book-author">Cal Newport</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Deep Work</div>
-<div class="book-author">Cal Newport</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Deep Work</div>
-<div class="book-author">Cal Newport</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Deep Work</div>
-<div class="book-author">Cal Newport</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><span class="badge-new">New</span><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">The Compound Effect</div>
-<div class="book-author">Darren Hardy</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.6</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><span class="badge-new">New</span><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Never Enough</div>
-<div class="book-author">Jennifer Breheny Wallace</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.5</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">The Creative Act: A Way of Being</div>
-<div class="book-author">Rick Rubin</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><span class="badge-new">New</span><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">How to Talk to Anyone</div>
-<div class="book-author">Leil Lowndes</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.6</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-</div>
-<button class="scroll-arrow right" onclick="scrollRow('newArrivalsRow',1)">
-    <i class="ti ti-chevron-right"></i>
-</button>
-</div>
-</div>
-
 
 <!-- ── RECOMMENDED FOR YOU ── -->
 <div class="page-section" id="section-recommended">
@@ -318,132 +190,40 @@
     </div>
     <div class="row-wrapper">
         <div class="books-scroll-row" id="recommendedRow">
-            <div class="book-card">
-                <div class="book-cover">
-                    <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-                    <i class="ti ti-bookmark"></i>
-                </button>
-            </div>
-            <div class="book-title">The Subtle Art of Not Giving a F*ck</div>
-            <div class="book-author">Mark Manson</div>
-            <div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.6</span></div><button class="btn-card-add">
-            <i class="ti ti-plus"></i> Add to List
+            @foreach (var book in Model.Recommended)
+            {
+                <div class="book-card" data-book-id="@book.Id">
+                    <div class="book-cover">
+                        @if (!string.IsNullOrWhiteSpace(book.CoverImageUrl))
+                        {
+                            <img src="@book.CoverImageUrl" alt="@book.Title" />
+                        }
+                        else
+                        {
+                            <div class="book-cover-ph"><i class="ti ti-book"></i></div>
+                        }
+                        <button class="btn-bookmark @(book.IsInReadingList ? "active" : "")"
+                                data-book-id="@book.Id" title="Save for later">
+                            <i class="ti ti-bookmark"></i>
+                        </button>
+                    </div>
+                    <div class="book-title">@book.Title</div>
+                    <div class="book-author">@book.Author</div>
+                    <div class="book-stars">
+                        <span class="stars">@RenderStars(book.AverageRating)</span>
+                        <span class="val">@book.AverageRating.ToString("0.0")</span>
+                    </div>
+                    <button class="btn-card-add @(book.IsFavorite ? "active" : "")" data-book-id="@book.Id">
+                        <i class="ti ti-plus"></i> @(book.IsFavorite ? "In Favorites" : "Add to List")
+                    </button>
+                </div>
+            }
+        </div>
+        <button class="scroll-arrow right" onclick="scrollRow('recommendedRow',1)">
+            <i class="ti ti-chevron-right"></i>
         </button>
     </div>
-    <div class="book-card">
-        <div class="book-cover">
-            <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-            <i class="ti ti-bookmark"></i>
-        </button>
-    </div>
-    <div class="book-title">Deep Work</div>
-    <div class="book-author">Cal Newport</div>
-    <div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-    <i class="ti ti-plus"></i> Add to List
-</button>
 </div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Make Your Bed</div>
-<div class="book-author">William H. McRaven</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div><div class="book-card">
-<div class="book-cover">
-    <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-    <i class="ti ti-bookmark"></i>
-</button>
-</div>
-<div class="book-title">Deep Work</div>
-<div class="book-author">Cal Newport</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Deep Work</div>
-<div class="book-author">Cal Newport</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">The Power of Habit</div>
-<div class="book-author">Charles Duhigg</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.6</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Mindset</div>
-<div class="book-author">Carol S. Dweck</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.6</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Deep Work</div>
-<div class="book-author">Cal Newport</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Deep Work</div>
-<div class="book-author">Cal Newport</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Essentialism</div>
-<div class="book-author">Greg McKeown</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.5</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-</div>
-<button class="scroll-arrow right" onclick="scrollRow('recommendedRow',1)">
-    <i class="ti ti-chevron-right"></i>
-</button>
-</div>
-</div>
-
 
 <!-- ── POPULAR THIS WEEK ── -->
 <div class="page-section" id="section-popular">
@@ -453,131 +233,39 @@
     </div>
     <div class="row-wrapper">
         <div class="books-scroll-row" id="popularRow">
-            <div class="book-card">
-                <div class="book-cover">
-                    <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-                    <i class="ti ti-bookmark"></i>
-                </button>
-            </div>
-            <div class="book-title">Thinking, Fast and Slow</div>
-            <div class="book-author">Daniel Kahneman</div>
-            <div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.6</span></div><button class="btn-card-add">
-            <i class="ti ti-plus"></i> Add to List
+            @foreach (var book in Model.Popular)
+            {
+                <div class="book-card" data-book-id="@book.Id">
+                    <div class="book-cover">
+                        @if (!string.IsNullOrWhiteSpace(book.CoverImageUrl))
+                        {
+                            <img src="@book.CoverImageUrl" alt="@book.Title" />
+                        }
+                        else
+                        {
+                            <div class="book-cover-ph"><i class="ti ti-book"></i></div>
+                        }
+                        <button class="btn-bookmark @(book.IsInReadingList ? "active" : "")"
+                                data-book-id="@book.Id" title="Save for later">
+                            <i class="ti ti-bookmark"></i>
+                        </button>
+                    </div>
+                    <div class="book-title">@book.Title</div>
+                    <div class="book-author">@book.Author</div>
+                    <div class="book-stars">
+                        <span class="stars">@RenderStars(book.AverageRating)</span>
+                        <span class="val">@book.AverageRating.ToString("0.0")</span>
+                    </div>
+                    <button class="btn-card-add @(book.IsFavorite ? "active" : "")" data-book-id="@book.Id">
+                        <i class="ti ti-plus"></i> @(book.IsFavorite ? "In Favorites" : "Add to List")
+                    </button>
+                </div>
+            }
+        </div>
+        <button class="scroll-arrow right" onclick="scrollRow('popularRow',1)">
+            <i class="ti ti-chevron-right"></i>
         </button>
     </div>
-    <div class="book-card">
-        <div class="book-cover">
-            <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-            <i class="ti ti-bookmark"></i>
-        </button>
-    </div>
-    <div class="book-title">Deep Work</div>
-    <div class="book-author">Cal Newport</div>
-    <div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-    <i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Deep Work</div>
-<div class="book-author">Cal Newport</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Deep Work</div>
-<div class="book-author">Cal Newport</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Deep Work</div>
-<div class="book-author">Cal Newport</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Who Moved My Cheese?</div>
-<div class="book-author">Spencer Johnson</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.5</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">The 5 AM Club</div>
-<div class="book-author">Robin Sharma</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">Rich Dad Poor Dad</div>
-<div class="book-author">Robert T. Kiyosaki</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.6</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">The 7 Habits of Highly Effective People</div>
-<div class="book-author">Stephen R. Covey</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.7</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-<div class="book-card">
-    <div class="book-cover">
-        <div class="book-cover-ph"><i class="ti ti-book"></i></div><button class="btn-bookmark">
-        <i class="ti ti-bookmark"></i>
-    </button>
-</div>
-<div class="book-title">The Alchemist</div>
-<div class="book-author">Paulo Coelho</div>
-<div class="book-stars"><span class="stars">★★★★½</span><span class="val">4.6</span></div><button class="btn-card-add">
-<i class="ti ti-plus"></i> Add to List
-</button>
-</div>
-</div>
-<button class="scroll-arrow right" onclick="scrollRow('popularRow',1)">
-    <i class="ti ti-chevron-right"></i>
-</button>
-</div>
 </div>
 
 <script>
@@ -585,14 +273,8 @@
         var row = document.getElementById(rowId);
         if (row) row.scrollBy({ left: dir * 520, behavior: 'smooth' });
     }
-    document.querySelectorAll('.hero-dot').forEach(function (dot, i, dots) {
-        dot.addEventListener('click', function () {
-            dots.forEach(function (d) { d.classList.remove('active'); });
-            dot.classList.add('active');
-        });
-    });
 
-    /* ── Topbar: dropdowns (bell + profile) ── */
+    /* ── Topbar dropdowns ── */
     document.addEventListener('DOMContentLoaded', function () {
         const bellBtn = document.getElementById('bellBtn');
         const notifPanel = document.getElementById('notifPanel');
@@ -604,7 +286,6 @@
                 if (panel && panel !== except) panel.classList.remove('open');
             });
         }
-
         function toggleDropdown(btn, panel) {
             if (!btn || !panel) return;
             btn.addEventListener('click', (e) => {
@@ -614,21 +295,70 @@
                 panel.classList.toggle('open', !isOpen);
             });
         }
-
         toggleDropdown(bellBtn, notifPanel);
         toggleDropdown(profileBtn, profilePanel);
-
         document.addEventListener('click', () => closeAllDropdowns());
-
         [notifPanel, profilePanel].forEach(panel => {
             if (panel) panel.addEventListener('click', (e) => e.stopPropagation());
         });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeAllDropdowns();
+        /* ── Save icon: toggles Reading List ── */
+        document.querySelectorAll('.btn-bookmark').forEach(function (btn) {
+            btn.addEventListener('click', async function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const bookId = btn.dataset.bookId;
+                btn.disabled = true;
+                try {
+                    const res = await fetch('/Reader/ToggleBookList', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `bookId=${bookId}&listType=ReadingList`
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        btn.classList.toggle('active', data.isInList);
+                    }
+                } catch (err) {
+                    console.error('Reading list toggle failed', err);
+                } finally {
+                    btn.disabled = false;
+                }
+            });
         });
 
-        /* ── Topbar search: indexes this page's actual book cards ── */
+        /* ── Add to List button: toggles Favorite ── */
+        document.querySelectorAll('.btn-card-add, .btn-add-to-list').forEach(function (btn) {
+            btn.addEventListener('click', async function (e) {
+                e.preventDefault();
+                const bookId = btn.dataset.bookId;
+                if (!bookId) return;
+                btn.disabled = true;
+                try {
+                    const res = await fetch('/Reader/ToggleBookList', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `bookId=${bookId}&listType=Favorite`
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        btn.classList.toggle('active', data.isInList);
+                        const label = btn.querySelector('i') ? btn : null;
+                        if (btn.classList.contains('btn-card-add')) {
+                            btn.innerHTML = data.isInList
+                                ? '<i class="ti ti-plus"></i> In Favorites'
+                                : '<i class="ti ti-plus"></i> Add to List';
+                        }
+                    }
+                } catch (err) {
+                    console.error('Favorite toggle failed', err);
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+        });
+
+        /* ── Topbar search ── */
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
 
@@ -646,7 +376,6 @@
             });
             return items;
         }
-
         const searchIndex = buildSearchIndex();
 
         function renderResults(query) {
@@ -660,17 +389,15 @@
                 item.title.toLowerCase().includes(q) ||
                 (item.author && item.author.toLowerCase().includes(q))
             );
-
             if (matches.length === 0) {
                 searchResults.innerHTML = '<div class="search-empty">No books match your search.</div>';
             } else {
                 searchResults.innerHTML = matches.map((m, idx) => `
-        <div class="search-result-item" data-idx="${idx}">
-          <div class="sr-title">${m.title}</div>
-          <div class="sr-meta"><span>${m.author || ''}</span><span class="sr-section">${m.section}</span></div>
-        </div>
-      `).join('');
-
+          <div class="search-result-item" data-idx="${idx}">
+            <div class="sr-title">${m.title}</div>
+            <div class="sr-meta"><span>${m.author || ''}</span><span class="sr-section">${m.section}</span></div>
+          </div>
+        `).join('');
                 Array.from(searchResults.querySelectorAll('.search-result-item')).forEach(function (el, idx) {
                     el.addEventListener('click', function () {
                         const match = matches[idx];
@@ -688,66 +415,42 @@
         }
 
         if (searchInput && searchResults) {
-            searchInput.addEventListener('input', function (e) {
-                renderResults(e.target.value.trim());
-            });
-            searchInput.addEventListener('focus', function (e) {
-                var v = e.target.value.trim();
-                if (v) renderResults(v);
-            });
-            searchInput.addEventListener('click', function (e) {
-                e.stopPropagation();
-            });
-            searchResults.addEventListener('click', function (e) {
-                e.stopPropagation();
-            });
-
-            document.addEventListener('click', function () {
-                searchResults.classList.remove('open');
-            });
-
+            searchInput.addEventListener('input', function (e) { renderResults(e.target.value.trim()); });
+            searchInput.addEventListener('focus', function (e) { if (e.target.value.trim()) renderResults(e.target.value.trim()); });
+            searchInput.addEventListener('click', function (e) { e.stopPropagation(); });
+            searchResults.addEventListener('click', function (e) { e.stopPropagation(); });
+            document.addEventListener('click', function () { searchResults.classList.remove('open'); });
             document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') {
-                    searchResults.classList.remove('open');
-                    searchInput.blur();
-                }
+                if (e.key === 'Escape') { searchResults.classList.remove('open'); searchInput.blur(); }
             });
         }
     });
 
-    // ── Scrollspy for this page ──
+    // ── Scrollspy ──
     document.addEventListener('DOMContentLoaded', function () {
-
         const sections = document.querySelectorAll('.page-section');
         if (sections.length === 0) return;
-
         const currentPage = 'books';
         const pageHashLinks = document.querySelectorAll('.nav-item[data-hash][data-page="' + currentPage + '"]');
         const sectionList = Array.from(sections);
 
         function setActiveByHash(hash) {
-            pageHashLinks.forEach(function (link) {
-                link.classList.remove('active');
-            });
+            pageHashLinks.forEach(function (link) { link.classList.remove('active'); });
             if (hash) {
                 var matched = document.querySelector('.nav-item[data-hash="' + hash + '"][data-page="' + currentPage + '"]');
                 if (matched) matched.classList.add('active');
-            } else {
-                if (pageHashLinks[0]) pageHashLinks[0].classList.add('active');
+            } else if (pageHashLinks[0]) {
+                pageHashLinks[0].classList.add('active');
             }
         }
 
-        // ── Scroll listener on .main — works for short and tall sections ──
         function getActiveSection() {
             var scrollContainer = document.querySelector('.main');
             var scrollTop = scrollContainer ? scrollContainer.scrollTop : window.pageYOffset;
             var triggerPoint = scrollTop + window.innerHeight * 0.35;
-
             var active = sectionList[0];
             for (var i = 0; i < sectionList.length; i++) {
-                if (sectionList[i].offsetTop <= triggerPoint) {
-                    active = sectionList[i];
-                }
+                if (sectionList[i].offsetTop <= triggerPoint) active = sectionList[i];
             }
             return active;
         }
@@ -762,20 +465,10 @@
         }
 
         var scrollContainer = document.querySelector('.main');
-        if (scrollContainer) {
-            scrollContainer.addEventListener('scroll', onScroll, { passive: true });
-        } else {
-            window.addEventListener('scroll', onScroll, { passive: true });
-        }
+        if (scrollContainer) scrollContainer.addEventListener('scroll', onScroll, { passive: true });
+        else window.addEventListener('scroll', onScroll, { passive: true });
 
-        // Set active on page load
         onScroll();
-
-        // Update on nav link click
-        window.addEventListener('hashchange', function () {
-            setActiveByHash(window.location.hash);
-        });
-
+        window.addEventListener('hashchange', function () { setActiveByHash(window.location.hash); });
     });
 </script>
-

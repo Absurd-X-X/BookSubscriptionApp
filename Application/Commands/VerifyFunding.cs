@@ -14,7 +14,7 @@ namespace Application.Commands
         public record VerifyFundingCommand(
             string Reference) : IRequest<Result<string>>;
 
-        
+
         public class VerifyFundingHandler(
             IWalletRepository walletRepository,
             IWalletTransactionRepository walletTransactionRepository,
@@ -49,7 +49,14 @@ namespace Application.Commands
                     return Result<string>.Failure("Payment verification failed");
                 }
 
-                // Credit wallet
+                if (verification.Amount != transaction.Balance)
+                {
+                    transaction.Status = WalletTransactionStatus.Failed;
+                    transaction.DateModified = DateTime.UtcNow;
+                    await unitOfWork.SaveAsync();
+                    return Result<string>.Failure("Payment amount mismatch");
+                }
+
                 var wallet = await walletRepository
                     .GetAsync(transaction.WalletId);
 
@@ -61,7 +68,6 @@ namespace Application.Commands
 
                 await unitOfWork.SaveAsync();
 
-                // Send email notification
                 var emailResult = await emailService.SendEmailAsync(
                     wallet.User.Email,
                     "Wallet Funded Successfully",
@@ -69,11 +75,6 @@ namespace Application.Commands
                         wallet.User.UserName,
                         transaction.Balance,
                         wallet.Balance));
-
-                if (!emailResult.Success)
-                    return Result<string>.Failure("Failed to send funding confirmation email due to network error");
-
-
 
                 string? ipAddress = httpContextAccessor
                 .HttpContext?
@@ -95,6 +96,15 @@ namespace Application.Commands
                 };
 
                 await auditLogRepository.AddAsync(audit);
+                await unitOfWork.SaveAsync();
+
+                if (!emailResult.Success)
+                {
+                    // Wallet was funded successfully; email is secondary, so we still return success
+                    // but flag it so the caller/logs can surface a soft warning if needed
+                    return Result<string>.Success(
+                        "Wallet funded successfully! (Confirmation email could not be sent)", "funded");
+                }
 
                 return Result<string>.Success(
                     "Wallet funded successfully!", "funded");

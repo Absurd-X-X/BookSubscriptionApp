@@ -15,11 +15,11 @@ namespace Host.Controllers
     public class WalletController(IMediator mediator) : Controller
     {
         public async Task<IActionResult> Index(
-    int txPage = 1,
-    int creditPage = 1,
-    int debitPage = 1,
-    int pendingPage = 1,
-    int pageSize = 3)
+        int txPage = 1,
+        int creditPage = 1,
+        int debitPage = 1,
+        int pendingPage = 1,
+        int pageSize = 3)
         {
             var customerId = ClaimsHelper.GetCustomerId(User);
 
@@ -71,6 +71,14 @@ namespace Host.Controllers
             var result = await mediator.Send(
                 new VerifyFundingCommand(reference));
 
+            TempData[result.Status ? "Success" : "Error"] = result.Message;
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Callback(string reference)
+        {
+            var result = await mediator.Send(new VerifyFundingCommand(reference));
             TempData[result.Status ? "Success" : "Error"] = result.Message;
             return RedirectToAction(nameof(Index));
         }

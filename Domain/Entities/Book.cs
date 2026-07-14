@@ -43,8 +43,10 @@
         public DateTime DateModified { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsPublished { get; set; }
-
         public ICollection<Review> Reviews { get; set; } = new HashSet<Review>();
+        public ICollection<Favorite> Favorites{ get; set; } = new HashSet<Favorite>();
+        public ICollection<ReadingListItem> ReadingListItems { get; set; } = new HashSet<ReadingListItem>();
+        public ICollection<Bookmark> Bookmarks { get; set; } = new HashSet<Bookmark>();
         public ICollection<ReadingProgress> ReadingProgresses { get; set; } = new HashSet<ReadingProgress>();
         public ICollection<BookVersion> Versions { get; set; } = new HashSet<BookVersion>();
     }

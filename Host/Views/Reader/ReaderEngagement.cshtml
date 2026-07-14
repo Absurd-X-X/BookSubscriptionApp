@@ -1,8 +1,31 @@
-﻿@{
+﻿@model Application.Features.ReaderEngagement.Queries.GetReaderEngagementDashboard.ReaderEngagementVm
+@using System.Text.Json
+
+@{
     ViewData["Title"] = "My Engagement";
     ViewData["ScrollPage"] = "myengagement";
     Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+
+    var chartJson = JsonSerializer.Serialize(Model.Analytics.Chart);
 }
+
+@functions {
+    string StarClass(int position, double rating)
+    {
+        if (position <= Math.Floor(rating)) return "ti-star-filled";
+        if (position - rating < 1 && position - rating > 0) return "ti-star-half-filled";
+        return "ti-star";
+    }
+
+    string TimeAgo(DateTime dt)
+    {
+        var span = DateTime.UtcNow - dt;
+        if (span.TotalMinutes < 60) return $"{(int)span.TotalMinutes}m ago";
+        if (span.TotalHours < 24) return $"{(int)span.TotalHours}h ago";
+        return $"{(int)span.TotalDays}d ago";
+    }
+}
+
 <link href="~/css/readerEngagement.css" rel="stylesheet" />
 
 <!-- TOPBAR -->
@@ -19,20 +42,43 @@
             <div class="eg-sdrop" id="egSD"></div>
         </div>
         <div class="eg-bell-w">
-            <div class="eg-bell" id="egBell"><i class="ti ti-bell"></i><span class="bdot" id="egBDot"></span></div>
+            <div class="eg-bell" id="egBell">
+                <i class="ti ti-bell"></i>
+                <span class="bdot" id="egBDot" style="display:@(Model.UnreadNotificationCount > 0 ? "block" : "none")"></span>
+            </div>
             <div class="eg-nd" id="egND">
                 <div class="eg-nd-hdr"><span>Notifications</span><a id="egMA">Mark all read</a></div>
-                <div class="eg-nd-item unread"><div class="eg-nd-ico"><i class="ti ti-book-2"></i></div><div class="eg-nd-txt"><div class="ndt">New chapter unlocked</div><div class="nds">Atomic Habits · Ch.13 available</div></div><div class="eg-nd-dot"></div></div>
-                <div class="eg-nd-item unread"><div class="eg-nd-ico"><i class="ti ti-trophy"></i></div><div class="eg-nd-txt"><div class="ndt">Streak milestone 🔥</div><div class="nds">12 days in a row!</div></div><div class="eg-nd-dot"></div></div>
-                <div class="eg-nd-item"><div class="eg-nd-ico"><i class="ti ti-star"></i></div><div class="eg-nd-txt"><div class="ndt">Review reminder</div><div class="nds">Rate Deep Work you finished</div></div></div>
+                @if (!Model.Notifications.Any())
+                {
+                    <div class="eg-nd-item"><div class="eg-nd-txt"><div class="ndt">No notifications yet</div></div></div>
+                }
+                else
+                {
+                    @foreach (var n in Model.Notifications.Take(3))
+                    {
+                        <div class="eg-nd-item @(n.IsRead ? "" : "unread")" data-notif-id="@n.Id">
+                            <!-- TODO: swap ti-bell for a type-based icon once NotificationType is confirmed -->
+                            <div class="eg-nd-ico"><i class="ti ti-bell"></i></div>
+                            <div class="eg-nd-txt">
+                                <div class="ndt">@n.Title</div>
+                                <div class="nds">@n.Message</div>
+                            </div>
+                            @if (!n.IsRead)
+                            {
+                                <div class="eg-nd-dot"></div>
+                            }
+                        </div>
+                    }
+                }
+                <a class="dropdown-footer" href="@Url.Action("ReaderEngagement", "Reader")">View all notifications</a>
             </div>
         </div>
         <div class="eg-av-w">
             <div class="eg-av" id="egAV">A</div>
             <div class="eg-avd" id="egAVD">
                 <div class="eg-avd-top"><div class="avn">Alex Reader</div><div class="ave">alex@soulshelf.app</div></div>
-                <a><i class="ti ti-user"></i> Profile</a>
-                <a><i class="ti ti-settings"></i> Settings</a>
+                <a href="@Url.Action("ReaderPersonal", "Reader")"><i class="ti ti-user"></i> Profile</a>
+                <a href="@Url.Action("ReaderPersonal", "Reader")><i class="ti ti-settings"></i> Settings</a>
                 <div class="eg-avd-div"></div>
                 <a class="out"><i class="ti ti-logout"></i> Logout</a>
             </div>
@@ -48,20 +94,29 @@
         <section id="section-reviews" class="page-section eg-card">
             <div class="eg-shdr">
                 <div class="eg-shdr-l"><i class="ti ti-star"></i><div><div class="eg-stitle">Reviews</div><div class="eg-ssub">Your reviews and ratings</div></div></div>
-                <a class="eg-va">View all reviews</a>
+                <a class="eg-va" href="/Reader/Reviews">View all reviews</a>
             </div>
             <div class="rev-overview">
                 <div class="rev-big">
-                    <div class="rbn">4.6</div>
-                    <div class="rbs"><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-half-filled"></i></div>
-                    <div class="rbl">Out of 5</div><div class="rbc">Based on 128 reviews</div>
+                    <div class="rbn">@Model.ReviewSummary.AverageRating.ToString("0.0")</div>
+                    <div class="rbs">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <i class="ti @StarClass(i, Model.ReviewSummary.AverageRating)"></i>
+                        }
+                    </div>
+                    <div class="rbl">Out of 5</div>
+                    <div class="rbc">Based on @Model.ReviewSummary.TotalReviews reviews</div>
                 </div>
                 <div class="rev-bars">
-                    <div class="rev-bar-row"><span class="rl">5 star</span><div class="rev-bar-bg"><div class="rev-bar-fill" style="width:72%"></div></div><span class="rp">72%</span></div>
-                    <div class="rev-bar-row"><span class="rl">4 star</span><div class="rev-bar-bg"><div class="rev-bar-fill" style="width:18%"></div></div><span class="rp">18%</span></div>
-                    <div class="rev-bar-row"><span class="rl">3 star</span><div class="rev-bar-bg"><div class="rev-bar-fill" style="width:7%"></div></div><span class="rp">7%</span></div>
-                    <div class="rev-bar-row"><span class="rl">2 star</span><div class="rev-bar-bg"><div class="rev-bar-fill" style="width:2%"></div></div><span class="rp">2%</span></div>
-                    <div class="rev-bar-row"><span class="rl">1 star</span><div class="rev-bar-bg"><div class="rev-bar-fill" style="width:1%"></div></div><span class="rp">1%</span></div>
+                    @foreach (var bar in Model.ReviewSummary.Distribution)
+                    {
+                        <div class="rev-bar-row">
+                            <span class="rl">@bar.Stars star</span>
+                            <div class="rev-bar-bg"><div class="rev-bar-fill" style="width:@bar.Percentage.ToString("0")%"></div></div>
+                            <span class="rp">@bar.Percentage.ToString("0")%</span>
+                        </div>
+                    }
                 </div>
             </div>
             <div class="rev-rec-hdr">
@@ -69,44 +124,43 @@
                 <button class="eg-btn" id="writeBtn1"><i class="ti ti-edit" style="font-size:12px"></i> Write a review</button>
             </div>
 
-            <!-- Atomic Habits -->
-            <div class="rev-row">
-                <div class="bk-cover">
-                    <svg viewBox="0 0 38 52" width="38" height="52"><defs><linearGradient id="cah" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4a843" /><stop offset="100%" stop-color="#7a4010" /></linearGradient></defs><rect width="38" height="52" rx="3" fill="url(#cah)" /><text x="19" y="11" text-anchor="middle" font-size="4" font-weight="700" fill="rgba(255,255,255,.7)" font-family="sans-serif">TINY CHANGES</text><text x="19" y="16" text-anchor="middle" font-size="3.5" fill="rgba(255,255,255,.6)" font-family="sans-serif">REMARKABLE RESULTS</text><text x="19" y="27" text-anchor="middle" font-size="8.5" font-weight="900" fill="#fff" font-family="sans-serif">Atomic</text><text x="19" y="36" text-anchor="middle" font-size="8.5" font-weight="900" fill="#fff" font-family="sans-serif">Habits</text><text x="19" y="48" text-anchor="middle" font-size="4" font-weight="600" fill="rgba(255,255,255,.85)" font-family="sans-serif">James Clear</text></svg>
-                </div>
-                <div class="rev-mid">
-                    <div class="rmt">Atomic Habits</div><div class="rma">James Clear</div>
-                    <div class="rms"><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><span>5.0</span></div>
-                    <div class="rmtx">Life changing! The small habits approach is practical and easy to implement.</div>
-                </div>
-                <div class="rev-right"><span class="rrd">May 12, 2024</span><div class="kb-w"><i class="ti ti-dots-vertical kb"></i><div class="kb-m"><a><i class="ti ti-edit"></i>Edit</a><a class="danger"><i class="ti ti-trash"></i>Delete</a></div></div></div>
-            </div>
-
-            <!-- The 5 AM Club -->
-            <div class="rev-row">
-                <div class="bk-cover">
-                    <svg viewBox="0 0 38 52" width="38" height="52"><defs><linearGradient id="cfc" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#cc3322" /><stop offset="100%" stop-color="#5a0a00" /></linearGradient></defs><rect width="38" height="52" rx="3" fill="url(#cfc)" /><circle cx="19" cy="17" r="5" fill="rgba(255,210,160,.85)" /><path d="M13 24 Q19 21 25 24 L27 40 L11 40 Z" fill="rgba(255,190,130,.8)" /><line x1="9" y1="22" x2="13" y2="26" stroke="rgba(255,210,160,.85)" stroke-width="2.5" stroke-linecap="round" /><line x1="29" y1="22" x2="25" y2="26" stroke="rgba(255,210,160,.85)" stroke-width="2.5" stroke-linecap="round" /><text x="19" y="47" text-anchor="middle" font-size="4.5" font-weight="800" fill="#fff" font-family="sans-serif">5 AM CLUB</text></svg>
-                </div>
-                <div class="rev-mid">
-                    <div class="rmt">The 5 AM Club</div><div class="rma">Robin Sharma</div>
-                    <div class="rms"><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-half-filled"></i><span>4.5</span></div>
-                    <div class="rmtx">Great insights on morning routines and productivity.</div>
-                </div>
-                <div class="rev-right"><span class="rrd">May 8, 2024</span><div class="kb-w"><i class="ti ti-dots-vertical kb"></i><div class="kb-m"><a><i class="ti ti-edit"></i>Edit</a><a class="danger"><i class="ti ti-trash"></i>Delete</a></div></div></div>
-            </div>
-
-            <!-- Deep Work -->
-            <div class="rev-row">
-                <div class="bk-cover">
-                    <svg viewBox="0 0 38 52" width="38" height="52"><defs><linearGradient id="cdw" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e" /><stop offset="100%" stop-color="#0d0d14" /></linearGradient></defs><rect width="38" height="52" rx="3" fill="url(#cdw)" /><text x="19" y="20" text-anchor="middle" font-size="10" font-weight="900" fill="#f0b429" font-family="sans-serif">DEEP</text><text x="19" y="31" text-anchor="middle" font-size="10" font-weight="900" fill="#f0b429" font-family="sans-serif">WORK</text><text x="19" y="40" text-anchor="middle" font-size="3.5" fill="rgba(255,255,255,.55)" font-family="sans-serif">Rules for Focused</text><text x="19" y="45" text-anchor="middle" font-size="3.5" fill="rgba(255,255,255,.55)" font-family="sans-serif">Success in a Distracted</text><text x="19" y="50" text-anchor="middle" font-size="3.5" fill="rgba(255,255,255,.55)" font-family="sans-serif">World · Cal Newport</text></svg>
-                </div>
-                <div class="rev-mid">
-                    <div class="rmt">Deep Work</div><div class="rma">Cal Newport</div>
-                    <div class="rms"><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star-filled"></i><i class="ti ti-star"></i><span>4.0</span></div>
-                    <div class="rmtx">Helped me eliminate distractions and focus on what matters.</div>
-                </div>
-                <div class="rev-right"><span class="rrd">May 1, 2024</span><div class="kb-w"><i class="ti ti-dots-vertical kb"></i><div class="kb-m"><a><i class="ti ti-edit"></i>Edit</a><a class="danger"><i class="ti ti-trash"></i>Delete</a></div></div></div>
-            </div>
+            @if (!Model.RecentReviews.Any())
+            {
+                <div class="an-placeholder"><i class="ti ti-star"></i><p>You haven't reviewed any books yet</p></div>
+            }
+            else
+            {
+                @foreach (var review in Model.RecentReviews)
+                {
+                    <div class="rev-row" data-review-id="@review.ReviewId">
+                        <div class="bk-cover">
+                            <div class="bk-cover-ph"><i class="ti ti-book"></i></div>
+                        </div>
+                        <div class="rev-mid">
+                            <div class="rmt">@review.BookTitle</div>
+                            <div class="rma">@review.BookAuthor</div>
+                            <div class="rms">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="ti @(i <= review.Rating ? "ti-star-filled" : "ti-star")"></i>
+                                }
+                                <span>@review.Rating.ToString("0.0")</span>
+                            </div>
+                            <div class="rmtx">@review.Comment</div>
+                        </div>
+                        <div class="rev-right">
+                            <span class="rrd">@review.DateCreated.ToString("MMM d, yyyy")</span>
+                            <div class="kb-w">
+                                <i class="ti ti-dots-vertical kb"></i>
+                                <div class="kb-m">
+                                    <a><i class="ti ti-edit"></i>Edit</a>
+                                    <a class="danger"><i class="ti ti-trash"></i>Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
 
             <button class="eg-btn-out">View all reviews</button>
         </section>
@@ -117,28 +171,33 @@
                 <div class="eg-shdr-l"><i class="ti ti-bell"></i><div><div class="eg-stitle">Notifications</div><div class="eg-ssub">Recent updates and alerts</div></div></div>
                 <a class="eg-va" id="markSecRead">Mark all as read</a>
             </div>
-            <div class="notif-row">
-                <div class="notif-bk-thumb">
-                    <svg viewBox="0 0 36 36" width="36" height="36"><defs><linearGradient id="cnb" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b8902a" /><stop offset="100%" stop-color="#6b3d08" /></linearGradient></defs><rect width="36" height="36" rx="5" fill="url(#cnb)" /><text x="18" y="13" text-anchor="middle" font-size="7" font-weight="900" fill="#fff" font-family="sans-serif">$</text><text x="18" y="20" text-anchor="middle" font-size="4" font-weight="700" fill="rgba(255,255,255,.85)" font-family="sans-serif">PSYCH</text><text x="18" y="26" text-anchor="middle" font-size="4" fill="rgba(255,255,255,.7)" font-family="sans-serif">MONEY</text><text x="18" y="32" text-anchor="middle" font-size="3.2" fill="rgba(255,255,255,.6)" font-family="sans-serif">M. Housel</text></svg>
-                </div>
-                <div class="notif-mid"><div class="nt">New book in your reading list</div><div class="ns">"The Psychology of Money" by Morgan Housel is now available.</div></div>
-                <div class="notif-r"><span class="ntime">2h ago</span><div class="ndot" id="snd1"></div></div>
-            </div>
-            <div class="notif-row">
-                <div class="notif-ico"><i class="ti ti-user"></i></div>
-                <div class="notif-mid"><div class="nt">Your review got a like!</div><div class="ns">Someone liked your review on "Atomic Habits"</div></div>
-                <div class="notif-r"><span class="ntime">1d ago</span><div class="ndot" id="snd2"></div></div>
-            </div>
-            <div class="notif-row">
-                <div class="notif-ico"><i class="ti ti-message-circle"></i></div>
-                <div class="notif-mid"><div class="nt">Welcome to Atomic Habits!</div><div class="ns">Thanks for joining us. Start your reading journey today.</div></div>
-                <div class="notif-r"><span class="ntime">2d ago</span><div class="ndot" id="snd3"></div></div>
-            </div>
-            <div class="notif-row">
-                <div class="notif-ico"><i class="ti ti-bell"></i></div>
-                <div class="notif-mid"><div class="nt">Reminder: Keep your streak going!</div><div class="ns">You're on a 12 day reading streak. Keep it up!</div></div>
-                <div class="notif-r"><span class="ntime">3d ago</span><div class="ndot" id="snd4"></div></div>
-            </div>
+
+            @if (!Model.Notifications.Any())
+            {
+                <div class="an-placeholder"><i class="ti ti-bell"></i><p>You're all caught up</p></div>
+            }
+            else
+            {
+                @foreach (var n in Model.Notifications)
+                {
+                    <div class="notif-row" data-notif-id="@n.Id">
+                        <!-- TODO: map notification type to icon once NotificationType is confirmed -->
+                        <div class="notif-ico"><i class="ti ti-bell"></i></div>
+                        <div class="notif-mid">
+                            <div class="nt">@n.Title</div>
+                            <div class="ns">@n.Message</div>
+                        </div>
+                        <div class="notif-r">
+                            <span class="ntime">@TimeAgo(n.DateCreated)</span>
+                            @if (!n.IsRead)
+                            {
+                                <div class="ndot"></div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+
             <button class="eg-btn-out">View all notifications</button>
         </section>
 
@@ -156,10 +215,54 @@
             </div>
             <div id="anOverview">
                 <div class="an-stats">
-                    <div class="an-stat"><div class="asl">Books Read</div><div class="asv">24</div><div class="ass">This year</div><div class="ast"><i class="ti ti-arrow-up"></i>14% from last year</div></div>
-                    <div class="an-stat"><div class="asl">Pages Read</div><div class="asv">3,240</div><div class="ass">This year</div><div class="ast"><i class="ti ti-arrow-up"></i>22% from last year</div></div>
-                    <div class="an-stat"><div class="asl">Reading Time</div><div class="asv sm">128h 45m</div><div class="ass">This year</div><div class="ast"><i class="ti ti-arrow-up"></i>18% from last year</div></div>
-                    <div class="an-stat"><div class="asl">★ Avg. Rating</div><div class="asv">4.6</div><div class="ass">This year</div><div class="ast"><i class="ti ti-arrow-up"></i>5% from last year</div></div>
+                    <div class="an-stat">
+                        <div class="asl">Books Read</div>
+                        <div class="asv">@Model.Analytics.BooksReadThisYear</div>
+                        <div class="ass">This year</div>
+                        @if (Model.Analytics.BooksReadTrend is { } bt)
+                        {
+                            <div class="ast @(bt.IsUp ? "" : "down")">
+                                <i class="ti @(bt.IsUp ? "ti-arrow-up" : "ti-arrow-down")"></i>
+                                @Math.Abs(bt.PercentChange)% from last year
+                            </div>
+                        }
+                    </div>
+                    <div class="an-stat">
+                        <div class="asl">Pages Read</div>
+                        <div class="asv">@Model.Analytics.TotalPagesRead.ToString("N0")</div>
+                        <div class="ass">This year</div>
+                        @if (Model.Analytics.PagesReadTrend is { } pt)
+                        {
+                            <div class="ast @(pt.IsUp ? "" : "down")">
+                                <i class="ti @(pt.IsUp ? "ti-arrow-up" : "ti-arrow-down")"></i>
+                                @Math.Abs(pt.PercentChange)% from last year
+                            </div>
+                        }
+                    </div>
+                    <div class="an-stat">
+                        <div class="asl">Reading Time</div>
+                        <div class="asv sm">@(Model.Analytics.TotalMinutesRead / 60)h @(Model.Analytics.TotalMinutesRead % 60)m</div>
+                        <div class="ass">This year</div>
+                        @if (Model.Analytics.ReadingTimeTrend is { } rt)
+                        {
+                            <div class="ast @(rt.IsUp ? "" : "down")">
+                                <i class="ti @(rt.IsUp ? "ti-arrow-up" : "ti-arrow-down")"></i>
+                                @Math.Abs(rt.PercentChange)% from last year
+                            </div>
+                        }
+                    </div>
+                    <div class="an-stat">
+                        <div class="asl">★ Avg. Rating</div>
+                        <div class="asv">@Model.Analytics.AverageRatingGiven.ToString("0.0")</div>
+                        <div class="ass">This year</div>
+                        @if (Model.Analytics.AvgRatingTrend is { } at)
+                        {
+                            <div class="ast @(at.IsUp ? "" : "down")">
+                                <i class="ti @(at.IsUp ? "ti-arrow-up" : "ti-arrow-down")"></i>
+                                @Math.Abs(at.PercentChange)% from last year
+                            </div>
+                        }
+                    </div>
                 </div>
                 <div class="an-divider"></div>
                 <div class="an-act-hdr">
@@ -175,7 +278,7 @@
                     </div>
                 </div>
                 <div class="an-chart">
-                    <div class="an-yaxis"><span>8h</span><span>6h</span><span>4h</span><span>2h</span><span>0h</span></div>
+                    <div class="an-yaxis" id="anYAxis"></div>
                     <div class="an-bars-wrap">
                         <div class="an-bars" id="anBars"></div>
                         <div class="an-xlabels" id="anXL"></div>
@@ -190,8 +293,7 @@
     </div><!-- eg-feed -->
     <!-- RIGHT ASIDE -->
     <aside class="eg-aside">
-
-        <!-- Community Highlights -->
+        <!-- Community Highlights: no leaderboard data source yet, left static -->
         <div class="ra-card">
             <div class="ra-title">Community Highlights</div>
             <div style="font-size:11px;color:var(--t4);font-weight:600;margin-bottom:6px;">Top Reviewers</div>
@@ -201,31 +303,12 @@
             <a class="ch-lb">View leaderboard</a>
         </div>
 
-        <!-- Share your thoughts -->
         <div class="share-card">
             <div class="sc-t">Share your thoughts</div>
             <div class="sc-s">Your reviews help others discover great books.</div>
             <button class="eg-btn" id="writeBtn2" style="width:100%;justify-content:center;"><i class="ti ti-edit" style="font-size:12px"></i> Write a review</button>
-            <div style="text-align:center;margin-top:14px;">
-                <svg viewBox="0 0 120 72" width="110" height="66" aria-hidden="true">
-                    <defs><radialGradient id="sg" cx="50%" cy="80%" r="55%"><stop offset="0%" stop-color="#7c6af7" stop-opacity=".3" /><stop offset="100%" stop-color="#7c6af7" stop-opacity="0" /></radialGradient></defs>
-                    <ellipse cx="60" cy="66" rx="50" ry="7" fill="url(#sg)" />
-                    <path d="M12 56 Q60 8 108 56" fill="#2d2060" opacity=".5" />
-                    <path d="M16 56 Q60 12 104 56" fill="none" stroke="#7c6af7" stroke-width="1.5" />
-                    <path d="M22 56 Q60 18 98 56" fill="#7c6af7" opacity=".07" />
-                    <line x1="60" y1="12" x2="60" y2="56" stroke="#9080f8" stroke-width="1" />
-                    <text x="22" y="30" font-size="10" fill="#f0b429" opacity=".9">★</text>
-                    <text x="42" y="20" font-size="12" fill="#f0b429">★</text>
-                    <text x="60" y="14" font-size="9" fill="#f0b429" opacity=".8">★</text>
-                    <text x="76" y="19" font-size="11" fill="#f0b429" opacity=".9">★</text>
-                    <text x="93" y="28" font-size="9" fill="#f0b429" opacity=".7">★</text>
-                    <text x="34" y="42" font-size="7" fill="#f0b429" opacity=".5">★</text>
-                    <text x="83" y="40" font-size="7" fill="#f0b429" opacity=".5">★</text>
-                </svg>
-            </div>
         </div>
 
-        <!-- Need Help -->
         <div class="ra-card">
             <div class="ra-title">Need Help?</div>
             <div style="font-size:11px;color:var(--t4);margin-bottom:4px;">We're here for you</div>
@@ -235,28 +318,11 @@
             <div class="sup-row"><div class="sup-row-l"><div class="sup-ico"><i class="ti ti-message-dots"></i></div><div><div class="sup-title">Feedback</div><div class="sup-sub">Share your suggestions</div></div></div><i class="ti ti-chevron-right sup-chev"></i></div>
         </div>
 
-        <!-- Quote -->
         <div class="quote-card">
             <div class="qc-mark">"</div>
             <div class="qc-text">The more you engage, the richer your reading journey becomes.</div>
             <div class="qc-auth">— Atomic Habits Team</div>
-            <div style="text-align:center;margin-top:14px;">
-                <svg viewBox="0 0 120 72" width="110" height="66" aria-hidden="true">
-                    <defs><radialGradient id="qg" cx="50%" cy="80%" r="55%"><stop offset="0%" stop-color="#7c6af7" stop-opacity=".25" /><stop offset="100%" stop-color="#7c6af7" stop-opacity="0" /></radialGradient></defs>
-                    <ellipse cx="60" cy="66" rx="50" ry="7" fill="url(#qg)" />
-                    <path d="M12 56 Q60 8 108 56" fill="#2d2060" opacity=".4" />
-                    <path d="M16 56 Q60 12 104 56" fill="none" stroke="#7c6af7" stroke-width="1.5" />
-                    <path d="M22 56 Q60 18 98 56" fill="#7c6af7" opacity=".06" />
-                    <line x1="60" y1="12" x2="60" y2="56" stroke="#9080f8" stroke-width="1" />
-                    <polygon points="60,5 64,12 60,16 56,12" fill="#7c6af7" opacity=".7" />
-                    <circle cx="38" cy="32" r="1.5" fill="#7c6af7" opacity=".5" />
-                    <circle cx="82" cy="28" r="1.5" fill="#7c6af7" opacity=".5" />
-                    <circle cx="28" cy="44" r="1" fill="#a58bf8" opacity=".4" />
-                    <circle cx="92" cy="42" r="1" fill="#a58bf8" opacity=".4" />
-                </svg>
-            </div>
         </div>
-
     </aside>
 </div><!-- eg-body -->
 <!-- WRITE REVIEW MODAL -->
@@ -265,11 +331,7 @@
         <div class="eg-mhdr"><h3>Write a Review</h3><i class="ti ti-x eg-mclose" id="closeRev"></i></div>
         <label>Book</label>
         <select id="revBook">
-            <option>Atomic Habits — James Clear</option>
-            <option>The 5 AM Club — Robin Sharma</option>
-            <option>Deep Work — Cal Newport</option>
-            <option>Make Your Bed — William H. McRaven</option>
-            <option>Mindset — Carol S. Dweck</option>
+            <!-- TODO: populate from reader's currently-reading / completed list once that endpoint is confirmed -->
         </select>
         <label>Rating</label>
         <div class="eg-mstars" id="mStars">
@@ -285,104 +347,161 @@
         </div>
     </div>
 </div>
+
 <script>
-        (function(){
-    'use strict';
-    function gi(id){ return document.getElementById(id); }
+    (function () {
+        'use strict';
+        function gi(id) { return document.getElementById(id); }
 
-    function closeAll(except){
-      [gi('egND'),gi('egAVD'),gi('egSD'),gi('pdDrop')].forEach(function(d){ if(d&&d!==except) d.classList.remove('open'); });
-      var pb=gi('pdBtn'); if(pb&&gi('pdDrop')!==except) pb.classList.remove('open');
-      document.querySelectorAll('.kb-m').forEach(function(m){ if(m!==except) m.classList.remove('open'); });
-    }
-    document.addEventListener('click',function(){ closeAll(null); });
+        const CHART_DATA = @Html.Raw(chartJson); // [{ label, hours }]
 
-    /* Search */
-    var ITEMS=[
-      {t:'Reviews',s:'Your reviews and ratings',i:'ti-star',h:'#section-reviews'},
-      {t:'Notifications',s:'Recent updates',i:'ti-bell',h:'#section-notifications'},
-      {t:'Analytics',s:'Your reading insights',i:'ti-chart-bar',h:'#section-analytics'},
-      {t:'Atomic Habits',s:'James Clear',i:'ti-book-2',h:'#section-reviews'},
-      {t:'The 5 AM Club',s:'Robin Sharma',i:'ti-book-2',h:'#section-reviews'},
-      {t:'Deep Work',s:'Cal Newport',i:'ti-book-2',h:'#section-reviews'},
-      {t:'Help Center',s:'Find answers to common questions',i:'ti-help-circle',h:'#section-notifications'},
-    ];
-    var si=gi('egSI'),sd=gi('egSD');
-    function renderSearch(q){
-      sd.innerHTML=''; if(!q){sd.classList.remove('open');return;}
-      var ql=q.toLowerCase();
-      var hits=ITEMS.filter(function(x){return x.t.toLowerCase().includes(ql)||x.s.toLowerCase().includes(ql);});
-      if(!hits.length){sd.innerHTML='<div class="eg-sr-empty">No results for "'+q+'"</div>';}
-      else{hits.forEach(function(b){var el=document.createElement('div');el.className='eg-sr';el.innerHTML='<i class="ti '+b.i+'"></i><div><div class="eg-sr-t">'+b.t+'</div><div class="eg-sr-s">'+b.s+'</div></div>';el.addEventListener('click',function(){var t=document.querySelector(b.h);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});si.value=b.t;sd.classList.remove('open');});sd.appendChild(el);});}
-      sd.classList.add('open');
-    }
-    if(si){
-      si.addEventListener('input',function(){closeAll(sd);renderSearch(this.value.trim());});
-      si.addEventListener('focus',function(){if(this.value.trim())renderSearch(this.value.trim());});
-      document.addEventListener('keydown',function(e){if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();si.focus();si.select();}if(e.key==='Escape'){sd.classList.remove('open');si.blur();closeAll(null);}});
-    }
+        function closeAll(except) {
+            [gi('egND'), gi('egAVD'), gi('egSD'), gi('pdDrop')].forEach(function (d) { if (d && d !== except) d.classList.remove('open'); });
+            var pb = gi('pdBtn'); if (pb && gi('pdDrop') !== except) pb.classList.remove('open');
+            document.querySelectorAll('.kb-m').forEach(function (m) { if (m !== except) m.classList.remove('open'); });
+        }
+        document.addEventListener('click', function () { closeAll(null); });
 
-    /* Bell */
-    var bell=gi('egBell'),nd=gi('egND'),bdot=gi('egBDot');
-    if(bell)bell.addEventListener('click',function(e){e.stopPropagation();var o=nd.classList.contains('open');closeAll(null);if(!o)nd.classList.add('open');});
-    var ma=gi('egMA');
-    if(ma)ma.addEventListener('click',function(){document.querySelectorAll('.eg-nd-item.unread').forEach(function(el){el.classList.remove('unread');});document.querySelectorAll('.eg-nd-dot').forEach(function(el){el.remove();});if(bdot)bdot.style.display='none';});
+        /* Bell */
+        var bell = gi('egBell'), nd = gi('egND'), bdot = gi('egBDot');
+        if (bell) bell.addEventListener('click', function (e) { e.stopPropagation(); var o = nd.classList.contains('open'); closeAll(null); if (!o) nd.classList.add('open'); });
 
-    /* Avatar */
-    var av=gi('egAV'),avd=gi('egAVD');
-    if(av)av.addEventListener('click',function(e){e.stopPropagation();var o=avd.classList.contains('open');closeAll(null);if(!o)avd.classList.add('open');});
+        var ma = gi('egMA');
+        if (ma) ma.addEventListener('click', async function () {
+            await fetch('/Reader/MarkAllNotificationsRead', { method: 'POST' });
+            document.querySelectorAll('.eg-nd-item.unread').forEach(function (el) { el.classList.remove('unread'); });
+            document.querySelectorAll('.eg-nd-dot').forEach(function (el) { el.remove(); });
+            if (bdot) bdot.style.display = 'none';
+        });
 
-    /* Section mark read */
-    var msr=gi('markSecRead');
-    if(msr)msr.addEventListener('click',function(e){e.preventDefault();['snd1','snd2','snd3','snd4'].forEach(function(id){var el=gi(id);if(el)el.style.display='none';});if(bdot)bdot.style.display='none';});
+        var msr = gi('markSecRead');
+        if (msr) msr.addEventListener('click', async function (e) {
+            e.preventDefault();
+            await fetch('/Reader/MarkAllNotificationsRead', { method: 'POST' });
+            document.querySelectorAll('.notif-row .ndot').forEach(function (el) { el.remove(); });
+            if (bdot) bdot.style.display = 'none';
+        });
 
-    /* Kebabs */
-    document.querySelectorAll('.kb').forEach(function(k){k.addEventListener('click',function(e){e.stopPropagation();var m=this.nextElementSibling;var o=m.classList.contains('open');closeAll(null);if(!o)m.classList.add('open');});});
+        /* Individual notification click → mark read */
+        document.querySelectorAll('.notif-row, .eg-nd-item').forEach(function (row) {
+            row.addEventListener('click', async function () {
+                var id = row.dataset.notifId;
+                if (!id) return;
+                await fetch('/Reader/MarkNotificationRead?id=' + id, { method: 'POST' });
+                var dot = row.querySelector('.ndot, .eg-nd-dot');
+                if (dot) dot.remove();
+                row.classList.remove('unread');
+            });
+        });
 
-    /* Analytics tabs */
-    var panels={overview:gi('anOverview'),reading:gi('anReading'),activity:gi('anActivity'),streaks:gi('anStreaks')};
-    document.querySelectorAll('.an-tab').forEach(function(tab){tab.addEventListener('click',function(){document.querySelectorAll('.an-tab').forEach(function(t){t.classList.remove('active');});this.classList.add('active');var k=this.getAttribute('data-tab');Object.keys(panels).forEach(function(p){if(panels[p])panels[p].style.display=(p===k)?'':'none';});});});
+        /* Avatar */
+        var av = gi('egAV'), avd = gi('egAVD');
+        if (av) av.addEventListener('click', function (e) { e.stopPropagation(); var o = avd.classList.contains('open'); closeAll(null); if (!o) avd.classList.add('open'); });
 
-    /* Chart */
-    var CHART={
-      '8w':{v:[2,5,3,4,6,3,5,7],l:['Mar 24','Mar 31','Apr 7','Apr 14','Apr 21','Apr 28','May 5','May 12']},
-      '4w':{v:[4,6,5,7],l:['Apr 21','Apr 28','May 5','May 12']},
-      '12w':{v:[1,3,2,4,3,5,2,4,3,5,4,7],l:['Feb','','Mar','','Apr','','','May','','','','']},
-      '6m':{v:[4,5,3,6,5,7],l:['Dec','Jan','Feb','Mar','Apr','May']}
-    };
-    function buildChart(key){
-      var bars=gi('anBars'),xl=gi('anXL');if(!bars||!xl)return;
-      var d=CHART[key]||CHART['8w'];var mx=Math.max.apply(null,d.v);
-      bars.innerHTML='';xl.innerHTML='';
-      d.v.forEach(function(v){var b=document.createElement('div');b.className='an-bar'+(v===mx?' hi':'');b.style.height=Math.round((v/mx)*100)+'%';var tip=document.createElement('div');tip.className='an-bar-tip';tip.textContent=v+'h';b.appendChild(tip);bars.appendChild(b);});
-      d.l.forEach(function(l){var s=document.createElement('span');s.className='an-xlabel';s.textContent=l;xl.appendChild(s);});
-    }
-    var pb=gi('pdBtn'),pdrop=gi('pdDrop'),pl=gi('pdLabel');
-    if(pb){
-      pb.addEventListener('click',function(e){e.stopPropagation();var o=pdrop.classList.contains('open');closeAll(null);if(!o){pdrop.classList.add('open');pb.classList.add('open');}});
-      pdrop.querySelectorAll('a[data-p]').forEach(function(a){a.addEventListener('click',function(e){e.stopPropagation();pdrop.querySelectorAll('a').forEach(function(x){x.classList.remove('active');});this.classList.add('active');pl.textContent=this.textContent;buildChart(this.getAttribute('data-p'));pdrop.classList.remove('open');pb.classList.remove('open');});});
-    }
+        /* Kebabs */
+        document.querySelectorAll('.kb').forEach(function (k) {
+            k.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var m = this.nextElementSibling;
+                var o = m.classList.contains('open');
+                closeAll(null);
+                if (!o) m.classList.add('open');
+            });
+        });
 
-    /* Modal */
-    var modal=gi('revModal');var rating=0;
-    function openM(){modal.classList.add('open');}
-    function closeM(){modal.classList.remove('open');}
-    [gi('writeBtn1'),gi('writeBtn2')].forEach(function(b){if(b)b.addEventListener('click',openM);});
-    if(gi('closeRev'))gi('closeRev').addEventListener('click',closeM);
-    if(gi('cancelRev'))gi('cancelRev').addEventListener('click',closeM);
-    if(modal)modal.addEventListener('click',function(e){if(e.target===modal)closeM();});
-    var mstars=document.querySelectorAll('#mStars i');
-    mstars.forEach(function(s,i){s.addEventListener('mouseover',function(){mstars.forEach(function(x,j){x.className=j<=i?'ti ti-star-filled lit':'ti ti-star';});});s.addEventListener('click',function(){rating=i+1;});});
-    var ms=gi('mStars');
-    if(ms)ms.addEventListener('mouseleave',function(){mstars.forEach(function(s,i){s.className=i<rating?'ti ti-star-filled lit':'ti ti-star';});});
-    if(gi('submitRev'))gi('submitRev').addEventListener('click',function(){alert('Review submitted: '+gi('revBook').value+' ('+rating+' stars)');closeM();});
+        /* Analytics tabs */
+        var panels = { overview: gi('anOverview'), reading: gi('anReading'), activity: gi('anActivity'), streaks: gi('anStreaks') };
+        document.querySelectorAll('.an-tab').forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                document.querySelectorAll('.an-tab').forEach(function (t) { t.classList.remove('active'); });
+                this.classList.add('active');
+                var k = this.getAttribute('data-tab');
+                Object.keys(panels).forEach(function (p) { if (panels[p]) panels[p].style.display = (p === k) ? '' : 'none'; });
+            });
+        });
 
-    /* Scrollspy */
-    var smap=[{label:'Reviews',id:'section-reviews'},{label:'Notifications',id:'section-notifications'},{label:'Analytics',id:'section-analytics'},{label:'Support',id:'section-notifications'}];
-    document.querySelectorAll('.nav-subitem').forEach(function(link){var txt=link.textContent.trim();smap.forEach(function(m){if(txt===m.label){link.setAttribute('href','#'+m.id);link.classList.add('scrollspy-link');}});});
+        /* Chart — server-provided data for the current range only */
+        function buildChart(data) {
+            var bars = gi('anBars'), xl = gi('anXL'), yax = gi('anYAxis');
+            if (!bars || !xl) return;
+            if (!data || !data.length) {
+                bars.innerHTML = ''; xl.innerHTML = '';
+                if (yax) yax.innerHTML = '';
+                return;
+            }
+            var mx = Math.max.apply(null, data.map(function (d) { return d.hours; })) || 1;
 
-    /* Init */
-    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){buildChart('8w');});}
-    else{buildChart('8w');}
+            if (yax) {
+                yax.innerHTML = '';
+                [1, 0.75, 0.5, 0.25, 0].forEach(function (f) {
+                    var s = document.createElement('span');
+                    s.textContent = Math.round(mx * f) + 'h';
+                    yax.appendChild(s);
+                });
+            }
+
+            bars.innerHTML = ''; xl.innerHTML = '';
+            data.forEach(function (d) {
+                var b = document.createElement('div');
+                b.className = 'an-bar' + (d.hours === mx ? ' hi' : '');
+                b.style.height = Math.round((d.hours / mx) * 100) + '%';
+                var tip = document.createElement('div');
+                tip.className = 'an-bar-tip';
+                tip.textContent = d.hours + 'h';
+                b.appendChild(tip);
+                bars.appendChild(b);
+
+                var s = document.createElement('span');
+                s.className = 'an-xlabel';
+                s.textContent = d.label;
+                xl.appendChild(s);
+            });
+        }
+
+        var pb = gi('pdBtn'), pdrop = gi('pdDrop'), pl = gi('pdLabel');
+        if (pb) {
+            pb.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var o = pdrop.classList.contains('open');
+                closeAll(null);
+                if (!o) { pdrop.classList.add('open'); pb.classList.add('open'); }
+            });
+            pdrop.querySelectorAll('a[data-p]').forEach(function (a) {
+                a.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    window.location.href = '/Reader/Engagement?range=' + this.getAttribute('data-p') + '#section-analytics';
+                });
+            });
+        }
+
+        /* Modal (submit still unwired — no create-review endpoint yet) */
+        var modal = gi('revModal'); var rating = 0;
+        function openM() { modal.classList.add('open'); }
+        function closeM() { modal.classList.remove('open'); }
+        [gi('writeBtn1'), gi('writeBtn2')].forEach(function (b) { if (b) b.addEventListener('click', openM); });
+        if (gi('closeRev')) gi('closeRev').addEventListener('click', closeM);
+        if (gi('cancelRev')) gi('cancelRev').addEventListener('click', closeM);
+        if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) closeM(); });
+        var mstars = document.querySelectorAll('#mStars i');
+        mstars.forEach(function (s, i) {
+            s.addEventListener('mouseover', function () { mstars.forEach(function (x, j) { x.className = j <= i ? 'ti ti-star-filled lit' : 'ti ti-star'; }); });
+            s.addEventListener('click', function () { rating = i + 1; });
+        });
+        var ms = gi('mStars');
+        if (ms) ms.addEventListener('mouseleave', function () { mstars.forEach(function (s, i) { s.className = i < rating ? 'ti ti-star-filled lit' : 'ti ti-star'; }); });
+        if (gi('submitRev')) gi('submitRev').addEventListener('click', function () {
+            alert('TODO: wire to a CreateReview command — no such endpoint exists yet.');
+            closeM();
+        });
+
+        /* Scrollspy */
+        var smap = [{ label: 'Reviews', id: 'section-reviews' }, { label: 'Notifications', id: 'section-notifications' }, { label: 'Analytics', id: 'section-analytics' }, { label: 'Support', id: 'section-notifications' }];
+        document.querySelectorAll('.nav-subitem').forEach(function (link) {
+            var txt = link.textContent.trim();
+            smap.forEach(function (m) { if (txt === m.label) { link.setAttribute('href', '#' + m.id); link.classList.add('scrollspy-link'); } });
+        });
+
+        /* Init */
+        buildChart(CHART_DATA);
     })();
 </script>

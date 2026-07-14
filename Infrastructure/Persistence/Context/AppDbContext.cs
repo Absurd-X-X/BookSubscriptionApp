@@ -12,13 +12,17 @@ namespace Infrastructure.Persistence.Context
         public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<BankAccount> BankAccounts { get; set; }
         public DbSet<Book> Books { get; set; }
+        public DbSet<Bookmark> Bookmarks { get; set; }
         public DbSet<BookVersion> BookVersions { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Conversation> Conversations { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
         public DbSet<Library> Libraries { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Reader> Readers { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<ReadingListItem> ReadingListItems { get; set; }
         public DbSet<ReadingProgress> ReadingProgresses { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<SubscriptionType> SubscriptionTypes { get; set; }
@@ -26,7 +30,7 @@ namespace Infrastructure.Persistence.Context
         public DbSet<UserConversation> UserConversations { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<WalletTransaction> WalletTransactions { get; set; }
-        public DbSet<Review> Reviews { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

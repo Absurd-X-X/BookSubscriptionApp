@@ -10,6 +10,7 @@ using Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Repositories;
 using static Application.Command.AddBook;
 
 
@@ -46,7 +47,10 @@ public partial class Program
         builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
         builder.Services.AddScoped<IReadingProgressRepository, ReadingProgressRepository>();
         builder.Services.AddScoped<IReviewRepository, ReviewRepository>(); 
-        builder.Services.AddScoped<IBookVersionRepository, BookVersionRepository>(); 
+        builder.Services.AddScoped<IBookVersionRepository, BookVersionRepository>();
+        builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+        builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
+        builder.Services.AddScoped<IReadingListRepository, ReadingListRepository>();
         builder.Services.AddHttpContextAccessor();
 
         builder.Services.AddTransient<IPasswordHasher<string>, PasswordHasher<string>>();

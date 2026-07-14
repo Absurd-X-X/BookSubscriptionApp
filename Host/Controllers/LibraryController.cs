@@ -108,7 +108,7 @@ namespace Host.Controllers
             }
 
             TempData["Success"] = result.Message;
-            return RedirectToAction(nameof(GetByLibrary));
+            return RedirectToAction(nameof(Index));
         }
 
 

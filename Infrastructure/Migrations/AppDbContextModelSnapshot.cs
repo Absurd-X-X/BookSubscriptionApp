@@ -27,13 +27,11 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("ActionType")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Icon")
                         .IsRequired()
@@ -41,8 +39,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("IpAddress")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
@@ -61,8 +58,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("UserRole")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("varchar(150)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -300,6 +296,49 @@ namespace Infrastructure.Migrations
                     b.ToTable("BookVersions");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Bookmark", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DateModified")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("PageNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Quote")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("ReaderId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReaderId");
+
+                    b.ToTable("Bookmarks");
+                });
+
             modelBuilder.Entity("Domain.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
@@ -365,6 +404,28 @@ namespace Infrastructure.Migrations
                     b.ToTable("Conversations");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Favorite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("ReaderId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReaderId");
+
+                    b.ToTable("Favorites");
+                });
+
             modelBuilder.Entity("Domain.Entities.Library", b =>
                 {
                     b.Property<Guid>("Id")
@@ -396,8 +457,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("RefNumber")
                         .IsRequired()
@@ -408,6 +468,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PhoneNumber");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -552,6 +614,18 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<DateTime?>("ReadingGoalDeadline")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ReadingGoalMotivation")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("ReadingGoalTarget")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReadingGoalType")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
@@ -563,6 +637,31 @@ namespace Infrastructure.Migrations
                     b.ToTable("Readers");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ReadingListItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("ListType")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ReaderId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReaderId");
+
+                    b.ToTable("ReadingListItems");
+                });
+
             modelBuilder.Entity("Domain.Entities.ReadingProgress", b =>
                 {
                     b.Property<Guid>("Id")
@@ -572,10 +671,26 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("BookId")
                         .HasColumnType("char(36)");
 
-                    b.Property<string>("CurrentLocation")
+                    b.Property<string>("Cfi")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CurrentChapter")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
+
+                    b.Property<int>("CurrentPage")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DateModified")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsCompleted")
                         .HasMaxLength(50)
@@ -585,16 +700,28 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("tinyint(10)");
 
-                    b.Property<DateTime>("LastReadAt")
+                    b.Property<DateTime>("LastReadDate")
                         .HasMaxLength(100)
                         .HasColumnType("datetime(6)");
 
-                    b.Property<double>("Percentage")
+                    b.Property<int>("LongestReadingStreak")
+                        .HasColumnType("int");
+
+                    b.Property<double>("ProgressPercentage")
                         .HasMaxLength(100)
                         .HasColumnType("double");
 
                     b.Property<Guid>("ReaderId")
                         .HasColumnType("char(36)");
+
+                    b.Property<int>("ReadingStreak")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalMinutesRead")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalPagesRead")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -793,10 +920,10 @@ namespace Infrastructure.Migrations
                         {
                             Id = new Guid("c117635d-96e0-409b-9fae-72976ec9c42a"),
                             CreatedBy = "system",
-                            DateCreated = new DateTime(2026, 7, 8, 13, 25, 18, 487, DateTimeKind.Utc).AddTicks(5489),
+                            DateCreated = new DateTime(2026, 7, 12, 16, 9, 44, 585, DateTimeKind.Utc).AddTicks(9518),
                             DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
-                            HashPassword = "AQAAAAIAAYagAAAAEFmzEno+8ej3IDVssOM5OKNSDHesHVxN+TJYYgHC77FDcaugc5q0LYXCAIWHzCAbAg==",
+                            HashPassword = "AQAAAAIAAYagAAAAELYdntFo3Dlu4glAUFBF0FYXcMflRhteMOWvE5gGWMgjL/JMUcYjxwt3fMTQJbJYhA==",
                             IsDeleted = false,
                             IsVerified = true,
                             Role = "admin",
@@ -862,10 +989,10 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("6bff2f97-13ac-49f9-85fa-eeef73ff249b"),
+                            Id = new Guid("be45162f-6b3c-468d-8fff-bfee256cf054"),
                             Balance = 0m,
                             CreatedBy = "admin@gmail.com",
-                            DateCreated = new DateTime(2026, 7, 8, 13, 25, 18, 569, DateTimeKind.Utc).AddTicks(8213),
+                            DateCreated = new DateTime(2026, 7, 12, 16, 9, 44, 666, DateTimeKind.Utc).AddTicks(1619),
                             DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             LastPayoutDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -982,6 +1109,44 @@ namespace Infrastructure.Migrations
                     b.Navigation("Book");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Bookmark", b =>
+                {
+                    b.HasOne("Domain.Entities.Book", "Book")
+                        .WithMany("Bookmarks")
+                        .HasForeignKey("ReaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Reader", "Reader")
+                        .WithMany("Bookmarks")
+                        .HasForeignKey("ReaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Reader");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Favorite", b =>
+                {
+                    b.HasOne("Domain.Entities.Book", "Book")
+                        .WithMany("Favorites")
+                        .HasForeignKey("ReaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Reader", "Reader")
+                        .WithMany("Favorites")
+                        .HasForeignKey("ReaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Reader");
+                });
+
             modelBuilder.Entity("Domain.Entities.Library", b =>
                 {
                     b.HasOne("Domain.Entities.User", "User")
@@ -1032,6 +1197,25 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ReadingListItem", b =>
+                {
+                    b.HasOne("Domain.Entities.Book", "Book")
+                        .WithMany("ReadingListItems")
+                        .HasForeignKey("ReaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Reader", "Reader")
+                        .WithMany("Readings")
+                        .HasForeignKey("ReaderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Reader");
                 });
 
             modelBuilder.Entity("Domain.Entities.ReadingProgress", b =>
@@ -1134,6 +1318,12 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Book", b =>
                 {
+                    b.Navigation("Bookmarks");
+
+                    b.Navigation("Favorites");
+
+                    b.Navigation("ReadingListItems");
+
                     b.Navigation("ReadingProgresses");
 
                     b.Navigation("Reviews");
@@ -1160,7 +1350,13 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Reader", b =>
                 {
+                    b.Navigation("Bookmarks");
+
+                    b.Navigation("Favorites");
+
                     b.Navigation("ReadingProgresses");
+
+                    b.Navigation("Readings");
 
                     b.Navigation("Reviews");
 

@@ -27,26 +27,29 @@ namespace Application.Command
             public async Task<Result<string>> Handle(UpdateLibraryComand request, CancellationToken cancellationToken)
             {
 
-                var user = await userRepository.GetAsync(request.UserId); 
+                var library = await libraryRepository.GetAsync(request.UserId);
 
-                if (user == null)
+                var admin = await userRepository.GetAsync("admin@gmail.com");
+
+                if (admin == null)
                     return Result<string>.Failure("User not found");
-
-                var library = await libraryRepository.GetLibraryAsync(user.Email);
 
                 if (library == null)
                     return Result<string>.Failure("Library not found");
 
-                if (library.CreatedBy != user.Email)
+                if (library.CreatedBy != admin.Id.ToString())
                     return Result<string>.Failure("Unauthorized");
-                user.UserName = request.Username; 
-                user.Email = request.Email;
+
+                library.User.UserName = request.Username; 
+                library.User.Email = request.Email; 
                 library.Name = request.Name;
                 library.Email = request.Email;
                 library.PhoneNumber = request.PhoneNumber;
                 library.CreatedBy = request.Email;
 
-
+                var user = await userRepository.GetAsync(request.Email);
+                if (user == null)
+                    return Result<string>.Failure("User not found");
 
                 string? ipAddress = httpContextAccessor
                 .HttpContext?

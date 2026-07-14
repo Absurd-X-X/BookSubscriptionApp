@@ -304,5 +304,12 @@ namespace Infrastructure.Persistence.Repositories
                 TotalPendingAmount: pending.Sum(p => p.Balance)
             );
         }
+
+        public async Task<decimal> GetTotalByTypeAsync(Guid walletId, TransactionType type)
+        {
+            return await context.WalletTransactions
+                .Where(x => x.WalletId == walletId && x.Type == type && !x.IsDeleted)
+                .SumAsync(x => x.Balance);
+        }
     }
 }

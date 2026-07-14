@@ -21,14 +21,14 @@ namespace Application.Commands
                     {
                         ReaderId = request.ReaderId,
                         BookId = request.BookId,
-                        Percentage = request.Percentage,
-                        CurrentLocation = request.CurrentLocation
+                        ProgressPercentage = request.Percentage,
+                        CurrentChapter = request.CurrentLocation
                     });
                 }
 
-                existingProgress!.Percentage = request.Percentage;
-                existingProgress.CurrentLocation = request.CurrentLocation;
-                existingProgress.LastReadAt = DateTime.UtcNow;
+                existingProgress!.ProgressPercentage = request.Percentage;
+                existingProgress.CurrentChapter = request.CurrentLocation;
+                existingProgress.LastReadDate = DateTime.UtcNow;
 
                 return Result<string>.Success("Reading progress updated successfully.", "");
             }

@@ -1,6 +1,7 @@
 ﻿using Application.Common.Pagenation;
 using Application.Common.Repositories;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -49,6 +50,25 @@ namespace Infrastructure.Persistence.Repositories
                 Items = query,
                 TotalCount = totalCount
             };
+        }
+
+        public async Task UpdateReadingGoalAsync(
+            Guid readerId,
+            ReadingGoalType type,
+            int target,
+            DateTime? deadline,
+            string? motivation)
+        {
+            var reader = await context.Readers
+                .FirstOrDefaultAsync(x => x.Id == readerId);
+
+            if (reader is null) return;
+
+            reader.ReadingGoalType = type;
+            reader.ReadingGoalTarget = target;
+            reader.ReadingGoalDeadline = deadline;
+            reader.ReadingGoalMotivation = motivation;
+            reader.DateModified = DateTime.UtcNow;
         }
     }
 }

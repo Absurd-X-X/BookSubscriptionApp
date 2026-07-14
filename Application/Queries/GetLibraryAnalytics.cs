@@ -47,8 +47,8 @@ namespace Application.Queries
                 var prevTotalReaders = prevProgress.Select(p => p.ReaderId).Distinct().Count();
                 var totalReadersGrowth = PercentChange(prevTotalReaders, totalReaders);
 
-                var activeReaders = progress.Where(p => p.Percentage > 0).Select(p => p.ReaderId).Distinct().Count();
-                var prevActiveReaders = prevProgress.Where(p => p.Percentage > 0).Select(p => p.ReaderId).Distinct().Count();
+                var activeReaders = progress.Where(p => p.ProgressPercentage > 0).Select(p => p.ReaderId).Distinct().Count();
+                var prevActiveReaders = prevProgress.Where(p => p.ProgressPercentage > 0).Select(p => p.ReaderId).Distinct().Count();
                 var activeReadersGrowth = PercentChange(prevActiveReaders, activeReaders);
 
                 // --- Ratings (from Review.Rating) ---
@@ -95,17 +95,17 @@ namespace Application.Queries
                     .OrderByDescending(x => x.Growth)
                     .FirstOrDefault();
 
-                // --- Most active day (from ReadingProgress.LastReadAt) ---
+                // --- Most active day (from ReadingProgress.LastReadDate) ---
                 var mostActiveDayGroup = progress
-                    .GroupBy(p => p.LastReadAt.DayOfWeek)
+                    .GroupBy(p => p.LastReadDate.HasValue ? p.LastReadDate.Value.DayOfWeek : (DayOfWeek?)null)
                     .OrderByDescending(g => g.Select(p => p.ReaderId).Distinct().Count())
                     .FirstOrDefault();
 
                 // --- Funnel (only stages derivable from Percentage/IsCompleted) ---
                 var funnelOpened = totalReads;
-                var funnelStarted = progress.Count(p => p.Percentage > 0);
-                var funnelReached50 = progress.Count(p => p.Percentage >= 50);
-                var funnelReached90 = progress.Count(p => p.Percentage >= 90);
+                var funnelStarted = progress.Count(p => p.ProgressPercentage > 0);
+                var funnelReached50 = progress.Count(p => p.ProgressPercentage >= 50);
+                var funnelReached90 = progress.Count(p => p.ProgressPercentage >= 90);
 
                 var funnel = new List<FunnelStepDto>
                 {
@@ -136,9 +136,9 @@ namespace Application.Queries
                     OneStarPct: PctOfTotal(allRatings.Count(r => r == 1), allRatings.Count)
                 );
 
-                // --- Daily trend (readers active per day, from LastReadAt) ---
+                // --- Daily trend (readers active per day, from LastReadDate) ---
                 var trend = progress
-                    .GroupBy(p => p.LastReadAt.Date)
+                    .GroupBy(p => p.LastReadDate.HasValue ? p.LastReadDate.Value.Date : (DateTime?)null)
                     .OrderBy(g => g.Key)
                     .Select(g => new { Date = g.Key, Count = g.Select(p => p.ReaderId).Distinct().Count() })
                     .ToList();
@@ -178,7 +178,7 @@ namespace Application.Queries
                     AverageCompletionRate: completionRate,
                     AverageCompletionRateGrowthPercent: completionRateGrowth,
 
-                    TrendLabels: trend.Select(t => t.Date.ToString("MMM d")).ToList(),
+                    TrendLabels: trend.Select(t => t.Date?.ToString("MMM d") ?? "").ToList(),
                     TrendData: trend.Select(t => t.Count).ToList(),
 
                     BestPerformingBookTitle: bestBook?.Title,

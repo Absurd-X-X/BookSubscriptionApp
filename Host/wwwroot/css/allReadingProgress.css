@@ -143,7 +143,6 @@
 
 /* ── PAGE CONTENT ────────────────────────────── */
 .cr-content {
-    padding: 32px;
 }
 
 .cr-header {
@@ -284,6 +283,10 @@
     padding: 16px 0 16px 18px;
     display: flex;
     align-items: center;
+}
+
+a{
+    text-decoration: none;
 }
 
 .book-cover-img {

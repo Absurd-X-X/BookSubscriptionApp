@@ -1,5 +1,5 @@
 ﻿@using static Application.Queries.GetLibraryAuditLogs
-@model GetAllAuditLogResponse
+@model GetLibraryAuditLogsResponse
 
 @{
     Layout = "~/Views/Shared/_LibraryLayout.cshtml";
@@ -7,7 +7,7 @@
 
     int totalPages = Model.TotalCount == 0 ? 1 : (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
     int startItem = Model.TotalCount == 0 ? 0 : ((Model.Page - 1) * Model.PageSize) + 1;
-    int endItem = Math.Min(Model.Page * Model.PageSize, Model.TotalCount);
+    long endItem = Math.Min(Model.Page * Model.PageSize, Model.TotalCount);
 
     string TrendClass(double pct) => pct >= 0 ? "up" : "down";
     string TrendArrowPath(double pct) => pct >= 0 ? "M12 19V5M5 12l7-7 7 7" : "M12 5v14M19 12l-7 7-7-7";
@@ -181,7 +181,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var log in Model.Items)
+                        @foreach (var log in Model.Items.Where(x => x.Role.ToLower() == "library"))
                         {
                             <tr data-category="@log.ResourceType" data-log-id="@log.Id">
                                 <td>
@@ -240,7 +240,7 @@
                     <span id="al-showing-text">Showing @startItem to @endItem of @Model.TotalCount.ToString("N0") activities</span>
                     <div class="al-pagination" id="al-pagination">
                         <a class="al-page-arrow" aria-label="Previous page"
-                           href="@Url.Action("AdminActivity", "Admin", new { page = Math.Max(1, Model.Page - 1), pageSize = Model.PageSize })">
+                           href="@Url.Action("GetActivity", "Library", new { page = Math.Max(1, Model.Page - 1), pageSize = Model.PageSize })">
                             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" /></svg>
                         </a>
                         @{

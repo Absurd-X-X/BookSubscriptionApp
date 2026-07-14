@@ -17,5 +17,7 @@ namespace Application.Common.Repositories
         Task<ICollection<Book>> SearchBook(string searchText);
         Task<ICollection<Book>> GetBooksAuthorAsync(string author);
         void Update(Book book);
+        Task<List<Book>> GetNewArrivalsAsync(int take);
+        Task<List<Book>> GetRecommendedForReaderAsync(Guid readerId, List<Guid> excludeBookIds, int take);
     }
 }

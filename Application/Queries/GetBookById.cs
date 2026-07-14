@@ -23,10 +23,6 @@ namespace Application.Queries
                     PageSize = 10
                 }, false, request.Id);
 
-                if (reviews.TotalCount == 0)
-                {
-                    return Result<GetBookByIdResponse>.Failure("Cant Retrieve");
-                }
 
                 if (book is null)
                     return Result<GetBookByIdResponse>.Failure("Cant Retrieve");
@@ -78,7 +74,7 @@ namespace Application.Queries
     string? BookCoverUrl, string BookFileUrl,
     bool IsActive, DateTime AddedDate, int Engagement,
     long TotalReviewCount, double AverageRating,
-    IEnumerable<Review> RecentBookReviews
+    IEnumerable<Review>? RecentBookReviews
             );
 
     }

@@ -31,12 +31,16 @@ using static Application.Queries.GetConversationMessages;
 using static Application.Queries.GetLibraryById;
 using static Application.Queries.GetMyNotifications;
 using static Application.Queries.GetNotificationById;
+using static Application.Queries.GetPendingTransaction;
 using static Application.Queries.GetSubscriptionById;
 using static Application.Queries.GetSubscriptionByUserId;
 using static Application.Queries.GetSubscriptions;
 using static Application.Queries.GetTransactionById;
+using static Application.Queries.GetTransactionByTransactionStatus;
+using static Application.Queries.GetTransactions;
 using static Application.Queries.GetUserDetails;
 using static Application.Queries.GetUsers;
+using static Application.Queries.GetWalletBalance;
 
 namespace Host.Controllers
 {
@@ -162,12 +166,27 @@ namespace Host.Controllers
         public async Task<IActionResult> GetCategories(int page = 1, int pageSize = 7)
         {
             var result = await mediator.Send(new GetAllCategoryQuery(page, pageSize));
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction(nameof(Index));
+            }
+            TempData["Success"] = result.Message;
             return View(result.Data);
         }
         [HttpGet]
         public async Task<IActionResult> GetLibraries(int page = 1, int pageSize = 7 )
         {
             Result<PagenatedList<GetAllLibraryResponse>> libraries = await mediator.Send(new GetAllLibraryQuery(page, pageSize));
+
+            if (!libraries.Status)
+            {
+                TempData["Error"] = libraries.Message;
+                return RedirectToAction(nameof(Index));
+            }
+
+            TempData["Success"] = libraries .Message;
+
             return View(libraries.Data);
         }
         [HttpGet]
@@ -181,6 +200,7 @@ namespace Host.Controllers
                 return RedirectToAction(nameof(GetLibraries));
             }
 
+            TempData["Success"] = result.Message;
             return View(result.Data);
         }
 
@@ -195,6 +215,7 @@ namespace Host.Controllers
                 return View(result);
             }
 
+            TempData["Success"] = result.Message;
             return View(result.Data);
         }
         [HttpGet]
@@ -208,6 +229,7 @@ namespace Host.Controllers
                 return RedirectToAction(nameof(GetNotifications));
             }
 
+            TempData["Success"] = result.Message;
             return View(result.Data);
         }
         [HttpGet]
@@ -220,6 +242,7 @@ namespace Host.Controllers
                 TempData["Error"] = result.Message;
                 return RedirectToAction(nameof(GetCategories));
             }
+            TempData["Success"] = result.Message;
             return View(result.Data);
         }
 
@@ -426,23 +449,9 @@ namespace Host.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> EditLibrary(Guid libraryId)
+        public async Task<IActionResult> EditLibrary(Guid id)
         {
-            var result = await mediator.Send(new GetLibraryByIdQuery(libraryId));
-
-            if (!result.Status)
-            {
-                TempData["Error"] = "The requested category could not be found.";
-                return RedirectToAction(nameof(GetLibraries));
-            }
-
-            return View(result.Data);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> EditLibrary(string name, string phone, string email, string userName)
-        {
-            var result = await mediator.Send(new UpdateLibraryComand(ClaimsHelper.GetUserId(User), name, email, phone, userName));
+            var result = await mediator.Send(new GetLibraryByIdQuery(id));
 
             if (!result.Status)
             {
@@ -450,7 +459,57 @@ namespace Host.Controllers
                 return RedirectToAction(nameof(GetLibraries));
             }
 
-            TempData["Successful"] = result.Message;
+            TempData["Success"] = result.Message;
+            return View(result.Data);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetWallet(
+        int txPage = 1,
+        int creditPage = 1,
+        int debitPage = 1,
+        int pendingPage = 1,
+        int pageSize = 3)
+        {
+            var customerId = ClaimsHelper.GetCustomerId(User);
+
+            var balance = await mediator.Send(new GetWalletBalanceQuery(customerId));
+
+            var transactionHistory = await mediator.Send(new GetTransactionsQuery(txPage, pageSize));
+
+            var transactionStatus = await mediator.Send(new GetTransactionByTypeQuery(creditPage, pageSize, TransactionType.Credit));
+
+            var transactionStatusDebit = await mediator.Send(new GetTransactionByTypeQuery(debitPage, pageSize, TransactionType.Debit));
+
+            var transactionTypes = await mediator.Send(new GetPendingTransactionQuery(pendingPage, pageSize, WalletTransactionStatus.Pending));
+
+            var walletFullDetails = new WalletFullData
+            {
+                Transactions = transactionHistory.Data!,
+                TransactionStatusDebit = transactionStatusDebit.Data!,
+                TransactionStatusCredit = transactionStatus.Data!,
+                PendingTransactionStatus = transactionTypes.Data!,
+                WalletBalance = balance.Data!
+            };
+
+            ViewBag.Balance = balance.Data?.Balance ?? 0;
+            ViewBag.WalletId = balance.Data?.WalletId;
+
+            return View(walletFullDetails);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditLibrary(Guid id, string name, string phone, string email, string userName)
+        {
+            var result = await mediator.Send(new UpdateLibraryComand(id, name, email, phone, userName));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction(nameof(GetLibraries));
+            }
+
+            TempData["Success"] = result.Message;
             return View(result.Data);
         }
 
@@ -578,10 +637,5 @@ namespace Host.Controllers
             }
             return View(result.Data);
         }
-
-        [HttpGet]
-
-        public async Task<IActionResult> GetWallet() {
-            return View(); }
     }
 }

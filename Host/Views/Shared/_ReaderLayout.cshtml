@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
     <link href="~/css/readerLayout.css" rel="stylesheet" />
+    <link href="~/css/toast.css" rel="stylesheet" />
+    <link href="~/css/notify.css" rel="stylesheet" />
+    <link href="~/css/modal.css" rel="stylesheet" />
 
 </head>
 <body>
@@ -17,8 +20,9 @@
         var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
         var scrollPage = ViewData["ScrollPage"]?.ToString() ?? "";
 
-        string IsActive(string action, string controller = "Reader")
-            => (currentAction == action && currentController == controller) ? "active" : "";
+        string IsActive(string controller, params string[] actions)
+    => (currentController == controller && actions.Contains(currentAction, StringComparer.OrdinalIgnoreCase))
+        ? "active" : "";
     }
 
     <div class="container">
@@ -30,7 +34,7 @@
 
             <nav class="nav-links">
 
-                <a href="@Url.Action("ReaderDashboard", "Reader")" class="nav-item @IsActive("ReaderDashboard")">
+                <a href="@Url.Action("ReaderDashboard", "Reader")" class="nav-item @IsActive("Reader", "ReaderDetails", "ReaderDashboard", "ManageSub") ">
                     <i class="ti ti-layout-dashboard" aria-hidden="true"></i>DASHBOARD
                 </a>
 
@@ -67,7 +71,7 @@
                 </button>
                 <div class="nav-group" data-group-panel="myreading">
                     <div class="nav-group-inner">
-                        <a href="@Url.Action("ReadingProgress", "Reader")#section-currently-reading" class="nav-item nav-subitem @IsActive("ReadingProgress ")" data-hash="#section-currently-reading" data-page="myreading">
+                        <a href="@Url.Action("ReadingProgress", "Reader")#section-currently-reading" class="nav-item nav-subitem @IsActive("Reader", "ReadingProgress")" data-hash="#section-currently-reading" data-page="myreading">
                             <i class="ti ti-book-2" aria-hidden="true"></i>Currently Reading
                         </a>
                         <a href="@Url.Action("ReadingProgress", "Reader")#section-completed-books" class="nav-item nav-subitem" data-hash="#section-completed-books" data-page="myreading">
@@ -89,13 +93,13 @@
                 </button>
                 <div class="nav-group" data-group-panel="mycollection">
                     <div class="nav-group-inner">
-                        <a href="@Url.Action("ReaderCollection", "Reader")#section-favorites" class="nav-item nav-subitem @IsActive("ReaderCollection")" data-hash="#section-favorites" data-page="mycollection">
+                        <a href="@Url.Action("ReaderCollection", "Reader")#section-favorites" class="nav-item nav-subitem @IsActive("Reader", "ReaderCollection", "ViewAllFavorites")" data-hash="#section-favorites" data-page="mycollection">
                             <i class="ti ti-heart" aria-hidden="true"></i>Favorites
                         </a>
-                        <a href="@Url.Action("ReaderCollection", "Reader")#section-bookmarks" class="nav-item nav-subitem" data-hash="#section-bookmarks" data-page="mycollection">
+                        <a href="@Url.Action("ReaderCollection", "Reader")#section-bookmarks" class="nav-item nav-subitem" @IsActive("Reader", "ViewAllFavorites") data-hash="#section-bookmarks" data-page="mycollection">
                             <i class="ti ti-bookmark" aria-hidden="true"></i>Bookmarks
                         </a>
-                        <a href="@Url.Action("ReaderCollection", "Reader")#section-reading-list" class="nav-item nav-subitem" data-hash="#section-reading-list" data-page="mycollection">
+                        <a href="@Url.Action("ReaderCollection", "Reader")#section-reading-list" class="nav-item nav-subitem" @IsActive("Reader", "ViewAllFavorites") data-hash="#section-reading-list" data-page="mycollection">
                             <i class="ti ti-list" aria-hidden="true"></i>Reading List
                         </a>
                     </div>
@@ -108,7 +112,7 @@
                 </button>
                 <div class="nav-group" data-group-panel="engagement">
                     <div class="nav-group-inner">
-                        <a href="@Url.Action("ReaderEngagement", "Reader")#section-reviews" class="nav-item nav-subitem @IsActive("ReaderEngagement")" data-hash="#section-reviews" data-page="myengagement">
+                        <a href="@Url.Action("ReaderEngagement", "Reader")#section-reviews" class="nav-item nav-subitem @IsActive("Reader", "ReaderEngagement")" data-hash="#section-reviews" data-page="myengagement">
                             <i class="ti ti-star" aria-hidden="true"></i>Reviews
                         </a>
                         <a href="@Url.Action("ReaderEngagement", "Reader")#section-notifications" class="nav-item nav-subitem nav-subitem-badge" data-hash="#section-notifications" data-page="myengagement">
@@ -131,7 +135,7 @@
                 </button>
                 <div class="nav-group" data-group-panel="billing">
                     <div class="nav-group-inner">
-                        <a href="@Url.Action("ReaderBilling", "Reader")#section-wallet" class="nav-item nav-subitem @IsActive("ReaderBilling")" data-hash="#section-wallet" data-page="billing">
+                        <a href="@Url.Action("ReaderBilling", "Reader")#section-wallet" class="nav-item nav-subitem @IsActive("Reader", "ReaderBilling")" data-hash="#section-wallet" data-page="billing">
                             <i class="ti ti-wallet" aria-hidden="true"></i>Wallet
                         </a>
                         <a href="@Url.Action("ReaderBilling", "Reader")#section-subscription" class="nav-item nav-subitem" data-hash="#section-subscription" data-page="billing">
@@ -147,7 +151,7 @@
                 </button>
                 <div class="nav-group" data-group-panel="personal">
                     <div class="nav-group-inner">
-                        <a href="@Url.Action("ReaderPersonal", "Reader")#section-profile" class="nav-item nav-subitem @IsActive("ReaderPersonal")" data-hash="#section-profile" data-page="personal">
+                        <a href="@Url.Action("ReaderPersonal", "Reader")#section-profile" class="nav-item nav-subitem @IsActive("Reader", "ReaderPersonal")" data-hash="#section-profile" data-page="personal">
                             <i class="ti ti-user" aria-hidden="true"></i>Profile
                         </a>
                         <a href="@Url.Action("ReaderPersonal", "Reader")#section-preferences" class="nav-item nav-subitem" data-hash="#section-preferences" data-page="personal">
@@ -193,8 +197,35 @@
         <main class="main">
             @RenderBody()
         </main>
+        <script src="~/js/myJsFile.js"></script>
+        <script src="~/js/toast.js"></script>
+        <script src="~/js/modal.js"></script>
     </div>
+    @await RenderSectionAsync("Scripts", required: false)
 
+    @if (TempData["Success"] != null)
+    {
+        <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    Toast.show("success", {
+                        title: "Success",
+                        message: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Success"]))
+                    });
+                });
+        </script>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    Toast.show("error", {
+                        title: "Error",
+                        message: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Error"]))
+                    });
+                });
+        </script>
+    }
     <script>
             (function () {
                 const STORAGE_KEY = "sidebarGroupState";
@@ -324,8 +355,28 @@
                 });
 
                 sections.forEach(section => observer.observe(section));
-
             });
+
+        (function () {
+        'use strict';
+
+        var postUrl = '@Url.Action("Fund", "Reader")';
+        var tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+        var token = tokenInput ? tokenInput.value : '';
+
+        function openFundWalletModal() {
+        Modal.showFundWallet({ postUrl: postUrl, antiForgeryToken: token });
+        }
+
+        var topBtn = document.getElementById('openFundWalletTop');
+        var tileBtn = document.getElementById('openFundWalletTile');
+
+        if (topBtn) topBtn.addEventListener('click', openFundWalletModal);
+        if (tileBtn) tileBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        openFundWalletModal();
+        });
+        })();
     </script>
 </body>
 </html>

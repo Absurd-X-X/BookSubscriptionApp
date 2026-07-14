@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Application.Queries.GetPersonalSettings.GetPersonalSettingsResponse
+@{
     ViewData["Title"] = "My Personal Settings";
     ViewData["ScrollPage"] = "personal";
     Layout = "~/Views/Shared/_ReaderLayout.cshtml";
@@ -24,53 +25,67 @@
                 <!-- Avatar column -->
                 <div class="pi-avatar-col">
                     <div class="pi-avatar-wrap">
-                        <img src="/img/profile-placeholder.jpg" alt="Profile photo" class="pi-avatar" id="piAvatar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
-                        <div class="pi-avatar-fallback" style="display:none">JD</div>
+                        @if (!string.IsNullOrEmpty(Model.Profile.AvatarUrl))
+                        {
+                            <img src="@Model.Profile.AvatarUrl" alt="Profile photo" class="pi-avatar" id="piAvatar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                        }
+                        else
+                        {
+                            <img src="/img/profile-placeholder.jpg" alt="Profile photo" class="pi-avatar" id="piAvatar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                        }
+                        <div class="pi-avatar-fallback" style="display:none">@Model.Profile.FullName.Substring(0, Math.Min(2, Model.Profile.FullName.Length)).ToUpper()</div>
                         <label class="pi-cam" for="piFileInput" title="Change photo">
                             <i class="ti ti-camera"></i>
                         </label>
-                        <input type="file" id="piFileInput" accept="image/*" style="display:none" />
+                        <input type="file" id="piFileInput" name="AvatarFile" accept="image/*" style="display:none" />
                     </div>
-                    <div class="pi-name">John Doe</div>
-                    <div class="pi-badge"><i class="ti ti-rosette"></i> Premium Member</div>
-                    <div class="pi-since">Member since Jan 15, 2024</div>
+                    <div class="pi-name">@Model.Profile.FullName</div>
+                    @if (Model.Profile.IsPremiumMember)
+                    {
+                        <div class="pi-badge"><i class="ti ti-rosette"></i> Premium Member</div>
+                    }
+                    <div class="pi-since">Member since @Model.Profile.MemberSince.ToString("MMM d, yyyy")</div>
                 </div>
 
                 <!-- Form column -->
-                <div class="pi-form-col">
+                <form id="piForm" class="pi-form-col" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="UserId" value="@Model.Profile.UserId" />
                     <div class="pn-field">
                         <label>Full Name</label>
-                        <input type="text" id="piFullName" value="John Doe" />
+                        <input type="text" id="piFullName" name="FullName" value="@Model.Profile.FullName" />
                     </div>
                     <div class="pn-field">
                         <label>Email Address</label>
                         <div class="pn-input-addon">
-                            <input type="email" id="piEmail" value="john.doe@email.com" />
-                            <span class="pn-verified"><i class="ti ti-check"></i> Verified</span>
+                            <input type="email" id="piEmail" name="Email" value="@Model.Profile.Email" />
+                            @if (Model.Profile.IsEmailVerified)
+                            {
+                                <span class="pn-verified"><i class="ti ti-check"></i> Verified</span>
+                            }
                         </div>
                     </div>
                     <div class="pn-field">
                         <label>Username</label>
-                        <input type="text" id="piUsername" value="johndoe_reader" />
+                        <input type="text" id="piUsername" name="Username" value="@Model.Profile.Username" />
                     </div>
                     <div class="pn-field">
                         <label>Bio</label>
-                        <textarea id="piBio" maxlength="120" rows="3">A passionate reader exploring new ideas every day.</textarea>
-                        <div class="pn-bio-count"><span id="piBioCount">46</span>/120</div>
+                        <textarea id="piBio" name="Bio" maxlength="120" rows="3">@Model.Profile.Bio</textarea>
+                        <div class="pn-bio-count"><span id="piBioCount">@Model.Profile.Bio.Length</span>/120</div>
                     </div>
                     <div style="display:flex;justify-content:flex-end;margin-top:4px;">
-                        <button class="pn-btn-primary" id="saveChangesBtn">Save Changes</button>
+                        <button type="submit" class="pn-btn-primary" id="saveChangesBtn">Save Changes</button>
                     </div>
-                </div>
+                </form>
             </div>
         </section>
 
-        <!-- ▌ SECURITY -->
+        <!-- ▌ SECURITY (mocked) -->
         <section id="section-security" class="page-section pn-card" data-hash="#section-security" data-page="personal">
             <div class="pn-sec-title">Security</div>
             <div class="pn-sec-sub">Manage your password and account security.</div>
 
-            <!-- Password row -->
             <div class="sec-row sec-row-plain">
                 <div class="sec-row-l">
                     <div class="sec-ico"><i class="ti ti-lock"></i></div>
@@ -79,7 +94,6 @@
                 <button class="pn-btn-outline-sm" id="changePwBtn">Change</button>
             </div>
 
-            <!-- 2FA row -->
             <div class="sec-row sec-row-link" id="twoFaRow">
                 <div class="sec-row-l">
                     <div class="sec-ico"><i class="ti ti-shield-check"></i></div>
@@ -94,7 +108,6 @@
                 </div>
             </div>
 
-            <!-- Active Sessions row -->
             <div class="sec-row sec-row-link" id="sessionsRow">
                 <div class="sec-row-l">
                     <div class="sec-ico"><i class="ti ti-devices"></i></div>
@@ -110,12 +123,11 @@
             </div>
         </section>
 
-        <!-- ▌ PREFERENCES -->
+        <!-- ▌ PREFERENCES (mocked) -->
         <section id="section-preferences" class="page-section pn-card" data-hash="#section-preferences" data-page="personal">
             <div class="pn-sec-title">Preferences</div>
             <div class="pn-sec-sub">Customize your reading experience.</div>
 
-            <!-- Theme -->
             <div class="pref-row">
                 <div class="pref-row-l">
                     <div class="pref-ico"><i class="ti ti-palette"></i></div>
@@ -134,7 +146,6 @@
                 </div>
             </div>
 
-            <!-- Reading Goals -->
             <div class="pref-row">
                 <div class="pref-row-l">
                     <div class="pref-ico"><i class="ti ti-target"></i></div>
@@ -146,7 +157,6 @@
                 <button class="pn-btn-outline-sm" id="editGoalsBtn">Edit</button>
             </div>
 
-            <!-- Language -->
             <div class="pref-row">
                 <div class="pref-row-l">
                     <div class="pref-ico"><i class="ti ti-world"></i></div>
@@ -167,7 +177,6 @@
                 </div>
             </div>
 
-            <!-- Default View -->
             <div class="pref-row">
                 <div class="pref-row-l">
                     <div class="pref-ico"><i class="ti ti-layout-grid"></i></div>
@@ -187,7 +196,7 @@
             </div>
         </section>
 
-        <!-- ▌ NOTIFICATIONS -->
+        <!-- ▌ NOTIFICATIONS (mocked) -->
         <section id="section-notifications" class="page-section pn-card" data-hash="#section-notifications" data-page="personal">
             <div class="pn-sec-title">Notifications</div>
             <div class="pn-sec-sub">Manage how you want to be notified.</div>
@@ -480,7 +489,7 @@
       }
       document.addEventListener('click', function () { closeAllDrops(null); });
 
-      /* ── Profile picture upload ────────────────────────────────── */
+      /* ── Profile picture preview (upload happens on Save) ─────── */
       var fileInput = gi('piFileInput');
       if (fileInput) {
         fileInput.addEventListener('change', function () {
@@ -495,7 +504,6 @@
               img.style.display = '';
               if (fb) fb.style.display = 'none';
             }
-            showToast('Profile photo updated', 'success');
           };
           reader.readAsDataURL(file);
         });
@@ -512,16 +520,50 @@
         updateCount();
       }
 
-      /* ── Save Changes ─────────────────────────────────────────── */
-      var saveBtn = gi('saveChangesBtn');
-      if (saveBtn) {
-        saveBtn.addEventListener('click', function () {
+      /* ── Save Changes (real submit) ───────────────────────────── */
+      var piForm = gi('piForm');
+      if (piForm) {
+        piForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+
           var name = gi('piFullName') ? gi('piFullName').value.trim() : '';
           if (!name) { showToast('Full name cannot be empty', 'error'); return; }
-          // Update displayed name in the avatar column
-          var nameEl = document.querySelector('.pi-name');
-          if (nameEl) nameEl.textContent = name;
-          showToast('Changes saved successfully', 'success');
+
+          var formData = new FormData(piForm);
+          if (fileInput && fileInput.files[0]) {
+            formData.set('AvatarFile', fileInput.files[0]);
+          }
+
+          var saveBtn = gi('saveChangesBtn');
+          if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
+
+          fetch('@Url.Action("UpdateProfile", "Reader")', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            }
+          })
+            .then(function (res) { return res.json(); })
+            .then(function (result) {
+              if (result.success) {
+                var nameEl = document.querySelector('.pi-name');
+                if (nameEl) nameEl.textContent = name;
+                if (result.avatarUrl) {
+                  var avatarImg = gi('piAvatar');
+                  if (avatarImg) avatarImg.src = result.avatarUrl;
+                }
+                showToast(result.message || 'Changes saved successfully', 'success');
+              } else {
+                showToast(result.message || 'Could not save changes', 'error');
+              }
+            })
+            .catch(function () {
+              showToast('Something went wrong. Please try again.', 'error');
+            })
+            .finally(function () {
+              if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Changes'; }
+            });
         });
       }
 
@@ -714,4 +756,3 @@
 
     })();
 </script>
-

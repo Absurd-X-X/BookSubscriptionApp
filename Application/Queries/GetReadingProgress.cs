@@ -25,9 +25,10 @@ namespace Application.Queries
                 var response = new ReadingProgressResponse(
                     progress.ReaderId,
                     progress.BookId,
-                    progress.Percentage,
-                    progress.CurrentLocation,
-                    progress.LastReadAt,
+                    progress.ProgressPercentage,
+                    progress.CurrentChapter,
+                    progress.CurrentPage,
+                    progress.LastReadDate.HasValue ? progress.LastReadDate.Value : DateTime.MinValue,
                     progress.IsCompleted
                 );
 
@@ -39,7 +40,8 @@ namespace Application.Queries
             Guid ReaderId,
             Guid BookId,
             double Percentage,
-            string? CurrentLocation,
+            string? CurrentChapter,
+            int CurrentPage,
             DateTime LastReadAt,
             bool IsCompleted
         );

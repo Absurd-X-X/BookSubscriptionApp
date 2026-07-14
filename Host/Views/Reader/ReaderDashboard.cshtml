@@ -1,9 +1,56 @@
-﻿@{
+﻿@model Application.Queries.GetReaderDashboard.GetReaderDashboardResponse
+@{
     Layout = "~/Views/Shared/_ReaderLayout.cshtml";
     ViewData["Title"] = "Activity";
+
+    string[] coverPalette = { "cv-1", "cv-2", "cv-3", "cv-4", "cv-5", "cv-6" };
+
+    string CoverClass(Guid id) => coverPalette[Math.Abs(id.GetHashCode()) % coverPalette.Length];
+
+    string ActivityColor(string icon)
+    {
+        var i = (icon ?? "").ToLower();
+        if (i.Contains("book")) return "blue";
+        if (i.Contains("star")) return "yellow";
+        if (i.Contains("bookmark") || i.Contains("heart")) return "green";
+        if (i.Contains("bolt") || i.Contains("fire") || i.Contains("flame")) return "indigo";
+        return "blue";
+    }
+
+    (string cssClass, string icon) NotifStyle(string type)
+    {
+        var t = (type ?? "").ToLower();
+        if (t.Contains("payment") || t.Contains("wallet") || t.Contains("transaction"))
+            return ("green", "ti ti-wallet");
+        if (t.Contains("book"))
+            return ("blue", "ti ti-book-2");
+        if (t.Contains("alert") || t.Contains("warning"))
+            return ("orange", "ti ti-alert-triangle");
+        if (t.Contains("system"))
+            return ("indigo", "ti ti-settings");
+        return ("purple", "ti ti-bell");
+    }
+
+    string StarDisplay(int seedValue)
+    {
+        var rating = 3.5 + (Math.Abs(seedValue) % 15) / 10.0;
+        var full = (int)Math.Floor(rating);
+        var half = (rating - full) >= 0.5;
+        var sb = new System.Text.StringBuilder();
+        for (int i = 0; i < full; i++) sb.Append("★");
+        if (half) sb.Append("½");
+        return sb.ToString() + $"<span class=\"rec-score\">{rating:0.0}</span>";
+    }
 }
 
 <link href="~/css/readerDashboard.css" rel="stylesheet" />
+<link href="~/css/modal.css" rel="stylesheet" />
+<link href="~/css/notify.css" rel="stylesheet" />
+
+
+<form id="antiForgeryForm" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
 
 <div class="content-wrap">
 
@@ -12,65 +59,75 @@
         <!-- Top bar -->
         <header class="topbar">
             <div class="greeting">
-                <h1>Good evening, John! <span class="wave">👋</span></h1>
+                <h1>Good evening, @Model.DisplayName! <span class="wave">👋</span></h1>
                 <p>Pick up where you left off and keep your reading streak alive.</p>
             </div>
             <div class="topbar-right">
                 <div class="search-box">
                     <input type="text" placeholder="Search books, authors..." id="searchInput">
-                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <i class="ti ti-search"></i>
                     <div class="search-results" id="searchResults"></div>
                 </div>
                 <div class="dropdown-wrap">
                     <button class="icon-btn bell-btn" id="bellBtn">
-                        <i class="fa-regular fa-bell"></i>
-                        <span class="bell-badge">8</span>
+                        <i class="ti ti-bell"></i>
+                        @if (Model.UnreadNotificationCount > 0)
+                        {
+                            <span class="bell-badge">@Model.UnreadNotificationCount</span>
+                        }
                     </button>
                     <div class="dropdown-panel notif-panel" id="notifPanel">
                         <div class="dropdown-header">Notifications</div>
-                        <div class="notif-item">
-                            <div class="notif-icon blue"><i class="fa-solid fa-book-open"></i></div>
-                            <div class="notif-body">
-                                <p><b>Deep Work</b> marked as completed</p>
-                                <span>2 hours ago</span>
+                        @if (!Model.Notifications.Any())
+                        {
+                            <div class="notif-item">
+                                <div class="notif-body">
+                                    <p>You're all caught up</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="notif-item">
-                            <div class="notif-icon purple"><i class="fa-solid fa-calendar"></i></div>
-                            <div class="notif-body">
-                                <p>Book Club Discussion starts soon</p>
-                                <span>5 hours ago</span>
-                            </div>
-                        </div>
-                        <div class="notif-item">
-                            <div class="notif-icon orange"><i class="fa-solid fa-fire"></i></div>
-                            <div class="notif-body">
-                                <p>You're on a 12-day reading streak!</p>
-                                <span>1 day ago</span>
-                            </div>
-                        </div>
+                        }
+                        else
+                        {
+                            @foreach (var notif in Model.Notifications)
+                            {
+                                var style = NotifStyle(notif.Type);
+                                <div class="notif-item">
+                                    <div class="notif-icon @style.cssClass"><i class="@style.icon"></i></div>
+                                    <div class="notif-body">
+                                        <p><b>@notif.Title</b></p>
+                                        <span>@notif.DateModified.ToString("MMM d, h:mm tt")</span>
+                                    </div>
+                                </div>
+                            }
+                        }
                         <a class="dropdown-footer" href="@Url.Action("ReaderEngagement", "Reader")#section-notifications">View all notifications</a>
                     </div>
                 </div>
                 <div class="dropdown-wrap">
                     <button class="profile-chip" id="profileBtn">
-                        <img src="https://i.pravatar.cc/64?img=12" alt="John Doe">
-                        <i class="fa-solid fa-chevron-down"></i>
+                        <img src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "https://i.pravatar.cc/64?u=" + Model.UserId : Model.AvatarUrl)" alt="@Model.DisplayName">
+                        <i class="ti ti-chevron-down"></i>
                     </button>
                     <div class="dropdown-panel profile-panel" id="profilePanel">
                         <div class="dropdown-profile-head">
-                            <img src="https://i.pravatar.cc/64?img=12" alt="John Doe">
+                            <img src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "https://i.pravatar.cc/64?u=" + Model.UserId : Model.AvatarUrl)" alt="@Model.DisplayName">
                             <div>
-                                <div class="dp-name">John Doe</div>
-                                <div class="dp-email">john.doe@email.com</div>
+                                @{
+                                    string email = Model.Email ?? "";
+                                    int take = Math.Min(10, email.Length);
+                                    string shorten = email.Substring(0, take);
+                                    string outEmail = $"{shorten}...";
+                                }
+                                <div class="dp-name">@Model.DisplayName</div>
+                                <div class="dp-email">@outEmail</div>
                             </div>
                         </div>
-                        <a class="dropdown-link" href="#"><i class="fa-regular fa-user"></i> Profile</a>
-                        <a class="dropdown-link" href="#"><i class="fa-solid fa-gear"></i> Settings</a>
-                        <a class="dropdown-link" href="#"><i class="fa-regular fa-credit-card"></i> Subscription</a>
+                        <a class="dropdown-link" href="@Url.Action("ReaderPersonal", "Reader")"><i class="ti ti-user"></i> Profile</a>
+                        <a class="dropdown-link" href="@Url.Action("ReaderPersonal", "Reader")"><i class="ti ti-settings"></i> Settings</a>
+                        <a class="dropdown-link" href="@Url.Action("ManageSub", "Reader")"><i class="ti ti-credit-card"></i> Subscription</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-link danger" href="#">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <i class="ti ti-logout"></i>
                             Logout
                         </a>
                     </div>
@@ -81,34 +138,33 @@
         <!-- Stat cards -->
         <section class="stat-grid">
             <div class="stat-card">
-                <div class="stat-icon purple"><i class="fa-solid fa-book"></i></div>
+                <div class="stat-icon purple"><i class="ti ti-book"></i></div>
                 <div class="stat-body">
                     <div class="stat-label">Books Read</div>
-                    <div class="stat-value">48</div>
-                    <div class="stat-foot green"><i class="fa-solid fa-arrow-up"></i> 12 this month</div>
+                    <div class="stat-value">@Model.BooksReadTotal</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon purple"><i class="fa-solid fa-book-open"></i></div>
+                <div class="stat-icon purple"><i class="ti ti-book-2"></i></div>
                 <div class="stat-body">
                     <div class="stat-label">Books In Progress</div>
-                    <div class="stat-value">3</div>
+                    <div class="stat-value">@Model.BooksInProgress</div>
                     <div class="stat-foot link">Keep going!</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon purple"><i class="fa-solid fa-heart"></i></div>
+                <div class="stat-icon purple"><i class="ti ti-heart"></i></div>
                 <div class="stat-body">
                     <div class="stat-label">Favorite Books</div>
-                    <div class="stat-value">16</div>
+                    <div class="stat-value">@Model.FavoriteBooksCount</div>
                     <div class="stat-foot link">View your favorites</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon orange"><i class="fa-solid fa-fire"></i></div>
+                <div class="stat-icon orange"><i class="ti ti-flame"></i></div>
                 <div class="stat-body">
                     <div class="stat-label">Reading Streak</div>
-                    <div class="stat-value">12</div>
+                    <div class="stat-value">@Model.ReadingStreakDays</div>
                     <div class="stat-foot orange">days in a row</div>
                 </div>
             </div>
@@ -121,27 +177,43 @@
                     <h2>Continue Reading</h2>
                     <a class="view-all" href="@Url.Action("ViewAllReadingProgress", "Reader")">View all</a>
                 </div>
-                <div class="cr-card">
-                    <img class="cr-cover" src="https://covers.openlibrary.org/b/isbn/0735211299-L.jpg"
-                         alt="Atomic Habits">
-                    <div class="cr-info">
-                        <div>
-                            <h3>Atomic Habits</h3>
-                            <p class="cr-desc">An Easy &amp; Proven Way to Build Good Habits &amp; Break Bad Ones</p>
-                            <p class="cr-author">James Clear</p>
-                        </div>
-                        <div class="cr-progress-row">
-                            <span class="cr-progress-label">67% complete</span>
-                        </div>
-                        <div class="progress-track">
-                            <div class="progress-fill" style="width:67%"></div>
-                        </div>
-                        <div class="cr-bottom-row">
-                            <span class="cr-time"><i class="fa-regular fa-clock"></i> 9h 24m left</span>
-                            <a href="@Url.Action("BookReadingProgress", "Reader")" class="btn-primary" style="text-decoration: none;"><i class="fa-solid fa-play"></i> Continue Reading</a>
+                @if (Model.ContinueReading is null)
+                {
+                    <div class="cr-empty">
+                        <p>No books in progress right now.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="cr-card">
+                        @if (string.IsNullOrEmpty(Model.ContinueReading.BookCoverUrl))
+                        {
+                            <div class="cr-cover @CoverClass(Model.ContinueReading.BookId)">
+                                <div class="cover-fallback">@Model.ContinueReading.Title</div>
+                            </div>
+                        }
+                        else
+                        {
+                            <img class="cr-cover" src="@Model.ContinueReading.BookCoverUrl" alt="@Model.ContinueReading.Title">
+                        }
+                        <div class="cr-info">
+                            <div>
+                                <h3>@Model.ContinueReading.Title</h3>
+                                <p class="cr-author">@Model.ContinueReading.Author</p>
+                            </div>
+                            <div class="cr-progress-row">
+                                <span class="cr-progress-label">@Model.ContinueReading.PercentComplete.ToString("0")% complete</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width:@Model.ContinueReading.PercentComplete.ToString("0")%"></div>
+                            </div>
+                            <div class="cr-bottom-row">
+                                <span class="cr-time"><i class="ti ti-clock"></i> @Model.ContinueReading.TotalMinutesRead min read</span>
+                                <a href="@Url.Action("BookReadingProgress", "Reader", new { id = Model.ContinueReading.BookId })" class="btn-primary" style="text-decoration: none;"><i class="ti ti-player-play"></i> Continue Reading</a>
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
             </div>
 
             <div class="panel recently-completed">
@@ -149,41 +221,40 @@
                     <h2>Recently Completed</h2>
                     <a class="view-all" href="@Url.Action("ViewAllReadingProgress", "Reader")">View all</a>
                 </div>
-                <div class="rc-list">
-                    <div class="rc-item">
-                        <img src="https://covers.openlibrary.org/b/isbn/0316066525-L.jpg" alt="Deep Work">
-                        <div class="rc-info">
-                            <h4>Deep Work</h4>
-                            <p>Cal Newport</p>
-                            <div class="rc-bottom">
-                                <span class="stars">★★★★★</span>
-                                <span class="rc-when">Completed Today</span>
-                            </div>
-                        </div>
+                @if (!Model.RecentlyCompleted.Any())
+                {
+                    <div class="rc-empty">
+                        <p>No completed books yet.</p>
                     </div>
-                    <div class="rc-item">
-                        <img src="https://covers.openlibrary.org/b/isbn/1849837538-L.jpg" alt="The 5 AM Club">
-                        <div class="rc-info">
-                            <h4>The 5 AM Club</h4>
-                            <p>Robin Sharma</p>
-                            <div class="rc-bottom">
-                                <span class="stars">★★★★★</span>
-                                <span class="rc-when">Completed 2 days ago</span>
+                }
+                else
+                {
+                    <div class="rc-list">
+                        @foreach (var book in Model.RecentlyCompleted)
+                        {
+                            <div class="rc-item">
+                                @if (string.IsNullOrEmpty(book.BookCoverUrl))
+                                {
+                                    <div class="@CoverClass(book.BookId)" style="width:56px;height:80px;border-radius:8px;">
+                                        <div class="cover-fallback">@book.Title</div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <img src="@book.BookCoverUrl" alt="@book.Title">
+                                }
+                                <div class="rc-info">
+                                    <h4>@book.Title</h4>
+                                    <p>@book.Author</p>
+                                    <div class="rc-bottom">
+                                        <span class="stars">@Html.Raw(StarDisplay(book.BookId.GetHashCode()))</span>
+                                        <span class="rc-when">Completed @book.CompletedOn.ToString("MMM d, yyyy")</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        }
                     </div>
-                    <div class="rc-item">
-                        <img src="https://covers.openlibrary.org/b/isbn/0374533555-L.jpg" alt="Thinking, Fast and Slow">
-                        <div class="rc-info">
-                            <h4>Thinking, Fast and Slow</h4>
-                            <p>Daniel Kahneman</p>
-                            <div class="rc-bottom">
-                                <span class="stars">★★★★★</span>
-                                <span class="rc-when">Completed 1 week ago</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                }
             </div>
         </section>
 
@@ -193,72 +264,40 @@
                 <h2>Recommended for You</h2>
                 <a class="view-all" href="#">View all</a>
             </div>
-            <div class="rec-carousel-wrap">
-                <div class="rec-carousel">
-                    <div class="rec-card">
-                        <div class="rec-cover" style="background:#e8540f;">
-                            <div class="rec-cover-text orange-cover">
-                                <span class="rc-line1">THE</span>
-                                <span class="rc-line1">SUBTLE</span>
-                                <span class="rc-line1">ART OF</span>
-                                <span class="rc-line2">NOT<sup>*</sup></span>
-                                <span class="rc-line1">GIVING</span>
-                                <span class="rc-line1">A F*CK</span>
-                            </div>
-                        </div>
-                        <h4>The Subtle Art of Not Giving a F*ck</h4>
-                        <p class="rec-author">Mark Manson</p>
-                        <div class="rec-rating">
-                            <span class="stars small">★★★★½</span><span class="rec-score">4.6</span>
-                        </div>
-                    </div>
-
-                    <div class="rec-card">
-                        <div class="rec-cover" style="background:#1b2a52;">
-                            <div class="rec-cover-text navy-cover">MAKE<br>YOUR<br>BED</div>
-                        </div>
-                        <h4>Make Your Bed</h4>
-                        <p class="rec-author">William H. McRaven</p>
-                        <div class="rec-rating">
-                            <span class="stars small">★★★★½</span><span class="rec-score">4.7</span>
-                        </div>
-                    </div>
-
-                    <div class="rec-card">
-                        <div class="rec-cover" style="background:#f4d61a;">
-                            <div class="rec-cover-text yellow-cover">THE<br>POWER<br>OF<br><b>HABIT</b></div>
-                        </div>
-                        <h4>The Power of Habit</h4>
-                        <p class="rec-author">Charles Duhigg</p>
-                        <div class="rec-rating">
-                            <span class="stars small">★★★★½</span><span class="rec-score">4.5</span>
-                        </div>
-                    </div>
-
-                    <div class="rec-card">
-                        <div class="rec-cover" style="background:#f4f1ec;">
-                            <div class="rec-cover-text mindset-cover">mindset</div>
-                        </div>
-                        <h4>Mindset</h4>
-                        <p class="rec-author">Carol S. Dweck</p>
-                        <div class="rec-rating">
-                            <span class="stars small">★★★★½</span><span class="rec-score">4.6</span>
-                        </div>
-                    </div>
-
-                    <div class="rec-card">
-                        <div class="rec-cover" style="background:#fafafa;">
-                            <div class="rec-cover-text essentialism-cover">ESSENTIALISM</div>
-                        </div>
-                        <h4>Essentialism</h4>
-                        <p class="rec-author">Greg McKeown</p>
-                        <div class="rec-rating">
-                            <span class="stars small">★★★★½</span><span class="rec-score">4.5</span>
-                        </div>
-                    </div>
+            @if (!Model.Recommended.Any())
+            {
+                <div class="rec-empty">
+                    <p>No recommendations available right now.</p>
                 </div>
-                <button class="carousel-next"><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
+            }
+            else
+            {
+                <div class="rec-carousel-wrap">
+                    <div class="rec-carousel">
+                        @foreach (var rec in Model.Recommended)
+                        {
+                            <div class="rec-card">
+                                @if (string.IsNullOrEmpty(rec.BookCoverUrl))
+                                {
+                                    <div class="rec-cover @CoverClass(rec.BookId)">
+                                        <div class="cover-fallback">@rec.Title</div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <img class="rec-cover-img rec-cover" src="@rec.BookCoverUrl" alt="@rec.Title">
+                                }
+                                <h4>@rec.Title</h4>
+                                <p class="rec-author">@rec.Author</p>
+                                <div class="rec-rating">
+                                    <span class="stars small">@Html.Raw(StarDisplay(rec.BookId.GetHashCode()))</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <button class="carousel-next"><i class="ti ti-chevron-right"></i></button>
+                </div>
+            }
         </section>
 
         <!-- Recent Activity -->
@@ -267,52 +306,37 @@
                 <h2>Recent Activity</h2>
                 <a class="view-all" href="@Url.Action("ReaderActivities", "Reader")">View all</a>
             </div>
-            <div class="activity-list">
-                <div class="activity-item">
-                    <div class="activity-icon blue"><i class="fa-solid fa-book-open"></i></div>
-                    <div class="activity-body">
-                        <p class="activity-title">You finished reading <b>Deep Work</b></p>
-                        <p class="activity-sub">Great job! You earned 50 points</p>
-                    </div>
-                    <div class="activity-time">
-                        <div>Today</div>
-                        <div class="activity-time-sub">6:30 PM</div>
-                    </div>
+            @if (!Model.RecentActivity.Any())
+            {
+                <div class="activity-empty">
+                    <p>No recent activity.</p>
                 </div>
-                <div class="activity-item">
-                    <div class="activity-icon yellow"><i class="fa-solid fa-star"></i></div>
-                    <div class="activity-body">
-                        <p class="activity-title">You left a review for <b>Atomic Habits</b></p>
-                        <p class="activity-sub">Thank you for your feedback!</p>
-                    </div>
-                    <div class="activity-time">
-                        <div>Yesterday</div>
-                        <div class="activity-time-sub">9:15 PM</div>
-                    </div>
+            }
+            else
+            {
+                <div class="activity-list">
+                    @foreach (var activity in Model.RecentActivity.Where(v => v.ActionType.
+                    ToLower() != "logged in" && v.ActionType.ToLower() != "reset password" &&
+                    v.ActionType.ToLower() != "verify email" &&
+                    v.ActionType.ToLower() != "bank payment" &&
+                    v.ActionType.ToLower() != "vrify" &&
+                    v.ActionType.ToLower() != "resend" &&
+                    v.ActionType.ToLower() != "add new user"))
+                    {
+                        <div class="activity-item">
+                            <div class="activity-icon @ActivityColor(activity.Icon)"><i class="@activity.Icon"></i></div>
+                            <div class="activity-body">
+                                <p class="activity-title">@activity.ActionType</p>
+                                <p class="activity-sub">@activity.Description</p>
+                            </div>
+                            <div class="activity-time">
+                                <div>@activity.Timestamp.ToString("MMM d")</div>
+                                <div class="activity-time-sub">@activity.Timestamp.ToString("h:mm tt")</div>
+                            </div>
+                        </div>
+                    }
                 </div>
-                <div class="activity-item">
-                    <div class="activity-icon green"><i class="fa-solid fa-bookmark"></i></div>
-                    <div class="activity-body">
-                        <p class="activity-title">You added <b>The 5 AM Club</b> to your Reading List</p>
-                        <p class="activity-sub">Keep building your collection</p>
-                    </div>
-                    <div class="activity-time">
-                        <div>May 14, 2024</div>
-                        <div class="activity-time-sub">4:20 PM</div>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon indigo"><i class="fa-solid fa-bolt"></i></div>
-                    <div class="activity-body">
-                        <p class="activity-title">You achieved a <b>12-day reading streak!</b></p>
-                        <p class="activity-sub">Keep it up! You're doing amazing</p>
-                    </div>
-                    <div class="activity-time">
-                        <div>May 14, 2024</div>
-                        <div class="activity-time-sub">12:00 PM</div>
-                    </div>
-                </div>
-            </div>
+            }
         </section>
 
     </main>
@@ -321,55 +345,77 @@
     <aside class="right-panel">
         <div class="camped">
             <div class="profile-card">
-                <img src="https://i.pravatar.cc/72?img=12" alt="John Doe">
+                <img src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "https://i.pravatar.cc/72?u=" + Model.UserId : Model.AvatarUrl)" alt="@Model.DisplayName">
                 <div class="profile-info">
-                    <h3>John Doe</h3>
-                    <span class="premium-tag"><i class="fa-solid fa-circle-check"></i> Premium Member</span>
+                    <h3>@Model.DisplayName</h3>
+                    @if (Model.PlanName != "Free Plan")
+                    {
+                        <span class="premium-tag"><i class="ti ti-circle-check"></i> @Model.PlanName Member</span>
+                    }
                 </div>
             </div>
             <div class="profile-meta">
-                <div class="profile-meta-row"><span>Member since</span><b>Jan 15, 2024</b></div>
-                <div class="profile-meta-row"><span>Last active</span><b>Today, 7:45 PM</b></div>
+                <div class="profile-meta-row"><span>Member since</span><b>@Model.MemberSince.ToString("MMM d, yyyy")</b></div>
             </div>
-            <button class="btn-outline full">View Profile</button>
+            <a href="@Url.Action("ReaderDetails", "Reader")" style="text-decoration: none;" class="btn-outline full">View Profile</a>
         </div>
 
         <div class="rp-card">
             <h4 class="rp-title">Your Plan</h4>
             <div class="plan-row">
-                <div class="plan-icon"><i class="fa-solid fa-crown"></i></div>
+                <div class="plan-icon"><i class="ti ti-crown"></i></div>
                 <div>
-                    <div class="plan-name">Premium Plan</div>
-                    <div class="plan-price">$49.00 / month</div>
+                    <div class="plan-name">@Model.PlanName</div>
+                    <div class="plan-price">@Model.MonthlyPrice.ToString("C") / cycle</div>
                 </div>
             </div>
-            <div class="profile-meta-row"><span>Renews on</span><b>Jun 15, 2024</b></div>
-            <a href="@Url.Action("ManageSub", "Reader")" class="btn-primary full " style="text-decoration: none">Manage Subscription</a>
+            @if (Model.RenewsOn.HasValue)
+            {
+                <div class="profile-meta-row"><span>Renews on</span><b>@Model.RenewsOn.Value.ToString("MMM d, yyyy")</b></div>
+            }
+            <a href="@Url.Action("ManageSub", "Reader")" class="btn-primary full" style="text-decoration: none">Manage Subscription</a>
         </div>
 
         <div class="rp-card">
             <div class="rp-head-row">
                 <h4 class="rp-title">Reading Goal</h4>
-                <a class="edit-link" href="#">Edit Goal</a>
+                <a class="edit-link" href="#" id="editGoalBtn">Edit Goal</a>
             </div>
-            <p class="goal-status"><i class="fa-solid fa-circle-check"></i> You're on track!</p>
+            <p class="goal-status">
+                @if (Model.GoalIsOnTrack)
+                {
+                    <span><i class="ti ti-circle-check"></i> You're on track!</span>
+                }
+                else
+                {
+                    <span><i class="ti ti-alert-circle"></i> Keep going!</span>
+                }
+            </p>
             <div class="goal-row">
-                <span>24 of 50 books</span>
-                <span>48%</span>
+                <span>@Model.GoalCurrentValue of @Model.GoalTargetValue @(Model.GoalType == "Pages" ? "pages" : "books")</span>
+                <span>@Model.GoalPercentComplete.ToString("0")%</span>
             </div>
             <div class="progress-track">
-                <div class="progress-fill" style="width:48%"></div>
+                <div class="progress-fill" style="width:@Model.GoalPercentComplete.ToString("0")%"></div>
             </div>
-            <p class="goal-foot">Great progress! Keep reading. 🚀</p>
+            @if (!string.IsNullOrEmpty(Model.GoalMotivation))
+            {
+                <p class="goal-foot">@Model.GoalMotivation</p>
+            }
+            else
+            {
+                <p class="goal-foot">Great progress! Keep reading. 🚀</p>
+            }
         </div>
 
+        <!-- Upcoming — MOCKED, not model-bound. Replace when you wire a real source. -->
         <div class="rp-card">
             <div class="rp-head-row">
                 <h4 class="rp-title">Upcoming</h4>
                 <a class="view-all" href="#">View all</a>
             </div>
             <div class="upcoming-item">
-                <div class="upcoming-icon purple"><i class="fa-solid fa-calendar"></i></div>
+                <div class="upcoming-icon purple"><i class="ti ti-calendar"></i></div>
                 <div class="upcoming-body">
                     <h5>Book Club Discussion</h5>
                     <p>Deep Work</p>
@@ -377,173 +423,185 @@
                 </div>
             </div>
             <div class="upcoming-item">
-                <div class="upcoming-icon indigo"><i class="fa-regular fa-bell"></i></div>
+                <div class="upcoming-icon indigo"><i class="ti ti-bell"></i></div>
                 <div class="upcoming-body">
                     <h5>Subscription Renewal</h5>
-                    <p>Premium plan renews in 26 days</p>
-                    <p class="upcoming-date">Jun 15, 2024</p>
+                    <p>@Model.PlanName renews soon</p>
+                    <p class="upcoming-date">@(Model.RenewsOn?.ToString("MMM d, yyyy") ?? "—")</p>
                 </div>
             </div>
         </div>
 
         <div class="quote-card">
-            <i class="fa-solid fa-quote-left quote-mark"></i>
+            <i class="ti ti-quote quote-mark"></i>
             <p class="quote-text">"Books are a uniquely portable magic."</p>
             <p class="quote-author">— Stephen King</p>
-            <i class="fa-solid fa-book-open quote-book-icon"></i>
+            <i class="ti ti-book-2 quote-book-icon"></i>
         </div>
     </aside>
 
 </div>
 
+<script src="~/js/modal.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-        /* ============ Carousel next-arrow ============ */
-        const nextBtn = document.querySelector('.carousel-next');
-        const carousel = document.querySelector('.rec-carousel');
-        if (nextBtn && carousel) {
-            nextBtn.addEventListener('click', () => {
-                carousel.scrollBy({ left: 220, behavior: 'smooth' });
-            });
-        }
+    /* ============ Carousel next-arrow ============ */
+    const nextBtn = document.querySelector('.carousel-next');
+    const carousel = document.querySelector('.rec-carousel');
+    if (nextBtn && carousel) {
+    nextBtn.addEventListener('click', () => {
+    carousel.scrollBy({ left: 220, behavior: 'smooth' });
+    });
+    }
 
-        /* ============ Dropdowns: notification bell + profile chip ============ */
-        const bellBtn = document.getElementById('bellBtn');
-        const notifPanel = document.getElementById('notifPanel');
-        const profileBtn = document.getElementById('profileBtn');
-        const profilePanel = document.getElementById('profilePanel');
+    /* ============ Dropdowns: notification bell + profile chip ============ */
+    const bellBtn = document.getElementById('bellBtn');
+    const notifPanel = document.getElementById('notifPanel');
+    const profileBtn = document.getElementById('profileBtn');
+    const profilePanel = document.getElementById('profilePanel');
 
-        function closeAllDropdowns(except) {
-            [notifPanel, profilePanel].forEach(panel => {
-                if (panel && panel !== except) panel.classList.remove('open');
-            });
-        }
+    function closeAllDropdowns(except) {
+    [notifPanel, profilePanel].forEach(panel => {
+    if (panel && panel !== except) panel.classList.remove('open');
+    });
+    }
 
-        function toggleDropdown(btn, panel) {
-            if (!btn || !panel) return;
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isOpen = panel.classList.contains('open');
-                closeAllDropdowns();
-                panel.classList.toggle('open', !isOpen);
-            });
-        }
+    function toggleDropdown(btn, panel) {
+    if (!btn || !panel) return;
+    btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = panel.classList.contains('open');
+    closeAllDropdowns();
+    panel.classList.toggle('open', !isOpen);
+    });
+    }
 
-        toggleDropdown(bellBtn, notifPanel);
-        toggleDropdown(profileBtn, profilePanel);
+    toggleDropdown(bellBtn, notifPanel);
+    toggleDropdown(profileBtn, profilePanel);
 
-        // Click outside closes any open dropdown
-        document.addEventListener('click', () => closeAllDropdowns());
+    document.addEventListener('click', () => closeAllDropdowns());
 
-        // Prevent clicks inside a panel from closing it via the document listener
-        [notifPanel, profilePanel].forEach(panel => {
-            if (panel) panel.addEventListener('click', (e) => e.stopPropagation());
-        });
+    [notifPanel, profilePanel].forEach(panel => {
+    if (panel) panel.addEventListener('click', (e) => e.stopPropagation());
+    });
 
-        // Escape key closes dropdowns
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeAllDropdowns();
-        });
+    document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeAllDropdowns();
+    });
 
-        /* ============ Search ============ */
-        const searchInput = document.getElementById('searchInput');
-        const searchResults = document.getElementById('searchResults');
+    /* ============ Search ============ */
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
 
-        // Build a searchable index from content already on the page,
-        // so results always match what's actually rendered.
-        function buildSearchIndex() {
-            const items = [];
+    function buildSearchIndex() {
+    const items = [];
 
-            // Continue Reading
-            var crInfos = document.querySelectorAll('.continue-reading .cr-info');
-            for (var i = 0; i < crInfos.length; i++) {
-                var el = crInfos[i];
-                var titleEl = el.querySelector('h3');
-                var authorEl = el.querySelector('.cr-author');
-                var title = titleEl ? titleEl.textContent.trim() : '';
-                var author = authorEl ? authorEl.textContent.trim() : '';
-                if (title) items.push({ title: title, author: author, section: 'Continue Reading' });
-            }
+    var crInfos = document.querySelectorAll('.continue-reading .cr-info');
+    for (var i = 0; i < crInfos.length; i++) {
+    var el = crInfos[i];
+    var titleEl = el.querySelector('h3');
+    var authorEl = el.querySelector('.cr-author');
+    var title = titleEl ? titleEl.textContent.trim() : '';
+    var author = authorEl ? authorEl.textContent.trim() : '';
+    if (title) items.push({ title: title, author: author, section: 'Continue Reading' });
+    }
 
-            // Recently Completed
-            var rcItems = document.querySelectorAll('.rc-item');
-            for (var j = 0; j < rcItems.length; j++) {
-                var rcEl = rcItems[j];
-                var rcTitleEl = rcEl.querySelector('h4');
-                var rcAuthorEl = rcEl.querySelector('.rc-info p');
-                var rcTitle = rcTitleEl ? rcTitleEl.textContent.trim() : '';
-                var rcAuthor = rcAuthorEl ? rcAuthorEl.textContent.trim() : '';
-                if (rcTitle) items.push({ title: rcTitle, author: rcAuthor, section: 'Recently Completed' });
-            }
+    var rcItems = document.querySelectorAll('.rc-item');
+    for (var j = 0; j < rcItems.length; j++) {
+    var rcEl = rcItems[j];
+    var rcTitleEl = rcEl.querySelector('h4');
+    var rcAuthorEl = rcEl.querySelector('.rc-info p');
+    var rcTitle = rcTitleEl ? rcTitleEl.textContent.trim() : '';
+    var rcAuthor = rcAuthorEl ? rcAuthorEl.textContent.trim() : '';
+    if (rcTitle) items.push({ title: rcTitle, author: rcAuthor, section: 'Recently Completed' });
+    }
 
-            // Recommended for You
-            var recCards = document.querySelectorAll('.rec-card');
-            for (var k = 0; k < recCards.length; k++) {
-                var recEl = recCards[k];
-                var recTitleEl = recEl.querySelector('h4');
-                var recAuthorEl = recEl.querySelector('.rec-author');
-                var recTitle = recTitleEl ? recTitleEl.textContent.trim() : '';
-                var recAuthor = recAuthorEl ? recAuthorEl.textContent.trim() : '';
-                if (recTitle) items.push({ title: recTitle, author: recAuthor, section: 'Recommended for You' });
-            }
+    var recCards = document.querySelectorAll('.rec-card');
+    for (var k = 0; k < recCards.length; k++) {
+    var recEl = recCards[k];
+    var recTitleEl = recEl.querySelector('h4');
+    var recAuthorEl = recEl.querySelector('.rec-author');
+    var recTitle = recTitleEl ? recTitleEl.textContent.trim() : '';
+    var recAuthor = recAuthorEl ? recAuthorEl.textContent.trim() : '';
+    if (recTitle) items.push({ title: recTitle, author: recAuthor, section: 'Recommended for You' });
+    }
 
-            return items;
-        }
+    return items;
+    }
 
-        const searchIndex = buildSearchIndex();
+    const searchIndex = buildSearchIndex();
 
-        function renderResults(query) {
-            if (!query) {
-                searchResults.classList.remove('open');
-                searchResults.innerHTML = '';
-                return;
-            }
-            const q = query.toLowerCase();
-            const matches = searchIndex.filter(item =>
-                item.title.toLowerCase().includes(q) ||
-                (item.author && item.author.toLowerCase().includes(q))
-            );
+    function renderResults(query) {
+    if (!query) {
+    searchResults.classList.remove('open');
+    searchResults.innerHTML = '';
+    return;
+    }
+    const q = query.toLowerCase();
+    const matches = searchIndex.filter(item =>
+    item.title.toLowerCase().includes(q) ||
+    (item.author && item.author.toLowerCase().includes(q))
+    );
 
-            if (matches.length === 0) {
-                searchResults.innerHTML = '<div class="search-empty">No books match your search.</div>';
-            } else {
-                searchResults.innerHTML = matches.map(m => `
-        <div class="search-result-item">
-          <div class="sr-title">${m.title}</div>
-          <div class="sr-meta"><span>${m.author || ''}</span><span class="sr-section">${m.section}</span></div>
-        </div>
-      `).join('');
-            }
-            searchResults.classList.add('open');
-        }
+    if (matches.length === 0) {
+    searchResults.innerHTML = '<div class="search-empty">No books match your search.</div>';
+    } else {
+    searchResults.innerHTML = matches.map(m => `
+    <div class="search-result-item">
+    <div class="sr-title">${m.title}</div>
+    <div class="sr-meta"><span>${m.author || ''}</span><span class="sr-section">${m.section}</span></div>
+    </div>
+    `).join('');
+    }
+    searchResults.classList.add('open');
+    }
 
-        if (searchInput && searchResults) {
-            searchInput.addEventListener('input', function (e) {
-                renderResults(e.target.value.trim());
-            });
-            searchInput.addEventListener('focus', function (e) {
-                var v = e.target.value.trim();
-                if (v) renderResults(v);
-            });
-            searchInput.addEventListener('click', function (e) {
-                e.stopPropagation();
-            });
-            searchResults.addEventListener('click', function (e) {
-                e.stopPropagation();
-            });
+    if (searchInput && searchResults) {
+    searchInput.addEventListener('input', function (e) {
+    renderResults(e.target.value.trim());
+    });
+    searchInput.addEventListener('focus', function (e) {
+    var v = e.target.value.trim();
+    if (v) renderResults(v);
+    });
+    searchInput.addEventListener('click', function (e) {
+    e.stopPropagation();
+    });
+    searchResults.addEventListener('click', function (e) {
+    e.stopPropagation();
+    });
 
-            document.addEventListener('click', function () {
-                searchResults.classList.remove('open');
-            });
+    document.addEventListener('click', function () {
+    searchResults.classList.remove('open');
+    });
 
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') {
-                    searchResults.classList.remove('open');
-                    searchInput.blur();
-                }
-            });
-        }
+    document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+    searchResults.classList.remove('open');
+    searchInput.blur();
+    }
+    });
+    }
+
+    /* ============ Edit Reading Goal ============ */
+    var editGoalBtn = document.getElementById('editGoalBtn');
+    if (editGoalBtn) {
+    editGoalBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+
+    var token = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]').value;
+
+    Modal.showReadingGoal({
+    goalType: '@Model.GoalType',
+    target: @Model.GoalTargetValue,
+    deadline: '@(Model.GoalDeadline?.ToString("yyyy-MM-dd") ?? "")',
+    motivation: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GoalMotivation ?? "")),
+    postUrl: '@Url.Action("UpdateReadingGoal", "Reader")',
+    antiForgeryToken: token
+    });
+    });
+    }
 
     });
 </script>

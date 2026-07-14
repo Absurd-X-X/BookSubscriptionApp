@@ -1,0 +1,171 @@
+﻿@using Application.Common.Pagenation
+@using Application.Queries
+@model PagenatedList<GetPagenatedFavorites.GetPagenatedFavoritesResponse>
+@{
+    ViewData["Title"] = "All Favorite Books";
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+
+    string RenderStars(double rating)
+    {
+        var full = (int)Math.Floor(rating);
+        var hasHalf = (rating - full) >= 0.25 && (rating - full) < 0.75;
+        var hasExtraFull = (rating - full) >= 0.75;
+        if (hasExtraFull) full++;
+        var stars = new string('★', full);
+        if (hasHalf) stars += "½";
+        return stars;
+    }
+
+    var search = Context.Request.Query["search"].ToString();
+    var categoryId = Context.Request.Query["categoryId"].ToString();
+    var sortBy = Context.Request.Query["sortBy"].ToString();
+    if (string.IsNullOrEmpty(sortBy)) sortBy = "recent";
+
+    var categories = Model.Items
+        .Select(x => new { x.CategoryId, x.CategoryName })
+        .Distinct()
+        .ToList();
+
+    int totalPages = (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize);
+    if (totalPages < 1) totalPages = 1;
+
+    string? PageUrl(int targetPage) 
+        => Url.Action("FavoritesAll", "Reader", new
+    {
+        page = targetPage,
+        pageSize = Model.PageSize,
+        search,
+        categoryId,
+        sortBy
+    });
+}
+<link href="~/css/readerFavorites.css" rel="stylesheet" />
+
+<div class="fav-header">
+    <button class="icon-btn" onclick="history.back()"><i class="ti ti-arrow-left"></i></button>
+    <h1><i class="ti ti-heart-filled" style="color:#B98CFF"></i> All Favorite Books</h1>
+</div>
+<p class="fav-count">@Model.TotalCount books</p>
+<p class="fav-sub">All the books you've marked as favorites.</p>
+
+<form method="get" asp-action="FavoritesAll" asp-controller="Reader" class="fav-toolbar">
+    <div class="fav-search-box">
+        <input type="text" name="search" value="@search" placeholder="Search your favorites..." />
+        <button type="submit" class="fav-search-btn"><i class="ti ti-search"></i></button>
+    </div>
+
+    <select name="categoryId" class="fav-select" onchange="this.form.submit()">
+        <option value="">All Categories</option>
+        @foreach (var c in categories)
+        {
+            <option value="@c.CategoryId" selected="@(categoryId == c.CategoryId.ToString())">@c.CategoryName</option>
+        }
+    </select>
+
+    <select name="sortBy" class="fav-select" onchange="this.form.submit()">
+        <option value="recent" selected="@(sortBy == "recent")">Recently Added</option>
+        <option value="title" selected="@(sortBy == "title")">Title (A–Z)</option>
+        <option value="author" selected="@(sortBy == "author")">Author (A–Z)</option>
+    </select>
+
+    <input type="hidden" name="page" value="1" />
+    <input type="hidden" name="pageSize" value="@Model.PageSize" />
+
+    <div class="fav-view-toggle">
+        <button type="button" class="view-btn active" data-view="grid"><i class="ti ti-layout-grid"></i></button>
+        <button type="button" class="view-btn" data-view="list"><i class="ti ti-list"></i></button>
+    </div>
+</form>
+
+<div class="fav-grid" id="favGrid">
+    @if (!Model.Items.Any())
+    {
+        <div class="fav-empty">No favorites match your search.</div>
+    }
+    else
+    {
+        @foreach (var f in Model.Items)
+        {
+            <div class="fav-card" data-book-id="@f.BookId">
+                <div class="fav-cover-wrap">
+                    <img class="fav-cover" src="@f.BookCoverUrl" alt="@f.Title cover" />
+                    <button class="fav-heart-btn filled" data-favorite-toggle aria-label="Toggle favorite"><i class="ti ti-heart-filled"></i></button>
+                </div>
+                <div class="fav-title">@f.Title</div>
+                <div class="fav-author">@f.Author</div>
+                <div class="star-rating">
+                    <span class="stars">@RenderStars(f.AverageRating)</span>
+                    <span>@f.AverageRating.ToString("0.0")</span>
+                </div>
+                <a href="/Reader/BookDetails/@f.BookId" class="btn-read-now">Read Now</a>
+                <a href="/Reader/BookDetails/@f.BookId" class="btn-view-details">View Details</a>
+            </div>
+        }
+    }
+</div>
+
+<div class="fav-pagination">
+    <span>
+        Showing @(((Model.Page - 1) * Model.PageSize) + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalCount) of @Model.TotalCount books
+    </span>
+    <div class="fav-page-controls">
+        <a class="@(Model.Page <= 1 ? "disabled" : "")" href="@(Model.Page > 1 ? PageUrl(Model.Page - 1) : "#")">
+            <i class="ti ti-chevron-left"></i>
+        </a>
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <a class="@(i == Model.Page ? "active" : "")" href="@PageUrl(i)">@i</a>
+        }
+        <a class="@(Model.Page >= totalPages ? "disabled" : "")" href="@(Model.Page < totalPages ? PageUrl(Model.Page + 1) : "#")">
+            <i class="ti ti-chevron-right"></i>
+        </a>
+    </div>
+    <form method="get" asp-action="FavoritesAll" asp-controller="Reader" class="fav-page-size">
+        Books per page
+        <input type="hidden" name="page" value="1" />
+        <input type="hidden" name="search" value="@search" />
+        <input type="hidden" name="categoryId" value="@categoryId" />
+        <input type="hidden" name="sortBy" value="@sortBy" />
+        <select name="pageSize" onchange="this.form.submit()">
+            <option value="12" selected="@(Model.PageSize == 12)">12</option>
+            <option value="24" selected="@(Model.PageSize == 24)">24</option>
+            <option value="48" selected="@(Model.PageSize == 48)">48</option>
+        </select>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var grid = document.getElementById('favGrid');
+
+            document.querySelectorAll('.view-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    document.querySelectorAll('.view-btn').forEach(function (b) { b.classList.remove('active'); });
+                    btn.classList.add('active');
+                    grid.classList.toggle('list-view', btn.dataset.view === 'list');
+                });
+            });
+
+            document.querySelectorAll('[data-favorite-toggle]').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var card = btn.closest('[data-book-id]');
+                    var bookId = card.getAttribute('data-book-id');
+
+                    fetch('/Reader/ToggleBookList', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'bookId=' + encodeURIComponent(bookId) + '&listType=Favorite'
+                    })
+                    .then(function (res) { return res.json(); })
+                    .then(function (result) {
+                        if (result.success && !result.isInList) {
+                            card.remove();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}

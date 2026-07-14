@@ -10,6 +10,7 @@ namespace Application.Common.Repositories
         Task<User?> GetAsync(string email);
         Task<User?> GetByUserNameAsync(string userName);
         Task<bool> IsExistAsync(string email);
+        void Update(User user);
         Task<PagenatedList<User>> GetUsersAsync(PageRequest pageRequest, bool usePaging);
     }
 }

@@ -1,36 +1,201 @@
-﻿@{
-    ViewData["Title"] = "My Personal Settings";
+﻿@model Application.Queries.GetCurrentlyReading.GetCurrentlyReadingResponse
+@{
+    ViewData["Title"] = "Currently Reading";
     Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+
+    string? currentSearch = Context.Request.Query["search"];
+    string? currentSort = Context.Request.Query["sortBy"];
+    string? currentFilter = Context.Request.Query["filter"];
+
+    var sortOptions = new (string Value, string Label)[]
+    {
+        ("last-opened", "Last Opened"),
+        ("title-asc", "Title A – Z"),
+        ("title-desc", "Title Z – A"),
+        ("progress-asc", "Progress ↑"),
+        ("progress-desc", "Progress ↓"),
+        ("date-added", "Date Added"),
+    };
+
+    var filterOptions = new (string Value, string Label, string Icon)[]
+    {
+        ("all", "All Books", "📚"),
+        ("under50", "Under 50%", "🔵"),
+        ("over50", "Over 50%", "🟣"),
+        ("over75", "Almost done", "🏁"),
+        ("recent", "Started recently", "🆕"),
+    };
+
+    string sortLabel = sortOptions.FirstOrDefault(x => x.Value == currentSort).Label ?? "Last Opened";
+    string activeFilterVal = string.IsNullOrEmpty(currentFilter) ? "all" : currentFilter;
+    var activeFilterOpt = filterOptions.FirstOrDefault(x => x.Value == activeFilterVal);
+
+    int totalPages = (int)Math.Ceiling((double)Model.TotalCount / (Model.PageSize == 0 ? 1 : Model.PageSize));
+    if (totalPages < 1) totalPages = 1;
+
+    string BuildUrl(int? page = null, string? sort = null, string? filter = null, string? search = null)
+    {
+        var q = new Dictionary<string, string?>
+        {
+            ["page"] = (page ?? Model.Page).ToString(),
+            ["pageSize"] = Model.PageSize.ToString(),
+            ["sortBy"] = sort ?? currentSort,
+            ["filter"] = filter ?? currentFilter,
+            ["search"] = search ?? currentSearch
+        };
+        var query = string.Join("&", q.Where(kv => !string.IsNullOrEmpty(kv.Value))
+            .Select(kv => $"{kv.Key}={Uri.EscapeDataString(kv.Value!)}"));
+        return Url.Action("ViewAllReadingProgress", "Reader") + "?" + query;
+    }
+
+    string[] coverPalette = { "cv-1", "cv-2", "cv-3", "cv-4", "cv-5", "cv-6" };
+    string CoverClass(Guid id) => coverPalette[Math.Abs(id.GetHashCode()) % coverPalette.Length];
+
+    (string cssClass, string icon) NotifStyle(string type)
+    {
+        var t = (type ?? "").ToLower();
+        if (t.Contains("payment") || t.Contains("wallet") || t.Contains("transaction"))
+            return ("green", "fa-solid fa-wallet");
+        if (t.Contains("book"))
+            return ("blue", "fa-solid fa-book-open");
+        if (t.Contains("alert") || t.Contains("warning"))
+            return ("orange", "fa-solid fa-triangle-exclamation");
+        if (t.Contains("system"))
+            return ("indigo", "fa-solid fa-gear");
+        return ("purple", "fa-solid fa-bell");
+    }
+
+    string FormatMinutesLeft(int? minutes)
+    {
+        if (!minutes.HasValue) return "";
+        var h = minutes.Value / 60;
+        var m = minutes.Value % 60;
+        return h > 0 ? $"{h}h {m:00}m left" : $"{m}m left";
+    }
+
+    string? toastMessage = TempData["ToastMessage"] as string;
+    string toastType = TempData["ToastType"] as string ?? "success";
+    string toastIcon = TempData["ToastIcon"] as string ?? "✓";
 }
 
 <link href="~/css/allReadingProgress.css" rel="stylesheet" />
+
+<style>
+    .cv-1 {
+        background: linear-gradient(135deg,#7c6af7,#4c3fd6);
+    }
+
+    .cv-2 {
+        background: linear-gradient(135deg,#e8540f,#b93d08);
+    }
+
+    .cv-3 {
+        background: linear-gradient(135deg,#1b2a52,#0f172e);
+    }
+
+    .cv-4 {
+        background: linear-gradient(135deg,#f4d61a,#c9a800);
+    }
+
+    .cv-5 {
+        background: linear-gradient(135deg,#0f9d76,#066b4f);
+    }
+
+    .cv-6 {
+        background: linear-gradient(135deg,#d63384,#a5266a);
+    }
+</style>
+
+<div class="toast-wrap"></div>
+
 <main>
 
     <!-- ── Topbar ── -->
     <div class="topbar">
-        <div class="search-wrap">
+        <form class="search-wrap" method="get" action="@Url.Action("ViewAllReadingProgress", "Reader")">
             <span class="search-icon">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
             </span>
-            <input type="text" placeholder="Search your books…" />
+            <input type="text" name="search" placeholder="Search your books…" value="@currentSearch" />
+            <input type="hidden" name="sortBy" value="@currentSort" />
+            <input type="hidden" name="filter" value="@currentFilter" />
+        </form>
+
+        <div class="dropdown-wrap">
+            <button class="topbar-btn" id="sortBtn" type="button">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+                Sort by: @sortLabel
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
+            </button>
+            <div class="dropdown-menu" id="sortMenu">
+                <div class="dropdown-label">Sort by</div>
+                @foreach (var opt in sortOptions)
+                {
+                    <a class="dropdown-item @(opt.Value == currentSort || (string.IsNullOrEmpty(currentSort) && opt.Value == "last-opened") ? "active" : "")"
+                       href="@BuildUrl(page: 1, sort: opt.Value)">
+                        @opt.Label
+                        <svg class="di-check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12" /></svg>
+                    </a>
+                }
+            </div>
         </div>
 
-        <button class="topbar-btn">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
-            Sort by: Last Opened
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9" /></svg>
-        </button>
-
-        <button class="topbar-btn">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
-            Filter
-        </button>
+        <div class="dropdown-wrap">
+            <button class="topbar-btn @(activeFilterVal != "all" ? "btn-active" : "")" id="filterBtn" type="button">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+                Filter
+            </button>
+            <div class="dropdown-menu" id="filterMenu" style="left:auto;">
+                <div class="dropdown-label">Filter books</div>
+                @foreach (var opt in filterOptions)
+                {
+                    <a class="dropdown-item @(opt.Value == activeFilterVal ? "active" : "")"
+                       href="@BuildUrl(page: 1, filter: opt.Value == "all" ? "" : opt.Value)">
+                        <span>@opt.Icon</span> @opt.Label
+                        <svg class="di-check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12" /></svg>
+                    </a>
+                }
+            </div>
+        </div>
 
         <div class="topbar-right">
-            <button class="notif-btn">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
-                <span class="notif-badge">8</span>
-            </button>
+            <div class="dropdown-wrap" style="position:relative;">
+                <button class="notif-btn" id="notifBtn" type="button">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
+                    @if (Model.UnreadNotificationCount > 0)
+                    {
+                        <span class="notif-badge">@Model.UnreadNotificationCount</span>
+                    }
+                </button>
+                <div class="notif-panel" id="notifPanel">
+                    <div class="notif-panel-head">
+                        <span>Notifications</span>
+                        <span class="notif-mark-all" id="markAllReadBtn">Mark all read</span>
+                    </div>
+                    <div class="notif-list">
+                        @if (!Model.Notifications.Any())
+                        {
+                            <div class="notif-row"><div class="notif-body"><p>You're all caught up</p></div></div>
+                        }
+                        else
+                        {
+                            @foreach (var notif in Model.Notifications)
+                            {
+                                var style = NotifStyle(notif.Type);
+                                <div class="notif-row @(notif.IsRead ? "" : "unread")">
+                                    <div class="@(notif.IsRead ? "notif-dot-read" : "notif-dot-unread")"></div>
+                                    <div class="notif-icon @style.cssClass"><i class="@style.icon"></i></div>
+                                    <div class="notif-body">
+                                        <strong>@notif.Title</strong>
+                                        <p>@notif.Message</p>
+                                        <span class="notif-time">@notif.DateModified.ToString("MMM d, h:mm tt")</span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
             <div class="avatar">
                 <div class="avatar-fallback">JD</div>
             </div>
@@ -45,6 +210,19 @@
             <p class="cr-sub">Continue where you left off.</p>
         </div>
 
+        @if (activeFilterVal != "all")
+        {
+            <div class="filter-chips visible">
+                <div class="chip">
+                    @activeFilterOpt.Icon @activeFilterOpt.Label
+                    <a href="@BuildUrl(page: 1, filter: "")" style="color:inherit;text-decoration:none;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                    </a>
+                </div>
+                <a class="chip chip-clear" href="@BuildUrl(page: 1, filter: "")" style="text-decoration:none;">Clear all</a>
+            </div>
+        }
+
         <!-- Stats -->
         <div class="cr-stats">
             <div class="stat-card">
@@ -53,7 +231,7 @@
                 </div>
                 <div class="stat-body">
                     <div class="stat-label">Active Books</div>
-                    <div class="stat-val">7</div>
+                    <div class="stat-val">@Model.ActiveBooksCount</div>
                     <div class="stat-note purple">Keep going!</div>
                 </div>
             </div>
@@ -64,7 +242,7 @@
                 </div>
                 <div class="stat-body">
                     <div class="stat-label">Reading Streak</div>
-                    <div class="stat-val">12</div>
+                    <div class="stat-val">@Model.ReadingStreakDays</div>
                     <div class="stat-note orange">days in a row</div>
                 </div>
             </div>
@@ -75,8 +253,8 @@
                 </div>
                 <div class="stat-body">
                     <div class="stat-label">Total Reading Time</div>
-                    <div class="stat-val sm">24h 36m</div>
-                    <div class="stat-note muted">This month</div>
+                    <div class="stat-val sm">@(Model.TotalReadingMinutes / 60)h @(Model.TotalReadingMinutes % 60)m</div>
+                    <div class="stat-note muted">All time</div>
                 </div>
             </div>
 
@@ -86,718 +264,254 @@
                 </div>
                 <div class="stat-body">
                     <div class="stat-label">Books in Progress</div>
-                    <div class="stat-val">7</div>
+                    <div class="stat-val">@Model.ActiveBooksCount</div>
                     <div class="stat-note teal">You're on track!</div>
                 </div>
             </div>
         </div>
 
         <!-- Book List -->
-        <div class="book-list">
-
-            <!-- ① Atomic Habits -->
-            <div class="book-card">
-                <div class="bc-cover">
-                    <div class="book-cover-fake cover-ah">
-                        <div style="font-size:7px;color:rgba(255,255,255,.7);text-align:center;margin-bottom:3px;">Tiny Changes<br>Remarkable Results</div>
-                        <div class="cover-title" style="font-size:11px;">Atomic<br>Habits</div>
-                        <div class="cover-author">James Clear</div>
-                    </div>
-                </div>
-                <div class="bc-info">
-                    <div class="bc-title">Atomic Habits</div>
-                    <div class="bc-tagline">Tiny Changes, Remarkable Results</div>
-                    <div class="bc-author">James Clear</div>
-                    <div class="progress-row">
-                        <div class="prog-bg"><div class="prog-fill" style="width:67%"></div></div>
-                        <span class="prog-pct">67%</span>
-                    </div>
-                    <div class="time-left">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                        9h 24m left
-                    </div>
-                </div>
-                <div class="bc-meta">
-                    <div class="meta-row">
-                        <span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg></span>
-                        <div class="meta-text">
-                            <div class="meta-label">Last opened</div>
-                            <div class="meta-val">Today, 7:45 PM</div>
+        @if (!Model.Items.Any())
+        {
+            <div class="rc-empty"><p>No books match your search or filter.</p></div>
+        }
+        else
+        {
+            <div class="book-list">
+                @foreach (var book in Model.Items)
+                {
+                    <div class="book-card" data-progress-id="@book.ReadingProgressId">
+                        <div class="bc-cover">
+                            @if (string.IsNullOrEmpty(book.BookCoverUrl))
+                            {
+                                <div class="book-cover-fake @CoverClass(book.BookId)">
+                                    <div class="cover-title" style="font-size:11px;">@book.Title</div>
+                                </div>
+                            }
+                            else
+                            {
+                                <img src="@book.BookCoverUrl" alt="@book.Title" style="width:64px;height:92px;border-radius:7px;object-fit:cover;flex-shrink:0;" />
+                            }
+                        </div>
+                        <div class="bc-info">
+                            <div class="bc-title">@book.Title</div>
+                            <div class="bc-author">@book.Author</div>
+                            <div class="progress-row">
+                                <div class="prog-bg"><div class="prog-fill" style="width:@book.ProgressPercentage.ToString("0")%"></div></div>
+                                <span class="prog-pct">@book.ProgressPercentage.ToString("0")%</span>
+                            </div>
+                            @if (book.EstimatedMinutesLeft.HasValue)
+                            {
+                                <div class="time-left">
+                                    <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                                    @FormatMinutesLeft(book.EstimatedMinutesLeft)
+                                </div>
+                            }
+                        </div>
+                        <div class="bc-meta">
+                            <div class="meta-row">
+                                <span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg></span>
+                                <div class="meta-text">
+                                    <div class="meta-label">Last opened</div>
+                                    <div class="meta-val">@(book.LastReadDate?.ToString("MMM d, yyyy, h:mm tt") ?? "Never")</div>
+                                </div>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg></span>
+                                <div class="meta-text">
+                                    <div class="meta-label">Started on</div>
+                                    <div class="meta-val">@book.StartedOn.ToString("MMM d, yyyy")</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bc-actions">
+                            <a href="@Url.Action("BookReadingProgress", "Reader", new { id = book.BookId })" class="btn-continue" data-title="@book.Title" style="text-decoration:none;">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                                Continue Reading
+                            </a>
+                            <button class="btn-remove" type="button" data-progress-id="@book.ReadingProgressId" data-title="@book.Title">
+                                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
+                                Remove
+                            </button>
                         </div>
                     </div>
-                    <div class="meta-row">
-                        <span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg></span>
-                        <div class="meta-text">
-                            <div class="meta-label">Started on</div>
-                            <div class="meta-val">May 10, 2024</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bc-actions">
-                    <button class="btn-continue">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
-                        Continue Reading
-                    </button>
-                    <button class="btn-remove">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
-                        Remove
-                    </button>
-                </div>
+                }
             </div>
+        }
 
-            <!-- ② Deep Work -->
-            <div class="book-card">
-                <div class="bc-cover">
-                    <div class="book-cover-fake cover-dw">
-                        <div class="cover-title" style="font-size:13px;color:#f5c518;">DEEP<br>WORK</div>
-                        <div class="cover-author" style="color:rgba(245,197,24,.7);">Cal Newport</div>
-                    </div>
-                </div>
-                <div class="bc-info">
-                    <div class="bc-title">Deep Work</div>
-                    <div class="bc-tagline">Rules for Focused Success in a Distracted World</div>
-                    <div class="bc-author">Cal Newport</div>
-                    <div class="progress-row">
-                        <div class="prog-bg"><div class="prog-fill" style="width:42%"></div></div>
-                        <span class="prog-pct">42%</span>
-                    </div>
-                    <div class="time-left">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                        6h 18m left
-                    </div>
-                </div>
-                <div class="bc-meta">
-                    <div class="meta-row">
-                        <span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg></span>
-                        <div class="meta-text">
-                            <div class="meta-label">Last opened</div>
-                            <div class="meta-val">Yesterday, 9:15 PM</div>
-                        </div>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg></span>
-                        <div class="meta-text">
-                            <div class="meta-label">Started on</div>
-                            <div class="meta-val">May 5, 2024</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bc-actions">
-                    <button class="btn-continue">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
-                        Continue Reading
-                    </button>
-                    <button class="btn-remove">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
-                        Remove
-                    </button>
-                </div>
-            </div>
-
-            <!-- ③ The 5 AM Club -->
-            <div class="book-card">
-                <div class="bc-cover">
-                    <div class="book-cover-fake cover-5am">
-                        <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,200,0,.9);display:flex;align-items:center;justify-content:center;margin-bottom:5px;">
-                            <span style="font-size:14px;font-weight:900;color:#c0390b;">5</span>
-                        </div>
-                        <div class="cover-title" style="font-size:9px;">THE 5 AM<br>CLUB</div>
-                        <div class="cover-author">Robin Sharma</div>
-                    </div>
-                </div>
-                <div class="bc-info">
-                    <div class="bc-title">The 5 AM Club</div>
-                    <div class="bc-tagline">Own Your Morning. Elevate Your Life.</div>
-                    <div class="bc-author">Robin Sharma</div>
-                    <div class="progress-row">
-                        <div class="prog-bg"><div class="prog-fill" style="width:28%"></div></div>
-                        <span class="prog-pct">28%</span>
-                    </div>
-                    <div class="time-left">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                        7h 02m left
-                    </div>
-                </div>
-                <div class="bc-meta">
-                    <div class="meta-row">
-                        <span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg></span>
-                        <div class="meta-text">
-                            <div class="meta-label">Last opened</div>
-                            <div class="meta-val">May 14, 2024, 6:20 PM</div>
-                        </div>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg></span>
-                        <div class="meta-text">
-                            <div class="meta-label">Started on</div>
-                            <div class="meta-val">May 2, 2024</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bc-actions">
-                    <button class="btn-continue">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
-                        Continue Reading
-                    </button>
-                    <button class="btn-remove">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
-                        Remove
-                    </button>
-                </div>
-            </div>
-
-            <!-- ④ Thinking, Fast and Slow -->
-            <div class="book-card">
-                <div class="bc-cover">
-                    <div class="book-cover-fake cover-tfs">
-                        <div class="cover-title" style="font-size:8px;color:#2c2c2c;">THINKING,<br>FAST<br>AND SLOW</div>
-                        <div class="cover-author" style="color:#4a4a4a;">Daniel Kahneman</div>
-                    </div>
-                </div>
-                <div class="bc-info">
-                    <div class="bc-title">Thinking, Fast and Slow</div>
-                    <div class="bc-tagline">Daniel Kahneman</div>
-                    <div class="bc-author">Daniel Kahneman</div>
-                    <div class="progress-row">
-                        <div class="prog-bg"><div class="prog-fill" style="width:81%"></div></div>
-                        <span class="prog-pct">81%</span>
-                    </div>
-                    <div class="time-left">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                        2h 10m left
-                    </div>
-                </div>
-                <div class="bc-meta">
-                    <div class="meta-row">
-                        <span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg></span>
-                        <div class="meta-text">
-                            <div class="meta-label">Last opened</div>
-                            <div class="meta-val">May 13, 2024, 10:30 PM</div>
-                        </div>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg></span>
-                        <div class="meta-text">
-                            <div class="meta-label">Started on</div>
-                            <div class="meta-val">Apr 28, 2024</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bc-actions">
-                    <button class="btn-continue">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
-                        Continue Reading
-                    </button>
-                    <button class="btn-remove">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
-                        Remove
-                    </button>
-                </div>
-            </div>
-
-            <!-- ⑤ Mindset -->
-            <div class="book-card">
-                <div class="bc-cover">
-                    <div class="book-cover-fake cover-ms">
-                        <div class="cover-title" style="font-size:14px;letter-spacing:.05em;">mindset</div>
-                        <div style="font-size:6.5px;color:rgba(255,255,255,.5);margin:3px 0;text-align:center;line-height:1.3;">THE NEW PSYCHOLOGY<br>OF SUCCESS</div>
-                        <div class="cover-author">Carol S. Dweck</div>
-                    </div>
-                </div>
-                <div class="bc-info">
-                    <div class="bc-title">Mindset</div>
-                    <div class="bc-tagline">The New Psychology of Success</div>
-                    <div class="bc-author">Carol S. Dweck</div>
-                    <div class="progress-row">
-                        <div class="prog-bg"><div class="prog-fill" style="width:55%"></div></div>
-                        <span class="prog-pct">55%</span>
-                    </div>
-                    <div class="time-left">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                        5h 47m left
-                    </div>
-                </div>
-                <div class="bc-meta">
-                    <div class="meta-row">
-                        <span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg></span>
-                        <div class="meta-text">
-                            <div class="meta-label">Last opened</div>
-                            <div class="meta-val">May 12, 2024, 8:10 PM</div>
-                        </div>
-                    </div>
-                    <div class="meta-row">
-                        <span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg></span>
-                        <div class="meta-text">
-                            <div class="meta-label">Started on</div>
-                            <div class="meta-val">Apr 20, 2024</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bc-actions">
-                    <button class="btn-continue">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3" /></svg>
-                        Continue Reading
-                    </button>
-                    <button class="btn-remove">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
-                        Remove
-                    </button>
-                </div>
-            </div>
-
-        </div><!-- /book-list -->
         <!-- Pagination -->
         <div class="pagination-wrap">
             <div class="pagination-row">
-                <button class="pg-btn">
+                <a class="pg-btn @(Model.Page <= 1 ? "disabled" : "")" href="@(Model.Page > 1 ? BuildUrl(Model.Page - 1) : "#")">
                     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
                     Prev
-                </button>
-                <button class="pg-btn active">1</button>
-                <button class="pg-btn">2</button>
-                <button class="pg-btn">3</button>
-                <button class="pg-btn">
+                </a>
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <a class="pg-btn @(i == Model.Page ? "active" : "")" href="@BuildUrl(i)">@i</a>
+                }
+                <a class="pg-btn @(Model.Page >= totalPages ? "disabled" : "")" href="@(Model.Page < totalPages ? BuildUrl(Model.Page + 1) : "#")">
                     Next
                     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
-                </button>
+                </a>
             </div>
-            <div class="pg-showing">Showing 1 to 5 of 7 books</div>
+            <div class="pg-showing">
+                @{
+                    int start = Model.TotalCount == 0 ? 0 : (Model.Page - 1) * Model.PageSize + 1;
+                    long end = Math.Min(start + Model.Items.Count - 1, Model.TotalCount);
+                }
+                @(Model.TotalCount == 0 ? "No books match your filter" : $"Showing {start} to {end} of {Model.TotalCount} books")
+            </div>
         </div>
 
     </div>
 </main>
 
+<!-- Remove confirmation modal -->
+<div class="modal-overlay" id="removeModal">
+    <div class="modal-box">
+        <div class="modal-icon">
+            <svg width="24" height="24" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
+        </div>
+        <div class="modal-title">Remove book?</div>
+        <div class="modal-body">Are you sure you want to remove <strong id="modal-book-name"></strong> from your reading list? Your progress will be lost.</div>
+        <div class="modal-actions">
+            <button class="modal-cancel" type="button" id="modalCancelBtn">Keep it</button>
+            <form method="post" action="@Url.Action("RemoveReadingProgress", "Reader")" id="removeForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="removeProgressId" />
+                <button class="modal-confirm" type="submit">Yes, remove</button>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
     (function () {
-      function toast(msg, type = 'info', icon = '✓') {
-        const wrap = document.querySelector('.toast-wrap') || (() => {
-          const w = document.createElement('div');
-          w.className = 'toast-wrap';
-          document.body.appendChild(w);
-          return w;
-        })();
-        const t = document.createElement('div');
-        t.className = 'toast';
-        t.innerHTML = `<div class="toast-ic ${type}">${icon}</div><span class="toast-msg">${msg}</span>`;
-        wrap.appendChild(t);
-        setTimeout(() => t.remove(), 3100);
-      }
-
-      function closeAllDropdowns(except) {
-        document.querySelectorAll('.dropdown-menu.open').forEach(m => {
-          if (m !== except) m.classList.remove('open');
-        });
-      }
-
-      /* ─────────────────────────────────────────────
-         Sort dropdown
-      ───────────────────────────────────────────── */
-      const sortOptions = [
-        { label: 'Last Opened',   value: 'last-opened' },
-        { label: 'Title A – Z',   value: 'title-asc' },
-        { label: 'Title Z – A',   value: 'title-desc' },
-        { label: 'Progress ↑',    value: 'progress-asc' },
-        { label: 'Progress ↓',    value: 'progress-desc' },
-        { label: 'Date Added',    value: 'date-added' },
-      ];
-
-      const sortBtn = document.querySelector('.topbar-btn:nth-of-type(1)');
-      let currentSort = 'last-opened';
-
-      // Wrap sort button in a relative container
-      const sortWrap = document.createElement('div');
-      sortWrap.className = 'dropdown-wrap';
-      sortBtn.parentNode.insertBefore(sortWrap, sortBtn);
-      sortWrap.appendChild(sortBtn);
-
-      const sortMenu = document.createElement('div');
-      sortMenu.className = 'dropdown-menu';
-      sortMenu.innerHTML = `<div class="dropdown-label">Sort by</div>` +
-        sortOptions.map(o => `
-          <div class="dropdown-item${o.value === currentSort ? ' active' : ''}" data-val="${o.value}">
-            ${o.label}
-            <svg class="di-check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>`).join('');
-      sortWrap.appendChild(sortMenu);
-
-      sortBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        closeAllDropdowns(sortMenu);
-        sortMenu.classList.toggle('open');
-        sortBtn.classList.toggle('btn-active', sortMenu.classList.contains('open'));
-      });
-
-      sortMenu.querySelectorAll('.dropdown-item').forEach(item => {
-        item.addEventListener('click', () => {
-          currentSort = item.dataset.val;
-          sortMenu.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
-          item.classList.add('active');
-          sortBtn.childNodes[2].textContent = ' ' + item.textContent.trim().replace(/\n/g,'').replace(/\s+/g,' ').split('✓')[0].trim();
-          // Update label text node (the text between the two SVGs)
-          const labelNode = [...sortBtn.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
-          if (labelNode) labelNode.textContent = ' Sort by: ' + item.textContent.trim().split('\n')[0].trim() + ' ';
-          sortMenu.classList.remove('open');
-          sortBtn.classList.remove('btn-active');
-          sortBooks(currentSort);
-          toast(`Sorted by <strong>${item.textContent.trim().split('\n')[0].trim()}</strong>`, 'info', '↕');
-        });
-      });
-
-      function sortBooks(mode) {
-        const list = document.querySelector('.book-list');
-        const cards = [...list.querySelectorAll('.book-card')];
-        cards.sort((a, b) => {
-          const titleA = a.querySelector('.bc-title').textContent;
-          const titleB = b.querySelector('.bc-title').textContent;
-          const pctA   = parseInt(a.querySelector('.prog-pct').textContent);
-          const pctB   = parseInt(b.querySelector('.prog-pct').textContent);
-          if (mode === 'title-asc')      return titleA.localeCompare(titleB);
-          if (mode === 'title-desc')     return titleB.localeCompare(titleA);
-          if (mode === 'progress-asc')   return pctA - pctB;
-          if (mode === 'progress-desc')  return pctB - pctA;
-          return 0; // keep order for last-opened / date-added
-        });
-        cards.forEach(c => list.appendChild(c));
-      }
-
-      /* ─────────────────────────────────────────────
-         Filter dropdown
-      ───────────────────────────────────────────── */
-      const filterOptions = [
-        { label: 'All Books',       value: 'all',       icon: '📚' },
-        { label: 'Under 50%',       value: 'under50',   icon: '🔵' },
-        { label: 'Over 50%',        value: 'over50',    icon: '🟣' },
-        { label: 'Almost done',     value: 'over75',    icon: '🏁' },
-        { label: 'Started recently',value: 'recent',    icon: '🆕' },
-      ];
-
-      const filterBtn = document.querySelector('.topbar-btn:nth-of-type(2)');
-      let activeFilter = 'all';
-
-      const filterWrap = document.createElement('div');
-      filterWrap.className = 'dropdown-wrap';
-      filterBtn.parentNode.insertBefore(filterWrap, filterBtn);
-      filterWrap.appendChild(filterBtn);
-
-      const filterMenu = document.createElement('div');
-      filterMenu.className = 'dropdown-menu';
-      filterMenu.style.left = 'auto';
-      filterMenu.innerHTML = `<div class="dropdown-label">Filter books</div>` +
-        filterOptions.map(o => `
-          <div class="dropdown-item${o.value === activeFilter ? ' active' : ''}" data-val="${o.value}">
-            <span>${o.icon}</span> ${o.label}
-            <svg class="di-check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>`).join('');
-      filterWrap.appendChild(filterMenu);
-
-      // Chip row (appears below topbar in content area)
-      const chipRow = document.createElement('div');
-      chipRow.className = 'filter-chips';
-      const crHeader = document.querySelector('.cr-header');
-      crHeader.parentNode.insertBefore(chipRow, crHeader.nextSibling);
-
-      filterBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        closeAllDropdowns(filterMenu);
-        filterMenu.classList.toggle('open');
-        filterBtn.classList.toggle('btn-active', filterMenu.classList.contains('open'));
-      });
-
-      filterMenu.querySelectorAll('.dropdown-item').forEach(item => {
-        item.addEventListener('click', () => {
-          activeFilter = item.dataset.val;
-          filterMenu.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
-          item.classList.add('active');
-          filterMenu.classList.remove('open');
-          filterBtn.classList.remove('btn-active');
-          applyFilter(activeFilter);
-
-          // chips
-          chipRow.innerHTML = '';
-          if (activeFilter !== 'all') {
-            const label = item.textContent.trim().split('\n')[0].trim().replace(/\s+/g,' ');
-            chipRow.innerHTML = `
-              <div class="chip" data-filter="${activeFilter}">
-                ${label}
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </div>
-              <div class="chip chip-clear" id="clear-filter">Clear all</div>`;
-            chipRow.classList.add('visible');
-            chipRow.querySelector('.chip').addEventListener('click', clearFilter);
-            chipRow.querySelector('#clear-filter').addEventListener('click', clearFilter);
-          } else {
-            chipRow.classList.remove('visible');
-          }
-          filterBtn.classList.toggle('btn-active', activeFilter !== 'all');
-        });
-      });
-
-      function clearFilter() {
-        activeFilter = 'all';
-        filterMenu.querySelectorAll('.dropdown-item').forEach(i => {
-          i.classList.toggle('active', i.dataset.val === 'all');
-        });
-        chipRow.classList.remove('visible');
-        filterBtn.classList.remove('btn-active');
-        applyFilter('all');
-      }
-
-      function applyFilter(mode) {
-        document.querySelectorAll('.book-card').forEach(card => {
-          const pct = parseInt(card.querySelector('.prog-pct').textContent);
-          let show = true;
-          if (mode === 'under50')  show = pct < 50;
-          if (mode === 'over50')   show = pct >= 50;
-          if (mode === 'over75')   show = pct >= 75;
-          if (mode === 'recent')   show = card.querySelector('.meta-val').textContent.includes('May 14') ||
-                                          card.querySelector('.meta-val').textContent.includes('Today') ||
-                                          card.querySelector('.meta-val').textContent.includes('Yesterday');
-          card.style.display = show ? '' : 'none';
-        });
-        updateShowing();
-      }
-
-      /* ─────────────────────────────────────────────
-         Live search
-      ───────────────────────────────────────────── */
-      const searchInput = document.querySelector('.search-wrap input');
-      searchInput.addEventListener('input', () => {
-        const q = searchInput.value.toLowerCase().trim();
-        document.querySelectorAll('.book-card').forEach(card => {
-          const text = (card.querySelector('.bc-title').textContent +
-                        card.querySelector('.bc-author').textContent).toLowerCase();
-          card.style.display = (!q || text.includes(q)) ? '' : 'none';
-        });
-        updateShowing();
-      });
-
-      /* ─────────────────────────────────────────────
-         Remove book — confirm modal
-      ───────────────────────────────────────────── */
-      const modal = document.createElement('div');
-      modal.className = 'modal-overlay';
-      modal.innerHTML = `
-        <div class="modal-box">
-          <div class="modal-icon">
-            <svg width="24" height="24" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          </div>
-          <div class="modal-title">Remove book?</div>
-          <div class="modal-body">Are you sure you want to remove <strong id="modal-book-name"></strong> from your reading list? Your progress will be lost.</div>
-          <div class="modal-actions">
-            <button class="modal-cancel">Keep it</button>
-            <button class="modal-confirm">Yes, remove</button>
-          </div>
-        </div>`;
-      document.body.appendChild(modal);
-
-      let pendingCard = null;
-
-      modal.querySelector('.modal-cancel').addEventListener('click', () => {
-        modal.classList.remove('open');
-        pendingCard = null;
-      });
-      modal.addEventListener('click', e => {
-        if (e.target === modal) { modal.classList.remove('open'); pendingCard = null; }
-      });
-      modal.querySelector('.modal-confirm').addEventListener('click', () => {
-        if (!pendingCard) return;
-        const title = pendingCard.querySelector('.bc-title').textContent;
-        pendingCard.classList.add('removing');
-        setTimeout(() => {
-          pendingCard.remove();
-          updateShowing();
-        }, 320);
-        modal.classList.remove('open');
-        toast(`"${title}" removed from your list`, 'danger', '🗑');
-        pendingCard = null;
-      });
-
-      document.querySelector('.book-list').addEventListener('click', e => {
-        const removeBtn = e.target.closest('.btn-remove');
-        if (!removeBtn) return;
-        pendingCard = removeBtn.closest('.book-card');
-        const title = pendingCard.querySelector('.bc-title').textContent;
-        modal.querySelector('#modal-book-name').textContent = title;
-        modal.classList.add('open');
-      });
-
-      /* ─────────────────────────────────────────────
-         Continue Reading button
-      ───────────────────────────────────────────── */
-      document.querySelector('.book-list').addEventListener('click', e => {
-        const btn = e.target.closest('.btn-continue');
-        if (!btn) return;
-        const title = btn.closest('.book-card').querySelector('.bc-title').textContent;
-        toast(`Opening "${title}"…`, 'success', '▶');
-      });
-
-      /* ─────────────────────────────────────────────
-         Notification panel
-      ───────────────────────────────────────────── */
-      const notifications = [
-        { icon:'📖', bg:'rgba(124,92,252,.15)', title:'Reading goal reached!',  text:'You hit 2 hours today. Great job!',       time:'2 min ago',  unread:true  },
-        { icon:'🔥', bg:'rgba(249,115,22,.15)', title:'12-day streak!',          text:'Keep it up — you\'re on fire.',            time:'1 hr ago',   unread:true  },
-        { icon:'📚', bg:'rgba(52,211,153,.12)', title:'New recommendation',      text:'"The Power of Now" matches your taste.',  time:'3 hrs ago',  unread:true  },
-        { icon:'✅', bg:'rgba(52,211,153,.12)', title:'Book completed',           text:'You finished "Can\'t Hurt Me".',          time:'Yesterday',  unread:false },
-        { icon:'💡', bg:'rgba(99,179,237,.12)', title:'Reading tip',              text:'Try reading before bed for better recall.','time':'2 days ago',unread:false },
-      ];
-
-      const notifBtn  = document.querySelector('.notif-btn');
-      const notifWrap = notifBtn.parentElement;
-      notifWrap.style.position = 'relative';
-
-      const notifPanel = document.createElement('div');
-      notifPanel.className = 'notif-panel';
-      notifPanel.innerHTML = `
-        <div class="notif-panel-head">
-          <span>Notifications</span>
-          <span class="notif-mark-all">Mark all read</span>
-        </div>
-        <div class="notif-list">
-          ${notifications.map(n => `
-            <div class="notif-row${n.unread ? ' unread' : ''}">
-              <div class="${n.unread ? 'notif-dot-unread' : 'notif-dot-read'}"></div>
-              <div class="notif-icon" style="background:${n.bg}">${n.icon}</div>
-              <div class="notif-body">
-                <strong>${n.title}</strong>
-                <p>${n.text}</p>
-                <span class="notif-time">${n.time}</span>
-              </div>
-            </div>`).join('')}
-        </div>`;
-      notifWrap.appendChild(notifPanel);
-
-      notifBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        closeAllDropdowns();
-        notifPanel.classList.toggle('open');
-      });
-
-      notifPanel.querySelector('.notif-mark-all').addEventListener('click', () => {
-        notifPanel.querySelectorAll('.notif-row').forEach(r => r.classList.remove('unread'));
-        notifPanel.querySelectorAll('.notif-dot-unread').forEach(d => d.className = 'notif-dot-read');
-        const badge = document.querySelector('.notif-badge');
-        if (badge) badge.style.display = 'none';
-        toast('All notifications marked as read', 'success', '✓');
-      });
-
-      /* ─────────────────────────────────────────────
-         Pagination
-      ───────────────────────────────────────────── */
-      const BOOKS_PER_PAGE = 5;
-      // Full dataset (current visible cards are page 1)
-      const allBooks = [...document.querySelectorAll('.book-card')].map(c => c.outerHTML);
-      // Simulate 7 total books (2 more on page 2)
-      const page2Extra = [
-        `<div class="book-card">
-          <div class="bc-cover"><div class="book-cover-fake" style="background:linear-gradient(160deg,#1a5c2a,#0d3a18);width:64px;height:92px;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.55);padding:6px;text-align:center;flex-shrink:0;">
-            <div style="font-size:9px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px;text-transform:uppercase;">THE LEAN<br>STARTUP</div>
-            <div style="font-size:7px;color:rgba(255,255,255,.65);text-transform:uppercase;">Eric Ries</div>
-          </div></div>
-          <div class="bc-info">
-            <div class="bc-title">The Lean Startup</div>
-            <div class="bc-tagline">How Today's Entrepreneurs Use Continuous Innovation</div>
-            <div class="bc-author">Eric Ries</div>
-            <div class="progress-row"><div class="prog-bg"><div class="prog-fill" style="width:19%"></div></div><span class="prog-pct">19%</span></div>
-            <div class="time-left"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>11h 30m left</div>
-          </div>
-          <div class="bc-meta">
-            <div class="meta-row"><span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><div class="meta-text"><div class="meta-label">Last opened</div><div class="meta-val">May 10, 2024</div></div></div>
-            <div class="meta-row"><span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="meta-text"><div class="meta-label">Started on</div><div class="meta-val">May 8, 2024</div></div></div>
-          </div>
-          <div class="bc-actions">
-            <button class="btn-continue"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Continue Reading</button>
-            <button class="btn-remove"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Remove</button>
-          </div>
-        </div>`,
-        `<div class="book-card">
-          <div class="bc-cover"><div class="book-cover-fake" style="background:linear-gradient(160deg,#5c1a1a,#3a0d0d);width:64px;height:92px;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.55);padding:6px;text-align:center;flex-shrink:0;">
-            <div style="font-size:9px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px;text-transform:uppercase;">MAN'S SEARCH<br>FOR MEANING</div>
-            <div style="font-size:7px;color:rgba(255,255,255,.65);text-transform:uppercase;">Viktor Frankl</div>
-          </div></div>
-          <div class="bc-info">
-            <div class="bc-title">Man's Search for Meaning</div>
-            <div class="bc-tagline">A Psychiatrist's Experiences in the Concentration Camps</div>
-            <div class="bc-author">Viktor E. Frankl</div>
-            <div class="progress-row"><div class="prog-bg"><div class="prog-fill" style="width:73%"></div></div><span class="prog-pct">73%</span></div>
-            <div class="time-left"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>1h 20m left</div>
-          </div>
-          <div class="bc-meta">
-            <div class="meta-row"><span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><div class="meta-text"><div class="meta-label">Last opened</div><div class="meta-val">May 9, 2024, 11:00 PM</div></div></div>
-            <div class="meta-row"><span class="meta-icon"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="meta-text"><div class="meta-label">Started on</div><div class="meta-val">Apr 15, 2024</div></div></div>
-          </div>
-          <div class="bc-actions">
-            <button class="btn-continue"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Continue Reading</button>
-            <button class="btn-remove"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Remove</button>
-          </div>
-        </div>`
-      ];
-
-      const pages = [allBooks, page2Extra, []]; // page 3 empty for demo
-      let currentPage = 1;
-
-      const pgBtns = document.querySelectorAll('.pg-btn');
-      const prevBtn = pgBtns[0];
-      const nextBtn = pgBtns[pgBtns.length - 1];
-      const numBtns = [...pgBtns].slice(1, -1);
-
-      function goToPage(n) {
-        if (n < 1 || n > 2) return;
-        currentPage = n;
-
-        const list = document.querySelector('.book-list');
-        list.style.opacity = '0';
-        list.style.transform = 'translateY(8px)';
-        list.style.transition = 'opacity .2s, transform .2s';
-
-        setTimeout(() => {
-          list.innerHTML = pages[n - 1].join('');
-          list.style.opacity = '1';
-          list.style.transform = 'translateY(0)';
-          updateShowing();
-        }, 200);
-
-        numBtns.forEach((b, i) => b.classList.toggle('active', i + 1 === n));
-        prevBtn.style.opacity = n === 1 ? '.4' : '1';
-        prevBtn.style.pointerEvents = n === 1 ? 'none' : 'all';
-        nextBtn.style.opacity = n === 2 ? '.4' : '1';
-        nextBtn.style.pointerEvents = n === 2 ? 'none' : 'all';
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
-      prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
-      nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
-      numBtns.forEach((b, i) => b.addEventListener('click', () => goToPage(i + 1)));
-      goToPage(1); // init state
-
-      /* ─────────────────────────────────────────────
-         Showing X–Y of Z counter
-      ───────────────────────────────────────────── */
-      function updateShowing() {
-        const visible = document.querySelectorAll('.book-card:not([style*="display: none"])').length;
-        const total   = pages.flat().length;
-        const start   = (currentPage - 1) * BOOKS_PER_PAGE + 1;
-        const end     = Math.min(start + visible - 1, total);
-        const el = document.querySelector('.pg-showing');
-        if (el) el.textContent = visible
-          ? `Showing ${start} to ${end} of ${total} books`
-          : 'No books match your filter';
-      }
-
-      /* ─────────────────────────────────────────────
-         Close dropdowns / panels on outside click
-      ───────────────────────────────────────────── */
-      document.addEventListener('click', e => {
-        if (!e.target.closest('.dropdown-wrap')) {
-          document.querySelectorAll('.dropdown-menu.open').forEach(m => m.classList.remove('open'));
-          document.querySelectorAll('.topbar-btn').forEach(b => b.classList.remove('btn-active'));
+        function toast(msg, type = 'info', icon = '✓') {
+            const wrap = document.querySelector('.toast-wrap');
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.innerHTML = `<div class="toast-ic ${type}">${icon}</div><span class="toast-msg">${msg}</span>`;
+            wrap.appendChild(t);
+            setTimeout(() => t.remove(), 3100);
         }
-        if (!e.target.closest('.notif-btn') && !e.target.closest('.notif-panel')) {
-          notifPanel.classList.remove('open');
-        }
-      });
 
+        function closeAllDropdowns(except) {
+            document.querySelectorAll('.dropdown-menu.open').forEach(m => {
+                if (m !== except) m.classList.remove('open');
+            });
+        }
+
+        var sortBtn = document.getElementById('sortBtn');
+        var sortMenu = document.getElementById('sortMenu');
+        if (sortBtn && sortMenu) {
+            sortBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                closeAllDropdowns(sortMenu);
+                sortMenu.classList.toggle('open');
+            });
+            sortMenu.querySelectorAll('.dropdown-item').forEach(function (item) {
+                item.addEventListener('click', function () {
+                    toast('Sorting your books…', 'info', '↕');
+                });
+            });
+        }
+
+        var filterBtn = document.getElementById('filterBtn');
+        var filterMenu = document.getElementById('filterMenu');
+        if (filterBtn && filterMenu) {
+            filterBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                closeAllDropdowns(filterMenu);
+                filterMenu.classList.toggle('open');
+            });
+        }
+
+        var notifBtn = document.getElementById('notifBtn');
+        var notifPanel = document.getElementById('notifPanel');
+        if (notifBtn && notifPanel) {
+            notifBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                closeAllDropdowns();
+                notifPanel.classList.toggle('open');
+            });
+        }
+
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.dropdown-wrap')) {
+                document.querySelectorAll('.dropdown-menu.open').forEach(m => m.classList.remove('open'));
+            }
+            if (!e.target.closest('#notifBtn') && !e.target.closest('#notifPanel')) {
+                notifPanel?.classList.remove('open');
+            }
+        });
+
+        /* Mark all notifications read */
+        var markAllBtn = document.getElementById('markAllReadBtn');
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', function () {
+                fetch('@Url.Action("MarkAllNotificationsRead", "Reader")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(function (res) {
+                    if (!res.ok) throw new Error('Request failed');
+                    document.querySelectorAll('.notif-row').forEach(function (r) {
+                        r.classList.remove('unread');
+                    });
+                    document.querySelectorAll('.notif-dot-unread').forEach(function (d) {
+                        d.className = 'notif-dot-read';
+                    });
+                    var badge = document.querySelector('.notif-badge');
+                    if (badge) badge.style.display = 'none';
+                    toast('All notifications marked as read', 'success', '✓');
+                })
+                .catch(function () {
+                    toast('Could not mark notifications as read', 'danger', '!');
+                });
+            });
+        }
+
+        /* Continue Reading — delay navigation so the toast is visible */
+        document.querySelectorAll('.btn-continue').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var title = btn.dataset.title;
+                var href = btn.getAttribute('href');
+                toast('Opening "' + title + '"…', 'success', '▶');
+                setTimeout(function () {
+                    window.location.href = href;
+                }, 450);
+            });
+        });
+
+        /* Remove modal */
+        var modal = document.getElementById('removeModal');
+        var cancelBtn = document.getElementById('modalCancelBtn');
+        var modalNameEl = document.getElementById('modal-book-name');
+        var progressIdInput = document.getElementById('removeProgressId');
+
+        document.querySelectorAll('.btn-remove').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                modalNameEl.textContent = btn.dataset.title;
+                progressIdInput.value = btn.dataset.progressId;
+                modal.classList.add('open');
+            });
+        });
+
+        cancelBtn.addEventListener('click', function () {
+            modal.classList.remove('open');
+        });
+
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) modal.classList.remove('open');
+        });
+
+        /* Toast carried over from server via TempData after a redirect (e.g. remove) */
+        @if (!string.IsNullOrEmpty(toastMessage))
+        {
+                @Html.Raw($"toast('{System.Web.HttpUtility.JavaScriptStringEncode(toastMessage)}', '{toastType}', '{toastIcon}');")
+        }
     })();
 </script>

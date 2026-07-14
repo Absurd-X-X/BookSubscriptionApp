@@ -252,6 +252,7 @@ main::-webkit-scrollbar {
     grid-area: mn;
     background-color: #080B1A;
     overflow-y: auto;
+    padding: 10px;
 }
 
 /* ── Profile dropdown ── */

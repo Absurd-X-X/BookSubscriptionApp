@@ -14,9 +14,7 @@ namespace Infrastructure.Persistence.Configurations
                 .IsRequired()
                 .HasMaxLength(100);
 
-            builder.Property(x => x.PhoneNumber)
-                .IsRequired()
-                .HasMaxLength(20);
+            builder.HasIndex(x => x.PhoneNumber);
 
             builder.Property(x => x.Email)
                 .IsRequired()

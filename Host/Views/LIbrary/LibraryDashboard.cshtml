@@ -109,27 +109,30 @@
                     rank++;
                     var colorClass = coverColors[(rank - 1) % coverColors.Length];
                     var clampedBookRating = ratingsByBookId.TryGetValue(book.Id, out var r) ? r : 0;
-                    <div class="top-card">
-                        @if (!string.IsNullOrWhiteSpace(book.BookCoverUrl))
-                        {
-                            <div class="cover cover-img" style="background-image:url('@book.BookCoverUrl')">
-                                <span class="rank">@rank</span>
+                    <a href="@Url.Action("GetLibraryBook", "Library", new { bookId = book.Id })" style="text-decoration: none;">
+
+                        <div class="top-card">
+                            @if (!string.IsNullOrWhiteSpace(book.BookCoverUrl))
+                            {
+                                <div class="cover cover-img" style="background-image:url('@book.BookCoverUrl')">
+                                    <span class="rank">@rank</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="cover @colorClass">
+                                    <span class="rank">@rank</span>
+                                    <span class="cover-title">@book.Title</span>
+                                </div>
+                            }
+                            <div class="top-title">@book.Title</div>
+                            <div class="top-cat">@book.Category</div>
+                            <div class="top-meta">
+                                <span>@book.NoOfTimeReadByPeople Reads</span>
+                                <span class="rating">@clampedBookRating ★</span>
                             </div>
-                        }
-                        else
-                        {
-                            <div class="cover @colorClass">
-                                <span class="rank">@rank</span>
-                                <span class="cover-title">@book.Title</span>
-                            </div>
-                        }
-                        <div class="top-title">@book.Title</div>
-                        <div class="top-cat">@book.Category</div>
-                        <div class="top-meta">
-                            <span>@book.NoOfTimeReadByPeople Reads</span>
-                            <span class="rating">@clampedBookRating ★</span>
                         </div>
-                    </div>
+                    </a>
                 }
             </div>
         </article>
@@ -162,7 +165,13 @@
         <article class="card">
             <div class="card-head"><h2>Recent Activity</h2><a class="link" href="@Url.Action("GetActivity", "Library")">View all</a></div>
             <ul class="activity-list">
-                @foreach (var log in Model.RecentActivity)
+                @foreach (var log in Model.RecentActivity.Where(v => v.ActionType.
+                    ToLower() != "logged in" && v.ActionType.ToLower() != "reset password" &&
+                    v.ActionType.ToLower() != "verify email" &&
+                    v.ActionType.ToLower() != "bank payment" &&
+                    v.ActionType.ToLower() != "vrify" &&
+                    v.ActionType.ToLower() != "resend" &&
+                    v.ActionType.ToLower() != "add new user"))
                 {
                     <li>
                         <span class="act-icon">📋</span>

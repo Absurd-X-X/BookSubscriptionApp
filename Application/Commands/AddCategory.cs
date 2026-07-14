@@ -56,12 +56,14 @@ namespace Application.Command
                     IpAddress = ipAddress!,
                     UserRole = user.Role,
                     ResourceType = ResourceType.System,
-                    ResourceId = category.Id
+                    ResourceId = category.Id,
+                    UserId = user.Id,
                 };
 
                 await auditLogRepository.AddAsync(audit);
 
                 await categoryRepository.AddAsync(category);
+
                 await unitOfWork.SaveAsync();
 
                 return Result<string>.Success("Category", "Added");

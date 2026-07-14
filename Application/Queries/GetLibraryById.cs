@@ -1,7 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Repositories;
 using Domain.Entities;
-using Mapster;
 using MediatR;
 
 namespace Application.Queries
@@ -26,11 +25,12 @@ namespace Application.Queries
                 var user = await userRepo.GetAsync(library.Email);
                 if (user == null || user.IsDeleted)
                 {
-                    return Result<GetLibraryByIdResponse>.Failure("Library not found");
+                    return Result<GetLibraryByIdResponse>.Failure("Library not found as a user");
                 }
 
                 var res = new GetLibraryByIdResponse(library.Id, library.Name, user.UserName, user.ImageUrl ?? "none", library.Email
                     , library.PhoneNumber, library.RefNumber, library.DateCreated, library.Books);
+
                 return Result<GetLibraryByIdResponse>.Success(res, "Retrieved");
                 }
             }

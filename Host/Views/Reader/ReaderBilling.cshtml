@@ -1,7 +1,47 @@
-﻿@{
+﻿@using Application.Queries
+@using Domain.Enums
+@{
     ViewData["Title"] = "Billing";
     ViewData["ScrollPage"] = "billing";
     Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+
+    var wallet = ViewData["Wallet"] as GetWalletDashboard.GetWalletDashboardResponse;
+    var subscription = ViewData["Subscription"] as GetSubscriptionByUserId.GetSubscriptionByUserIdResponse;
+
+    string TxnIcon(TransactionType type) => type switch
+    {
+        TransactionType.Credit => "ti ti-arrow-up",
+        TransactionType.Debit => "ti ti-book",
+        TransactionType.Withdaw => "ti ti-arrow-up-circle",
+        TransactionType.Payout => "ti ti-arrow-up-circle",
+        _ => "ti ti-receipt"
+    };
+
+    string TxnIconClass(TransactionType type) => type switch
+    {
+        TransactionType.Credit => "green",
+        TransactionType.Debit => "amber",
+        TransactionType.Withdaw => "blue",
+        TransactionType.Payout => "blue",
+        _ => "purple"
+    };
+
+    string TxnLabel(TransactionType type) => type switch
+    {
+        TransactionType.Credit => "Top Up",
+        TransactionType.Debit => "Purchase",
+        TransactionType.Withdaw => "Withdrawal",
+        TransactionType.Payout => "Payout",
+        _ => type.ToString()
+    };
+
+    string StatusClass(WalletTransactionStatus status) => status switch
+    {
+        WalletTransactionStatus.Successful => "success",
+        WalletTransactionStatus.Pending => "pending",
+        WalletTransactionStatus.Failed => "failed",
+        _ => "success"
+    };
 }
 <link href="~/css/readerBilling.css" rel="stylesheet" />
 
@@ -18,16 +58,16 @@
                 <h2>Wallet</h2>
                 <div class="section-sub">Your balance and wallet management.</div>
             </div>
-            <button type="button" class="btn-pill-primary"><i class="ti ti-plus"></i> Fund Wallet</button>
+            @Html.AntiForgeryToken()
+            <button type="button" class="btn-pill-primary" id="openFundWalletTop"><i class="ti ti-plus"></i> Fund Wallet</button>
         </div>
 
-        <!-- Stat tiles -->
         <div class="stat-tiles-row">
             <div class="stat-tile">
                 <div class="stat-tile-icon purple"><i class="ti ti-wallet"></i></div>
                 <div class="stat-tile-body">
                     <div class="stat-tile-label">Wallet Balance</div>
-                    <div class="stat-tile-value">$49.00</div>
+                    <div class="stat-tile-value">@((wallet?.Balance ?? 0).ToString("C"))</div>
                     <div class="stat-tile-sub purple-text">Available Balance</div>
                 </div>
             </div>
@@ -35,7 +75,7 @@
                 <div class="stat-tile-icon blue"><i class="ti ti-clock"></i></div>
                 <div class="stat-tile-body">
                     <div class="stat-tile-label">Pending Funds</div>
-                    <div class="stat-tile-value">$12.50</div>
+                    <div class="stat-tile-value">@((wallet?.PendingFunds ?? 0).ToString("C"))</div>
                     <div class="stat-tile-sub blue-text">Processing</div>
                 </div>
             </div>
@@ -43,7 +83,7 @@
                 <div class="stat-tile-icon green"><i class="ti ti-trending-down"></i></div>
                 <div class="stat-tile-body">
                     <div class="stat-tile-label">Total Spent</div>
-                    <div class="stat-tile-value">$156.75</div>
+                    <div class="stat-tile-value">@((wallet?.TotalSpentThisYear ?? 0).ToString("C"))</div>
                     <div class="stat-tile-sub green-text">This year</div>
                 </div>
             </div>
@@ -51,15 +91,16 @@
                 <div class="stat-tile-icon amber"><i class="ti ti-refresh"></i></div>
                 <div class="stat-tile-body">
                     <div class="stat-tile-label">Auto-Renew</div>
-                    <div class="stat-tile-value">Enabled</div>
-                    <div class="stat-tile-sub amber-text">Next billing: Jun 15, 2024</div>
+                    <div class="stat-tile-value">@(subscription != null && subscription.AutoRenew ? "Enabled" : "Disabled")</div>
+                    <div class="stat-tile-sub amber-text">
+                        @(subscription != null ? "Next billing: " + subscription.ExpiryDate.ToString("MMM d, yyyy") : "Next billing: —")
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Action tiles -->
         <div class="action-tiles-row">
-            <a href="#" class="action-tile">
+            <a href="#" class="action-tile" id="openFundWalletTile">
                 <div class="action-tile-icon purple"><i class="ti ti-arrow-down"></i></div>
                 <div>
                     <div class="action-tile-title">Fund Wallet</div>
@@ -89,7 +130,6 @@
             </a>
         </div>
 
-        <!-- Transaction History -->
         <div class="history-section-header">
             <h3>Transaction History</h3>
             <a href="#" class="view-all-link">View all</a>
@@ -106,74 +146,35 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>May 14, 2024</td>
-                    <td>
-                        <div class="txn-type-cell">
-                            <div class="txn-type-icon green"><i class="ti ti-arrow-up"></i></div>
-                            Top Up
-                        </div>
-                    </td>
-                    <td class="txn-desc">Wallet funding via Card</td>
-                    <td class="txn-amount positive">+$20.00</td>
-                    <td><span class="status-pill success">Success</span></td>
-                    <td class="txn-reference">TXN123456789</td>
-                </tr>
-                <tr>
-                    <td>May 10, 2024</td>
-                    <td>
-                        <div class="txn-type-cell">
-                            <div class="txn-type-icon purple"><i class="ti ti-crown"></i></div>
-                            Subscription
-                        </div>
-                    </td>
-                    <td class="txn-desc">Premium Plan - Monthly</td>
-                    <td class="txn-amount negative">-$49.00</td>
-                    <td><span class="status-pill success">Success</span></td>
-                    <td class="txn-reference">SUB987654321</td>
-                </tr>
-                <tr>
-                    <td>May 5, 2024</td>
-                    <td>
-                        <div class="txn-type-cell">
-                            <div class="txn-type-icon amber"><i class="ti ti-book"></i></div>
-                            Purchase
-                        </div>
-                    </td>
-                    <td class="txn-desc">Book: Atomic Habits</td>
-                    <td class="txn-amount negative">-$8.99</td>
-                    <td><span class="status-pill success">Success</span></td>
-                    <td class="txn-reference">PUR456123789</td>
-                </tr>
-                <tr>
-                    <td>May 2, 2024</td>
-                    <td>
-                        <div class="txn-type-cell">
-                            <div class="txn-type-icon green"><i class="ti ti-arrow-up"></i></div>
-                            Top Up
-                        </div>
-                    </td>
-                    <td class="txn-desc">Wallet funding via PayPal</td>
-                    <td class="txn-amount positive">+$30.00</td>
-                    <td><span class="status-pill success">Success</span></td>
-                    <td class="txn-reference">TXN789456123</td>
-                </tr>
-                <tr>
-                    <td>Apr 28, 2024</td>
-                    <td>
-                        <div class="txn-type-cell">
-                            <div class="txn-type-icon amber"><i class="ti ti-book"></i></div>
-                            Purchase
-                        </div>
-                    </td>
-                    <td class="txn-desc">Book: Deep Work</td>
-                    <td class="txn-amount negative">-$12.99</td>
-                    <td><span class="status-pill success">Success</span></td>
-                    <td class="txn-reference">PUR321654987</td>
-                </tr>
+                @if (wallet is null || !wallet.RecentTransactions.Any())
+                {
+                    <tr><td colspan="6">No transactions yet.</td></tr>
+                }
+                else
+                {
+                    @foreach (var t in wallet.RecentTransactions)
+                    {
+                        var isCredit = t.Type == TransactionType.Credit;
+                        <tr>
+                            <td>@t.Date.ToString("MMM d, yyyy")</td>
+                            <td>
+                                <div class="txn-type-cell">
+                                    <div class="txn-type-icon @TxnIconClass(t.Type)"><i class="@TxnIcon(t.Type)"></i></div>
+                                    @TxnLabel(t.Type)
+                                </div>
+                            </td>
+                            <td class="txn-desc">@t.Description</td>
+                            <td class="txn-amount @(isCredit ? "positive" : "negative")">
+                                @(isCredit ? "+" : "-")@t.Amount.ToString("C")
+                            </td>
+                            <td><span class="status-pill @StatusClass(t.Status)">@t.Status</span></td>
+                            <td class="txn-reference">@(t.Reference ?? "—")</td>
+                        </tr>
+                    }
+                }
             </tbody>
         </table>
-        <a href="#" class="view-more-row-link">View all transactions <i class="ti ti-arrow-right"></i></a>
+        <a href="@Url.Action("ReaderDetails", "Reader")" class="view-more-row-link">View all transactions <i class="ti ti-arrow-right"></i></a>
     </div>
 </section>
 
@@ -188,77 +189,90 @@
             <a href="@Url.Action("ManageSub", "Reader")" class="btn-pill-primary" style="text-decoration: none">Upgrade Plan</a>
         </div>
 
-        <!-- Subscription stat tiles -->
-        <div class="sub-tiles-row">
-            <div class="stat-tile">
-                <div class="stat-tile-icon purple"><i class="ti ti-crown"></i></div>
-                <div class="stat-tile-body">
-                    <div class="sub-tile-label">Current Plan</div>
-                    <div class="sub-tile-value">Premium</div>
-                    <div class="sub-tile-sub purple-text">Monthly Plan</div>
-                </div>
-            </div>
-            <div class="stat-tile">
-                <div class="stat-tile-icon blue"><i class="ti ti-calendar"></i></div>
-                <div class="stat-tile-body">
-                    <div class="sub-tile-label">Renewal Date</div>
-                    <div class="sub-tile-value">Jun 15, 2024</div>
-                    <div class="sub-tile-sub blue-text">In 26 days</div>
-                </div>
-            </div>
-            <div class="stat-tile">
-                <div class="stat-tile-icon green"><i class="ti ti-refresh"></i></div>
-                <div class="stat-tile-body">
-                    <div class="sub-tile-label">Auto-Renew</div>
-                    <div class="sub-tile-value">Enabled</div>
-                    <div class="sub-tile-sub green-text">Will renew automatically</div>
-                </div>
-            </div>
-            <div class="stat-tile">
-                <div class="stat-tile-icon amber"><i class="ti ti-shield-check"></i></div>
-                <div class="stat-tile-body">
-                    <div class="sub-tile-label">Status</div>
-                    <div class="sub-tile-value">Active</div>
-                    <div class="sub-tile-sub amber-text">Your plan is active</div>
-                </div>
-            </div>
-        </div>
+        @if (subscription is null)
+        {
+            <p>No active subscription found.</p>
+        }
+        else
+        {
+            var daysToExpiry = (subscription.ExpiryDate.Date - DateTime.UtcNow.Date).Days;
 
-        <!-- Payment method + actions -->
-        <div class="sub-action-tiles-row">
-            <a href="#" class="payment-method-tile">
-                <div class="payment-method-icon"><i class="ti ti-credit-card"></i></div>
-                <div>
-                    <div class="action-tile-title">Payment Method</div>
-                    <div class="action-tile-sub">•••• •••• •••• 4242</div>
-                    <div class="action-tile-sub">Expires 12/26</div>
+            <div class="sub-tiles-row">
+                <div class="stat-tile">
+                    <div class="stat-tile-icon purple"><i class="ti ti-crown"></i></div>
+                    <div class="stat-tile-body">
+                        <div class="sub-tile-label">Current Plan</div>
+                        <div class="sub-tile-value">@subscription.CurrentPlan</div>
+                        <div class="sub-tile-sub purple-text">@subscription.Cost.ToString("C")</div>
+                    </div>
                 </div>
-                <i class="ti ti-chevron-right action-tile-arrow"></i>
-            </a>
-            <a href="#" class="action-tile">
-                <div class="action-tile-icon blue"><i class="ti ti-refresh"></i></div>
-                <div>
-                    <div class="action-tile-title">Renew Now</div>
-                    <div class="action-tile-sub">$49.00</div>
+                <div class="stat-tile">
+                    <div class="stat-tile-icon blue"><i class="ti ti-calendar"></i></div>
+                    <div class="stat-tile-body">
+                        <div class="sub-tile-label">Renewal Date</div>
+                        <div class="sub-tile-value">@subscription.ExpiryDate.ToString("MMM d, yyyy")</div>
+                        <div class="sub-tile-sub blue-text">In @daysToExpiry days</div>
+                    </div>
                 </div>
-            </a>
-            <a href="#" class="action-tile">
-                <div class="action-tile-icon purple"><i class="ti ti-replace"></i></div>
-                <div>
-                    <div class="action-tile-title">Change Plan</div>
-                    <div class="action-tile-sub">View other plans</div>
+                <div class="stat-tile">
+                    <div class="stat-tile-icon green"><i class="ti ti-refresh"></i></div>
+                    <div class="stat-tile-body">
+                        <div class="sub-tile-label">Auto-Renew</div>
+                        <div class="sub-tile-value">@(subscription.AutoRenew ? "Enabled" : "Disabled")</div>
+                        <div class="sub-tile-sub green-text">
+                            @(subscription.AutoRenew ? "Will renew automatically" : "Will not auto-renew")
+                        </div>
+                    </div>
                 </div>
-            </a>
-            <a href="#" class="action-tile danger-tile">
-                <div class="action-tile-icon"><i class="ti ti-x"></i></div>
-                <div>
-                    <div class="action-tile-title">Cancel Plan</div>
-                    <div class="action-tile-sub">Cancel subscription</div>
+                <div class="stat-tile">
+                    <div class="stat-tile-icon amber"><i class="ti ti-shield-check"></i></div>
+                    <div class="stat-tile-body">
+                        <div class="sub-tile-label">Status</div>
+                        <div class="sub-tile-value">@(subscription.IsActive ? "Active" : "Inactive")</div>
+                        <div class="sub-tile-sub amber-text">
+                            @(subscription.IsActive ? "Your plan is active" : "Your plan is not active")
+                        </div>
+                    </div>
                 </div>
-            </a>
-        </div>
+            </div>
 
-        <!-- Subscription History -->
+            <div class="sub-action-tiles-row">
+                <a href="#" class="payment-method-tile">
+                    <div class="payment-method-icon"><i class="ti ti-credit-card"></i></div>
+                    <div>
+                        <div class="action-tile-title">Payment Method</div>
+                        <div class="action-tile-sub">Not available</div>
+                    </div>
+                    <i class="ti ti-chevron-right action-tile-arrow"></i>
+                </a>
+                <form asp-action="AutoRenewSub" asp-controller="Reader" method="post" class="action-tile" style="border:none; background:none; cursor:pointer;">
+                    <input type="hidden" name="subId" value="@subscription.Id" />
+                    <input type="hidden" name="autoRenew" value="@(!subscription.AutoRenew)" />
+                    <button type="submit" style="all:unset; display:flex; gap:inherit; align-items:center; width:100%;">
+                        <div class="action-tile-icon blue"><i class="ti ti-refresh"></i></div>
+                        <div>
+                            <div class="action-tile-title">@(subscription.AutoRenew ? "Disable Auto-Renew" : "Enable Auto-Renew")</div>
+                            <div class="action-tile-sub">@subscription.Cost.ToString("C")</div>
+                        </div>
+                    </button>
+                </form>
+                <a href="@Url.Action("ManageSub", "Reader")" class="action-tile">
+                    <div class="action-tile-icon purple"><i class="ti ti-replace"></i></div>
+                    <div>
+                        <div class="action-tile-title">Change Plan</div>
+                        <div class="action-tile-sub">View other plans</div>
+                    </div>
+                </a>
+                <a href="#" class="action-tile danger-tile">
+                    <div class="action-tile-icon"><i class="ti ti-x"></i></div>
+                    <div>
+                        <div class="action-tile-title">Cancel Plan</div>
+                        <div class="action-tile-sub">Cancel subscription</div>
+                    </div>
+                </a>
+            </div>
+        }
+
         <div class="history-section-header">
             <h3>Subscription History</h3>
             <a href="#" class="view-all-link">View all</a>
@@ -268,45 +282,34 @@
                 <tr>
                     <th>Plan</th>
                     <th>Amount</th>
-                    <th>Duration</th>
                     <th>Renewed On</th>
                     <th>Next Billing</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td class="txn-desc">Premium</td>
-                    <td>$49.00</td>
-                    <td>1 Month</td>
-                    <td>May 15, 2024</td>
-                    <td>Jun 15, 2024</td>
-                    <td><span class="status-pill active">Active</span></td>
-                </tr>
-                <tr>
-                    <td class="txn-desc">Premium</td>
-                    <td>$49.00</td>
-                    <td>1 Month</td>
-                    <td>Apr 15, 2024</td>
-                    <td>May 15, 2024</td>
-                    <td><span class="status-pill completed">Completed</span></td>
-                </tr>
-                <tr>
-                    <td class="txn-desc">Premium</td>
-                    <td>$49.00</td>
-                    <td>1 Month</td>
-                    <td>Mar 15, 2024</td>
-                    <td>Apr 15, 2024</td>
-                    <td><span class="status-pill completed">Completed</span></td>
-                </tr>
+                @if (subscription is null)
+                {
+                    <tr><td colspan="5">No subscription history.</td></tr>
+                }
+                else
+                {
+                    <tr>
+                        <td class="txn-desc">@subscription.CurrentPlan</td>
+                        <td>@subscription.Cost.ToString("C")</td>
+                        <td>@subscription.SubcriptionDate.ToString("MMM d, yyyy")</td>
+                        <td>@subscription.ExpiryDate.ToString("MMM d, yyyy")</td>
+                        <td><span class="status-pill @(subscription.IsActive ? "active" : "completed")">@(subscription.IsActive ? "Active" : "Expired")</span></td>
+                    </tr>
+                }
             </tbody>
         </table>
-        <a href="#" class="view-more-row-link">View all subscription history <i class="ti ti-arrow-right"></i></a>
+        <a href="@Url.Action("ReaderDetails", "Reader")" class="view-more-row-link">View all subscription history <i class="ti ti-arrow-right"></i></a>
     </div>
 </section>
 
 <!-- Help Banner -->
-<section class="page-section" id="section-help" data-hash="#section-help" data-page="billing">
+<section class="page-section" id="section-help" data-hash="#section-help" data-page="billing" style="margin-top: 10px;">
     <div class="card help-banner">
         <div class="help-banner-left">
             <div class="help-banner-icon"><i class="ti ti-wallet"></i></div>
@@ -318,4 +321,3 @@
         <a href="#" class="btn-help-center">Help Center <i class="ti ti-external-link"></i></a>
     </div>
 </section>
-

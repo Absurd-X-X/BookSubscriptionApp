@@ -34,6 +34,11 @@ namespace Application.Command
                 if (check)
                     return Result<AddLibraryResponse>.Failure("User already exists");
 
+                var admin = await userRepository.GetAsync("admin@gmail.com");
+
+                if (admin == null)
+                    return Result<AddLibraryResponse>.Failure("You can't add this library");
+
                 var token = new Random().Next(1000, 9999).ToString();
 
                 var user = new User
@@ -43,7 +48,7 @@ namespace Application.Command
                     VerificationToken = token,
                     VerificationTokenExpiry = DateTime.UtcNow.AddMinutes(5),
                     UserName = request.UserName,
-                    CreatedBy = request.UserName,
+                    CreatedBy = admin.Id.ToString(),
                     Role = "library"
                 };
 

@@ -25,5 +25,6 @@ namespace Application.Common.Repositories
         Task<int> GetUnpaidMonthsCountAsync(Guid walletId);
         Task<WalletTransaction?> GetLastPaidPayoutAsync(Guid walletId);
         Task<PayoutStatusOverviewDto> GetPayoutStatusOverviewAsync(Guid walletId);
+        Task<decimal> GetTotalByTypeAsync(Guid walletId, TransactionType type);
     }
 }

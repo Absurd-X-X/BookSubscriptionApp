@@ -60,7 +60,7 @@ namespace Application.Command
 
                 await emailServices.SendEmailAsync(
                     user.Email, 
-                    "Verify Your Email", 
+                    "Verify Your Email",
                     EmailTemplates.ForgotPasswordEmail(user.UserName, token));
 
                 return Result<string>.Success("You will shortly recieve a reset code if this email exists", "sent");

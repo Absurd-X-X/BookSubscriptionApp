@@ -14,6 +14,16 @@ namespace Application.Common.Repositories
         Task<double> GetAverageRatingForBookAsync(Guid bookId);
         Task<int> CountByReaderIdAsync(Guid readerId);
         Task<List<Review>> GetByLibraryIdAndDateRangeAsync(Guid libraryId, DateTime start, DateTime end);
+        Task<List<Review>> GetByReaderIdAsync(Guid readerId, int take);
+        Task<double> GetAverageRatingGivenByReaderAsync(Guid readerId);
+        Task<Dictionary<int, int>> GetRatingDistributionByReaderAsync(Guid readerId);
+        Task<double> GetAverageRatingGivenByReaderInYearAsync(Guid readerId, int year);
+        Task<PagenatedList<Review>> GetPagedByReaderIdAsync(
+            Guid readerId, PageRequest request, bool usePaging,
+            string? search = null, string? sortBy = null,
+            int? ratingFilter = null, Guid? bookIdFilter = null);
+
+        Task<List<(Guid BookId, string Title)>> GetReviewedBookOptionsAsync(Guid readerId);
 
     }
 }

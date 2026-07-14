@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="~/css/addBook.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@latest/tabler-icons.min.css" />
 
+
 <div class="wrap">
 
     <div class="topbar">
@@ -31,23 +32,16 @@
 
     <div class="step-tabs">
         <div class="step-tab active" onclick="goStep(1)">
-            <div class="step-circle" id="c1">1</div>
-            <span>Basic Information</span>
-            <div class="step-line"></div>
+            <div class="step-circle" id="c1">1</div><span>Basic Information</span><div class="step-line"></div>
         </div>
         <div class="step-tab" onclick="goStep(2)">
-            <div class="step-circle" id="c2">2</div>
-            <span>Pricing &amp; Access</span>
-            <div class="step-line"></div>
+            <div class="step-circle" id="c2">2</div><span>Pricing &amp; Access</span><div class="step-line"></div>
         </div>
         <div class="step-tab" onclick="goStep(3)">
-            <div class="step-circle" id="c3">3</div>
-            <span>Files &amp; Versions</span>
-            <div class="step-line"></div>
+            <div class="step-circle" id="c3">3</div><span>Files &amp; Preview</span><div class="step-line"></div>
         </div>
         <div class="step-tab" onclick="goStep(4)">
-            <div class="step-circle" id="c4">4</div>
-            <span>SEO &amp; Visibility</span>
+            <div class="step-circle" id="c4">4</div><span>SEO &amp; Visibility</span>
         </div>
     </div>
 
@@ -61,11 +55,11 @@
                         <div class="card-title">Basic Details</div>
                         <div class="card-sub">Enter the core information about this book.</div>
                         <div class="frow">
-                            <div class="field"><label class="label">Title <span class="req">*</span></label><input type="text" name="title" class="input" placeholder="Enter book title" required></div>
+                            <div class="field"><label class="label">Title <span class="req">*</span></label><input type="text" name="title" id="titleInput" class="input" placeholder="Enter book title" required></div>
                             <div class="field"><label class="label">Subtitle</label><input type="text" name="subtitle" class="input" placeholder="Enter subtitle (optional)"></div>
                         </div>
                         <div class="frow">
-                            <div class="field"><label class="label">Author <span class="req">*</span></label><input type="text" name="author" class="input" placeholder="Enter author name" required></div>
+                            <div class="field"><label class="label">Author <span class="req">*</span></label><input type="text" name="author" id="authorInput" class="input" placeholder="Enter author name" required></div>
                             <div class="field"><label class="label">Co-Author(s)</label><input type="text" class="input" placeholder="Enter co-author(s) (optional)"></div>
                         </div>
                         <div class="frow">
@@ -137,25 +131,39 @@
                     <div class="card">
                         <div class="card-title">Book Cover</div>
                         <div class="card-sub">Upload a high-quality cover image.</div>
-                        <div class="dropzone" onclick="document.getElementById('bookCoverInput').click()">
-                            <i class="ti ti-cloud-upload drop-icon"></i>
-                            <div class="drop-txt">Drag &amp; drop image here</div>
-                            <div class="drop-or">or</div>
-                            <button type="button" class="btn btn-outline">Choose File</button>
+                        <div class="dropzone" id="coverDropzone" onclick="document.getElementById('bookCoverInput').click()">
+                            <button type="button" class="dz-remove" id="coverRemoveBtn" style="display:none" onclick="removeCover(event)"><i class="ti ti-x"></i></button>
+                            <div class="cover-preview-wrap" id="coverPreviewWrap">
+                                <img id="coverPreviewImg" class="cover-preview-img" alt="Book cover preview">
+                            </div>
+                            <div class="dz-placeholder" id="coverPlaceholder">
+                                <i class="ti ti-cloud-upload drop-icon"></i>
+                                <div class="drop-txt">Drag &amp; drop image here</div>
+                                <div class="drop-or">or</div>
+                                <button type="button" class="btn btn-outline">Choose File</button>
+                            </div>
                         </div>
-                        <input type="file" id="bookCoverInput" name="bookCover" accept=".jpg,.jpeg,.png" required style="display:none" onchange="fileChosen(this,'coverFileName')">
+                        <input type="file" id="bookCoverInput" name="bookCover" accept=".jpg,.jpeg,.png" required style="display:none" onchange="previewCover(this)">
                         <p class="hint" id="coverFileName">Recommended: 600×900px · JPG, PNG (Max 2MB)</p>
                     </div>
                     <div class="card">
                         <div class="card-title">Upload Book File</div>
                         <div class="card-sub">Upload the main file for this book.</div>
-                        <div class="dropzone" onclick="document.getElementById('bookFileInput').click()">
-                            <i class="ti ti-file-upload drop-icon"></i>
-                            <div class="drop-txt">Drag &amp; drop file here</div>
-                            <div class="drop-or">or</div>
-                            <button type="button" class="btn btn-outline">Choose File</button>
+                        <div class="dropzone" id="fileDropzone" onclick="document.getElementById('bookFileInput').click()">
+                            <button type="button" class="dz-remove" id="fileRemoveBtn" style="display:none" onclick="removeBookFile(event)"><i class="ti ti-x"></i></button>
+                            <div class="file-drop-preview" id="fileDropPreview">
+                                <i class="ti ti-file-text file-drop-icon" id="fileDropIcon"></i>
+                                <div class="file-drop-name" id="fileDropName"></div>
+                                <div class="file-drop-size" id="fileDropSize"></div>
+                            </div>
+                            <div class="dz-placeholder" id="filePlaceholder">
+                                <i class="ti ti-file-upload drop-icon"></i>
+                                <div class="drop-txt">Drag &amp; drop file here</div>
+                                <div class="drop-or">or</div>
+                                <button type="button" class="btn btn-outline">Choose File</button>
+                            </div>
                         </div>
-                        <input type="file" id="bookFileInput" name="bookFile" accept=".pdf,.epub,.txt" required style="display:none" onchange="fileChosen(this,'bookFileName')">
+                        <input type="file" id="bookFileInput" name="bookFile" accept=".pdf,.epub,.txt" required style="display:none" onchange="previewBookFile(this)">
                         <p class="hint" id="bookFileName">Allowed: PDF, EPUB, TXT · Max 100MB</p>
                     </div>
                     <div class="card">
@@ -200,7 +208,7 @@
                         <div class="frow">
                             <div class="field">
                                 <label class="label">Price (NGN) <span class="req">*</span></label>
-                                <input type="number" name="price" id="priceInput" class="input" value="2500.00" step="0.01" disabled>
+                                <input type="number" name="price" id="priceInput" class="input" value="0" step="0.01" disabled>
                                 <div class="hint">Set the selling price for this book.</div>
                             </div>
                             <div class="field">
@@ -282,12 +290,12 @@
                         <div class="card-sub">This is how readers will see this book.</div>
                         <div class="preview-card">
                             <div class="prev-book-row">
-                                <div class="prev-cover">Atomic<br>Habits</div>
+                                <div class="prev-cover" id="accessPreviewCover"></div>
                                 <div>
-                                    <div class="prev-title">Atomic Habits</div>
-                                    <div class="prev-author">by James Clear</div>
-                                    <span class="badge badge-g" style="margin-top:5px;display:inline-flex">FREE</span>
-                                    <div class="prev-sub">Free for everyone</div>
+                                    <div class="prev-title" id="accessPreviewTitle">Untitled Book</div>
+                                    <div class="prev-author" id="accessPreviewAuthor">by Unknown Author</div>
+                                    <span class="badge badge-g" id="accessPreviewBadge" style="margin-top:5px;display:inline-flex">FREE</span>
+                                    <div class="prev-sub" id="accessPreviewSub">Free for everyone</div>
                                 </div>
                             </div>
                             <div class="prev-lock"><i class="ti ti-lock"></i> Login required to access this book</div>
@@ -298,81 +306,48 @@
             </div>
             <div class="step-footer">
                 <button type="button" class="btn btn-ghost" onclick="goStep(1)"><i class="ti ti-arrow-left"></i> Previous</button>
-                <button type="button" class="btn btn-primary" onclick="goStep(3)">Next: Files &amp; Versions <i class="ti ti-arrow-right"></i></button>
+                <button type="button" class="btn btn-primary" onclick="goStep(3)">Next: Files &amp; Preview <i class="ti ti-arrow-right"></i></button>
             </div>
         </div>
 
-        <!-- STEP 3 -->
+        <!-- STEP 3 (repurposed: live preview of what was uploaded in Step 1, no fake version history) -->
         <div class="step-panel" id="p3">
             <div class="two-col">
                 <div class="form-col">
                     <div class="card">
-                        <div class="card-hdr">
-                            <div class="card-title" style="display:flex;align-items:center;gap:8px">Current Version <span class="badge badge-g">Active</span></div>
-                            <button type="button" class="btn btn-outline"><i class="ti ti-upload"></i> Replace Current Version</button>
-                        </div>
-                        <div class="ver-cur">
-                            <div class="ver-icon"><i class="ti ti-file" style="font-size:24px;color:#7c3aed"></i><span class="ver-icon-lbl">EPUB</span></div>
+                        <div class="card-title">Book File Preview</div>
+                        <div class="card-sub">This is the file that will be uploaded with this book.</div>
+                        <div class="ver-cur" id="filePreviewCard">
+                            <div class="ver-icon">
+                                <i class="ti ti-file" id="p3FileIcon" style="font-size:24px;color:#7c3aed"></i>
+                                <span class="ver-icon-lbl" id="p3FileExt">-</span>
+                            </div>
                             <div style="flex:1">
                                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-                                    <strong>Version 1.0 (Current)</strong>
-                                    <span class="badge badge-p">Current Version</span>
+                                    <strong id="p3FileName">No file uploaded yet</strong>
                                 </div>
                                 <div class="ver-meta-row">
-                                    <div><div class="meta-lbl">File Type</div><div class="meta-val">EPUB</div></div>
-                                    <div><div class="meta-lbl">Uploaded</div><div class="meta-val">May 20, 2025<br>10:30 AM</div></div>
-                                    <div><div class="meta-lbl">File Size</div><div class="meta-val">2.4 MB</div></div>
-                                    <div><div class="meta-lbl">Uploaded By</div><div class="meta-val">Unilag Library Admin</div></div>
+                                    <div><div class="meta-lbl">File Type</div><div class="meta-val" id="p3FileType">—</div></div>
+                                    <div><div class="meta-lbl">File Size</div><div class="meta-val" id="p3FileSize">—</div></div>
                                 </div>
-                                <div class="rn-box"><div class="meta-lbl">Release Note</div>Initial version of the book.</div>
                             </div>
                         </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-title">Version History</div>
-                        <div class="card-sub">View and manage all previous versions of this book.</div>
-                        <div class="table-wrap">
-                            <table>
-                                <thead><tr><th>Version</th><th>File Type</th><th>Uploaded</th><th>File Size</th><th>Uploaded By</th><th>Release Note</th><th>Actions</th></tr></thead>
-                                <tbody>
-                                    <tr><td>1.0 <span class="badge badge-p">Current</span></td><td><span class="badge badge-g">EPUB</span></td><td>May 20, 2025<br><small>10:30 AM</small></td><td>2.4 MB</td><td>Unilag Library Admin</td><td>Initial version of the book.</td><td class="action-cell"><button type="button" class="icon-btn" onclick="toggleMenu(this)"><i class="ti ti-dots-vertical"></i></button><div class="vmenu"><div class="vm-item"><i class="ti ti-eye"></i> View Details</div><div class="vm-item"><i class="ti ti-download"></i> Download</div><div class="vm-item"><i class="ti ti-check"></i> Set as Current</div><div class="vm-item danger"><i class="ti ti-trash"></i> Delete Version</div></div></td></tr>
-                                    <tr><td>0.9</td><td><span class="badge badge-g">EPUB</span></td><td>May 18, 2025<br><small>04:15 PM</small></td><td>2.1 MB</td><td>Unilag Library Admin</td><td>Revised introduction and chapter 1.</td><td class="action-cell"><button type="button" class="icon-btn" onclick="toggleMenu(this)"><i class="ti ti-dots-vertical"></i></button><div class="vmenu"><div class="vm-item"><i class="ti ti-eye"></i> View Details</div><div class="vm-item"><i class="ti ti-download"></i> Download</div><div class="vm-item"><i class="ti ti-check"></i> Set as Current</div><div class="vm-item danger"><i class="ti ti-trash"></i> Delete Version</div></div></td></tr>
-                                    <tr><td>0.8</td><td><span class="badge badge-r">PDF</span></td><td>May 15, 2025<br><small>09:22 AM</small></td><td>3.7 MB</td><td>Unilag Library Admin</td><td>Converted from draft PDF.</td><td class="action-cell"><button type="button" class="icon-btn" onclick="toggleMenu(this)"><i class="ti ti-dots-vertical"></i></button><div class="vmenu"><div class="vm-item"><i class="ti ti-eye"></i> View Details</div><div class="vm-item"><i class="ti ti-download"></i> Download</div><div class="vm-item"><i class="ti ti-check"></i> Set as Current</div><div class="vm-item danger"><i class="ti ti-trash"></i> Delete Version</div></div></td></tr>
-                                    <tr><td>0.7</td><td><span class="badge badge-g">EPUB</span></td><td>May 10, 2025<br><small>11:05 AM</small></td><td>1.9 MB</td><td>Unilag Library Admin</td><td>Updated formatting and typos.</td><td class="action-cell"><button type="button" class="icon-btn" onclick="toggleMenu(this)"><i class="ti ti-dots-vertical"></i></button><div class="vmenu"><div class="vm-item"><i class="ti ti-eye"></i> View Details</div><div class="vm-item"><i class="ti ti-download"></i> Download</div><div class="vm-item"><i class="ti ti-check"></i> Set as Current</div><div class="vm-item danger"><i class="ti ti-trash"></i> Delete Version</div></div></td></tr>
-                                    <tr><td>0.6</td><td><span class="badge badge-b">DOCX</span></td><td>May 05, 2025<br><small>02:41 PM</small></td><td>1.5 MB</td><td>Unilag Library Admin</td><td>Original draft in Word.</td><td class="action-cell"><button type="button" class="icon-btn" onclick="toggleMenu(this)"><i class="ti ti-dots-vertical"></i></button><div class="vmenu"><div class="vm-item"><i class="ti ti-eye"></i> View Details</div><div class="vm-item"><i class="ti ti-download"></i> Download</div><div class="vm-item"><i class="ti ti-check"></i> Set as Current</div><div class="vm-item danger"><i class="ti ti-trash"></i> Delete Version</div></div></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="tbl-footer">
-                            <span>Showing 1 to 5 of 5 versions</span>
-                            <div class="pagination"><button type="button" class="pg-btn">‹</button><button type="button" class="pg-btn active">1</button><button type="button" class="pg-btn">›</button></div>
-                        </div>
-                    </div>
-                    <div class="tip-box">
-                        <i class="ti ti-info-circle tip-icon"></i>
-                        <div>
-                            <strong>Version Management Tips</strong>
-                            <ul><li>The current version is the file readers will access.</li><li>You can replace the current version without losing history.</li><li>Previous versions can be restored anytime.</li><li>Supported formats: EPUB, PDF, TXT</li></ul>
-                        </div>
+                        <p class="hint" id="p3NoFileHint">Go back to Step 1 to upload the book file.</p>
                     </div>
                 </div>
                 <div class="sidebar-col">
                     <div class="card">
-                        <div class="card-title">Upload New Version</div>
-                        <div class="card-sub">Upload a new version to replace the current book file.</div>
-                        <div class="dropzone">
-                            <i class="ti ti-cloud-upload drop-icon"></i>
-                            <div class="drop-txt">Drag &amp; drop file here</div>
-                            <div class="drop-or">or</div>
-                            <button type="button" class="btn btn-outline">Choose File</button>
+                        <div class="card-title">Book Cover Preview</div>
+                        <div class="card-sub">This is the cover that will be uploaded with this book.</div>
+                        <div class="dropzone" style="pointer-events:none;min-height:180px">
+                            <div class="cover-preview-wrap" id="p3CoverWrap">
+                                <img id="p3CoverImg" class="cover-preview-img" alt="Book cover preview">
+                            </div>
+                            <div class="dz-placeholder" id="p3CoverPlaceholder">
+                                <i class="ti ti-photo drop-icon"></i>
+                                <div class="drop-txt">No cover uploaded yet</div>
+                            </div>
                         </div>
-                        <p class="hint" style="margin-top:8px">Supported: EPUB, PDF, TXT · Max 100MB</p>
-                        <div class="field" style="margin-top:14px">
-                            <label class="label">Release Note (Optional)</label>
-                            <textarea class="input textarea" id="rn" placeholder="Describe what's new in this version..." style="min-height:80px" oninput="cc('rn','rn-cc',500)"></textarea>
-                            <div class="char-count" id="rn-cc">0/500</div>
-                        </div>
-                        <button type="button" class="btn btn-primary" style="width:100%;margin-top:10px;justify-content:center"><i class="ti ti-cloud-upload"></i> Upload &amp; Save Version</button>
                     </div>
                 </div>
             </div>
@@ -391,30 +366,26 @@
                         <div class="card-sub">Optimize how your book appears in search engines and on Unilag Library.</div>
                         <div class="field">
                             <label class="label">SEO Title <span class="req">*</span></label>
-                            <input type="text" class="input" id="seo-t" value="Atomic Habits by James Clear | Unilag Library" oninput="liveSearch()">
-                            <div class="char-count" id="seo-tc">56/60 characters</div>
+                            <input type="text" class="input" id="seo-t" value="" placeholder="Auto-filled from title and author" oninput="liveSearch()">
+                            <div class="char-count" id="seo-tc">0/60 characters</div>
                             <div class="hint">This is the title that search engines will display.</div>
                         </div>
                         <div class="field">
                             <label class="label">SEO Description <span class="req">*</span></label>
-                            <textarea class="input textarea" id="seo-d" style="min-height:75px" oninput="liveSearch()">Discover the proven strategies in Atomic Habits by James Clear. Learn how small changes can lead to remarkable results.</textarea>
-                            <div class="char-count" id="seo-dc">119/160 characters</div>
+                            <textarea class="input textarea" id="seo-d" style="min-height:75px" placeholder="Auto-filled once you enter a title" oninput="liveSearch()"></textarea>
+                            <div class="char-count" id="seo-dc">0/160 characters</div>
                             <div class="hint">This description appears in search results.</div>
                         </div>
                         <div class="field">
                             <label class="label">SEO Keywords</label>
                             <div class="kw-tags" id="kw-wrap">
-                                <span class="kw-tag">atomic habits <button type="button" onclick="rmKw(this)">×</button></span>
-                                <span class="kw-tag">james clear <button type="button" onclick="rmKw(this)">×</button></span>
-                                <span class="kw-tag">habits <button type="button" onclick="rmKw(this)">×</button></span>
-                                <span class="kw-tag">productivity <button type="button" onclick="rmKw(this)">×</button></span>
                                 <input class="kw-input" placeholder="Add keyword and press Enter" onkeydown="addKw(event)">
                             </div>
                             <div class="hint">Add relevant keywords separated by commas or enter.</div>
                         </div>
                         <div class="frow">
-                            <div class="field"><label class="label">URL Slug <span class="req">*</span></label><input type="text" class="input" value="atomic-habits-james-clear"><div class="hint">This will be used in the book's URL.</div></div>
-                            <div class="field"><label class="label">Canonical URL (Optional)</label><input type="text" class="input" value="https://unilaglibrary.com/books/atomic-habits"><div class="hint">Use canonical URL if this book has multiple URLs.</div></div>
+                            <div class="field"><label class="label">URL Slug <span class="req">*</span></label><input type="text" class="input" id="urlSlugInput" name="slug" placeholder="e.g. atomic-habits-james-clear" oninput="updateSlugPreview()"><div class="hint">This will be used in the book's URL.</div></div>
+                            <div class="field"><label class="label">Canonical URL (Optional)</label><input type="text" class="input" placeholder="https://unilaglibrary.com/books/..."><div class="hint">Use canonical URL if this book has multiple URLs.</div></div>
                         </div>
                     </div>
                     <div class="card">
@@ -441,7 +412,7 @@
                         <div class="frow">
                             <div class="field">
                                 <label class="label">Additional Categories</label>
-                                <div class="kw-tags"><span class="kw-tag">Personal Development <button type="button" onclick="rmKw(this)">×</button></span><span class="kw-tag">Psychology <button type="button" onclick="rmKw(this)">×</button></span><input class="kw-input" placeholder="Add category"></div>
+                                <div class="kw-tags"><input class="kw-input" placeholder="Add category"></div>
                             </div>
                             <div class="field"><label class="label">Reading Level</label><select class="input"><option>Intermediate</option><option>Beginner</option><option>Advanced</option></select><div class="hint">Helps readers find books suitable for their level.</div></div>
                         </div>
@@ -452,10 +423,9 @@
                         <div class="card-title">Search Preview</div>
                         <div class="card-sub">This is how your book may appear in search results.</div>
                         <div class="seo-prev">
-                            <div class="seo-url">unilaglibrary.com › books › atomic-habits-james-clear</div>
-                            <div class="seo-title" id="seo-pt">Atomic Habits by James Clear | Unilag Library</div>
-                            <div class="seo-desc" id="seo-pd">Discover the proven strategies in Atomic Habits by James Clear. Learn how small changes can lead to remarkable results.</div>
-                            <div class="seo-stars">★★★★★ 4.8 (124 reviews)</div>
+                            <div class="seo-url" id="seoUrlPreview">unilaglibrary.com › books › your-book-slug</div>
+                            <div class="seo-title" id="seo-pt"></div>
+                            <div class="seo-desc" id="seo-pd"></div>
                             <div class="seo-tip"><i class="ti ti-info-circle"></i> Tip: Write a clear title and description to improve your book's visibility.</div>
                         </div>
                     </div>
@@ -478,10 +448,10 @@
                         <div class="card-title">Social Share Preview</div>
                         <div class="card-sub">This is how your book will look when shared.</div>
                         <div class="social-card">
-                            <div class="social-cover">Atomic Habits</div>
+                            <div class="social-cover" id="socialCoverBox"></div>
                             <div class="social-body">
-                                <div class="social-ttl">Atomic Habits by James Clear</div>
-                                <div class="social-dsc">Discover the proven strategies in Atomic Habits by James Clear. Learn how small changes can lead to remarkable results.</div>
+                                <div class="social-ttl" id="socialTtl">Untitled Book</div>
+                                <div class="social-dsc" id="socialDsc"></div>
                                 <div class="social-url">unilaglibrary.com</div>
                             </div>
                         </div>
@@ -501,7 +471,7 @@
     const stepMeta = {
         1: { title: 'Add New Book', sub: 'Fill in the details below to add a new book to your library.', bc: null },
         2: { title: 'Pricing & Access', sub: 'Set the price, access rules and visibility settings for this book.', bc: 'Pricing & Access' },
-        3: { title: 'Files & Versions', sub: 'Upload, manage and track all versions of your book files.', bc: 'Files & Versions' },
+        3: { title: 'Files & Preview', sub: 'Confirm the file and cover you uploaded for this book.', bc: 'Files & Preview' },
         4: { title: 'SEO & Visibility', sub: 'Improve discoverability and control how this book appears to readers.', bc: 'SEO & Visibility' },
     };
 
@@ -537,6 +507,8 @@
             document.getElementById('bc-sep2').style.display = 'none';
             document.getElementById('bc-cur').textContent = '';
         }
+        if (n === 3) { syncBookMeta(); updateFilePreviewStep3(); }
+        if (n === 4) { autoFillSeo(); updateSlugPreview(); }
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -557,7 +529,7 @@
             sumPrice.textContent = 'NGN 0.00';
         } else if (value === 'Paid') {
             priceInput.disabled = false;
-            priceInput.value = 2500;
+            if (!priceInput.value || priceInput.value == 0) priceInput.value = 2500;
             banner.innerHTML = '<i class="ti ti-info-circle"></i> Readers will pay once to access this book.';
             sumType.textContent = 'Paid Book';
             sumPrice.textContent = 'NGN ' + priceInput.value;
@@ -567,6 +539,7 @@
             sumType.textContent = 'Subscription Only';
             sumPrice.textContent = 'NGN ' + priceInput.value;
         }
+        syncPricingPreview(value, priceInput.value);
     }
 
     function toggleMenu(btn) {
@@ -594,6 +567,8 @@
         document.getElementById('seo-pd').textContent = d;
         document.getElementById('seo-tc').textContent = t.length + '/60 characters';
         document.getElementById('seo-dc').textContent = d.length + '/160 characters';
+        const socialDsc = document.getElementById('socialDsc');
+        if (socialDsc) socialDsc.textContent = d;
     }
 
     function addKw(e) {
@@ -613,11 +588,268 @@
         btn.closest('.kw-tag').remove();
     }
 
-    function fileChosen(input, hintId) {
-        if (input.files && input.files[0]) {
-            document.getElementById(hintId).textContent = input.files[0].name;
+    function formatBytes(bytes) {
+        if (!bytes) return '0 B';
+        const units = ['B', 'KB', 'MB', 'GB'];
+        let i = 0;
+        let val = bytes;
+        while (val >= 1024 && i < units.length - 1) {
+            val /= 1024;
+            i++;
+        }
+        return (i === 0 ? val : val.toFixed(val >= 10 ? 0 : 1)) + ' ' + units[i];
+    }
+
+    const fileTypeIconMap = {
+        pdf: 'ti-file-type-pdf',
+        epub: 'ti-book-2',
+        txt: 'ti-file-text',
+        docx: 'ti-file-type-docx'
+    };
+
+    function getExt(name) {
+        const parts = name.split('.');
+        return parts.length > 1 ? parts.pop().toLowerCase() : '';
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Book Cover preview (image)                                        */
+    /* ---------------------------------------------------------------- */
+    function previewCover(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        if (!/^image\//.test(file.type)) {
+            alert('Please choose a JPG or PNG image for the cover.');
+            input.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const img = document.getElementById('coverPreviewImg');
+            img.src = e.target.result;
+            document.getElementById('coverPreviewWrap').classList.add('show');
+            document.getElementById('coverPlaceholder').classList.add('hide');
+            document.getElementById('coverRemoveBtn').style.display = 'flex';
+            syncBookMeta();
+        };
+        reader.readAsDataURL(file);
+        document.getElementById('coverFileName').textContent = file.name + ' · ' + formatBytes(file.size);
+    }
+
+    function removeCover(e) {
+        e.stopPropagation();
+        const input = document.getElementById('bookCoverInput');
+        input.value = '';
+        document.getElementById('coverPreviewWrap').classList.remove('show');
+        document.getElementById('coverPreviewImg').src = '';
+        document.getElementById('coverPlaceholder').classList.remove('hide');
+        document.getElementById('coverRemoveBtn').style.display = 'none';
+        document.getElementById('coverFileName').textContent = 'Recommended: 600×900px · JPG, PNG (Max 2MB)';
+        syncBookMeta();
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Book File preview (non-image: pdf/epub/txt)                       */
+    /* ---------------------------------------------------------------- */
+    function previewBookFile(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const ext = getExt(file.name);
+        document.getElementById('fileDropIcon').className = 'file-drop-icon ti ' + (fileTypeIconMap[ext] || 'ti-file');
+        document.getElementById('fileDropName').textContent = file.name;
+        document.getElementById('fileDropSize').textContent = formatBytes(file.size);
+        document.getElementById('fileDropPreview').classList.add('show');
+        document.getElementById('filePlaceholder').classList.add('hide');
+        document.getElementById('fileRemoveBtn').style.display = 'flex';
+        document.getElementById('bookFileName').textContent = file.name + ' · ' + formatBytes(file.size);
+        updateFilePreviewStep3();
+    }
+
+    function removeBookFile(e) {
+        e.stopPropagation();
+        const input = document.getElementById('bookFileInput');
+        input.value = '';
+        document.getElementById('fileDropPreview').classList.remove('show');
+        document.getElementById('filePlaceholder').classList.remove('hide');
+        document.getElementById('fileRemoveBtn').style.display = 'none';
+        document.getElementById('bookFileName').textContent = 'Allowed: PDF, EPUB, TXT · Max 100MB';
+        updateFilePreviewStep3();
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Step 3: live preview of what was uploaded in Step 1               */
+    /* ---------------------------------------------------------------- */
+    function updateFilePreviewStep3() {
+        const input = document.getElementById('bookFileInput');
+        const file = input.files && input.files[0];
+        const hint = document.getElementById('p3NoFileHint');
+        if (!file) {
+            document.getElementById('p3FileName').textContent = 'No file uploaded yet';
+            document.getElementById('p3FileType').textContent = '—';
+            document.getElementById('p3FileSize').textContent = '—';
+            document.getElementById('p3FileExt').textContent = '-';
+            document.getElementById('p3FileIcon').className = 'ti ti-file';
+            if (hint) hint.style.display = 'block';
+            return;
+        }
+        const ext = getExt(file.name);
+        document.getElementById('p3FileIcon').className = 'ti ' + (fileTypeIconMap[ext] || 'ti-file');
+        document.getElementById('p3FileExt').textContent = ext ? ext.toUpperCase() : 'FILE';
+        document.getElementById('p3FileName').textContent = file.name;
+        document.getElementById('p3FileType').textContent = ext ? ext.toUpperCase() : 'Unknown';
+        document.getElementById('p3FileSize').textContent = formatBytes(file.size);
+        if (hint) hint.style.display = 'none';
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Live sync of title/author/cover across Step 2, 3, 4 previews      */
+    /* ---------------------------------------------------------------- */
+    function syncBookMeta() {
+        const title = (document.getElementById('titleInput').value || '').trim() || 'Untitled Book';
+        const author = (document.getElementById('authorInput').value || '').trim() || 'Unknown Author';
+        const coverImg = document.getElementById('coverPreviewImg');
+        const hasCover = coverImg && coverImg.src && document.getElementById('coverPreviewWrap').classList.contains('show');
+
+        // Step 2 access preview
+        const apTitle = document.getElementById('accessPreviewTitle');
+        const apAuthor = document.getElementById('accessPreviewAuthor');
+        const apCover = document.getElementById('accessPreviewCover');
+        if (apTitle) apTitle.textContent = title;
+        if (apAuthor) apAuthor.textContent = 'by ' + author;
+        if (apCover) {
+            if (hasCover) {
+                apCover.style.backgroundImage = `url(${coverImg.src})`;
+                apCover.style.backgroundSize = 'cover';
+                apCover.style.backgroundPosition = 'center';
+                apCover.textContent = '';
+            } else {
+                apCover.style.backgroundImage = '';
+                apCover.textContent = title;
+            }
+        }
+
+        // Step 3 cover preview
+        const p3Wrap = document.getElementById('p3CoverWrap');
+        const p3Img = document.getElementById('p3CoverImg');
+        const p3Placeholder = document.getElementById('p3CoverPlaceholder');
+        if (p3Wrap) {
+            if (hasCover) {
+                p3Img.src = coverImg.src;
+                p3Wrap.classList.add('show');
+                p3Placeholder.classList.add('hide');
+            } else {
+                p3Wrap.classList.remove('show');
+                p3Placeholder.classList.remove('hide');
+            }
+        }
+
+        // Step 4 social preview
+        const socialCover = document.getElementById('socialCoverBox');
+        const socialTtl = document.getElementById('socialTtl');
+        if (socialTtl) socialTtl.textContent = author !== 'Unknown Author' ? `${title} by ${author}` : title;
+        if (socialCover) {
+            if (hasCover) {
+                socialCover.style.backgroundImage = `url(${coverImg.src})`;
+                socialCover.style.backgroundSize = 'cover';
+                socialCover.style.backgroundPosition = 'center';
+                socialCover.textContent = '';
+            } else {
+                socialCover.style.backgroundImage = '';
+                socialCover.textContent = title;
+            }
         }
     }
+
+    function syncPricingPreview(value, priceValue) {
+        const badge = document.getElementById('accessPreviewBadge');
+        const sub = document.getElementById('accessPreviewSub');
+        if (!badge || !sub) return;
+        if (value === 'Free') {
+            badge.className = 'badge badge-g';
+            badge.textContent = 'FREE';
+            sub.textContent = 'Free for everyone';
+        } else if (value === 'Paid') {
+            badge.className = 'badge badge-p';
+            badge.textContent = 'NGN ' + priceValue;
+            sub.textContent = 'One-time purchase';
+        } else {
+            badge.className = 'badge badge-b';
+            badge.textContent = 'SUBSCRIPTION';
+            sub.textContent = 'Subscribers only';
+        }
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Step 4: SEO auto-fill (only until the admin edits it themselves)  */
+    /* ---------------------------------------------------------------- */
+    function autoFillSeo() {
+        const title = (document.getElementById('titleInput').value || '').trim();
+        const author = (document.getElementById('authorInput').value || '').trim();
+        const seoT = document.getElementById('seo-t');
+        const seoD = document.getElementById('seo-d');
+        if (seoT && !seoT.dataset.touched && title) {
+            seoT.value = author ? `${title} by ${author} | Unilag Library` : `${title} | Unilag Library`;
+        }
+        if (seoD && !seoD.dataset.touched && title) {
+            seoD.value = `Discover ${title}${author ? ' by ' + author : ''} on Unilag Library.`;
+        }
+        liveSearch();
+    }
+
+    function updateSlugPreview() {
+        const slugInput = document.getElementById('urlSlugInput');
+        const seoUrlPreview = document.getElementById('seoUrlPreview');
+        if (slugInput && seoUrlPreview) {
+            const slug = slugInput.value.trim() || 'your-book-slug';
+            seoUrlPreview.textContent = 'unilaglibrary.com › books › ' + slug;
+        }
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Shared drag & drop wiring                                         */
+    /* ---------------------------------------------------------------- */
+    function setupDropzone(zoneId, inputId) {
+        const zone = document.getElementById(zoneId);
+        const input = document.getElementById(inputId);
+        if (!zone || !input) return;
+
+        ['dragenter', 'dragover'].forEach(evt => {
+            zone.addEventListener(evt, function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(evt => {
+            zone.addEventListener(evt, function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.remove('dragover');
+            });
+        });
+
+        zone.addEventListener('drop', function (e) {
+            const files = e.dataTransfer.files;
+            if (files && files.length) {
+                input.files = files;
+                input.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        setupDropzone('coverDropzone', 'bookCoverInput');
+        setupDropzone('fileDropzone', 'bookFileInput');
+
+        document.getElementById('titleInput').addEventListener('input', function () { syncBookMeta(); autoFillSeo(); });
+        document.getElementById('authorInput').addEventListener('input', function () { syncBookMeta(); autoFillSeo(); });
+        document.getElementById('seo-t').addEventListener('input', function () { this.dataset.touched = 'true'; });
+        document.getElementById('seo-d').addEventListener('input', function () { this.dataset.touched = 'true'; });
+
+        syncBookMeta();
+        updateSlugPreview();
+    });
 
     document.querySelectorAll('textarea').forEach(function (ta) {
         ta.addEventListener('input', function () {

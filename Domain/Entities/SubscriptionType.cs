@@ -13,7 +13,6 @@ namespace Domain.Entities
         public DateTime DateModified { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime SubscriptionDate { get; set; }
-        public ICollection<Subscription> Subscriptions { get; set; } = new HashSet<Subscription>();
         public DateTime ExpiryDate => Cycle switch
         {
             BillingCycle.Monthly => SubscriptionDate.AddMonths(1),
@@ -23,5 +22,7 @@ namespace Domain.Entities
 
             _ => throw new ArgumentOutOfRangeException(nameof(Cycle), $"Unknown billing cycle: {Cycle} detected!!!")
         };
+
+        public ICollection<Subscription> Subscriptions { get; set; } = new HashSet<Subscription>();
     }
 }
