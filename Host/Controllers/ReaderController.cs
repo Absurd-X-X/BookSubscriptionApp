@@ -6,7 +6,6 @@ using Application.Features.ReaderEngagement.Commands.DeleteReview;
 using Application.Features.ReaderEngagement.Queries.GetReaderEngagementDashboard;
 using Application.Queries;
 using Domain.Enums;
-using Infrastructure.Persistence.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Web.Helpers;
@@ -19,6 +18,7 @@ using static Application.Commands.MarkNotificationRead;
 using static Application.Commands.UploadProfilePIcs;
 using static Application.Commands.VerifyFunding;
 using static Application.Queries.GetAllBook;
+using static Application.Queries.GetBookById;
 using static Application.Queries.GetReaderDetails;
 using static Application.Queries.GetSubscriptionById;
 using static Application.Queries.GetSubscriptionByUserId;
@@ -395,7 +395,8 @@ namespace Host.Controllers
         public async Task<IActionResult> UpdateProgress(
     UpdateReadingProgress.UpdateReadingProgressCommand command)
         {
-            var result = await mediator.Send(command);
+            var readerId = ClaimsHelper.GetCustomerId(User);
+            var result = await mediator.Send(command with { ReaderId = readerId });
 
             if (!result.Status)
             {
@@ -487,9 +488,18 @@ namespace Host.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ManageSub()
+        public async Task<IActionResult> ManageSub(CancellationToken cancellationToken)
         {
-            return View();
+            var readerId = ClaimsHelper.GetUserId(User);
+            var result = await mediator.Send(new GetSubscriptionByUserIdQuery(readerId), cancellationToken);
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction(nameof(ReaderDashboard));
+            }
+
+            return View(result.Data);
         }
 
         [HttpGet]
@@ -545,6 +555,20 @@ namespace Host.Controllers
             var result = await mediator.Send(new VerifyFundingCommand(reference));
             TempData[result.Status ? "Success" : "Error"] = result.Message;
             return RedirectToAction(nameof(ReaderDashboard));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ReaderBook(Guid bookId)
+        {
+            var result = await mediator.Send(new GetBookByIdQuery(bookId));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction(nameof(ReaderBooks));
+            }
+            TempData["Success"] = result.Message;
+            return View(result.Data);
         }
     }
 }

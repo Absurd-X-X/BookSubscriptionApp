@@ -14,6 +14,7 @@ namespace Application.Queries
 
         public class GetBookForReadingHandler(
     IBookRepository bookRepository,IUnitOfWork unitOfWork,
+    ISubscriptionRepository subscriptionRepository,
     IReadingProgressRepository readingProgressRepository)
     : IRequestHandler<GetBookForReadingQuery,
         Result<GetBookForReadingResponse>>
@@ -23,6 +24,11 @@ namespace Application.Queries
                 CancellationToken cancellationToken)
             {
                 var book = await bookRepository.GetByIdAsync(request.BookId);
+
+                var isSubActive = await subscriptionRepository.GetByReaderIdAsync(request.ReaderId, true);
+
+                if (isSubActive is null)
+                    return Result<GetBookForReadingResponse>.Failure("You must subscribe to read book");
 
                 if (book == null)
                 {
@@ -40,8 +46,10 @@ namespace Application.Queries
                         ReaderId = request.ReaderId,
                         BookId = request.BookId,
                         CurrentPage = 1,
+                        CurrentChapter = "",
                         ProgressPercentage = 0,
-                        LastReadDate = DateTime.UtcNow
+                        LastReadDate = DateTime.UtcNow,
+                        CreatedBy = request.ReaderId.ToString()
                     };
 
                     await readingProgressRepository.AddAsync(progress);

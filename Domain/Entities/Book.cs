@@ -4,7 +4,6 @@
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        // Basic Details (Step 1)
         public string Title { get; set; } = default!;
         public string? Subtitle { get; set; }
         public string Author { get; set; } = default!;
@@ -19,22 +18,19 @@
         public int Pages { get; set; }
         public string MimeType { get; set; } = default!;
 
-        // Pricing & Access (Step 2)
-        public string PricingType { get; set; } = "Free"; // Free | Paid | Subscription
+        public string PricingType { get; set; } = "Free";
         public decimal Price { get; set; }
         public decimal Discount { get; set; }
-        public string AccessLevel { get; set; } = "Everyone"; // Everyone | SubscribersOnly | PremiumMembers
+        public string AccessLevel { get; set; } = "Everyone";
         public bool RequireLogin { get; set; } = true;
         public bool AllowDownload { get; set; }
         public bool AllowPrint { get; set; }
-        public bool AllowCopyPaste { get; set; }
+        public bool AllowCopyPaste { get; set; } = true;
 
-        // Files (Step 3 — current active file; version history lives in BookVersion)
         public string BookFileUrl { get; set; } = default!;
         public string FileType { get; set; } = default!;
         public string BookCoverUrl { get; set; } = default!;
 
-        // System
         public Guid LibraryId { get; set; }
         public Library Library { get; set; } = default!;
         public int NoOfTimeReadByPeople { get; set; }

@@ -28,6 +28,16 @@ namespace Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(x => x.ReaderId == readerId &&
                 x.IsActive == isActive && !x.IsDeleted);
 
+        public async Task<ICollection<Subscription>> GetByReaderIdAsync(Guid readerId)
+        {
+            return await context.Subscriptions
+                .Include(v => v.Types)
+                .Include(x => x.Reader)
+                .ThenInclude(x => x.User)
+                .Where(x => x.ReaderId == readerId && !x.IsDeleted)
+                .ToListAsync();
+        }
+
         public async Task<PagenatedList<Subscription>> GetSubscriptionsAsync(bool usePaging, PageRequest pageRequest)
         {
             var query = context.Subscriptions

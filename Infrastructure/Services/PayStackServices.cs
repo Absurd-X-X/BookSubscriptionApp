@@ -1,23 +1,33 @@
 ﻿using Application.Common.Dtos;
 using Application.Services;
 using Infrastructure.Settings;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Infrastructure.Services
 {
+    public class PaystackException : Exception
+    {
+        public PaystackException(string message, Exception? inner = null)
+            : base(message, inner) { }
+    }
+
     public class PaystackService : IPaystackService
     {
         private readonly HttpClient _httpClient;
         private readonly PaystackSettings _settings;
+        private readonly ILogger<PaystackService> _logger;
 
         public PaystackService(
             HttpClient httpClient,
-            IOptions<PaystackSettings> settings)
+            IOptions<PaystackSettings> settings,
+            ILogger<PaystackService> logger)
         {
             _settings = settings.Value;
             _httpClient = httpClient;
+            _logger = logger;
             _httpClient.DefaultRequestHeaders.Add(
                 "Authorization", $"Bearer {_settings.SecretKey}");
         }
@@ -138,21 +148,77 @@ namespace Infrastructure.Services
 
         private async Task<JObject> PostAsync(string url, object payload)
         {
-            var response = await _httpClient.PostAsync(url,
-                new StringContent(
-                    JsonConvert.SerializeObject(payload),
-                    System.Text.Encoding.UTF8,
-                    "application/json"));
+            HttpResponseMessage response;
 
-            var content = await response.Content.ReadAsStringAsync();
-            return JObject.Parse(content);
+            try
+            {
+                response = await _httpClient.PostAsync(url,
+                    new StringContent(
+                        JsonConvert.SerializeObject(payload),
+                        System.Text.Encoding.UTF8,
+                        "application/json"));
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error calling Paystack POST {Url}", url);
+                throw new PaystackException(
+                    "Unable to reach the payment service. Please check your connection and try again.", ex);
+            }
+            catch (TaskCanceledException ex) when (!ex.CancellationToken.IsCancellationRequested)
+            {
+                _logger.LogError(ex, "Timeout calling Paystack POST {Url}", url);
+                throw new PaystackException(
+                    "The payment service timed out. Please try again.", ex);
+            }
+
+            return await ParseResponseAsync(response, url);
         }
 
         private async Task<JObject> GetAsync(string url)
         {
-            var response = await _httpClient.GetAsync(url);
+            HttpResponseMessage response;
+
+            try
+            {
+                response = await _httpClient.GetAsync(url);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error calling Paystack GET {Url}", url);
+                throw new PaystackException(
+                    "Unable to reach the payment service. Please check your connection and try again.", ex);
+            }
+            catch (TaskCanceledException ex) when (!ex.CancellationToken.IsCancellationRequested)
+            {
+                _logger.LogError(ex, "Timeout calling Paystack GET {Url}", url);
+                throw new PaystackException(
+                    "The payment service timed out. Please try again.", ex);
+            }
+
+            return await ParseResponseAsync(response, url);
+        }
+
+        private async Task<JObject> ParseResponseAsync(HttpResponseMessage response, string url)
+        {
             var content = await response.Content.ReadAsStringAsync();
-            return JObject.Parse(content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError(
+                    "Paystack returned {StatusCode} for {Url}. Body: {Content}",
+                    response.StatusCode, url, content);
+            }
+
+            try
+            {
+                return JObject.Parse(content);
+            }
+            catch (JsonReaderException ex)
+            {
+                _logger.LogError(ex, "Invalid JSON from Paystack at {Url}. Body: {Content}", url, content);
+                throw new PaystackException(
+                    "Received an unexpected response from the payment service.", ex);
+            }
         }
     }
 }

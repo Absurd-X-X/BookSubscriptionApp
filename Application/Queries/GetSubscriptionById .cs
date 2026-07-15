@@ -1,8 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Repositories;
-using Domain.Entities;
 using MediatR;
-using MySqlX.XDevAPI.Common;
 
 namespace Application.Queries
 {

@@ -1,13 +1,56 @@
-﻿* {
+﻿:root {
+    --bg-page: #0f1117;
+    --bg-card: #13122a;
+    --bg-card-alt: #13151f;
+    --bg-input: #1e2135;
+    --border: #2d2b72;
+    --radius-lg: 7px;
+    /* derived, kept local to the reader so nothing outside is touched */
+    --text-hi: #f2f2f5;
+    --text-lo: #8a8fa3;
+    --accent: #6c63ff;
+    --danger: #e24b4a;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+}
+
+* {
     box-sizing: border-box;
 }
+
+/* ---------------------------------------------------------
+   Thin scrollbars, colored with --bg-card, used everywhere
+   in the reader (panels, viewer, dropdown lists, etc.)
+--------------------------------------------------------- */
+.reader-app * {
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: var(--bg-card) transparent; /* Firefox */
+}
+
+    .reader-app *::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .reader-app *::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .reader-app *::-webkit-scrollbar-thumb {
+        background: var(--bg-card);
+        border-radius: 10px;
+    }
+
+        .reader-app *::-webkit-scrollbar-thumb:hover {
+            background: var(--border);
+        }
 
 .reader-app {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background: #12141c;
-    color: #f2f2f5;
+    background: var(--bg-page);
+    color: var(--text-hi);
     font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
@@ -17,8 +60,9 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px 20px;
-    border-bottom: 1px solid #262a38;
+    border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+    background: var(--bg-card-alt);
 }
 
 .topbar-left {
@@ -28,7 +72,7 @@
 }
 
 .back-link {
-    color: #c8cad6;
+    color: var(--text-lo);
     text-decoration: none;
     font-size: 13px;
     margin-right: 8px;
@@ -49,7 +93,7 @@
 
 .book-author {
     font-size: 12px;
-    color: #8a8fa3;
+    color: var(--text-lo);
     margin: 0;
 }
 
@@ -64,9 +108,9 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #1d2130;
-    border: 1px solid #262a38;
-    border-radius: 8px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
     padding: 6px 12px;
     width: 320px;
 }
@@ -75,14 +119,14 @@
         flex: 1;
         background: none;
         border: none;
-        color: #f2f2f5;
+        color: var(--text-hi);
         font-size: 13px;
         outline: none;
     }
 
 .kbd {
     font-size: 11px;
-    color: #666;
+    color: var(--text-lo);
 }
 
 .topbar-right {
@@ -94,21 +138,22 @@
 .icon-btn {
     background: none;
     border: none;
-    color: #c8cad6;
+    color: var(--text-lo);
     font-size: 12px;
     padding: 6px 10px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
 }
 
     .icon-btn:hover {
-        background: #1d2130;
+        background: var(--bg-input);
+        color: var(--text-hi);
     }
 
 .icon-btn-plain {
     background: none;
     border: none;
-    color: #8a8fa3;
+    color: var(--text-lo);
     cursor: pointer;
     font-size: 16px;
 }
@@ -123,17 +168,17 @@
 .toc-panel, .settings-panel {
     width: 260px;
     flex-shrink: 0;
-    background: #171a24;
+    background: var(--bg-card-alt);
     padding: 18px 16px;
     overflow-y: auto;
 }
 
 .toc-panel {
-    border-right: 1px solid #262a38;
+    border-right: 1px solid var(--border);
 }
 
 .settings-panel {
-    border-left: 1px solid #262a38;
+    border-left: 1px solid var(--border);
 }
 
 .settings-header {
@@ -153,13 +198,13 @@
     font-size: 11px;
     font-weight: 700;
     letter-spacing: .06em;
-    color: #8a8fa3;
+    color: var(--text-lo);
     margin: 18px 0 8px;
 }
 
 .panel-loading, .panel-empty {
     font-size: 12px;
-    color: #666;
+    color: var(--text-lo);
     padding: 8px 0;
 }
 
@@ -169,25 +214,25 @@
     text-align: left;
     background: none;
     border: none;
-    border-radius: 8px;
-    color: #c8cad6;
+    border-radius: var(--radius-md);
+    color: var(--text-lo);
     font-size: 13px;
     padding: 8px 10px;
     cursor: pointer;
 }
 
     .toc-item:hover {
-        background: #1d2130;
+        background: var(--bg-input);
     }
 
     .toc-item.active {
-        background: #20223a;
-        color: #f2f2f5;
+        background: var(--bg-card);
+        color: var(--text-hi);
     }
 
 .bookmarks-block {
     margin-top: 24px;
-    border-top: 1px solid #262a38;
+    border-top: 1px solid var(--border);
     padding-top: 16px;
 }
 
@@ -198,7 +243,7 @@
 }
 
 .badge {
-    background: #262a38;
+    background: var(--bg-input);
     font-size: 11px;
     padding: 2px 8px;
     border-radius: 10px;
@@ -210,27 +255,28 @@
     justify-content: space-between;
     gap: 6px;
     font-size: 12px;
-    color: #c8cad6;
+    color: var(--text-lo);
     padding: 6px 4px;
 }
 
 .bookmark-jump, .bookmark-delete {
     background: none;
-    border: 1px solid #262a38;
-    color: #c8cad6;
+    border: 1px solid var(--border);
+    color: var(--text-lo);
     font-size: 11px;
     padding: 2px 8px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
 }
 
     .bookmark-jump:hover {
-        border-color: #6c63ff;
+        border-color: var(--accent);
+        color: var(--text-hi);
     }
 
     .bookmark-delete:hover {
-        border-color: #e24b4a;
-        color: #e24b4a;
+        border-color: var(--danger);
+        color: var(--danger);
     }
 
 /* VIEWER */
@@ -245,7 +291,7 @@
 .viewer {
     flex: 1;
     height: 100%;
-    background: #1b1d27;
+    background: var(--bg-card);
     overflow: auto;
     display: flex;
     justify-content: center;
@@ -259,23 +305,23 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    color: #8a8fa3;
+    color: var(--text-lo);
     font-size: 13px;
 }
 
     .viewer-error button {
-        background: #1d2130;
-        border: 1px solid #262a38;
-        color: #f2f2f5;
+        background: var(--bg-input);
+        border: 1px solid var(--border);
+        color: var(--text-hi);
         padding: 8px 16px;
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         cursor: pointer;
     }
 
 .nav-arrow {
-    background: #1d2130;
-    border: 1px solid #262a38;
-    color: #f2f2f5;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-hi);
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -287,7 +333,7 @@
 }
 
     .nav-arrow:hover {
-        border-color: #3a3f52;
+        border-color: var(--accent);
     }
 
 /* SETTINGS CONTROLS */
@@ -305,56 +351,56 @@
     }
 
 .opt {
-    background: #1d2130;
-    border: 1px solid #262a38;
-    border-radius: 8px;
-    color: #f2f2f5;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    color: var(--text-hi);
     font-size: 12px;
     padding: 9px 4px;
     cursor: pointer;
 }
 
     .opt:hover {
-        border-color: #3a3f52;
+        border-color: var(--accent);
     }
 
     .opt.active {
-        border-color: #6c63ff;
-        background: #20223a;
+        border-color: var(--accent);
+        background: var(--bg-card);
     }
 
 .stepper {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #1d2130;
-    border: 1px solid #262a38;
-    border-radius: 8px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
     padding: 4px;
 }
 
     .stepper button {
         background: none;
         border: none;
-        color: #f2f2f5;
+        color: var(--text-hi);
         width: 34px;
         height: 30px;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
         cursor: pointer;
     }
 
         .stepper button:hover {
-            background: #262a3c;
+            background: var(--bg-card);
         }
 
 select {
     width: 100%;
-    background: #1d2130;
-    border: 1px solid #262a38;
-    color: #f2f2f5;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-hi);
     font-size: 13px;
     padding: 8px 10px;
-    border-radius: 8px;
+    border-radius: var(--radius-lg);
 }
 
 .toggle-row {
@@ -368,8 +414,8 @@ select {
     width: 38px;
     height: 22px;
     border-radius: 20px;
-    background: #2b2f40;
-    border: none;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
     position: relative;
     cursor: pointer;
 }
@@ -379,15 +425,16 @@ select {
         position: absolute;
         top: 2px;
         left: 2px;
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         border-radius: 50%;
-        background: #c9cad3;
-        transition: transform .15s ease;
+        background: var(--text-lo);
+        transition: transform .15s ease, background .15s ease;
     }
 
     .switch.on {
-        background: #6c63ff;
+        background: var(--accent);
+        border-color: var(--accent);
     }
 
         .switch.on::after {
@@ -401,19 +448,24 @@ select {
     align-items: center;
     gap: 16px;
     padding: 12px 20px;
-    border-top: 1px solid #262a38;
+    border-top: 1px solid var(--border);
     flex-shrink: 0;
+    background: var(--bg-card-alt);
 }
 
 .page-btn {
-    background: #1d2130;
-    border: 1px solid #262a38;
-    color: #f2f2f5;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-hi);
     padding: 8px 14px;
-    border-radius: 8px;
+    border-radius: var(--radius-lg);
     cursor: pointer;
     font-size: 13px;
 }
+
+    .page-btn:hover {
+        border-color: var(--accent);
+    }
 
 .progress-track {
     flex: 1;
@@ -421,13 +473,14 @@ select {
 
     .progress-track input[type="range"] {
         width: 100%;
+        accent-color: var(--accent);
     }
 
 .progress-meta {
     display: flex;
     justify-content: space-between;
     font-size: 12px;
-    color: #8a8fa3;
+    color: var(--text-lo);
     margin-top: 4px;
 }
 
@@ -439,9 +492,9 @@ select {
     width: 100%;
     max-height: 320px;
     overflow-y: auto;
-    background: #1d2130;
-    border: 1px solid #262a38;
-    border-radius: 8px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
     z-index: 30;
 }
 
@@ -451,8 +504,8 @@ select {
     text-align: left;
     background: none;
     border: none;
-    border-bottom: 1px solid #262a38;
-    color: #c8cad6;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-lo);
     font-size: 12px;
     padding: 10px 12px;
     cursor: pointer;
@@ -460,7 +513,8 @@ select {
 }
 
     .search-result-item:hover {
-        background: #20223a;
+        background: var(--bg-card);
+        color: var(--text-hi);
     }
 
     .search-result-item:last-child {
@@ -470,10 +524,12 @@ select {
 .search-loading, .search-empty {
     padding: 12px;
     font-size: 12px;
-    color: #8a8fa3;
+    color: var(--text-lo);
 }
 
-/* PDF page canvas theme backgrounds */
+/* PDF page canvas theme backgrounds (unrelated to app chrome — these are
+   the simulated reading themes inside the book page, kept as literal
+   colors on purpose since they mimic paper, not UI chrome) */
 canvas.theme-light {
     background: #f5f1e8;
 }

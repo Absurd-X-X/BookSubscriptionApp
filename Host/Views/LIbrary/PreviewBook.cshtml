@@ -1,212 +1,765 @@
-﻿@{
+﻿@model Application.Queries.GetBookForReading.GetBookForReadingResponse
+@{
     Layout = "~/Views/Shared/_LibraryLayout.cshtml";
-    ViewData["Title"] = "Preview Book";
+    ViewData["Title"] = Model.Title;
 }
 
-<link href="~/css/preview.css" rel="stylesheet" />
-<div class="reader-wrap">
+<link rel="stylesheet" href="~/css/readBook.css" />
 
-    <aside class="toc">
-        <div class="toc-header">
-            <span>Table of Contents</span>
-            <button class="toc-close" aria-label="Close">&#x2715;</button>
-        </div>
-        <div class="toc-list">
-            <div class="toc-item">
-                <span>Cover</span>
-                <span class="check">&#10003;</span>
-            </div>
-            <div class="toc-item">
-                <span>Title Page</span>
-                <span class="check">&#10003;</span>
-            </div>
-            <div class="toc-item">
-                <span>Copyright</span>
-                <span class="check">&#10003;</span>
-            </div>
-            <div class="toc-item">
-                <span>Dedication</span>
-                <span class="check">&#10003;</span>
-            </div>
-            <div class="toc-item">
-                <span>Introduction</span>
-                <span class="toc-pg">1</span>
-            </div>
+<div class="reader-app" id="readerApp">
 
-            <div class="toc-section">PART 1: The Fundamentals</div>
-            <div class="toc-item active">
-                <span>1. Why Small Changes Make a Big Difference</span>
-                <span class="toc-pg">9</span>
-            </div>
-            <div class="toc-item">
-                <span>2. How Your Habits Shape Your Identity</span>
-                <span class="toc-pg">25</span>
-            </div>
-            <div class="toc-item">
-                <span>3. How to Build Better Habits</span>
-                <span class="toc-pg">39</span>
-            </div>
-            <div class="toc-item">
-                <span>4. The Mantra of Behavior Change</span>
-                <span class="toc-pg">55</span>
-            </div>
-
-            <div class="toc-section">PART 2: The 1st Law — Make It Obvious</div>
-            <div class="toc-item">
-                <span>5. The Best Way to Start</span>
-                <span class="toc-pg">67</span>
-            </div>
-            <div class="toc-item">
-                <span>6. Motivation Is Overrated; Environment Often Matters More</span>
-                <span class="toc-pg">81</span>
-            </div>
-
-            <div class="toc-section">PART 3: The 2nd Law — Make It Attractive</div>
-            <div class="toc-item">
-                <span>7. How to Make a Habit Irresistible</span>
-                <span class="toc-pg">103</span>
-            </div>
-            <div class="toc-item">
-                <span>8. The Role of Family and Friends</span>
-                <span class="toc-pg">117</span>
-            </div>
-
-            <button class="show-more-btn">
-                &#x25BC; Show More Chapters
-            </button>
-        </div>
-    </aside>
-
-
-    <!-- CENTER: Book Content -->
-    <section class="book-content">
-
-        <!-- Toolbar -->
-        <div class="reader-toolbar">
-            <div class="toolbar-left">
-                <div class="search-wrap">
-                    <span class="search-icon">&#x1F50D;</span>
-                    <input class="tb-search" type="text" placeholder="Search in book..." />
-                    <span class="search-shortcut">Ctrl + F</span>
-                </div>
-                <button class="tb-icon-btn" title="Bookmark">&#128278;</button>
-                <button class="tb-icon-btn" title="Notes">&#128203;</button>
-                <button class="tb-icon-btn" title="More">&#8230;</button>
-            </div>
-
-            <div class="toolbar-right">
-                <div class="tb-group">
-                    <span class="tb-group-label">Theme</span>
-                    <button class="theme-btn active" title="Light">&#9728;</button>
-                    <button class="theme-btn" title="Dark">&#9790;</button>
-                </div>
-                <div class="tb-group">
-                    <span class="tb-group-label">Font</span>
-                    <button class="theme-btn" title="Decrease">&#x2212;</button>
-                    <span class="font-size-val">100%</span>
-                    <button class="theme-btn" title="Increase">&#x2B;</button>
-                </div>
-                <button class="tb-more-label">More &#8230;</button>
-                <button class="exit-reader-btn">&#8592; Exit Reader</button>
+    <!-- TOP BAR -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <a asp-action="ReaderBooks" class="back-link">
+                &lsaquo; Back to library
+            </a>
+            <img src="@Model.BookCoverUrl" class="mini-cover" alt="" />
+            <div class="title-block">
+                <p class="book-title">@Model.Title</p>
+                <p class="book-author">@Model.Author</p>
             </div>
         </div>
 
-        <!-- Page Content -->
-        <div class="page-area">
-            <div class="chapter-label">Chapter 1</div>
-            <h1 class="chapter-title">Why Small Changes<br>Make a Big Difference</h1>
-            <p class="chapter-quote">
-                "Success is the product of daily habits—<br>
-                not once-in-a-lifetime transformations."
-            </p>
-            <div class="chapter-divider"></div>
-
-            <p class="page-text">
-                Imagine that you're an average person. Now imagine that, each day, you get 1% better. Just <strong>1%</strong>.
-            </p>
-            <p class="page-text">
-                You might think, "That's not much—sometimes I don't even notice 1% change in a day."
-            </p>
-            <p class="page-text">
-                But here's the catch: It compounds. 1% better every day for one year. You'd end up
-                <span class="highlight">37 times</span> better by the time you're done.
-            </p>
-
-            <!-- Gains Diagram -->
-            <div class="gains-box">
-                <div class="gains-title">The Power of Tiny Gains</div>
-
-                <div class="gains-row">
-                    <span class="gains-label">1% better every day</span>
-                    <div class="gains-eq">
-                        <span class="gains-formula">1.01<sup>365</sup></span>
-                        <span class="gains-equals">=</span>
-                        <span class="gains-result positive">37.78</span>
-                    </div>
-                </div>
-
-                <div class="gains-row">
-                    <span class="gains-label">1% worse every day</span>
-                    <div class="gains-eq">
-                        <span class="gains-formula">0.99<sup>365</sup></span>
-                        <span class="gains-equals">=</span>
-                        <span class="gains-result negative">0.03</span>
-                    </div>
-                </div>
-
-                <div class="gains-chart">
-                    <svg viewBox="0 0 420 90" xmlns="http://www.w3.org/2000/svg">
-                        <text x="2" y="12" font-size="10" fill="#9ca3af">Improvement</text>
-                        <!-- Growth curve (1% better) -->
-                        <polyline points="30,80 80,75 130,68 180,56 230,42 280,26 330,10 390,4"
-                                  fill="none" stroke="#7c3aed" stroke-width="2"
-                                  stroke-linecap="round" stroke-linejoin="round" />
-                        <!-- Decline curve (1% worse) -->
-                        <polyline points="30,80 80,81 130,82 180,83 230,83 280,84 330,84 390,85"
-                                  fill="none" stroke="#d1d5db" stroke-width="1.5"
-                                  stroke-linecap="round" stroke-linejoin="round" />
-                        <text x="30" y="88" font-size="9" fill="#9ca3af">1</text>
-                        <text x="360" y="88" font-size="9" fill="#9ca3af">Time</text>
-                        <text x="310" y="8" font-size="9" fill="#7c3aed">1% better every day</text>
-                        <text x="310" y="82" font-size="9" fill="#9ca3af">1% worse every day</text>
-                    </svg>
-                </div>
+        <div class="topbar-center">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search in book..." autocomplete="off" />
+                <span class="kbd">Ctrl+K</span>
             </div>
         </div>
 
-        <!-- Bottom Navigation Bar -->
-        <div class="reader-bottom-bar">
-            <button class="nav-btn">&#8592; Previous</button>
+        <div class="topbar-right">
+            <button id="bookmarkBtn" class="icon-btn" title="Bookmark">Bookmark</button>
+            <button id="favoriteBtn" class="icon-btn" title="Favorite">Favorite</button>
+            <button id="settingsToggle" class="icon-btn" title="Settings">Settings</button>
+            <button id="fullscreenBtn" class="icon-btn" title="Fullscreen">Fullscreen</button>
+        </div>
+    </header>
 
-            <div class="progress-wrap">
-                <div class="progress-track">
-                    <div class="progress-fill"></div>
-                    <div class="progress-thumb"></div>
+    <div class="reader-body">
+
+        <!-- TOC + BOOKMARKS PANEL -->
+        <aside class="toc-panel" id="tocPanel">
+            <p class="panel-label">Contents</p>
+            <div id="tocList" class="toc-list"><div class="panel-loading">Loading contents...</div></div>
+
+            <div class="bookmarks-block">
+                <div class="bookmarks-header">
+                    <p class="panel-label">Bookmarks</p>
+                    <span class="badge" id="bookmarkCount">0</span>
                 </div>
-                <div class="progress-pct">35% Complete</div>
+                <div id="bookmarksList" class="bookmarks-list"></div>
+            </div>
+        </aside>
+
+        <!-- VIEWER -->
+        <main class="viewer-wrap">
+            <button class="nav-arrow nav-arrow-left" id="prevBtn" aria-label="Previous page">&lsaquo;</button>
+
+            <div class="viewer" id="viewer">
+                <div class="viewer-loading" id="viewerLoading">Loading book...</div>
+                <div class="viewer-error" id="viewerError" style="display:none">
+                    <p>Couldn't load this book.</p>
+                    <button id="retryBtn">Retry</button>
+                </div>
             </div>
 
-            <span class="page-indicator">Page 24 of 320</span>
-            <button class="nav-btn">Next &#8594;</button>
+            <button class="nav-arrow nav-arrow-right" id="nextBtn" aria-label="Next page">&rsaquo;</button>
+        </main>
+
+        <!-- SETTINGS PANEL -->
+        <aside class="settings-panel" id="settingsPanel" hidden>
+            <div class="settings-header">
+                <p class="panel-label">Reading settings</p>
+                <button id="closeSettings" class="icon-btn-plain" aria-label="Close settings">&times;</button>
+            </div>
+
+            <p class="group-label">Theme</p>
+            <div class="opt-row three" id="themeGroup">
+                <button class="opt active" data-theme="light">Light</button>
+                <button class="opt" data-theme="sepia">Sepia</button>
+                <button class="opt" data-theme="dark">Dark</button>
+            </div>
+
+            <p class="group-label">Font size</p>
+            <div class="stepper">
+                <button id="decBtn">A-</button>
+                <span id="sizeVal">18px</span>
+                <button id="incBtn">A+</button>
+            </div>
+
+            <p class="group-label">Font family</p>
+            <select id="fontFamily">
+                <option value="Lora, serif">Lora</option>
+                <option value="Georgia, serif">Georgia</option>
+                <option value="'Merriweather', serif">Merriweather</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'OpenDyslexic', sans-serif">OpenDyslexic</option>
+            </select>
+
+            <p class="group-label">Line height</p>
+            <div class="opt-row three" id="lineHeightGroup">
+                <button class="opt" data-lh="1.35">Tight</button>
+                <button class="opt active" data-lh="1.7">Normal</button>
+                <button class="opt" data-lh="2.1">Loose</button>
+            </div>
+
+            <p class="group-label">Page width</p>
+            <div class="opt-row three" id="widthGroup">
+                <button class="opt" data-width="narrow">Narrow</button>
+                <button class="opt active" data-width="normal">Normal</button>
+                <button class="opt" data-width="wide">Wide</button>
+            </div>
+
+            <div class="toggle-row">
+                <span class="group-label" style="margin:0">Always show margins</span>
+                <button class="switch on" id="marginsToggle"></button>
+            </div>
+
+            <p class="group-label">Scroll mode (EPUB)</p>
+            <div class="opt-row two" id="scrollModeGroup">
+                <button class="opt active" data-scroll="paginated">Paginated</button>
+                <button class="opt" data-scroll="scrollable">Scrollable</button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <footer class="bottombar">
+        <button id="prevBtnBottom" class="page-btn">&lsaquo; Previous</button>
+
+        <div class="progress-track">
+            <input type="range" id="progressSlider" min="0" max="100" value="0" />
+            <div class="progress-meta">
+                <span id="pageLabel">Page — of —</span>
+                <span id="percentLabel">0%</span>
+            </div>
         </div>
 
-    </section>
-
-
-    <!-- RIGHT: Notes Panel -->
-    <aside class="notes-panel">
-        <div class="notes-tabs">
-            <button class="notes-tab active">Notes</button>
-            <button class="notes-tab">Bookmarks</button>
-            <button class="notes-tab">Highlights</button>
-        </div>
-
-        <div class="notes-empty">
-            <div class="notes-icon">&#128203;</div>
-            <p class="notes-empty-title">No notes yet</p>
-            <p class="notes-empty-sub">Start taking notes while reading this book.</p>
-            <button class="add-note-btn">&#x2B; Add Note</button>
-        </div>
-    </aside>
-
+        <button id="nextBtnBottom" class="page-btn">Next &rsaquo;</button>
+        <button id="gridViewBtn" class="icon-btn" title="Grid view">Grid</button>
+    </footer>
 </div>
+
+@Html.AntiForgeryToken()
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/epubjs/0.3.93/epub.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+    window.BOOK = {
+    id: "@Model.Id",
+    readerId: "@ViewBag.ReaderId",
+    fileUrl: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BookFileUrl)),
+    fileType: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.FileType)),
+    title: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Title)),
+    currentPage: @Model.CurrentPage,
+    cfi: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Cfi)),
+    progressPercentage: @Model.ProgressPercentage,
+    allowDownload: @Model.AllowDownload.ToString().ToLower(),
+    allowPrint: @Model.AllowPrint.ToString().ToLower(),
+    allowCopyPaste: @Model.AllowCopyPaste.ToString().ToLower()
+    };
+
+    // Normalized once, used everywhere instead of raw BOOK.fileType
+    const FILE_TYPE = BOOK.fileType.toLowerCase();
+
+    ['bookmarkBtn','searchInput','themeGroup','widthGroup','lineHeightGroup',
+    'scrollModeGroup','incBtn','decBtn','fontFamily','marginsToggle',
+    'settingsToggle','closeSettings','prevBtn','nextBtn','prevBtnBottom',
+    'nextBtnBottom','progressSlider','fullscreenBtn','retryBtn']
+    .forEach(id => { if (!document.getElementById(id)) console.error('Missing element:', id); });
+
+    const settings = {
+    theme: 'light',
+    fontSize: 18,
+    fontFamily: 'Lora, serif',
+    lineHeight: 1.7,
+    pageWidth: 'normal',
+    alwaysShowMargins: true,
+    scrollMode: 'paginated'
+    };
+
+    let epubBook = null;
+    let epubRendition = null;
+    let pdfDoc = null;
+    let pdfCurrentPage = 1;
+    let pdfTotalPages = 0;
+    let tocFlat = [];
+
+    const el = (id) => document.getElementById(id);
+    const viewer = el('viewer');
+    const viewerLoading = el('viewerLoading');
+    const viewerError = el('viewerError');
+
+    /* ---------------------------------------------------------
+    Permission enforcement (AllowDownload / AllowPrint / AllowCopyPaste)
+    --------------------------------------------------------- */
+    function enforcePermissions() {
+    if (!BOOK.allowCopyPaste) {
+    viewer.addEventListener('copy', (e) => e.preventDefault());
+    viewer.addEventListener('cut', (e) => e.preventDefault());
+    viewer.style.userSelect = 'none';
+    }
+    if (!BOOK.allowPrint) {
+    window.addEventListener('beforeprint', () => {
+    alert('Printing is disabled for this book.');
+    });
+    }
+    if (!BOOK.allowDownload) {
+    document.addEventListener('contextmenu', (e) => {
+    if (e.target.closest('.viewer')) e.preventDefault();
+    });
+    }
+    }
+
+    /* ---------------------------------------------------------
+    Open book (EPUB or PDF)
+    --------------------------------------------------------- */
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    async function openBook() {
+    viewerLoading.style.display = 'flex';
+    viewerError.style.display = 'none';
+
+    try {
+    if (FILE_TYPE === 'epub') {
+    await openEpub();
+    } else if (FILE_TYPE === 'pdf') {
+    await openPdf();
+    } else {
+    throw new Error('Unsupported file type: ' + BOOK.fileType);
+    }
+    viewerLoading.style.display = 'none';
+    } catch (err) {
+    console.error(err);
+    viewerLoading.style.display = 'none';
+    viewerError.style.display = 'flex';
+    }
+    }
+
+    el('retryBtn').addEventListener('click', openBook);
+
+    async function openEpub() {
+    epubBook = ePub(BOOK.fileUrl);
+    epubRendition = epubBook.renderTo('viewer', {
+    width: '100%',
+    height: '100%',
+    flow: settings.scrollMode === 'scrollable' ? 'scrolled-doc' : 'paginated'
+    });
+
+    await epubRendition.display(BOOK.cfi || undefined);
+    applyEpubTheme();
+
+    const nav = await epubBook.loaded.navigation;
+    tocFlat = flattenToc(nav.toc);
+    renderToc(tocFlat, (item) => epubRendition.display(item.href));
+
+    await epubBook.locations.generate(1000);
+
+    epubRendition.on('relocated', (location) => {
+    const cfi = location.start.cfi;
+    const percentage = Math.round(
+    (epubBook.locations.percentageFromCfi(cfi) || 0) * 100
+    );
+    updateBottomBar(null, null, percentage);
+    queueProgress({
+    currentPage: null,
+    cfi,
+    currentChapter: getCurrentChapterTitle(location),
+    progressPercentage: percentage
+    });
+    });
+
+    el('prevBtn').onclick = () => epubRendition.prev();
+    el('nextBtn').onclick = () => epubRendition.next();
+    el('prevBtnBottom').onclick = () => epubRendition.prev();
+    el('nextBtnBottom').onclick = () => epubRendition.next();
+    }
+
+    async function openPdf() {
+    pdfDoc = await pdfjsLib.getDocument(BOOK.fileUrl).promise;
+    pdfTotalPages = pdfDoc.numPages;
+    pdfCurrentPage = Math.min(BOOK.currentPage || 1, pdfTotalPages);
+
+    await renderPdfPage(pdfCurrentPage);
+
+    const outline = await pdfDoc.getOutline();
+    if (outline && outline.length) {
+    const items = outline.map(o => ({ label: o.title, dest: o.dest }));
+    renderToc(items, async (item) => {
+    const dest = typeof item.dest === 'string'
+    ? await pdfDoc.getDestination(item.dest)
+    : item.dest;
+    const pageIndex = await pdfDoc.getPageIndex(dest[0]);
+    renderPdfPage(pageIndex + 1);
+    });
+    } else {
+    el('tocList').innerHTML = '<div class="panel-empty">No contents available</div>';
+    }
+
+    el('prevBtn').onclick = () => renderPdfPage(pdfCurrentPage - 1);
+    el('nextBtn').onclick = () => renderPdfPage(pdfCurrentPage + 1);
+    el('prevBtnBottom').onclick = () => renderPdfPage(pdfCurrentPage - 1);
+    el('nextBtnBottom').onclick = () => renderPdfPage(pdfCurrentPage + 1);
+    }
+
+    async function renderPdfPage(pageNum) {
+    if (pageNum < 1 || pageNum > pdfTotalPages) return;
+
+    const page = await pdfDoc.getPage(pageNum);
+    viewer.innerHTML = '';
+    const canvas = document.createElement('canvas');
+    canvas.className = `theme-${settings.theme}`;
+    viewer.appendChild(canvas);
+
+    const scaleMap = { narrow: 1.0, normal: 1.3, wide: 1.6 };
+    const vp = page.getViewport({ scale: scaleMap[settings.pageWidth] });
+    canvas.width = vp.width;
+    canvas.height = vp.height;
+
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+
+    pdfCurrentPage = pageNum;
+    const percentage = Math.round((pageNum / pdfTotalPages) * 100);
+    updateBottomBar(pageNum, pdfTotalPages, percentage);
+
+    queueProgress({
+    currentPage: pageNum,
+    cfi: null,
+    currentChapter: null,
+    progressPercentage: percentage
+    });
+    }
+
+    /* ---------------------------------------------------------
+    TOC rendering (extracted from the file itself, not the DB)
+    --------------------------------------------------------- */
+    function flattenToc(items, depth = 0) {
+    let out = [];
+    items.forEach(i => {
+    out.push({ label: i.label.trim(), href: i.href, depth });
+    if (i.subitems && i.subitems.length) {
+    out = out.concat(flattenToc(i.subitems, depth + 1));
+    }
+    });
+    return out;
+    }
+
+    function renderToc(items, onClick) {
+    const list = el('tocList');
+    list.innerHTML = '';
+    items.forEach((item) => {
+    const btn = document.createElement('button');
+    btn.className = 'toc-item';
+    btn.style.paddingLeft = (10 + (item.depth || 0) * 14) + 'px';
+    btn.textContent = item.label;
+    btn.addEventListener('click', () => {
+    document.querySelectorAll('.toc-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    onClick(item);
+    });
+    list.appendChild(btn);
+    });
+    }
+
+    function getCurrentChapterTitle(location) {
+    const match = tocFlat.find(t => t.href.split('#')[0] === location.start.href);
+    return match ? match.label : null;
+    }
+
+    /* ---------------------------------------------------------
+    Bottom bar
+    --------------------------------------------------------- */
+    function updateBottomBar(page, total, percentage) {
+    if (page && total) {
+    el('pageLabel').textContent = `Page ${page} of ${total}`;
+    el('progressSlider').max = total;
+    el('progressSlider').value = page;
+    } else {
+    el('pageLabel').textContent = '';
+    el('progressSlider').max = 100;
+    el('progressSlider').value = percentage;
+    }
+    el('percentLabel').textContent = percentage + '%';
+    }
+
+    el('progressSlider').addEventListener('change', (e) => {
+    const val = Number(e.target.value);
+    if (FILE_TYPE === 'pdf') {
+    renderPdfPage(val);
+    } else if (epubBook) {
+    const cfi = epubBook.locations.cfiFromPercentage(val / 100);
+    epubRendition.display(cfi);
+    }
+    });
+
+    /* ---------------------------------------------------------
+    Settings panel toggle
+    --------------------------------------------------------- */
+    el('settingsToggle').addEventListener('click', () => {
+    el('settingsPanel').hidden = !el('settingsPanel').hidden;
+    });
+    el('closeSettings').addEventListener('click', () => {
+    el('settingsPanel').hidden = true;
+    });
+
+    /* ---------------------------------------------------------
+    Settings — in-memory only (no persistence), applied live
+    --------------------------------------------------------- */
+    function applyEpubTheme() {
+    if (!epubRendition) return;
+    epubRendition.themes.fontSize(settings.fontSize + 'px');
+    epubRendition.themes.font(settings.fontFamily);
+
+    const themeStyles = {
+    light: { body: { background: '#f5f1e8', color: '#1c1c1c', 'line-height': settings.lineHeight } },
+    sepia: { body: { background: '#f1e7d0', color: '#3a2f20', 'line-height': settings.lineHeight } },
+    dark:  { body: { background: '#1b1d27', color: '#d8d9e0', 'line-height': settings.lineHeight } }
+    };
+    epubRendition.themes.register('current', themeStyles[settings.theme]);
+    epubRendition.themes.select('current');
+    }
+
+    function refreshRender() {
+    if (FILE_TYPE === 'epub') applyEpubTheme();
+    else if (FILE_TYPE === 'pdf') renderPdfPage(pdfCurrentPage);
+    }
+
+    function bindOptGroup(groupId, dataAttr, settingKey, onChange) {
+    el(groupId).addEventListener('click', (e) => {
+    const btn = e.target.closest('.opt');
+    if (!btn) return;
+    el(groupId).querySelectorAll('.opt').forEach(o => o.classList.remove('active'));
+    btn.classList.add('active');
+    settings[settingKey] = btn.dataset[dataAttr];
+    onChange && onChange();
+    refreshRender();
+    });
+    }
+
+    bindOptGroup('themeGroup', 'theme', 'theme');
+    bindOptGroup('widthGroup', 'width', 'pageWidth');
+    bindOptGroup('lineHeightGroup', 'lh', 'lineHeight', () => {
+    settings.lineHeight = parseFloat(settings.lineHeight);
+    });
+    bindOptGroup('scrollModeGroup', 'scroll', 'scrollMode', () => {
+    if (FILE_TYPE === 'epub' && epubRendition) {
+    epubRendition.flow(settings.scrollMode === 'scrollable' ? 'scrolled-doc' : 'paginated');
+    }
+    });
+
+    el('incBtn').addEventListener('click', () => {
+    settings.fontSize = Math.min(settings.fontSize + 1, 28);
+    el('sizeVal').textContent = settings.fontSize + 'px';
+    refreshRender();
+    });
+    el('decBtn').addEventListener('click', () => {
+    settings.fontSize = Math.max(settings.fontSize - 1, 12);
+    el('sizeVal').textContent = settings.fontSize + 'px';
+    refreshRender();
+    });
+    el('fontFamily').addEventListener('change', (e) => {
+    settings.fontFamily = e.target.value;
+    refreshRender();
+    });
+    el('marginsToggle').addEventListener('click', () => {
+    settings.alwaysShowMargins = !settings.alwaysShowMargins;
+    el('marginsToggle').classList.toggle('on', settings.alwaysShowMargins);
+    viewer.style.padding = settings.alwaysShowMargins ? '32px' : '8px';
+    });
+
+    /* ---------------------------------------------------------
+    Bookmarks — persisted via AddBookmark / RemoveBookmark / Bookmarks
+    --------------------------------------------------------- */
+    async function loadBookmarks() {
+    try {
+    const res = await fetch('/Reader/GetAllBookmark');
+    const json = await res.json();
+    if (json.status && json.data) {
+    renderBookmarks(json.data.filter(b => b.bookId === BOOK.id));
+    }
+    } catch (err) {
+    console.warn('Could not load bookmarks', err);
+    }
+    }
+
+    function renderBookmarks(list) {
+    el('bookmarkCount').textContent = list.length;
+    const container = el('bookmarksList');
+    container.innerHTML = '';
+
+    list.forEach((b) => {
+    const div = document.createElement('div');
+    div.className = 'bookmark-item';
+
+    const label = document.createElement('span');
+    label.textContent = `Page ${b.pageNumber}`;
+    div.appendChild(label);
+
+    const jumpBtn = document.createElement('button');
+    jumpBtn.className = 'bookmark-jump';
+    jumpBtn.textContent = 'Go';
+    jumpBtn.addEventListener('click', () => {
+    if (FILE_TYPE === 'pdf') renderPdfPage(b.pageNumber);
+    });
+    div.appendChild(jumpBtn);
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'bookmark-delete';
+    delBtn.textContent = '\u2715';
+    delBtn.addEventListener('click', async () => {
+    await fetch('/Reader/RemoveBookmark', {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json',
+    'RequestVerificationToken': window.ANTIFORGERY_TOKEN
+    },
+    body: JSON.stringify(b.bookmarkId)
+    });
+    loadBookmarks();
+    });
+    div.appendChild(delBtn);
+
+    container.appendChild(div);
+    });
+    }
+
+    el('bookmarkBtn').addEventListener('click', async () => {
+    const pageNumber = FILE_TYPE === 'pdf'
+    ? pdfCurrentPage
+    : Math.round((epubBook.locations.percentageFromCfi(epubRendition.location.start.cfi) || 0) * 100);
+
+    await fetch('/Reader/AddBookmark', {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json',
+    'RequestVerificationToken': window.ANTIFORGERY_TOKEN
+    },
+    body: JSON.stringify({
+    readerId: BOOK.readerId,
+    bookId: BOOK.id,
+    pageNumber,
+    quote: '',
+    note: ''
+    })
+    });
+
+    loadBookmarks();
+    });
+
+    /* ---------------------------------------------------------
+    Search-in-book
+    --------------------------------------------------------- */
+    let searchDebounce = null;
+
+    el('searchInput').addEventListener('input', (e) => {
+    clearTimeout(searchDebounce);
+    const query = e.target.value.trim();
+    if (query.length < 2) {
+    hideSearchResults();
+    return;
+    }
+    searchDebounce = setTimeout(() => runSearch(query), 350);
+    });
+
+    function ensureSearchPanel() {
+    let panel = el('searchResults');
+    if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'searchResults';
+    panel.className = 'search-results';
+    el('searchInput').closest('.search-box').appendChild(panel);
+    }
+    return panel;
+    }
+
+    function hideSearchResults() {
+    const panel = el('searchResults');
+    if (panel) panel.remove();
+    }
+
+    async function runSearch(query) {
+    const panel = ensureSearchPanel();
+    panel.innerHTML = '<div class="search-loading">Searching...</div>';
+
+    let results = [];
+    if (FILE_TYPE === 'epub') {
+    results = await searchEpub(query);
+    } else if (FILE_TYPE === 'pdf') {
+    results = await searchPdf(query);
+    }
+
+    renderSearchResults(results, panel);
+    }
+
+    async function searchEpub(query) {
+    const results = [];
+    const items = epubBook.spine.spineItems;
+
+    for (const item of items) {
+    await item.load(epubBook.load.bind(epubBook));
+    const matches = item.find(query);
+    matches.forEach(m => {
+    results.push({ label: m.excerpt, target: m.cfi });
+    });
+    item.unload();
+    if (results.length >= 30) break;
+    }
+    return results;
+    }
+
+    async function searchPdf(query) {
+    const results = [];
+    const lowerQuery = query.toLowerCase();
+
+    for (let p = 1; p <= pdfTotalPages; p++) {
+    const page = await pdfDoc.getPage(p);
+    const textContent = await page.getTextContent();
+    const pageText = textContent.items.map(i => i.str).join(' ');
+    const idx = pageText.toLowerCase().indexOf(lowerQuery);
+
+    if (idx !== -1) {
+    const start = Math.max(0, idx - 40);
+    const excerpt = '...' + pageText.substring(start, idx + query.length + 40) + '...';
+    results.push({ label: excerpt, target: p });
+    }
+    if (results.length >= 30) break;
+    }
+    return results;
+    }
+
+    function renderSearchResults(results, panel) {
+    if (!results.length) {
+    panel.innerHTML = '<div class="search-empty">No matches found</div>';
+    return;
+    }
+
+    panel.innerHTML = '';
+    results.forEach(r => {
+    const item = document.createElement('button');
+    item.className = 'search-result-item';
+    item.textContent = r.label;
+    item.addEventListener('click', () => {
+    if (FILE_TYPE === 'epub') {
+    epubRendition.display(r.target);
+    } else {
+    renderPdfPage(r.target);
+    }
+    hideSearchResults();
+    el('searchInput').value = '';
+    });
+    panel.appendChild(item);
+    });
+    }
+
+    document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-box')) hideSearchResults();
+    });
+
+    /* ---------------------------------------------------------
+    Fullscreen
+    --------------------------------------------------------- */
+    el('fullscreenBtn').addEventListener('click', () => {
+    const app = el('readerApp');
+    if (!document.fullscreenElement) {
+    app.requestFullscreen();
+    } else {
+    document.exitFullscreen();
+    }
+    });
+
+    /* ---------------------------------------------------------
+    Progress posting — debounced + antiforgery token
+    --------------------------------------------------------- */
+    let sessionStart = Date.now();
+    let pendingProgress = null;
+    let debounceTimer = null;
+
+    function queueProgress(payload) {
+    pendingProgress = payload;
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(flushProgress, 2000);
+    }
+
+    async function flushProgress() {
+    if (!pendingProgress) return;
+    const payload = pendingProgress;
+    pendingProgress = null;
+
+    const minutesRead = Math.max(1, Math.round((Date.now() - sessionStart) / 60000));
+    sessionStart = Date.now();
+
+    try {
+    const res = await fetch('/Reader/UpdateProgress', {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json',
+    'RequestVerificationToken': window.ANTIFORGERY_TOKEN
+    },
+    body: JSON.stringify({
+    bookId: BOOK.id,
+    currentPage: payload.currentPage,
+    cfi: payload.cfi,
+    currentChapter: payload.currentChapter,
+    progressPercentage: payload.progressPercentage,
+    minutesRead,
+    pagesRead: 1
+    })
+    });
+
+    console.log({
+    readerId: BOOK.readerId,
+    bookId: BOOK.id,
+    currentPage: payload.currentPage,
+    cfi: payload.cfi,
+    currentChapter: payload.currentChapter,
+    progressPercentage: payload.progressPercentage,
+    minutesRead,
+    pagesRead: 1
+    });
+
+    if (res.status === 401) {
+    window.location.href = '/Account/Login';
+    }
+    } catch (err) {
+    console.warn('Progress save failed, will retry next update.', err);
+    }
+    }
+
+    window.addEventListener('beforeunload', () => {
+    if (pendingProgress) {
+    navigator.sendBeacon(
+    '/Reader/UpdateProgress',
+    new Blob([JSON.stringify({
+    readerId: BOOK.readerId,
+    bookId: BOOK.id,
+    ...pendingProgress,
+    minutesRead: 1,
+    pagesRead: 1
+    })], { type: 'application/json' })
+    );
+    }
+    });
+
+    /* ---------------------------------------------------------
+    Keyboard shortcuts
+    --------------------------------------------------------- */
+    document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') el('prevBtn').click();
+    if (e.key === 'ArrowRight') el('nextBtn').click();
+    if (e.ctrlKey && e.key === 'k') {
+    e.preventDefault();
+    el('searchInput').focus();
+    }
+    });
+
+    /* ---------------------------------------------------------
+    Init
+    --------------------------------------------------------- */
+    enforcePermissions();
+    openBook();
+    loadBookmarks();
+</script>

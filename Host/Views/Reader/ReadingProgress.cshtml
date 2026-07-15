@@ -62,8 +62,8 @@
                                 <i class="ti ti-clock"></i> @Model.CurrentlyReading.TotalMinutesRead min read
                             </div>
                             <div class="book-actions">
-                                <a href="@Url.Action("BookReadingProgress", "Reader", new { id = Model.CurrentlyReading.BookId })" class="btn-primary"><i class="ti ti-player-play"></i> Continue Reading</a>
-                                <a href="#" class="btn-secondary">Details</a>
+                                <a href="@Url.Action("ReadBook", "Reader", new { bookId = Model.CurrentlyReading.BookId })" class="btn-primary"><i class="ti ti-player-play"></i> Continue Reading</a>
+                                <a href="/Reader/ReaderBook/@Model.CurrentlyReading.BookId" class="btn-secondary">Details</a>
                             </div>
                         </div>
                         <div class="progress-panel">

@@ -12,6 +12,10 @@
     --radius: 5px;
 }
 
+a{
+    text-decoration: none;
+}
+
 .book-detail {
     color: var(--text);
     font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif;

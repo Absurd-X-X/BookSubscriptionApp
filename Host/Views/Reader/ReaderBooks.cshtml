@@ -97,7 +97,7 @@
                     @(hero.About?.Length > 160 ? hero.About.Substring(0, 160) + "…" : hero.About)
                 </div>
                 <div class="hero-actions">
-                    <a href="/Reader/BookDetails/@hero.Id" class="btn-read-now">Read Now</a>
+                    <a href="/Reader/ReadBook/@hero.Id" class="btn-read-now">Read Now</a>
                     <a href="#" class="btn-add-to-list" data-book-id="@hero.Id">+ Add to List</a>
                 </div>
             </div>
@@ -149,11 +149,15 @@
                     <div class="book-cover">
                         @if (!string.IsNullOrWhiteSpace(book.CoverImageUrl))
                         {
-                            <img src="@book.CoverImageUrl" alt="@book.Title" />
+                            <a href="/Reader/ReadBook/@book.Id">
+                                <img src="@book.CoverImageUrl" alt="@book.Title" />
+                            </a>
                         }
                         else
                         {
-                            <div class="book-cover-ph"><i class="ti ti-book"></i></div>
+                            <a href="/Reader/ReadBook/@book.Id">
+                                <div class="book-cover-ph"><i class="ti ti-book"></i></div>
+                            </a>
                         }
                         @if (book.IsNew)
                         {
@@ -196,11 +200,15 @@
                     <div class="book-cover">
                         @if (!string.IsNullOrWhiteSpace(book.CoverImageUrl))
                         {
-                            <img src="@book.CoverImageUrl" alt="@book.Title" />
+                            <a href="/Reader/ReadBook/@book.Id">
+                                <img src="@book.CoverImageUrl" alt="@book.Title" />
+                            </a>
                         }
                         else
                         {
-                            <div class="book-cover-ph"><i class="ti ti-book"></i></div>
+                            <a href="/Reader/ReadBook/@book.Id">
+                                <div class="book-cover-ph"><i class="ti ti-book"></i></div>
+                            </a>
                         }
                         <button class="btn-bookmark @(book.IsInReadingList ? "active" : "")"
                                 data-book-id="@book.Id" title="Save for later">
@@ -239,11 +247,16 @@
                     <div class="book-cover">
                         @if (!string.IsNullOrWhiteSpace(book.CoverImageUrl))
                         {
-                            <img src="@book.CoverImageUrl" alt="@book.Title" />
+                            <a href="/Reader/ReadBook/@book.Id">
+                                <img src="@book.CoverImageUrl" alt="@book.Title" />
+                            </a>
                         }
                         else
                         {
-                            <div class="book-cover-ph"><i class="ti ti-book"></i></div>
+
+                            <a href="/Reader/ReadBook/@book.Id">
+                                <div class="book-cover-ph"><i class="ti ti-book"></i></div>
+                            </a>
                         }
                         <button class="btn-bookmark @(book.IsInReadingList ? "active" : "")"
                                 data-book-id="@book.Id" title="Save for later">

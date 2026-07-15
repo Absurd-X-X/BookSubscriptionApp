@@ -8,6 +8,7 @@ namespace Application.Common.Repositories
         Task AddAsync(Subscription subscription);
         Task<Subscription?> GetAsync(Guid id);
         Task<Subscription?> GetByReaderIdAsync(Guid readerId, bool isActive);
+        Task<ICollection<Subscription>> GetByReaderIdAsync(Guid readerId);
         Task<PagenatedList<Subscription>> GetSubscriptionsAsync(bool usePaging, PageRequest pageRequest);
         void Update(Subscription subscription);
     }

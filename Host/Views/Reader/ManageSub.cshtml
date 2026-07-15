@@ -1,6 +1,27 @@
-﻿@{
+﻿@model Application.Queries.GetSubscriptionByUserId.GetSubscriptionByUserIdResponse
+@{
     ViewData["Title"] = "Subscription Management";
     Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+
+    var hasActiveSub = Model.IsActive;
+    var plans = Model.AvailablePlans ?? new();
+    var history = Model.Subscription ?? new();
+
+    string TileState(Guid planId, decimal planCost)
+    {
+        if (!hasActiveSub) return "none";
+        if (planId == Model.SubscriptionTypeId) return "current";
+        return planCost < Model.Cost ? "lower" : "higher";
+    }
+
+    string CycleLabel(Domain.Enums.BillingCycle cycle) => cycle switch
+    {
+        Domain.Enums.BillingCycle.Monthly => "month",
+        Domain.Enums.BillingCycle.Quaterly => "quarter",
+        Domain.Enums.BillingCycle.SemiAnnually => "6 months",
+        Domain.Enums.BillingCycle.Yearly => "year",
+        _ => "cycle"
+    };
 }
 
 <link href="~/css/manageSub.css" rel="stylesheet" />
@@ -9,7 +30,7 @@
     <div class="main sub-page">
 
         <nav class="breadcrumb">
-            <a href="#">Dashboard</a>
+            <a asp-action="ReaderDashboard" asp-controller="Reader">Dashboard</a>
             <span class="sep">&gt;</span>
             <span class="current">Subscription</span>
         </nav>
@@ -19,6 +40,15 @@
             <p>Manage your plan, billing, and payment preferences.</p>
         </div>
 
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert-banner alert-error">@TempData["Error"]</div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert-banner alert-success">@TempData["Success"]</div>
+        }
+
         <div class="sub-grid">
 
             <div class="sub-col sub-col--left">
@@ -27,60 +57,69 @@
                 <section class="card current-plan-card">
                     <h2 class="card-title">Current Plan</h2>
 
-                    <div class="plan-row">
-                        <div class="plan-id">
-                            <div class="plan-icon plan-icon--premium">
-                                <i class="fa-solid fa-crown"></i>
+                    @if (!hasActiveSub)
+                    {
+                        <p>You don't have an active subscription. Choose a plan below to get started.</p>
+                    }
+                    else
+                    {
+                        <div class="plan-row">
+                            <div class="plan-id">
+                                <div class="plan-icon plan-icon--premium">
+                                    <i class="fa-solid fa-crown"></i>
+                                </div>
+                                <div>
+                                    <div class="plan-name">@Model.CurrentPlan Plan</div>
+                                    <div class="plan-price"><span class="amount">@Model.Cost.ToString("C")</span> / month</div>
+                                </div>
                             </div>
-                            <div>
-                                <div class="plan-name">Premium Plan</div>
-                                <div class="plan-price"><span class="amount">$49.00</span> / month</div>
-                            </div>
-                        </div>
 
-                        <div class="plan-meta">
-                            <div class="meta-item">
-                                <div class="meta-label">Status</div>
-                                <span class="badge badge--active">Active</span>
-                            </div>
-                            <div class="meta-item">
-                                <div class="meta-label">Renewal Date</div>
-                                <div class="meta-value">Jun 15, 2024</div>
-                            </div>
-                            <div class="meta-item">
-                                <div class="meta-label">Auto-Renew</div>
-                                <div class="meta-value meta-value--accent">Enabled</div>
-                            </div>
-                            <div class="meta-item">
-                                <div class="meta-label">Payment Method</div>
-                                <div class="meta-value meta-value--card">
-                                    <i class="fa-brands fa-mastercard card-brand-icon"></i>
-                                    <span>&bull;&bull;&bull;&bull; 4242</span>
+                            <div class="plan-meta">
+                                <div class="meta-item">
+                                    <div class="meta-label">Status</div>
+                                    <span class="badge badge--active">Active</span>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-label">Renewal Date</div>
+                                    <div class="meta-value">@Model.ExpiryDate.ToString("MMM d, yyyy")</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="meta-label">Auto-Renew</div>
+                                    <div class="meta-value meta-value--accent">@(Model.AutoRenew ? "Enabled" : "Disabled")</div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <ul class="feature-list">
-                        <li><i class="fa-solid fa-square-check"></i> Unlimited access to books</li>
-                        <li><i class="fa-solid fa-square-check"></i> Audiobooks included</li>
-                        <li><i class="fa-solid fa-square-check"></i> Offline reading</li>
-                        <li><i class="fa-solid fa-square-check"></i> Early access to new releases</li>
-                        <li><i class="fa-solid fa-square-check"></i> Cancel anytime</li>
-                    </ul>
+                        <ul class="feature-list">
+                            <li><i class="fa-solid fa-square-check"></i> Unlimited access to books</li>
+                            <li><i class="fa-solid fa-square-check"></i> Audiobooks included</li>
+                            <li><i class="fa-solid fa-square-check"></i> Offline reading</li>
+                            <li><i class="fa-solid fa-square-check"></i> Early access to new releases</li>
+                            <li><i class="fa-solid fa-square-check"></i> Cancel anytime</li>
+                        </ul>
 
-                    <div class="plan-actions">
-                        <button type="button" class="btn btn-primary">Upgrade Plan</button>
-                        <button type="button" class="btn btn-outline">Cancel Subscription</button>
-                    </div>
+                        <div class="plan-actions">
+                            <form asp-action="AutoRenewSub" asp-controller="Reader" method="post">
+                                <input type="hidden" name="subId" value="@Model.Id" />
+                                <input type="hidden" name="autoRenew" value="@(!Model.AutoRenew)" />
+                                <button type="submit" class="btn btn-outline">
+                                    @(Model.AutoRenew ? "Disable Auto-Renew" : "Enable Auto-Renew")
+                                </button>
+                            </form>
 
-                    <div class="notice-row">
-                        <i class="fa-regular fa-circle-info"></i>
-                        Your plan will renew automatically on Jun 15, 2024.
-                    </div>
+                            <button type="button" class="btn btn-outline">Cancel Subscription</button>
+                        </div>
+
+                        <div class="notice-row">
+                            <i class="fa-regular fa-circle-info"></i>
+                            @(Model.AutoRenew
+                                ? $"Your plan will renew automatically on {Model.ExpiryDate:MMM d, yyyy}."
+                                : $"Your plan will expire on {Model.ExpiryDate:MMM d, yyyy} and will not renew.")
+                        </div>
+                    }
                 </section>
 
-                <!-- Payment Method -->
+                <!-- Payment Method (mocked) -->
                 <section class="card payment-card">
                     <h2 class="card-title">Payment Method</h2>
 
@@ -89,7 +128,7 @@
                             <i class="fa-brands fa-mastercard card-brand-icon card-brand-icon--lg"></i>
                             <div>
                                 <div class="payment-row-top">
-                                    <span class="card-number">&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242</span>
+                                    <span class="card-number">•••• •••• •••• 4242</span>
                                     <span class="badge badge--default">Default</span>
                                 </div>
                                 <div class="payment-row-sub">Expires 12/26</div>
@@ -116,139 +155,105 @@
                 <section class="card choose-plan-card">
                     <div class="choose-plan-head">
                         <h2 class="card-title">Choose Your Plan</h2>
-                        <div class="billing-toggle">
-                            <button type="button" class="toggle-btn is-active">Monthly</button>
-                            <button type="button" class="toggle-btn">Yearly</button>
-                            <span class="save-badge">Save 20%</span>
-                        </div>
                     </div>
 
-                    <div class="plans-grid">
-                        <!-- Basic -->
-                        <div class="plan-tile">
-                            <div class="plan-tile-icon plan-tile-icon--basic">
-                                <i class="fa-solid fa-book"></i>
-                            </div>
-                            <div class="plan-tile-name">Basic</div>
-                            <div class="plan-tile-price"><span class="amount">$19.00</span> / month</div>
-                            <p class="plan-tile-desc">Perfect for getting started with your reading journey.</p>
-                            <ul class="plan-tile-features">
-                                <li><i class="fa-solid fa-check"></i> Access to library</li>
-                                <li><i class="fa-solid fa-check"></i> Basic features</li>
-                                <li><i class="fa-solid fa-check"></i> Community access</li>
-                            </ul>
-                            <button type="button" class="btn btn-outline btn-block">Choose Plan</button>
-                        </div>
+                    @if (!plans.Any())
+                    {
+                        <p>No subscription plans are available right now.</p>
+                    }
+                    else
+                    {
+                        <div class="plans-grid">
+                            @foreach (var plan in plans)
+                            {
+                                var state = TileState(plan.Id, plan.Cost);
+                                var tileClass = state == "current" ? "plan-tile plan-tile--current" : "plan-tile";
 
-                        <!-- Premium -->
-                        <div class="plan-tile plan-tile--current">
-                            <span class="popular-badge">Most Popular</span>
-                            <div class="plan-tile-icon plan-tile-icon--premium">
-                                <i class="fa-solid fa-crown"></i>
-                            </div>
-                            <div class="plan-tile-name">Premium</div>
-                            <div class="plan-tile-price"><span class="amount">$49.00</span> / month</div>
-                            <p class="plan-tile-desc">The best experience for passionate readers.</p>
-                            <ul class="plan-tile-features">
-                                <li><i class="fa-solid fa-check"></i> Everything in Basic</li>
-                                <li><i class="fa-solid fa-check"></i> Audiobooks included</li>
-                                <li><i class="fa-solid fa-check"></i> Offline reading</li>
-                                <li><i class="fa-solid fa-check"></i> Early access</li>
-                                <li><i class="fa-solid fa-check"></i> Premium support</li>
-                            </ul>
-                            <button type="button" class="btn btn-primary btn-block" disabled>Current Plan</button>
-                        </div>
+                                <div class="@tileClass">
+                                    @if (state == "current")
+                                    {
+                                        <span class="popular-badge">Current Plan</span>
+                                    }
+                                    <div class="plan-tile-icon plan-tile-icon--premium">
+                                        <i class="fa-solid fa-crown"></i>
+                                    </div>
+                                    <div class="plan-tile-name">@plan.TypeName</div>
+                                    <div class="plan-tile-price">
+                                        <span class="amount">@plan.Cost.ToString("C")</span> / @CycleLabel(plan.Cycle)
+                                    </div>
 
-                        <!-- Family -->
-                        <div class="plan-tile">
-                            <div class="plan-tile-icon plan-tile-icon--family">
-                                <i class="fa-solid fa-users"></i>
-                            </div>
-                            <div class="plan-tile-name">Family</div>
-                            <div class="plan-tile-price"><span class="amount">$79.00</span> / month</div>
-                            <p class="plan-tile-desc">Share your love of reading with your family.</p>
-                            <ul class="plan-tile-features">
-                                <li><i class="fa-solid fa-check"></i> Everything in Premium</li>
-                                <li><i class="fa-solid fa-check"></i> Up to 6 accounts</li>
-                                <li><i class="fa-solid fa-check"></i> Family library</li>
-                                <li><i class="fa-solid fa-check"></i> Parental controls</li>
-                                <li><i class="fa-solid fa-check"></i> Priority support</li>
-                            </ul>
-                            <button type="button" class="btn btn-outline btn-block">Choose Plan</button>
+                                    @switch (state)
+                                    {
+                                        case "current":
+                                            <button type="button" class="btn btn-primary btn-block" disabled>Current Plan</button>
+                                            break;
+                                        default:
+                                            <form asp-action="Subscribe" asp-controller="Reader" method="post">
+                                                <input type="hidden" name="userId" value="@Model.ReaderId" />
+                                                <input type="hidden" name="subTypeId" value="@plan.Id" />
+                                                <button type="submit" class="btn @(state == "higher" || state == "none" ? "btn-primary" : "btn-outline") btn-block">
+                                                    @(state == "lower" ? "Change Now" : state == "higher" ? "Upgrade" : "Choose Plan")
+                                                </button>
+                                            </form>
+                                            break;
+                                    }
+                                </div>
+                            }
                         </div>
-                    </div>
+                    }
 
-                    <div class="plans-footnote">All plans include a 7-day free trial. Cancel anytime.</div>
+                    <div class="plans-footnote">Switching plans takes effect immediately.</div>
                 </section>
 
-                <!-- Billing History -->
+                <!-- Subscription History -->
                 <section class="card billing-card">
                     <div class="card-head-row">
-                        <h2 class="card-title">Billing History</h2>
-                        <a href="#" class="view-all-link">View all</a>
+                        <h2 class="card-title">Subscription History</h2>
                     </div>
 
-                    <table class="billing-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Description</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Invoice</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>May 15, 2024</td>
-                                <td>Premium Plan &ndash; Monthly</td>
-                                <td>$49.00</td>
-                                <td><span class="badge badge--paid">Paid</span></td>
-                                <td><i class="fa-regular fa-eye invoice-icon"></i></td>
-                            </tr>
-                            <tr>
-                                <td>Apr 15, 2024</td>
-                                <td>Premium Plan &ndash; Monthly</td>
-                                <td>$49.00</td>
-                                <td><span class="badge badge--paid">Paid</span></td>
-                                <td><i class="fa-regular fa-eye invoice-icon"></i></td>
-                            </tr>
-                            <tr>
-                                <td>Mar 15, 2024</td>
-                                <td>Premium Plan &ndash; Monthly</td>
-                                <td>$49.00</td>
-                                <td><span class="badge badge--paid">Paid</span></td>
-                                <td><i class="fa-regular fa-eye invoice-icon"></i></td>
-                            </tr>
-                            <tr>
-                                <td>Feb 15, 2024</td>
-                                <td>Premium Plan &ndash; Monthly</td>
-                                <td>$49.00</td>
-                                <td><span class="badge badge--paid">Paid</span></td>
-                                <td><i class="fa-regular fa-eye invoice-icon"></i></td>
-                            </tr>
-                            <tr>
-                                <td>Jan 15, 2024</td>
-                                <td>Premium Plan &ndash; Monthly</td>
-                                <td>$49.00</td>
-                                <td><span class="badge badge--paid">Paid</span></td>
-                                <td><i class="fa-regular fa-eye invoice-icon"></i></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="billing-table-footer">
-                        <a href="#" class="view-history-link">View full billing history <i class="fa-solid fa-arrow-right"></i></a>
-                    </div>
+                    @if (!history.Any())
+                    {
+                        <p>No subscription history yet.</p>
+                    }
+                    else
+                    {
+                        <table class="billing-table">
+                            <thead>
+                                <tr>
+                                    <th>Plan</th>
+                                    <th>Amount</th>
+                                    <th>Subscribed On</th>
+                                    <th>Expiry</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var h in history.OrderByDescending(x => x.Types.SubscriptionDate))
+                                {
+                                    <tr>
+                                        <td>@h.Types.TypeName</td>
+                                        <td>@h.Types.Cost.ToString("C")</td>
+                                        <td>@h.Types.SubscriptionDate.ToString("MMM d, yyyy")</td>
+                                        <td>@h.Types.ExpiryDate.ToString("MMM d, yyyy")</td>
+                                        <td>
+                                            <span class="badge @(h.IsActive ? "badge--paid" : "badge--default")">
+                                                @(h.IsActive ? "Active" : "Expired")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
                 </section>
 
             </div>
 
         </div>
 
-        <!-- Premium Benefits -->
+        <!-- Premium Benefits (mocked) -->
         <section class="card benefits-card">
-            <h2 class="card-title">Your Premium Benefits</h2>
+            <h2 class="card-title">Premium Benefits</h2>
             <div class="benefits-grid">
                 <div class="benefit-item">
                     <div class="benefit-icon"><i class="fa-solid fa-book-open"></i></div>
@@ -304,4 +309,3 @@
 
     </div>
 </div>
-

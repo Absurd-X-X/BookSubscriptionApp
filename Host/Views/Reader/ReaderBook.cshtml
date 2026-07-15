@@ -1,0 +1,296 @@
+﻿@using static Application.Queries.GetBookById
+@model GetBookByIdResponse
+
+@{
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+    ViewData["Title"] = "Get Book";
+
+    string GetInitials(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "??";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0].Length >= 2 ? parts[0].Substring(0, 2).ToUpper() : parts[0].ToUpper();
+        return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+    }
+
+    string[] avatarClasses = { "av-purple", "av-teal", "av-blue", "av-orange", "av-brown" };
+}
+<link href="~/css/getLibraryBook.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<!-- Book Header -->
+<div class="book-header">
+    <div class="book-cover-wrap">
+        @if (!string.IsNullOrWhiteSpace(Model.BookCoverUrl))
+        {
+            <img class="book-cover-img" src="@Model.BookCoverUrl" alt="@Model.Title cover" />
+        }
+        else
+        {
+            <div class="book-cover-img">
+                <div class="cover-placeholder">
+                    <div class="cover-main">@Model.Title</div>
+                    <div class="cover-author">@Model.Author</div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="book-header-info">
+        <h1 class="book-title">@Model.Title</h1>
+        <p class="book-author">@Model.Author</p>
+        <div class="book-badges">
+            <span class="badge @(Model.IsActive ? "badge-red" : "badge-green")">@(Model.IsActive ? "Archived" : "Published")</span>
+            <span class="badge badge-purple">@Model.CategoryName</span>
+            <span class="badge-date">&#128197; Added on @Model.AddedDate.ToString("MMM d, yyyy")</span>
+        </div>
+        <div class="book-rating">
+            <span class="star-icon">&#9733;</span>
+            <span class="rating-val">@Model.AverageRating</span>
+            <span class="rating-count">(@Model.TotalReviewCount reviews)</span>
+        </div>
+        <div class="book-stats">
+            <div class="stat-box">
+                <span class="stat-icon si-blue">&#128218;</span>
+                <div>
+                    <div class="stat-val">@Model.Engagement%</div>
+                    <div class="stat-lbl">Engagement</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="tab-nav">
+    <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
+    <button class="tab-btn" data-tab="analytics" onclick="switchTab('analytics')">Analytics</button>
+    <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')">Reviews <span class="tab-count">@Model.TotalReviewCount</span></button>
+    <button class="tab-btn" data-tab="revenue" onclick="switchTab('revenue')">Revenue</button>
+</div>
+
+<!-- ===== TAB: Overview ===== -->
+<div class="tab-pane active" id="tab-overview">
+    <div class="two-col">
+        <div class="main-col">
+
+            <div class="card">
+                <h2 class="card-title">About the Book</h2>
+                <div class="book-meta-grid">
+                    <div class="meta-item"><span class="meta-lbl">Category</span><span class="meta-val">@Model.CategoryName</span></div>
+                    <div class="meta-item"><span class="meta-lbl">ISBN</span><span class="meta-val">@Model.Isbn</span></div>
+                    <div class="meta-item"><span class="meta-lbl">Genre</span><span class="meta-val">@Model.Genre</span></div>
+                    <div class="meta-item"><span class="meta-lbl">Publication Year</span><span class="meta-val">@Model.PublicationYear</span></div>
+                    <div class="meta-item"><span class="meta-lbl">Library</span><span class="meta-val">@Model.LibraryName</span></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header-row">
+                    <h2 class="card-title">Recent Reviews</h2>
+                    <a href="#" class="view-all-link" onclick="switchTab('reviews');return false;">View all</a>
+                </div>
+                <div class="review-list">
+                    @{
+                        int reviewIdx = 0;
+                    }
+                    @foreach (var review in Model.RecentBookReviews)
+                    {
+                        var avClass = avatarClasses[reviewIdx % avatarClasses.Length];
+                        var initials = GetInitials(review.Reader.Name);
+                        var stars = Math.Clamp(review.Rating, 0, 5);
+                        reviewIdx++;
+                        <div class="review-item">
+                            <div class="avatar @avClass">@initials</div>
+                            <div class="review-body">
+                                <div class="review-top">
+                                    <span class="reviewer-name">@review.Reader.Name</span>
+                                    <span class="review-stars">@(new string('★', stars) + new string('☆', 5 - stars))</span>
+                                    <span class="review-age">@review.DateCreated.ToString("MMM d, yyyy")</span>
+                                </div>
+                                <p class="review-text">@review.Comment</p>
+                            </div>
+                        </div>
+                    }
+                    @if (!Model.RecentBookReviews.Any())
+                    {
+                        <p class="review-text">No reviews yet.</p>
+                    }
+                </div>
+                <button class="view-all-btn" onclick="switchTab('reviews')">View all @Model.TotalReviewCount reviews</button>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Book File</h2>
+                <div class="file-list">
+                    <div class="file-item">
+                        <div class="file-icon fi-red">FILE</div>
+                        <div class="file-info">
+                            <div class="file-name">@Model.Title</div>
+                            <div class="file-meta">Uploaded on @Model.AddedDate.ToString("MMM d, yyyy")</div>
+                        </div>
+                        <div class="file-actions">
+                            <a class="icon-btn" href="@Model.BookFileUrl" title="Download">&#8595;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="side-col">
+            <div class="card">
+                <h2 class="card-title">Quick Actions</h2>
+                <div class="quick-actions">
+                    <div class="qa-item" onclick="window.location.href='@Url.Action("EditBook", "Book", new { id = Model.BookId })'">
+                        <span class="qa-icon qa-purple">&#9998;</span>
+                        <div class="qa-info">
+                            <div class="qa-title">Edit Book Information</div>
+                            <div class="qa-desc">Update title, description, categories and more</div>
+                        </div>
+                        <span class="qa-arrow">&#8250;</span>
+                    </div>
+                    <div class="qa-item">
+                        <span class="qa-icon qa-blue">&#8679;</span>
+                        <div class="qa-info">
+                            <div class="qa-title">Upload New Version</div>
+                            <div class="qa-desc">Upload a new file to replace current book</div>
+                        </div>
+                        <span class="qa-arrow">&#8250;</span>
+                    </div>
+                    <div class="qa-item">
+                        <span class="qa-icon qa-green">&#9647;</span>
+                        <div class="qa-info">
+                            <div class="qa-title">Duplicate Book</div>
+                            <div class="qa-desc">Create a copy of this book</div>
+                        </div>
+                        <span class="qa-arrow">&#8250;</span>
+                    </div>
+                    <div class="qa-item qa-danger">
+                        <span class="qa-icon qa-red">&#128190;</span>
+                        <div class="qa-info">
+                            <div class="qa-title qa-title-red">Archive Book</div>
+                            <div class="qa-desc">Hide this book from the public</div>
+                        </div>
+                        <span class="qa-arrow">&#8250;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TAB: Analytics ===== -->
+<div class="tab-pane" id="tab-analytics">
+    <div class="two-col-wide">
+
+        <div class="card">
+            <div class="card-header-row">
+                <h2 class="card-title">Reading Trend <span class="card-title-sub">(30 Days)</span></h2>
+                <select class="mini-select"><option>30 Days</option><option>7 Days</option><option>90 Days</option></select>
+            </div>
+            <canvas id="trendChart" height="350" width="1100"></canvas>
+        </div>
+
+        <div class="card reader-insights-card">
+            <h2 class="card-title">Reader Insights</h2>
+            <div class="insight-item">
+                <div class="insight-icon ii-purple">&#128101;</div>
+                <div class="insight-info">
+                    <div class="insight-lbl">Total Readers</div>
+                    <div class="insight-val">@Model.TotalReviewCount</div>
+                </div>
+            </div>
+            <div class="insight-item">
+                <div class="insight-icon ii-green">&#128100;</div>
+                <div class="insight-info">
+                    <div class="insight-lbl">Engagement Rate</div>
+                    <div class="insight-val">@Model.Engagement%</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card">
+        <h2 class="card-title">Reader Demographics <span class="card-title-sub">(By Country)</span></h2>
+        <p style="color:#7878a0;font-size:13px">Demographic tracking isn't available yet for this book.</p>
+    </div>
+</div>
+
+<!-- ===== TAB: Reviews ===== -->
+<div class="tab-pane" id="tab-reviews">
+
+    <div class="two-col">
+        <div class="card">
+            <h2 class="card-title">Average Rating</h2>
+            <div class="avg-rating-wrap">
+                <div class="avg-big">
+                    <div class="avg-num">@Model.AverageRating</div>
+                    <div class="avg-stars">@(new string('★', (int)Math.Round(Model.AverageRating)))</div>
+                    <div class="avg-based">Based on @Model.TotalReviewCount reviews</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Review Overview</h2>
+            <div class="review-ov-grid">
+                <div class="rov-item">
+                    <div class="rov-label">Total Reviews</div>
+                    <div class="rov-val">@Model.TotalReviewCount</div>
+                </div>
+                <div class="rov-item">
+                    <div class="rov-label">Avg. Rating</div>
+                    <div class="rov-val">@Model.AverageRating / 5</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 class="card-title">Recent Reviews</h2>
+        <div class="review-list">
+            @{
+                int reviewIdx2 = 0;
+            }
+            @foreach (var review in Model.RecentBookReviews)
+            {
+                var avClass = avatarClasses[reviewIdx2 % avatarClasses.Length];
+                var initials = GetInitials(review.Reader.Name);
+                var stars = Math.Clamp(review.Rating, 0, 5);
+                reviewIdx2++;
+                <div class="review-item">
+                    <div class="avatar @avClass">@initials</div>
+                    <div class="review-body">
+                        <div class="review-top">
+                            <span class="reviewer-name">@review.Reader.Name</span>
+                            <span class="review-stars">@(new string('★', stars) + new string('☆', 5 - stars))</span>
+                            <span class="review-age">@review.DateCreated.ToString("MMM d, yyyy")</span>
+                        </div>
+                        <p class="review-text">@review.Comment</p>
+                    </div>
+                </div>
+            }
+            @if (!Model.RecentBookReviews.Any())
+            {
+                <p class="review-text">No reviews yet.</p>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ===== TAB: Revenue ===== -->
+<div class="tab-pane" id="tab-revenue">
+    <div class="card">
+        <h2 class="card-title">Revenue Overview</h2>
+        <p style="color:#7878a0;font-size:13px">Revenue tracking isn't available yet for this book.</p>
+    </div>
+</div>
+
+<script>
+    function switchTab(tab) {
+    document.querySelectorAll('.tab-pane').forEach(function (p) { p.classList.remove('active'); });
+    document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.querySelector('.tab-btn[data-tab="' + tab + '"]').classList.add('active');
+    }
+</script>

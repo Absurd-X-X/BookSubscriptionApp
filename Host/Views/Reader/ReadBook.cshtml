@@ -1,5 +1,6 @@
 ﻿@model Application.Queries.GetBookForReading.GetBookForReadingResponse
 @{
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
     ViewData["Title"] = Model.Title;
 }
 
@@ -144,8 +145,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/epubjs/0.3.93/epub.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
     window.BOOK = {
     id: "@Model.Id",
@@ -159,9 +159,17 @@
     allowDownload: @Model.AllowDownload.ToString().ToLower(),
     allowPrint: @Model.AllowPrint.ToString().ToLower(),
     allowCopyPaste: @Model.AllowCopyPaste.ToString().ToLower()
-};
-</script>
-<script>
+    };
+
+    // Normalized once, used everywhere instead of raw BOOK.fileType
+    const FILE_TYPE = BOOK.fileType.toLowerCase();
+
+    ['bookmarkBtn','searchInput','themeGroup','widthGroup','lineHeightGroup',
+    'scrollModeGroup','incBtn','decBtn','fontFamily','marginsToggle',
+    'settingsToggle','closeSettings','prevBtn','nextBtn','prevBtnBottom',
+    'nextBtnBottom','progressSlider','fullscreenBtn','retryBtn']
+    .forEach(id => { if (!document.getElementById(id)) console.error('Missing element:', id); });
+
     const settings = {
     theme: 'light',
     fontSize: 18,
@@ -208,14 +216,18 @@
     /* ---------------------------------------------------------
     Open book (EPUB or PDF)
     --------------------------------------------------------- */
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
     async function openBook() {
     viewerLoading.style.display = 'flex';
     viewerError.style.display = 'none';
 
     try {
-    if (BOOK.fileType === 'epub') {
+    if (FILE_TYPE === 'epub') {
     await openEpub();
-    } else if (BOOK.fileType === 'pdf') {
+    } else if (FILE_TYPE === 'pdf') {
     await openPdf();
     } else {
     throw new Error('Unsupported file type: ' + BOOK.fileType);
@@ -376,7 +388,7 @@
 
     el('progressSlider').addEventListener('change', (e) => {
     const val = Number(e.target.value);
-    if (BOOK.fileType === 'pdf') {
+    if (FILE_TYPE === 'pdf') {
     renderPdfPage(val);
     } else if (epubBook) {
     const cfi = epubBook.locations.cfiFromPercentage(val / 100);
@@ -412,8 +424,8 @@
     }
 
     function refreshRender() {
-    if (BOOK.fileType === 'epub') applyEpubTheme();
-    else if (BOOK.fileType === 'pdf') renderPdfPage(pdfCurrentPage);
+    if (FILE_TYPE === 'epub') applyEpubTheme();
+    else if (FILE_TYPE === 'pdf') renderPdfPage(pdfCurrentPage);
     }
 
     function bindOptGroup(groupId, dataAttr, settingKey, onChange) {
@@ -434,7 +446,7 @@
     settings.lineHeight = parseFloat(settings.lineHeight);
     });
     bindOptGroup('scrollModeGroup', 'scroll', 'scrollMode', () => {
-    if (BOOK.fileType === 'epub' && epubRendition) {
+    if (FILE_TYPE === 'epub' && epubRendition) {
     epubRendition.flow(settings.scrollMode === 'scrollable' ? 'scrolled-doc' : 'paginated');
     }
     });
@@ -464,7 +476,7 @@
     --------------------------------------------------------- */
     async function loadBookmarks() {
     try {
-    const res = await fetch('/Reader/Bookmarks');
+    const res = await fetch('/Reader/GetAllBookmark');
     const json = await res.json();
     if (json.status && json.data) {
     renderBookmarks(json.data.filter(b => b.bookId === BOOK.id));
@@ -491,7 +503,7 @@
     jumpBtn.className = 'bookmark-jump';
     jumpBtn.textContent = 'Go';
     jumpBtn.addEventListener('click', () => {
-    if (BOOK.fileType === 'pdf') renderPdfPage(b.pageNumber);
+    if (FILE_TYPE === 'pdf') renderPdfPage(b.pageNumber);
     });
     div.appendChild(jumpBtn);
 
@@ -516,7 +528,7 @@
     }
 
     el('bookmarkBtn').addEventListener('click', async () => {
-    const pageNumber = BOOK.fileType === 'pdf'
+    const pageNumber = FILE_TYPE === 'pdf'
     ? pdfCurrentPage
     : Math.round((epubBook.locations.percentageFromCfi(epubRendition.location.start.cfi) || 0) * 100);
 
@@ -574,9 +586,9 @@
     panel.innerHTML = '<div class="search-loading">Searching...</div>';
 
     let results = [];
-    if (BOOK.fileType === 'epub') {
+    if (FILE_TYPE === 'epub') {
     results = await searchEpub(query);
-    } else if (BOOK.fileType === 'pdf') {
+    } else if (FILE_TYPE === 'pdf') {
     results = await searchPdf(query);
     }
 
@@ -631,7 +643,7 @@
     item.className = 'search-result-item';
     item.textContent = r.label;
     item.addEventListener('click', () => {
-    if (BOOK.fileType === 'epub') {
+    if (FILE_TYPE === 'epub') {
     epubRendition.display(r.target);
     } else {
     renderPdfPage(r.target);
@@ -688,7 +700,6 @@
     'RequestVerificationToken': window.ANTIFORGERY_TOKEN
     },
     body: JSON.stringify({
-    readerId: BOOK.readerId,
     bookId: BOOK.id,
     currentPage: payload.currentPage,
     cfi: payload.cfi,
@@ -697,6 +708,17 @@
     minutesRead,
     pagesRead: 1
     })
+    });
+
+    console.log({
+    readerId: BOOK.readerId,
+    bookId: BOOK.id,
+    currentPage: payload.currentPage,
+    cfi: payload.cfi,
+    currentChapter: payload.currentChapter,
+    progressPercentage: payload.progressPercentage,
+    minutesRead,
+    pagesRead: 1
     });
 
     if (res.status === 401) {

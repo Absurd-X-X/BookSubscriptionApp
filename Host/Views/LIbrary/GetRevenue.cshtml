@@ -246,13 +246,13 @@
                         </div>
                     </div>
                 </div>
-                <a href="@Url.Action("PayoutHistory")" class="vl">View payout history →</a>
+                <a href="@Url.Action("GetWallet", "Library")" class="vl">View payout history →</a>
             </div>
 
             <div class="card">
                 <div class="va">
                     <span class="ct">Top Earning Books <span class="info-i">ⓘ</span></span>
-                    <a href="@Url.Action("TopBooks")" class="vl">View All →</a>
+                    <a href="@Url.Action("TopPerformingBooks", "Library")" class="vl">View All →</a>
                 </div>
 
                 @if (Model.TopEarningBooks == null || !Model.TopEarningBooks.Any())
@@ -300,7 +300,7 @@
                     <span class="ct">Quick Actions</span>
                 </div>
                 <div class="qa-list">
-                    <button class="ai" onclick="location.href='@Url.Action("PayoutHistory")'">
+                    <button class="ai" onclick="location.href='@Url.Action("GetWallet", "Library")'">
                         <div class="ai-ico"><i class="ti ti-calendar"></i></div>
                         View Payout History
                         <i class="ti ti-chevron-right ai-chev"></i>
@@ -310,12 +310,12 @@
                         Download Earnings Report
                         <i class="ti ti-chevron-right ai-chev"></i>
                     </button>
-                    <button class="ai" onclick="location.href='@Url.Action("TopBooks")'">
+                    <button class="ai" onclick="location.href='@Url.Action("TopPerformingBooks")'">
                         <div class="ai-ico"><i class="ti ti-chart-bar"></i></div>
                         View Top Books
                         <i class="ti ti-chevron-right ai-chev"></i>
                     </button>
-                    <button class="ai" onclick="location.href='@Url.Action("ContactSupport")'">
+                    <button class="ai">
                         <div class="ai-ico"><i class="ti ti-headset"></i></div>
                         Contact Super Admin (Support)
                         <i class="ti ti-chevron-right ai-chev"></i>
@@ -325,7 +325,7 @@
                     <div class="sup-icon"><i class="ti ti-gift"></i></div>
                     <p>Have questions about your earnings?</p>
                     <small>Create a support ticket and the Super Admin will get back to you.</small>
-                    <button class="btn-tkt" onclick="location.href='@Url.Action("CreateTicket", "Support")'">
+                    <button class="btn-tkt" onclick="location.href='#'">
                         Create Support Ticket
                     </button>
                 </div>
@@ -336,7 +336,7 @@
         <div class="card">
             <div class="va">
                 <span class="ct">Transaction History <span class="info-i">ⓘ</span></span>
-                <a href="@Url.Action("PayoutHistory")" class="vl">View All →</a>
+                <a href="@Url.Action("GetWallet", "Library")" class="vl">View All →</a>
             </div>
 
             @if (Model.RecentTransactions == null || !Model.RecentTransactions.Items.Any())

@@ -4,10 +4,13 @@ using Application.Common.Dtos;
 using Application.Common.Pagenation;
 using Application.Queries;
 using Application.Query;
+using Application.ViewModels;
+using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Web.Helpers;
 using static Application.Command.AddBook;
+using static Application.Commands.ArchiveBook;
 using static Application.Commands.MarkAllNotificationsRead;
 using static Application.Commands.MarkNotificationRead;
 using static Application.Commands.UploadProfilePIcs;
@@ -21,7 +24,11 @@ using static Application.Queries.GetLibraryAnalytics.GetLibraryAnalyticsHandler;
 using static Application.Queries.GetLibraryAuditLogs;
 using static Application.Queries.GetLibraryById;
 using static Application.Queries.GetLibraryDashboard;
+using static Application.Queries.GetPendingTransaction;
 using static Application.Queries.GetReviewById;
+using static Application.Queries.GetTransactionByTransactionStatus;
+using static Application.Queries.GetTransactions;
+using static Application.Queries.GetWalletBalance;
 
 namespace Host.Controllers
 {
@@ -63,13 +70,13 @@ namespace Host.Controllers
             if (bookFile is null || bookFile.Length == 0)
             {
                 TempData["Error"] = "Please select a book file to upload.";
-                return RedirectToAction(nameof(AddBook));
+                return RedirectToAction(nameof(LibraryDashboard));
             }
 
             if (bookCover is null || bookCover.Length == 0)
             {
                 TempData["Error"] = "Please select a book cover image to upload.";
-                return RedirectToAction(nameof(AddBook));
+                return RedirectToAction(nameof(LibraryDashboard));
             }
 
             var userId = ClaimsHelper.GetUserId(User);
@@ -108,7 +115,7 @@ namespace Host.Controllers
             }
 
             TempData["Success"] = result.Message;
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(LibraryDashboard));
         }
 
 
@@ -178,6 +185,78 @@ namespace Host.Controllers
             TempData["Success"] = result.Message;
             return View(result.Data);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ArchiveBook(Guid bookId)
+        {
+            var res = await mediator.Send(new ArchiveBookCommand(bookId));
+
+            if (!res.Status)
+            {
+                TempData["Error"] = res.Message;
+                return RedirectToAction(nameof(GetLibraryBooks));
+            }
+
+            TempData["Success"] = res.Message;
+            return RedirectToAction(nameof(GetLibraryBooks));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LibrarySettings()
+        {
+            var userId = ClaimsHelper.GetUserId(User);
+
+            var result = await mediator.Send(new GetPersonalSettings.GetPersonalSettingsQuery(userId));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction(nameof(LibrarySettings));
+            }
+
+            return View(result.Data);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProfile(
+            string fullName, string email, string username, string? bio, IFormFile? avatarFile)
+        {
+            var userId = ClaimsHelper.GetUserId(User);
+
+            Stream? avatarStream = avatarFile != null ? avatarFile.OpenReadStream() : null;
+
+            var command = new UpdatePersonalSettings.UpdatePersonalSettingsCommand(
+                userId, fullName, email, username, bio,
+                avatarFile?.FileName, avatarStream);
+
+            var result = await mediator.Send(command);
+
+            return Json(new { success = result.Status, message = result.Message, avatarUrl = result.Data });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> TopPerformingBooks(int page = 1, int pageSize = 10)
+        {
+            var libraryId = ClaimsHelper.GetCustomerId(User);
+
+            var result = await mediator.Send(new GetTopPerformingBooks.GetTopPerformingBooksQuery(libraryId, page, pageSize));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return View(new PagenatedList<GetTopPerformingBooks.TopPerformingBookDto>
+                {
+                    Items = new List<GetTopPerformingBooks.TopPerformingBookDto>(),
+                    Page = page,
+                    PageSize = pageSize,
+                    TotalCount = 0
+                });
+            }
+
+            return View(result.Data);
+        }
+
         [HttpGet]
 
         public async Task<IActionResult> LibraryDashboard()
@@ -244,7 +323,6 @@ namespace Host.Controllers
         }
 
         [HttpGet]
-
         public async Task<IActionResult> GetLibraryBook(Guid bookId)
         {
             var result = await mediator.Send(new GetBookByIdQuery(bookId));
@@ -266,7 +344,7 @@ namespace Host.Controllers
             if (!result.Status)
             {
                 TempData["Error"] = result.Message;
-                return RedirectToAction("Books", "Library");
+                return RedirectToAction("GetLibraryBooks", "Library");
             }
 
             return View(result.Data);
@@ -350,10 +428,17 @@ namespace Host.Controllers
         }
 
         [HttpGet]
-
-        public async Task<IActionResult> PreviewBook()
+        public async Task<IActionResult> PreviewBook(Guid bookId)
         {
-            return View();
+            var result = await mediator.Send(new GetBookByIdQuery(bookId));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return RedirectToAction(nameof(GetLibraryBooks));
+            }
+            TempData["Success"] = result.Message;
+            return View(result.Data);
         }
 
         [HttpGet]
@@ -553,20 +638,6 @@ namespace Host.Controllers
             return View();
         }
 
-        [HttpGet]
-
-        public async Task<IActionResult> LibrarySettings()
-        {
-            return View();
-        }
-
-        [HttpGet]
-
-        public async Task<IActionResult> TopPerformingBooks()
-        {
-            return View();
-        }
-
 
         [HttpGet]
         public async Task<IActionResult> GetConversations()
@@ -581,6 +652,41 @@ namespace Host.Controllers
             }
 
             return View(result.Data);
+        }
+
+
+        public async Task<IActionResult> GetWallet(
+            int txPage = 1,
+            int creditPage = 1,
+            int debitPage = 1,
+            int pendingPage = 1,
+            int pageSize = 3)
+        {
+            var customerId = ClaimsHelper.GetCustomerId(User);
+
+            var balance = await mediator.Send(new GetWalletBalanceQuery(customerId));
+
+            var transactionHistory = await mediator.Send(new GetTransactionsQuery(txPage, pageSize));
+
+            var transactionStatus = await mediator.Send(new GetTransactionByTypeQuery(creditPage, pageSize, TransactionType.Credit));
+
+            var transactionStatusDebit = await mediator.Send(new GetTransactionByTypeQuery(debitPage, pageSize, TransactionType.Debit));
+
+            var transactionTypes = await mediator.Send(new GetPendingTransactionQuery(pendingPage, pageSize, WalletTransactionStatus.Pending));
+
+            var walletFullDetails = new WalletFullData
+            {
+                Transactions = transactionHistory.Data!,
+                TransactionStatusDebit = transactionStatusDebit.Data!,
+                TransactionStatusCredit = transactionStatus.Data!,
+                PendingTransactionStatus = transactionTypes.Data!,
+                WalletBalance = balance.Data!
+            };
+
+            ViewBag.Balance = balance.Data?.Balance ?? 0;
+            ViewBag.WalletId = balance.Data?.WalletId;
+
+            return View(walletFullDetails);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Application.Command
         {
             public async Task<Result<string>> Handle(SubscribeCommand request, CancellationToken cancellationToken)
             {
-                var user = await userRepository.GetAsync( request.UserId );
+                var user = await userRepository.GetAsync(request.UserId);
                 if (user is null)
                     return Result<string>.Failure("User not found");
 
@@ -34,7 +34,7 @@ namespace Application.Command
                 if (reader is null)
                     return Result<string>.Failure("Reader not found");
 
-               var subscriptionType = await subscriptionTypeRepository.GetByIdAsync(request.SubscriptionTypeId);
+                var subscriptionType = await subscriptionTypeRepository.GetByIdAsync(request.SubscriptionTypeId);
 
                 if (subscriptionType is null)
                     return Result<string>.Failure("Subscription type not found");
@@ -49,44 +49,43 @@ namespace Application.Command
                     return Result<string>.Failure("Admin not found");
                 }
 
-                user.Wallet.Balance -= subscriptionType.Cost;
-                getAdmin.Wallet!.Balance += subscriptionType.Cost;
-                subscriptionType.SubscriptionDate = DateTime.UtcNow;
-
                 var sub = await subscriptionRepository.GetByReaderIdAsync(reader.Id, true);
 
                 if (sub is not null)
                 {
-                    var date = DateTime.UtcNow - sub.Types.ExpiryDate;
+                    if (sub.SubscriptionTypeId == request.SubscriptionTypeId)
+                    {
+                        return Result<string>.Failure("You are already subscribed to this plan");
+                    }
 
-                    return Result<string>.Failure($"You still have an active subsription" +
-                        $" which will expire in the next {date.Days} day(s)");
+                    sub.IsActive = false;
                 }
+
+                user.Wallet.Balance -= subscriptionType.Cost;
+                getAdmin.Wallet!.Balance += subscriptionType.Cost;
+                subscriptionType.SubscriptionDate = DateTime.UtcNow;
 
                 var subscription = subscriptionRepository.AddAsync(new Subscription
                 {
-                     AutoRenewal = false,
-                     CreatedBy = reader.Email,
-                     IsActive = true,
-                     ReaderId = reader.Id,
-                     SubscriptionTypeId = request.SubscriptionTypeId
+                    AutoRenewal = false,
+                    CreatedBy = reader.Email,
+                    IsActive = true,
+                    ReaderId = reader.Id,
+                    SubscriptionTypeId = request.SubscriptionTypeId
                 });
 
-                
-
-
-
                 string? ipAddress = httpContextAccessor
-                .HttpContext?
-                .Connection
-                .RemoteIpAddress?
-                .ToString();
-
+                    .HttpContext?
+                    .Connection
+                    .RemoteIpAddress?
+                    .ToString();
 
                 var audit = new AuditLog
                 {
-                    ActionType = "Subscribe",
-                    Description = $"Subscription created successfully",
+                    ActionType = sub is not null ? "SwitchSubscription" : "Subscribe",
+                    Description = sub is not null
+                        ? $"Switched subscription plan"
+                        : $"Subscription created successfully",
                     Icon = "👆",
                     IpAddress = ipAddress!,
                     UserRole = user.Role,

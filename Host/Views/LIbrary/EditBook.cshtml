@@ -17,7 +17,7 @@
             </nav>
             <div class="topline-actions">
                 <button type="button" class="btn btn-ghost">···</button>
-                <a href="@Url.Action("PreviewBook", "Library", new { id = Model.BookId })" class="btn btn-outline">👁 Preview Book</a>
+                <a href="/Library/PreviewBook/@Model.BookId" class="btn btn-outline">👁 Preview Book</a>
                 <button type="submit" class="btn btn-primary">✎ Save Changes</button>
             </div>
         </div>
@@ -194,9 +194,9 @@
 
                     <div class="card">
                         <h3>Quick Actions</h3>
-                        <a class="action-row" href="@Url.Action("DuplicateBook", "Library", new { id = Model.BookId })"><span class="a-ic">⧉</span><div><b>Duplicate Book</b><small class="muted">Create a copy of this book</small></div><span class="chev">›</span></a>
+                        <a class="action-row" href="#"><span class="a-ic">⧉</span><div><b>Duplicate Book</b><small class="muted">Create a copy of this book</small></div><span class="chev">›</span></a>
                         <a class="action-row" href="@Url.Action("ArchiveBook", "Library", new { id = Model.BookId })"><span class="a-ic">🗑</span><div><b>Archive Book</b><small class="muted">Hide this book from the public</small></div><span class="chev">›</span></a>
-                        <a class="action-row danger" href="@Url.Action("DeleteBook", "Library", new { id = Model.BookId })"><span class="a-ic">🗑</span><div><b>Delete Book</b><small class="muted">Permanently delete this book</small></div><span class="chev">›</span></a>
+                        <a class="action-row danger" href="@Url.Action("ArchiveBook", "Library", new { id = Model.BookId })"><span class="a-ic">🗑</span><div><b>Delete Book</b><small class="muted">Permanently delete this book</small></div><span class="chev">›</span></a>
                     </div>
                 </div>
             </div>
@@ -204,7 +204,7 @@
             <div class="card">
                 <div class="card-head">
                     <div><h3>Files &amp; Versions</h3><small class="muted">Manage your book files and versions.</small></div>
-                    <a class="btn btn-primary" href="@Url.Action("UploadVersion", "Library", new { id = Model.BookId })">+ Upload New Version</a>
+                    <a class="btn btn-primary" href="#">+ Upload New Version</a>
                 </div>
                 <table class="data-table">
                     <thead><tr><th>File Name</th><th>Version</th><th>Type</th><th>Size</th><th>Uploaded On</th><th>Status</th><th>Actions</th></tr></thead>
@@ -286,7 +286,6 @@
                         <label class="checkbox @(Model.LimitToOneDevice ? "checked" : "")"><input type="checkbox" asp-for="LimitToOneDevice"><div><b>Limit to 1 Device</b><small class="muted">Limit the book to be read on only 1 device.</small></div></label>
                         <div class="toggle-row"><div><b>Drip Content (Optional)</b><small class="muted">Release book chapters gradually over time.</small></div><span class="switch @(Model.DripContent ? "on" : "")" data-target="DripContent"></span></div>
                         <input type="hidden" asp-for="DripContent" id="DripContent" />
-                        <div class="upgrade-box">🔒 <div><b class="up-link">Upgrade to Pro to use drip content</b><small class="muted">This feature is available on our Pro plan.</small><br><a class="btn btn-primary" href="@Url.Action("UpgradePlan", "Library")">Upgrade Plan</a></div></div>
                     </div>
 
                     <div class="card">
@@ -343,7 +342,7 @@
                             <div class="af-row"><span class="muted">Uploaded By</span><span>👤 @Model.CurrentFile.UploadedBy</span></div>
                         </div>
                     </div>
-                    <div class="btn-pair"><a class="btn btn-primary" href="@Model.CurrentFile.Url" target="_blank">👁 Open File</a><a class="btn btn-outline" href="@Model.CurrentFile.Url" download>⬇ Download</a></div>
+                    <div class="btn-pair"><a class="btn btn-primary" href="/Reader/ReadBook/@Model.BookId">👁 Open File</a><a class="btn btn-outline" href="@Model.CurrentFile.Url" download>⬇ Download</a></div>
                 </div>
 
                 <div class="card">
@@ -365,7 +364,7 @@
                         <div class="upload-fields">
                             <div class="field"><label>Version Number <em>*</em></label><input value="@Model.NextVersionNumber" disabled></div>
                             <div class="field"><label>Release Notes</label><textarea rows="3" placeholder="Describe the changes in this version..." disabled></textarea><small class="counter muted">0/500</small></div>
-                            <a class="btn btn-primary btn-block" href="@Url.Action("UploadVersion", "Library", new { id = Model.BookId })">⬆ Upload Version</a>
+                            <a class="btn btn-primary btn-block" href="#">⬆ Upload Version</a>
                         </div>
                     </div>
                 </div>
@@ -385,8 +384,8 @@
                     </div>
                     <div class="card">
                         <h3>Quick Actions</h3>
-                        <a class="action-row" href="@Url.Action("ReplaceFile", "Library", new { id = Model.BookId })"><span class="a-ic">🔁</span><div><b>Replace Active File</b><small class="muted">Upload and replace the current file</small></div><span class="chev">›</span></a>
-                        <a class="action-row" href="@Url.Action("UploadVersion", "Library", new { id = Model.BookId })"><span class="a-ic">⬆</span><div><b>Upload New Version</b><small class="muted">Add a new version of this book</small></div><span class="chev">›</span></a>
+                        <a class="action-row" href="#"><span class="a-ic">🔁</span><div><b>Replace Active File</b><small class="muted">Upload and replace the current file</small></div><span class="chev">›</span></a>
+                        <a class="action-row" href="#"><span class="a-ic">⬆</span><div><b>Upload New Version</b><small class="muted">Add a new version of this book</small></div><span class="chev">›</span></a>
                         <a class="action-row" href="@Model.CurrentFile.Url" download><span class="a-ic">⬇</span><div><b>Download Current File</b><small class="muted">Download the active file</small></div><span class="chev">›</span></a>
                     </div>
                 </div>
