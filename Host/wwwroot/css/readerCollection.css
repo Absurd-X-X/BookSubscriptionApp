@@ -120,7 +120,7 @@
 .card {
     background-color: #13122a;
     border: 1px solid #2d2b72;
-    border-radius: 12px;
+    border-radius: 5px;
     padding: 24px;
 }
 
@@ -154,7 +154,7 @@
 .collection-book-cover {
     width: 100%;
     aspect-ratio: 3 / 4.35;
-    border-radius: 8px;
+    border-radius: 5px;
     object-fit: cover;
     display: block;
     background: linear-gradient(135deg, #1C2541, #0d1730);
@@ -367,7 +367,7 @@
     border: 1px solid #1C2541;
     min-width: 150px;
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
-    border-radius: 6px;
+    border-radius: 5px;
     padding: 6px 0;
     list-style: none;
     z-index: 50;
@@ -424,7 +424,7 @@
     padding: 10px 20px;
     background: #12182E;
     border: 1px solid #1C2541;
-    border-radius: 8px;
+    border-radius: 5px;
     font-size: 13px;
     font-weight: 500;
     color: #8A94A6;
@@ -463,7 +463,7 @@
 .readinglist-book-cover {
     width: 100%;
     aspect-ratio: 3 / 4.35;
-    border-radius: 8px;
+    border-radius: 5px;
     object-fit: cover;
     display: block;
     margin-bottom: 10px;
@@ -498,7 +498,7 @@
     background: transparent;
     color: #8A94A6;
     border: 1px solid #1C2541;
-    border-radius: 7px;
+    border-radius: 5px;
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
@@ -531,7 +531,7 @@
     position: relative;
     background: linear-gradient(120deg, #2A1F5C 0%, #1B1340 55%, #120c2c 100%);
     border: 1px solid #2c2160;
-    border-radius: 14px;
+    border-radius: 5px;
     padding: 32px 36px;
     overflow: hidden;
     display: flex;

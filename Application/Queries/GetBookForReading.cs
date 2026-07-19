@@ -15,6 +15,7 @@ namespace Application.Queries
         public class GetBookForReadingHandler(
     IBookRepository bookRepository,IUnitOfWork unitOfWork,
     ISubscriptionRepository subscriptionRepository,
+    IUserRepository userRepository,
     IReadingProgressRepository readingProgressRepository)
     : IRequestHandler<GetBookForReadingQuery,
         Result<GetBookForReadingResponse>>
@@ -25,10 +26,13 @@ namespace Application.Queries
             {
                 var book = await bookRepository.GetByIdAsync(request.BookId);
 
-                var isSubActive = await subscriptionRepository.GetByReaderIdAsync(request.ReaderId, true);
+                //if (user.Role.Equals("reader", StringComparison.CurrentCultureIgnoreCase))
+                //{
+                //    var isSubActive = await subscriptionRepository.GetByReaderIdAsync(request.ReaderId, true);
 
-                if (isSubActive is null)
-                    return Result<GetBookForReadingResponse>.Failure("You must subscribe to read book");
+                //    if (isSubActive is null)
+                //        return Result<GetBookForReadingResponse>.Failure("You must subscribe to read book");
+                //}
 
                 if (book == null)
                 {
@@ -39,21 +43,21 @@ namespace Application.Queries
                 var progress = await readingProgressRepository
                     .GetAsync(request.ReaderId, request.BookId);
 
-                if (progress == null)
-                {
-                    progress = new ReadingProgress
+                    if (progress is null)
                     {
-                        ReaderId = request.ReaderId,
-                        BookId = request.BookId,
-                        CurrentPage = 1,
-                        CurrentChapter = "",
-                        ProgressPercentage = 0,
-                        LastReadDate = DateTime.UtcNow,
-                        CreatedBy = request.ReaderId.ToString()
-                    };
+                        progress = new ReadingProgress
+                        {
+                            ReaderId = request.ReaderId,
+                            BookId = request.BookId,
+                            CurrentPage = 1,
+                            CurrentChapter = "",
+                            ProgressPercentage = 0,
+                            LastReadDate = DateTime.UtcNow,
+                            CreatedBy = request.ReaderId.ToString()
+                        };
 
-                    await readingProgressRepository.AddAsync(progress);
-                }
+                        await readingProgressRepository.AddAsync(progress);
+                    }
 
                 var response = new GetBookForReadingResponse(
                     book.Id,
@@ -66,8 +70,8 @@ namespace Application.Queries
                     book.AllowDownload,
                     book.AllowPrint,
                     book.AllowCopyPaste,
-                    progress.CurrentPage,
-                    progress.Cfi,
+                    progress?.CurrentPage,
+                    progress?.Cfi,
                     progress.ProgressPercentage
                 );
 

@@ -144,7 +144,9 @@
 @Html.AntiForgeryToken()
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/epubjs/0.3.93/epub.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://unpkg.com/epubjs/dist/epub.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
     window.BOOK = {
@@ -266,7 +268,7 @@
     );
     updateBottomBar(null, null, percentage);
     queueProgress({
-    currentPage: null,
+    currentPage: 0,
     cfi,
     currentChapter: getCurrentChapterTitle(location),
     progressPercentage: percentage
@@ -475,16 +477,20 @@
     Bookmarks — persisted via AddBookmark / RemoveBookmark / Bookmarks
     --------------------------------------------------------- */
     async function loadBookmarks() {
-    try {
-    const res = await fetch('/Reader/GetAllBookmark');
+  try {
+    const res = await fetch(`/Reader/BookmarksForBook?bookId=${BOOK.id}`);
+    if (!res.ok) {
+      console.warn('Bookmarks endpoint returned', res.status);
+      return;
+    }
     const json = await res.json();
     if (json.status && json.data) {
-    renderBookmarks(json.data.filter(b => b.bookId === BOOK.id));
+      renderBookmarks(json.data);
     }
-    } catch (err) {
+  } catch (err) {
     console.warn('Could not load bookmarks', err);
-    }
-    }
+  }
+}
 
     function renderBookmarks(list) {
     el('bookmarkCount').textContent = list.length;
@@ -685,49 +691,39 @@
     }
 
     async function flushProgress() {
-    if (!pendingProgress) return;
-    const payload = pendingProgress;
-    pendingProgress = null;
+  if (!pendingProgress) return;
+  const payload = pendingProgress;
+  pendingProgress = null;
 
-    const minutesRead = Math.max(1, Math.round((Date.now() - sessionStart) / 60000));
-    sessionStart = Date.now();
+  const minutesRead = Math.max(1, Math.round((Date.now() - sessionStart) / 60000));
+  sessionStart = Date.now();
 
-    try {
+  try {
     const res = await fetch('/Reader/UpdateProgress', {
-    method: 'POST',
-    headers: {
-    'Content-Type': 'application/json',
-    'RequestVerificationToken': window.ANTIFORGERY_TOKEN
-    },
-    body: JSON.stringify({
-    bookId: BOOK.id,
-    currentPage: payload.currentPage,
-    cfi: payload.cfi,
-    currentChapter: payload.currentChapter,
-    progressPercentage: payload.progressPercentage,
-    minutesRead,
-    pagesRead: 1
-    })
-    });
-
-    console.log({
-    readerId: BOOK.readerId,
-    bookId: BOOK.id,
-    currentPage: payload.currentPage,
-    cfi: payload.cfi,
-    currentChapter: payload.currentChapter,
-    progressPercentage: payload.progressPercentage,
-    minutesRead,
-    pagesRead: 1
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'RequestVerificationToken': window.ANTIFORGERY_TOKEN
+      },
+      body: JSON.stringify({
+        readerId: BOOK.readerId,     
+        bookId: BOOK.id,
+        currentPage: payload.currentPage,
+        cfi: payload.cfi,
+        currentChapter: payload.currentChapter,
+        progressPercentage: payload.progressPercentage,
+        minutesRead,
+        pagesRead: 1
+      })
     });
 
     if (res.status === 401) {
-    window.location.href = '/Account/Login';
+      window.location.href = '/Account/Login';
     }
-    } catch (err) {
+  } catch (err) {
     console.warn('Progress save failed, will retry next update.', err);
-    }
-    }
+  }
+}
 
     window.addEventListener('beforeunload', () => {
     if (pendingProgress) {

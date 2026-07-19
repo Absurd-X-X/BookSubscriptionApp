@@ -17,7 +17,6 @@ namespace Persistence.Repositories
         public async Task RemoveAsync(Favorite favorite)
         {
             context.Favorites.Remove(favorite);
-            await Task.CompletedTask;
         }
 
         public async Task<Favorite?> GetAsync(Guid readerId, Guid bookId)

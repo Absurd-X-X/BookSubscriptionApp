@@ -17,6 +17,11 @@
         opacity: 1;
     }
 
+
+.mode-card::-webkit-scrollbar {
+    display: none;
+}
+
 .mode-card {
     background: var(--notify-bg);
     border: 0.5px solid var(--notify-border);

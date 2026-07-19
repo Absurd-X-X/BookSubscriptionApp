@@ -1,4 +1,5 @@
-﻿@using static Application.Queries.GetSubscriptions
+﻿@using Domain.Enums
+@using static Application.Queries.GetSubscriptions
 @model Application.Common.Pagenation.PagenatedList<GetSubscriptionsResponse>
 
 @{
@@ -101,15 +102,17 @@
                                         <label>Subscription Type Name</label>
 
                                         <input type="text"
-                                               placeholder="Type name e.g Pro, Beginner etc" />
+                                               placeholder="Type name e.g Pro, Beginner etc" name="typeName" />
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Billing cycle</label>
+                                        <label for="cycle">Billing cycle</label>
 
-                                        <select>
-                                            <option>Monthly</option>
-                                            <option>Annually</option>
+                                        <select name="cycle">
+                                            <option value="@BillingCycle.Monthly">Monthly</option>
+                                            <option value="@BillingCycle.Yearly">Annually</option>
+                                            <option value="@BillingCycle.Quaterly">Quarterly</option>
+                                            <option value="@BillingCycle.SemiAnnually">Semi-Annually</option>
                                         </select>
                                     </div>
 
@@ -117,6 +120,7 @@
                                         <label>Cost (₦)</label>
 
                                         <input type="number"
+                                               name="cost"
                                                placeholder="Enter the cost for this sub type" />
                                     </div>
                                 </div>

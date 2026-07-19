@@ -391,7 +391,7 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<DateTime>("LastMessageAt")
+                    b.Property<DateTime?>("LastMessageAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Title")
@@ -420,6 +420,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookId");
 
                     b.HasIndex("ReaderId");
 
@@ -679,7 +681,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("CurrentChapter")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
@@ -693,15 +694,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsCompleted")
-                        .HasMaxLength(50)
-                        .HasColumnType("tinyint(50)");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasMaxLength(10)
-                        .HasColumnType("tinyint(10)");
+                        .HasColumnType("tinyint(1)");
 
-                    b.Property<DateTime>("LastReadDate")
-                        .HasMaxLength(100)
+                    b.Property<DateTime?>("LastReadDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("LongestReadingStreak")
@@ -920,10 +918,10 @@ namespace Infrastructure.Migrations
                         {
                             Id = new Guid("c117635d-96e0-409b-9fae-72976ec9c42a"),
                             CreatedBy = "system",
-                            DateCreated = new DateTime(2026, 7, 12, 16, 9, 44, 585, DateTimeKind.Utc).AddTicks(9518),
+                            DateCreated = new DateTime(2026, 7, 19, 8, 33, 22, 554, DateTimeKind.Utc).AddTicks(2633),
                             DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
-                            HashPassword = "AQAAAAIAAYagAAAAELYdntFo3Dlu4glAUFBF0FYXcMflRhteMOWvE5gGWMgjL/JMUcYjxwt3fMTQJbJYhA==",
+                            HashPassword = "AQAAAAIAAYagAAAAEIpWXQwzsWgMEaIWc2lH7gqR7/uYJJnShp9C3dHUSvM8iv2U7G6XCoarZqszkCn71w==",
                             IsDeleted = false,
                             IsVerified = true,
                             Role = "admin",
@@ -938,11 +936,6 @@ namespace Infrastructure.Migrations
 
                     b.Property<Guid>("ConversationId")
                         .HasColumnType("char(36)");
-
-                    b.Property<bool>("IsAdmin")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false);
 
                     b.HasKey("UserId", "ConversationId");
 
@@ -989,10 +982,10 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("be45162f-6b3c-468d-8fff-bfee256cf054"),
+                            Id = new Guid("3ec20f1b-13d8-4ff0-9784-de8af7b23cde"),
                             Balance = 0m,
                             CreatedBy = "admin@gmail.com",
-                            DateCreated = new DateTime(2026, 7, 12, 16, 9, 44, 666, DateTimeKind.Utc).AddTicks(1619),
+                            DateCreated = new DateTime(2026, 7, 19, 8, 33, 22, 629, DateTimeKind.Utc).AddTicks(9874),
                             DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             LastPayoutDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -1132,7 +1125,7 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.Book", "Book")
                         .WithMany("Favorites")
-                        .HasForeignKey("ReaderId")
+                        .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

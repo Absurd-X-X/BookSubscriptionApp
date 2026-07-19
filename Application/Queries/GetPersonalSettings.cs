@@ -33,7 +33,7 @@ namespace Application.Queries
                 var completedCount = await readingProgressRepository.GetCompletedBookCountAsync(readerId);
                 var currentStreak = await readingProgressRepository.GetMaxCurrentStreakAsync(readerId);
 
-                const int annualGoalTarget = 35; // TODO: replace with a real stored target once a Reading Goal field/entity exists
+                const int annualGoalTarget = 35; 
                 var booksLeft = Math.Max(0, annualGoalTarget - completedCount);
                 var goalPercent = annualGoalTarget == 0 ? 0 : Math.Round((double)completedCount / annualGoalTarget * 100, 0);
 
@@ -43,7 +43,7 @@ namespace Application.Queries
                     user.Email,
                     user.IsVerified,
                     user.UserName,
-                    "A passionate reader exploring new ideas every day.", // MOCK — no Bio field on User/Reader yet
+                    "A passionate reader exploring new ideas every day.",
                     user.ImageUrl,
                     user.Reader.DateCreated,
                     subscription != null,
@@ -51,9 +51,9 @@ namespace Application.Queries
                 );
 
                 var preferencesDto = new PreferencesDto(
-                    "dark",   // MOCK — no Theme field yet
-                    "en",     // MOCK — no Language field yet
-                    "grid"    // MOCK — no DefaultView field yet
+                    "dark",   
+                    "en",    
+                    "grid"    
                 );
 
                 var securityDto = new SecurityDto(

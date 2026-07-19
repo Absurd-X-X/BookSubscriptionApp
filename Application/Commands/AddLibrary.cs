@@ -1,10 +1,12 @@
 ﻿using Application.Common;
 using Application.Common.Dtos;
 using Application.Common.Repositories;
+using Application.Repositories;
 using Application.Services;
 using Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using static Application.Commands.StartConversation.StartConversationHandler;
 
 namespace Application.Command
 {
@@ -23,7 +25,8 @@ namespace Application.Command
             IUserRepository userRepository,
             IWalletRepository walletRepository,
             IEmailService emailServices,
-            IPasswordHasher<User> passwordHasher,
+            IPasswordHasher<User> passwordHasher, 
+            IConversationRepository conversationRepository,
             IAuditLogRepository auditLogRepository) : 
             IRequestHandler<AddLibraryCommand, Result<AddLibraryResponse>>
         {
@@ -79,6 +82,52 @@ namespace Application.Command
                 });
 
 
+                await auditLogRepository.AddAsync(new AuditLog
+                {
+                    UserId = user.Id,
+                    ActionType = "Added New User",
+                    Icon = "👤",
+                    Description = $"Super Admin created library '{request.Name}' ({request.UserName})",
+                    IpAddress = "",
+                    UserRole = user.Role,
+                    ResourceType = ResourceType.System,
+                    ResourceId = library.Id
+                });
+
+                if (admin is null)
+                    return Result<AddLibraryResponse>.Failure("Something weny wrong");
+
+                var checkConversation = await conversationRepository.GetPrivateConversationAsync(user.Id, admin.Id);
+
+                if (checkConversation is null)
+                {
+                    var conversation = new Conversation
+                    {
+                        Title = "Private chart",
+                        CreatedBy = admin.Id.ToString(),
+                        LastMessageAt = null,
+                        UserConversations = new List<UserConversation>
+                     {
+                         new UserConversation
+                         {
+                             UserId = admin.Id,
+                         },
+
+                         new UserConversation
+                         {
+                             UserId = user.Id,
+                         }
+                     },
+                    };
+
+
+                    await conversationRepository.AddAsync(conversation);
+                }
+
+
+                await unitOfWork.SaveAsync();
+
+
                 var emailResult = await emailServices.SendEmailAsync(
                     user.Email,
                     "Verify your email",
@@ -86,20 +135,6 @@ namespace Application.Command
 
                 if (!emailResult.Success)
                     return Result<AddLibraryResponse>.Failure("Failed to send verification email due to network error");
-
-                await auditLogRepository.AddAsync(new AuditLog
-                {
-                    UserId = user.Id,
-                    ActionType = "Added New User",
-                    Icon = "👤",
-                    Description = $"User Added: {request.Name}({request.UserName})",
-                    IpAddress = "",
-                    UserRole = user.Role,
-                    ResourceType = ResourceType.System,
-                    ResourceId = library.Id
-                });
-
-                await unitOfWork.SaveAsync();
 
                 return Result<AddLibraryResponse>.Success(new AddLibraryResponse(user.Id, user.Email), "Successfully Added");
             }

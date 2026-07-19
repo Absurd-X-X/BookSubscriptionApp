@@ -45,7 +45,7 @@ namespace Application.Commands
 
                 if (!paystackResponse.Status)
                     return Result<FundWalletResponse>.Failure(
-                        "Could not initialize payment");
+                        $"Could not initialize payment due to {paystackResponse.Message}");
 
                 wallet.Balance += request.Amount;
 
@@ -87,7 +87,7 @@ namespace Application.Commands
                 await unitOfWork.SaveAsync();
 
                 return Result<FundWalletResponse>.Success(new FundWalletResponse(
-                        paystackResponse.AuthorizationUrl, reference),
+                        paystackResponse.Data.AuthorizationUrl, reference),
                     "Payment initialized"
                     );
             }

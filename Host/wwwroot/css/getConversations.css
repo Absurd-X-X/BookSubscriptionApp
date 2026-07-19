@@ -1,6 +1,4 @@
-﻿
-
-.profile-dropdown-menu {
+﻿.profile-dropdown-menu {
     display: none;
     position: absolute;
     right: 0;
@@ -33,14 +31,14 @@
 
 
 .profile-dropdown-menu li a {
-        color: #d1d5db;
-        padding: 10px 16px;
-        text-decoration: none;
-        display: block;
-        font-size: 13px;
-        border-bottom: 1px solid #1C2541;
-        transition: background 0.15s ease, color 0.15s ease;
-    }
+    color: #d1d5db;
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 13px;
+    border-bottom: 1px solid #1C2541;
+    transition: background 0.15s ease, color 0.15s ease;
+}
 
     .profile-dropdown-menu li a:hover {
         background-color: #1e293b;
@@ -66,6 +64,7 @@
 .clear-link {
     color: #f87171 !important;
 }
+
 :root {
     --bg-page: #13122a;
     --bg-panel: #13122a;
@@ -235,23 +234,25 @@
         border-radius: 50%;
     }
 
-    .avatar.jd {
+    /* Hash-based color palette (replaces old per-initial jd/mj/sw/ed/la classes
+       now that avatars are driven by real data instead of fixed mock names) */
+    .avatar.color-1 {
         background: #1d4ed8;
     }
 
-    .avatar.mj {
+    .avatar.color-2 {
         background: #374151;
     }
 
-    .avatar.sw {
+    .avatar.color-3 {
         background: #4b5563;
     }
 
-    .avatar.ed {
+    .avatar.color-4 {
         background: #374151;
     }
 
-    .avatar.la {
+    .avatar.color-5 {
         background: #4b5563;
     }
 
@@ -496,6 +497,16 @@
     .msg-row.recv {
         align-items: flex-start;
     }
+
+/* Sender name label above received bubbles — only shown in group
+   conversations, once per consecutive run of messages from the same sender */
+.msg-sender {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    margin-left: 2px;
+}
 
 .bubble {
     max-width: 60%;

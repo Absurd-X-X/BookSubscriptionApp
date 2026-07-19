@@ -109,7 +109,7 @@
                                 </button>
 
                                 <div class="context-menu" id="menu-@b.BookId">
-                                    <a class="context-menu-item" href="@Url.Action("BookDetails", "Library", new { id = b.BookId })">
+                                    <a class="context-menu-item" href="@Url.Action("PreviewBook", "Library", new { id = b.BookId })">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
                                         View Book
                                     </a>
@@ -120,19 +120,12 @@
 
                                     <div class="context-menu-divider"></div>
 
-                                    <a class="context-menu-item" href="@Url.Action("Reviews", "Library", new { bookId = b.BookId })">
+                                    <a class="context-menu-item" href="@Url.Action("GetReviews", "Library", new { id = b.BookId })">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
                                         View Reviews
                                     </a>
 
                                     <div class="context-menu-divider"></div>
-
-                                    <form method="post" asp-action="TogglePublishBook" asp-route-id="@b.BookId">
-                                        <button type="submit" class="context-menu-item">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="5" width="22" height="14" rx="7" /></svg>
-                                            @(b.IsPublished ? "Unpublish Book" : "Publish Book")
-                                        </button>
-                                    </form>
 
                                     <form method="post" asp-action="DeleteBook" asp-route-id="@b.BookId" onsubmit="return confirm('Delete this book permanently?');">
                                         <button type="submit" class="context-menu-item is-danger">

@@ -4,16 +4,20 @@ namespace Application.Services
 {
     public interface IPaystackService
     {
-        // Fund wallet
-        Task<PaystackInitializeResponse> InitializePaymentAsync(string email, decimal amount, string reference);
-        Task<PaystackVerifyResponse> VerifyPaymentAsync(string reference);
+        Task<Result<PaystackInitializeResponse>> InitializePaymentAsync(
+            string email, decimal amount, string reference);
 
-        // Withdrawal
-        Task<PaystackAccountResponse> VerifyAccountNumberAsync(string accountNumber, string bankCode);
-        Task<string> CreateTransferRecipientAsync(string accountName, string accountNumber, string bankCode);
-        Task<PaystackTransferResponse> InitiateTransferAsync(string recipientCode, decimal amount, string reference, string reason);
+        Task<Result<PaystackVerifyResponse>> VerifyPaymentAsync(string reference);
 
-        // Banks list
-        Task<List<PaystackBank>> GetBanksAsync();
+        Task<Result<PaystackAccountResponse>> VerifyAccountNumberAsync(
+            string accountNumber, string bankCode);
+
+        Task<Result<string>> CreateTransferRecipientAsync(
+            string accountName, string accountNumber, string bankCode);
+
+        Task<Result<PaystackTransferResponse>> InitiateTransferAsync(
+            string recipientCode, decimal amount, string reference, string reason);
+
+        Task<Result<List<PaystackBank>>> GetBanksAsync();
     }
 }

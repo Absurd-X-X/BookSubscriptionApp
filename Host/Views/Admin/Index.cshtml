@@ -92,10 +92,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var book in Model.Books)
+                    @foreach (var book in Model.Books.Take(3))
                     {
                         <tr>
-                    
                             <td class="book-title-cell">@book.Title</td>
                             <td>@book.Author</td>
                             <td>@book.DateCreated</td>

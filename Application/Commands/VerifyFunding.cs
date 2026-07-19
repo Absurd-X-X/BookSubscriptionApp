@@ -41,7 +41,7 @@ namespace Application.Commands
                 var verification = await paystackService
                     .VerifyPaymentAsync(request.Reference);
 
-                if (!verification.Status || verification.PaymentStatus != "success")
+                if (!verification.Status || verification.Data.PaymentStatus != "success")
                 {
                     transaction.Status = WalletTransactionStatus.Failed;
                     transaction.DateModified = DateTime.UtcNow;
@@ -49,7 +49,7 @@ namespace Application.Commands
                     return Result<string>.Failure("Payment verification failed");
                 }
 
-                if (verification.Amount != transaction.Balance)
+                if (verification.Data.Amount != transaction.Balance)
                 {
                     transaction.Status = WalletTransactionStatus.Failed;
                     transaction.DateModified = DateTime.UtcNow;

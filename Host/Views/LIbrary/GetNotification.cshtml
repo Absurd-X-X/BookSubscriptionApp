@@ -234,7 +234,7 @@
             <div class="side-card">
                 <h3>Related Conversation</h3>
                 <div class="add-row"><span>Title</span><span>@c.Title</span></div>
-                <div class="add-row"><span>Last Message</span><span>@c.LastMessageAt.ToString("MMM d, yyyy h:mm tt")</span></div>
+                <div class="add-row"><span>Last Message</span><span>@c.LastMessageAt?.ToString("MMM d, yyyy h:mm tt")</span></div>
                 <a href="@Url.Action("Chat", "Support", new { id = c.ConversationId })" class="btn-outline-purple">Open Conversation</a>
             </div>
         }

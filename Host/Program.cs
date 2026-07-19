@@ -9,6 +9,7 @@ using Infrastructure.Services;
 using Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Repositories;
 using static Application.Command.AddBook;
@@ -102,8 +103,15 @@ public partial class Program
             app.UseHsts();
         }
 
-        app.UseHttpsRedirection();
-        app.UseStaticFiles();
+        app.UseHttpsRedirection(); 
+
+        var provider = new FileExtensionContentTypeProvider();
+        provider.Mappings[".epub"] = "application/epub+zip";
+
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            ContentTypeProvider = provider
+        });
 
         app.UseRouting();
 

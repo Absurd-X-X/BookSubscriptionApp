@@ -82,7 +82,7 @@
 
                             <div class="modal-header">
 
-                                <h2>Add New Library</h2>
+                                <h2>Add New Category</h2>
 
                                 <button type="button"
                                         id="closePaymentModal"
@@ -194,6 +194,11 @@
                             </td>
 
                             <td style="text-align: right; padding-right: 16px; white-space: nowrap;">
+
+                                <a href="@Url.Action("EditCategory", "Admin", new { categoryId = category.CategoryId })"
+                                   class="action-link details">
+                                    Edit
+                                </a>
 
                                 <a href="@Url.Action("GetCategory", "Admin", new { categoryId = category.CategoryId })"
                                    class="action-link details">

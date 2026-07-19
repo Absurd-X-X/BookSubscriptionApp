@@ -280,10 +280,8 @@
 
 <script>
     var MENU_HTML =
-        '<button type="button" role="menuitem" class="kebab-item" data-action="edit">✎ Edit Book</button>' +
-        '<button type="button" role="menuitem" class="kebab-item" data-action="upload">⤓ Upload New Version</button>' +
-        '<button type="button" role="menuitem" class="kebab-item" data-action="duplicate">⧉ Duplicate Book</button>' +
-        '<button type="button" role="menuitem" class="kebab-item" data-action="share">↗ Share Link</button>' +
+        '<a href"@Url.Action("EditBook", "Library")" type="button" role="menuitem" class="kebab-item" data-action="edit">✎ Open Book</a>' +
+        '<a href"@Url.Action("PreviewBook", "Library")" type="button" role="menuitem" class="kebab-item" data-action="edit">⤓ Edit Book</a>' +
         '<div class="kebab-sep"></div>' +
         '<button type="button" role="menuitem" class="kebab-item" data-action="archive">🗄 Archive Book</button>' +
         '<button type="button" role="menuitem" class="kebab-item danger" data-action="delete">🗑 Delete Book</button>';

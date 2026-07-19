@@ -121,25 +121,25 @@ namespace Host.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            if (User.Identity is { IsAuthenticated: true })
-            {
-                if (User.IsInRole("admin"))
-                {
-                    return RedirectToAction("Index", "Admin");
-                }
+            //if (User.Identity is { IsAuthenticated: true })
+            //{
+            //    if (User.IsInRole("admin"))
+            //    {
+            //        return RedirectToAction("Index", "Admin");
+            //    }
 
-                if (User.IsInRole("library"))
-                {
-                    return RedirectToAction("LibraryDashboard", "Library");
-                }
+            //    if (User.IsInRole("library"))
+            //    {
+            //        return RedirectToAction("LibraryDashboard", "Library");
+            //    }
 
-                if (User.IsInRole("reader"))
-                {
-                    return RedirectToAction("ReaderDashboard", "Reader");
-                }
+            //    if (User.IsInRole("reader"))
+            //    {
+            //        return RedirectToAction("ReaderDashboard", "Reader");
+            //    }
 
-                return RedirectToAction("Index", "Home");
-            }
+            //    return RedirectToAction("Index", "Home");
+            //}
 
             return View();
         }

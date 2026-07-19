@@ -15,6 +15,7 @@ namespace Infrastructure.Persistence.Repositories
 
             => await context.Users
                 .Include(x => x.Wallet)
+                .Include(x => x.Library)
                 .Include(x => x.Reader)
                 .FirstOrDefaultAsync(x => x.Id == id);
 

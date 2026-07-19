@@ -8,11 +8,13 @@ using Application.ViewModels;
 using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Web.Helpers;
 using static Application.Command.AddBook;
 using static Application.Commands.ArchiveBook;
 using static Application.Commands.MarkAllNotificationsRead;
 using static Application.Commands.MarkNotificationRead;
+using static Application.Commands.SendMessage;
 using static Application.Commands.UploadProfilePIcs;
 using static Application.Queries.GetBookById;
 using static Application.Queries.GetBookByLibraryId;
@@ -24,6 +26,7 @@ using static Application.Queries.GetLibraryAnalytics.GetLibraryAnalyticsHandler;
 using static Application.Queries.GetLibraryAuditLogs;
 using static Application.Queries.GetLibraryById;
 using static Application.Queries.GetLibraryDashboard;
+using static Application.Queries.GetLibrarySettings;
 using static Application.Queries.GetPendingTransaction;
 using static Application.Queries.GetReviewById;
 using static Application.Queries.GetTransactionByTransactionStatus;
@@ -32,7 +35,7 @@ using static Application.Queries.GetWalletBalance;
 
 namespace Host.Controllers
 {
-    public class LibraryController(IMediator mediator) : Controller
+    public class LibraryController(IMediator mediator, IHubContext<Hub> chatHub) : Controller
     {
 
         [HttpGet]
@@ -114,7 +117,7 @@ namespace Host.Controllers
                 return RedirectToAction(nameof(AddBook));
             }
 
-            TempData["Success"] = result.Message;
+            TempData["Success"] = "Book Added Successfully";
             return RedirectToAction(nameof(LibraryDashboard));
         }
 
@@ -206,12 +209,12 @@ namespace Host.Controllers
         {
             var userId = ClaimsHelper.GetUserId(User);
 
-            var result = await mediator.Send(new GetPersonalSettings.GetPersonalSettingsQuery(userId));
+            var result = await mediator.Send(new GetLibrarySettingsQuery(userId));
 
             if (!result.Status)
             {
                 TempData["Error"] = result.Message;
-                return RedirectToAction(nameof(LibrarySettings));
+                return RedirectToAction(nameof(LibraryDashboard));
             }
 
             return View(result.Data);
@@ -428,15 +431,16 @@ namespace Host.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> PreviewBook(Guid bookId)
+        public async Task<IActionResult> PreviewBook(Guid id)
         {
-            var result = await mediator.Send(new GetBookByIdQuery(bookId));
+            var result = await mediator.Send(new GetBookForPreview.GetBookForPreviewQuery(id));
 
             if (!result.Status)
             {
                 TempData["Error"] = result.Message;
                 return RedirectToAction(nameof(GetLibraryBooks));
             }
+
             TempData["Success"] = result.Message;
             return View(result.Data);
         }
@@ -631,30 +635,6 @@ namespace Host.Controllers
             return View(result.Data);
         }
 
-        [HttpGet]
-
-        public async Task<IActionResult> GetWallet()
-        {
-            return View();
-        }
-
-
-        [HttpGet]
-        public async Task<IActionResult> GetConversations()
-        {
-            var userId = ClaimsHelper.GetUserId(User);
-            var result = await mediator.Send(new GetConversationByUserIdQuery(userId));
-
-            if (!result.Status)
-            {
-                TempData["Error"] = result.Message;
-                return View(result.Data);
-            }
-
-            return View(result.Data);
-        }
-
-
         public async Task<IActionResult> GetWallet(
             int txPage = 1,
             int creditPage = 1,
@@ -687,6 +667,65 @@ namespace Host.Controllers
             ViewBag.WalletId = balance.Data?.WalletId;
 
             return View(walletFullDetails);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetConversations()
+        {
+            var userId = ClaimsHelper.GetUserId(User);
+            var result = await mediator.Send(new GetConversationByUserIdQuery(userId));
+
+            if (!result.Status)
+            {
+                TempData["Error"] = result.Message;
+                return View(result.Data);
+            }
+
+            ViewBag.CurrentUserId = userId;
+            return View(result.Data);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetConversation(Guid conversationId)
+        {
+            var userId = ClaimsHelper.GetUserId(User);
+
+            var listResult = await mediator.Send(new GetConversationByUserIdQuery(userId));
+            if (!listResult.Status)
+            {
+                TempData["Error"] = listResult.Message;
+                return View(nameof(GetConversations), listResult.Data);
+            }
+
+            ViewBag.CurrentUserId = userId;
+            ViewBag.SelectedConversationId = conversationId;
+            return View(nameof(GetConversations), listResult.Data);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Send(
+        Guid conversationId, string content)
+        {
+            var userId = ClaimsHelper.GetUserId(User);
+            var fullName = ClaimsHelper.GetFullName(User);
+
+            var result = await mediator.Send(
+                new SendMessageCommand(conversationId, userId, content));
+
+            if (!result.Status)
+                return Json(new { success = false, message = result.Message });
+
+            await chatHub.Clients
+                .Group($"conversation_{conversationId}")
+                .SendAsync("ReceiveMessage", new
+                {
+                    senderId = userId,
+                    senderName = fullName,
+                    content,
+                    sentAt = DateTime.UtcNow,
+                });
+
+            return Json(new { success = true });
         }
     }
 }

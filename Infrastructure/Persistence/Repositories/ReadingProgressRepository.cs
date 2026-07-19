@@ -134,7 +134,6 @@ namespace Persistence.Repositories
             var query = context.ReadingProgresses
                 .Include(x => x.Book)
                 .Where(x => x.ReaderId == readerId &&
-                            !x.IsCompleted &&
                             !x.IsDeleted)
                 .AsQueryable();
 

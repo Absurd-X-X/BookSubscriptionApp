@@ -15,8 +15,7 @@ namespace Infrastructure.Persistence.Configurations
                 HasMaxLength(100);
 
 
-            builder.Property(x => x.CurrentChapter)
-                .IsRequired().
+            builder.Property(x => x.CurrentChapter).
                 HasMaxLength(20);
 
 
@@ -24,18 +23,13 @@ namespace Infrastructure.Persistence.Configurations
                 .IsRequired();
 
 
-            builder.Property(x => x.IsCompleted)
-                .HasMaxLength(50);
+            builder.Property(x => x.IsCompleted);
 
 
-            builder.Property(x => x.LastReadDate)
-                .IsRequired()
-                .HasMaxLength(100);
+            builder.Property(x => x.LastReadDate);
 
 
-            builder.Property(x => x.IsDeleted)
-                .IsRequired()
-                .HasMaxLength(10);
+            builder.Property(x => x.IsDeleted);
 
             builder.HasOne(x => x.Reader)
                 .WithMany(x => x.ReadingProgresses)

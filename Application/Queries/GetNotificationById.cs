@@ -135,7 +135,7 @@ namespace Application.Queries
         public record RelatedReaderDto(Guid ReaderId, string Name, string Email, DateTime MemberSince);
         public record RelatedBookDto(Guid BookId, string Title, string Author, string? CoverUrl, int TimesRead);
         public record RelatedSubscriptionDto(Guid SubscriptionId, DateTime ExpiryDate);
-        public record RelatedChatDto(Guid ConversationId, string Title, DateTime LastMessageAt);
+        public record RelatedChatDto(Guid ConversationId, string Title, DateTime? LastMessageAt);
 
         public record GetNotificationByIdResponse(
             Guid Id, string Title, string Message,

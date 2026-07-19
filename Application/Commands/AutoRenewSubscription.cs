@@ -21,7 +21,7 @@ namespace Application.Command
 
                 if (sub == null)
                 {
-                    return Result<string>.Failure("Not found brosky");
+                    return Result<string>.Failure("Not found");
                 }
 
                 sub.AutoRenewal = true;
@@ -48,7 +48,7 @@ namespace Application.Command
                 await auditLogRepository.AddAsync(audit);
 
                 await unitOfWork.SaveAsync();
-                return Result<string>.Success("Retrieved", "Brosky");
+                return Result<string>.Success("Retrieved", "Retrieved!");
             }
         }
     }

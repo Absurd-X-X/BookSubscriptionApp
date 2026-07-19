@@ -342,7 +342,7 @@
                             <div class="af-row"><span class="muted">Uploaded By</span><span>👤 @Model.CurrentFile.UploadedBy</span></div>
                         </div>
                     </div>
-                    <div class="btn-pair"><a class="btn btn-primary" href="/Reader/ReadBook/@Model.BookId">👁 Open File</a><a class="btn btn-outline" href="@Model.CurrentFile.Url" download>⬇ Download</a></div>
+                    <div class="btn-pair"><a class="btn btn-primary" href="@Url.Action("PreviewBook", "Library", new { id = Model.BookId })">👁 Open File</a><a class="btn btn-outline" href="@Model.CurrentFile.Url" download>⬇ Download</a></div>
                 </div>
 
                 <div class="card">

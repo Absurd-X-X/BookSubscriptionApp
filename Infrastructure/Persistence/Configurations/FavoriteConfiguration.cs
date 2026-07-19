@@ -17,7 +17,7 @@ namespace Infrastructure.Persistence.Configurations
 
             builder.HasOne(x => x.Book)
                 .WithMany(x => x.Favorites)
-                .HasForeignKey(x => x.ReaderId)
+                .HasForeignKey(x => x.BookId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

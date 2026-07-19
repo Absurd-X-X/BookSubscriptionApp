@@ -1278,6 +1278,10 @@ input[type="radio"].ah-rad {
         margin-top: 2px;
     }
 
+.ah-avatar-upload .ah-avatar-wrap-square img {
+    border-radius: var(--ah-radius-sm);
+}
+
 /* responsive tweaks */
 @media (max-width: 640px) {
     .ah-settings-header {

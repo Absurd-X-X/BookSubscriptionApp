@@ -87,7 +87,7 @@
                     @foreach (var book in Model.Items)
                     {
                         <tr>
-                            <td style="border-radius: 3px; height: 10px; width:10px;"><img src="@(book.BookCoverUrl ?? "~/lib/images/bill.svg")" alt="Alternate Text" /></td>
+                            <td><img style="border-radius: 3px; height: 40px; width:30px;" src="@(book.BookCoverUrl ?? "~/lib/images/bill.svg")" alt="Alternate Text" /></td>
                             <td>@book.Title</td>
                             <td>@book.Author</td>
                             <td>@book.DateAdded.ToString("MMM dd, yyyy")</td>

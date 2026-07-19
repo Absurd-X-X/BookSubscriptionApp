@@ -3,7 +3,7 @@
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Get Category";
+    ViewData["Title"] = "Category Details";
 }
 <link rel="stylesheet" href="~/css/getCategory.css">
 
@@ -13,7 +13,6 @@
     </div>
     <div class="category-info">
         <form class="datas" asp-controller="Admin" asp-action="EditCategory" method="post">
-            @Html.AntiForgeryToken()
 
             
             <input type="hidden" name="categoryId" value="@Model.CategoryId" />

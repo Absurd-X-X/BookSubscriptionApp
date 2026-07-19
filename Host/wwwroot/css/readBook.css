@@ -48,7 +48,7 @@
 .reader-app {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100%;
     background: var(--bg-page);
     color: var(--text-hi);
     font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;

@@ -30,45 +30,59 @@ namespace Application.Commands
                     .GetByIdAsync(request.ConversationId);
 
                 if (conversation is null)
-                    return Result<string>.Failure(
-                        "Conversation not found");
+                {
+                    return Result<string>.Failure("Conversation not found.");
+                }
 
-                // Save customer message
+                var isParticipant = conversation.UserConversations
+                    .Any(x => x.UserId == request.SenderId);
+
+                if (!isParticipant)
+                {
+                    return Result<string>.Failure(
+                        "You are not a participant in this conversation.");
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Content))
+                {
+                    return Result<string>.Failure("Message cannot be empty.");
+                }
+
                 var message = new Message
                 {
                     ConversationId = request.ConversationId,
                     SenderId = request.SenderId,
-                    Content = request.Content,
+                    Content = request.Content.Trim(),
                     SentAt = DateTime.UtcNow,
                     CreatedBy = request.SenderId.ToString()
                 };
 
                 await messageRepository.AddAsync(message);
+
                 conversation.LastMessageAt = DateTime.UtcNow;
 
-                await unitOfWork.SaveAsync();
+                var receiver = conversation.UserConversations
+                    .FirstOrDefault(x => x.UserId != request.SenderId);
 
-                var adminParticipant = conversation.UserConversations
-                    .FirstOrDefault(uc => uc.IsAdmin);
-
-                if (adminParticipant is not null)
+                if (receiver != null)
                 {
                     await notificationRepository.AddAsync(new Notification
                     {
-                        UserId = adminParticipant.UserId,
-                        Title = "New Support Message",
+                        UserId = receiver.UserId,
+                        Title = "New Message",
                         RefType = NotificationRefType.ChatMessage,
-                        Message = $"New message in: {conversation.Title}",
+                        Message = "You have received a new message.",
                         Type = NotificationType.Others,
                         Ref = conversation.Id.ToString(),
                         CreatedBy = request.SenderId.ToString()
                     });
-
-                    await unitOfWork.SaveAsync();
                 }
 
+                await unitOfWork.SaveAsync();
+
                 return Result<string>.Success(
-                    "Message sent", "Sharp");
+                    "Message sent successfully.",
+                    "Success");
             }
         }
     }

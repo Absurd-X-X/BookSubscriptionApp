@@ -35,5 +35,15 @@ namespace Infrastructure.Persistence.Repositories
                 .Where(c => !c.IsDeleted)
                 .OrderByDescending(c => c.LastMessageAt)
                 .ToListAsync();
+
+        public Task<Conversation?> GetPrivateConversationAsync(Guid senderId, Guid userId)
+        {
+            return context.Conversations
+                .Include(c => c.UserConversations)
+                .Where(c => c.UserConversations.Any(uc => uc.UserId == senderId) &&
+                            c.UserConversations.Any(uc => uc.UserId == userId) &&
+                            !c.IsDeleted)
+                .FirstOrDefaultAsync();
+        }
     }
 }

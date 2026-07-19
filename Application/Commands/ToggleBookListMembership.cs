@@ -6,12 +6,13 @@ using MediatR;
 namespace Application.Features.ReaderBooks.Commands.ToggleBookListMembership
 {
 
-    public sealed record ToggleBookListMembershipCommand(
+    public record ToggleBookListMembershipCommand(
         Guid ReaderId, Guid BookId, BookListType ListType) : IRequest<bool>;
 
-    public sealed class ToggleBookListMembershipCommandHandler(
+    public class ToggleBookListMembershipCommandHandler(
         IReadingListRepository readingListRepository,
-        IFavoriteRepository favoriteRepository)
+        IFavoriteRepository favoriteRepository,
+        IUnitOfWork unitOfWork)
         : IRequestHandler<ToggleBookListMembershipCommand, bool>
     {
         public async Task<bool> Handle(ToggleBookListMembershipCommand request, CancellationToken ct)
@@ -48,6 +49,8 @@ namespace Application.Features.ReaderBooks.Commands.ToggleBookListMembership
                 ReaderId = request.ReaderId,
                 BookId = request.BookId
             });
+
+            await unitOfWork.SaveAsync();
             return true;
         }
     }

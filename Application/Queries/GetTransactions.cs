@@ -30,6 +30,7 @@ namespace Application.Queries
                 var response = transactions.Items.Select(transaction =>
                     new GetTransactionsResponse(
                         transaction.Id,
+                        transaction.Wallet.UserId,
                         transaction.WalletId,
                         transaction.Balance,
                         transaction.Type,
@@ -58,6 +59,7 @@ namespace Application.Queries
 
         public record GetTransactionsResponse(
             Guid Id,
+            Guid UserId,
             Guid WalletId,
             decimal Balance,
             TransactionType Type,

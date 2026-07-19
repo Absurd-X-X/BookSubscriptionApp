@@ -10,6 +10,7 @@ namespace Application.Queries
     {
         public record GetConversationByUserIdQuery(Guid UserId)
             : IRequest<Result<List<GetConversationByUserIdResponse>>>;
+
         public class GetMyConversationsHandler(
             IConversationRepository conversationRepository, IUserRepository userRepository)
 
@@ -29,20 +30,30 @@ namespace Application.Queries
                 var conversations = await conversationRepository
                     .GetByUserIdAsync(request.UserId);
 
-
                 var response = conversations.Select(c =>
-                    new GetConversationByUserIdResponse(
+                {
+                    var otherParticipants = c.UserConversations
+                        .Where(uc => uc.UserId != request.UserId)
+                        .Select(uc => uc.User)
+                        .ToList();
+
+                    var imageUrl = otherParticipants.Count == 1
+                        ? otherParticipants[0].ImageUrl ?? "none"
+                        : "none";
+
+                    return new GetConversationByUserIdResponse(
                         c.Id,
-                        c.Messages.Where(x => !x.IsRead && !x.IsDeleted && x != null).Count(),
+                        c.Messages.Where(x => !x.IsRead && !x.IsDeleted && x.SenderId != request.UserId).Count(),
                         c.Title,
                         c.LastMessageAt,
                         c.Messages.Count,
                         c.Messages,
-                        user.ImageUrl ?? "none",
+                        imageUrl,
                         c.Messages
                             .OrderByDescending(m => m.SentAt)
-                            .FirstOrDefault()?.Content ?? ""))
-                    .ToList();
+                            .FirstOrDefault()?.Content ?? "");
+                })
+                .ToList();
 
                 return Result<List<GetConversationByUserIdResponse>>
                     .Success(response, "Success");
@@ -53,7 +64,7 @@ namespace Application.Queries
             Guid ConversationId,
             int UnreadCount,
             string Title,
-            DateTime LastMessageAt,
+            DateTime? LastMessageAt,
             int TotalMessages,
             IEnumerable<Message> Messages,
             string ImageUrl,

@@ -106,7 +106,6 @@
                                     @(Model.AutoRenew ? "Disable Auto-Renew" : "Enable Auto-Renew")
                                 </button>
                             </form>
-
                             <button type="button" class="btn btn-outline">Cancel Subscription</button>
                         </div>
 
@@ -189,7 +188,6 @@
                                             break;
                                         default:
                                             <form asp-action="Subscribe" asp-controller="Reader" method="post">
-                                                <input type="hidden" name="userId" value="@Model.ReaderId" />
                                                 <input type="hidden" name="subTypeId" value="@plan.Id" />
                                                 <button type="submit" class="btn @(state == "higher" || state == "none" ? "btn-primary" : "btn-outline") btn-block">
                                                     @(state == "lower" ? "Change Now" : state == "higher" ? "Upgrade" : "Choose Plan")

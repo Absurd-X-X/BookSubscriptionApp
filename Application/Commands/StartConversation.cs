@@ -21,6 +21,13 @@ namespace Application.Commands
 
                 user ??= await userRepository.GetAsync(request.UserName);
 
+                var checkConversation = await conversationRepository.GetPrivateConversationAsync(request.SenderId, user.Id);
+
+                if (checkConversation is not null)
+                {
+                    return Result<StartConversationResponse>.Failure("You already have a private chart with this user");
+                }
+
                 if (user is null)
                 {
                     return Result<StartConversationResponse>.Failure("Inputed username not on the app");
@@ -35,14 +42,12 @@ namespace Application.Commands
                      {
                          new UserConversation
                          {
-                             UserId = request.SenderId,
-                             IsAdmin = true,
+                             UserId = request.SenderId
                          },
 
                          new UserConversation
                          {
-                             UserId = user.Id,
-                             IsAdmin = true,
+                             UserId = user.Id
                          }
                      },
                 };

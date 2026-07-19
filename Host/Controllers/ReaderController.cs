@@ -43,11 +43,11 @@ namespace Host.Controllers
             if (!process.Status)
             {
                 TempData["Error"] = process.Message;
-                return View(process.Data);
+                return RedirectToAction(nameof(ManageSub));
             }
 
             TempData["Success"] = process.Message;
-            return View(process.Data);
+            return RedirectToAction(nameof(ManageSub));
         }
         [HttpGet]
         public async Task<IActionResult> GetMySubs()
@@ -128,18 +128,20 @@ namespace Host.Controllers
             return View(result.Data);
         }
         [HttpPost]
-        public async Task<IActionResult> Subscribe(Guid userId, Guid subTypeId)
+        public async Task<IActionResult> Subscribe(Guid subTypeId)
         {
+            var userId = ClaimsHelper.GetUserId(User);
+
             var result = await mediator.Send(new SubscribeCommand(userId, subTypeId));
 
             if (!result.Status)
             {
                 TempData["Error"] = result.Message;
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(ReaderDashboard));
             }
 
             TempData["Success"] = result.Message;
-            return View(result.Data);
+            return RedirectToAction(nameof(ReaderDashboard));
         }
 
         [HttpPost]
@@ -210,7 +212,7 @@ namespace Host.Controllers
                 TempData["ToastIcon"] = "🎯";
             }
 
-            return RedirectToAction("Dashboard", "Reader");
+            return RedirectToAction(nameof(ReaderDashboard));
         }
 
         [HttpPost]
@@ -231,7 +233,7 @@ namespace Host.Controllers
         [HttpGet]
         public async Task<IActionResult> ReaderCollection(CancellationToken cancellationToken)
         {
-            var readerId = ClaimsHelper.GetUserId(User);
+            var readerId = ClaimsHelper.GetCustomerId(User);
 
             var bookmarks = await mediator.Send(new GetAllBookmarks.GetAllBookmarksQuery(readerId), cancellationToken);
             var readingList = await mediator.Send(new GetReadingList.GetReadingListQuery(readerId), cancellationToken);
@@ -245,11 +247,12 @@ namespace Host.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddBookmark(Guid bookId, int pageNumber, string quote, string note, CancellationToken ct)
+        public async Task<IActionResult> AddBookmark([FromBody] AddBookmark.AddBookmarkCommand command)
         {
-            var readerId = ClaimsHelper.GetUserId(User);
-            var result = await mediator.Send(new AddBookmark.AddBookmarkCommand(readerId, bookId, pageNumber, quote, note), ct);
-            return Json(new { success = result.Status, message = result.Message, id = result.Data });
+            var result = await mediator.Send(command);
+            if (!result.Status) return BadRequest(result.Message);
+
+            return Ok(result);
         }
 
         [HttpPost]
@@ -361,6 +364,21 @@ namespace Host.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> BookmarksForBook(Guid bookId)
+        {
+            var readerId = ClaimsHelper.GetCustomerId(User);
+
+            var result = await mediator.Send(
+                new GetAllBookmarks.GetAllBookmarksQuery(readerId));
+
+            if (!result.Status)
+                return Json(new { status = false, data = (object?)null });
+
+            var filtered = result.Data.Where(b => b.BookId == bookId);
+            return Json(new { status = true, data = filtered });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Reviews(
             int page = 1, int pageSize = 6, string? search = null,
             string? sortBy = null, int? rating = null, Guid? bookId = null,
@@ -376,6 +394,7 @@ namespace Host.Controllers
         public async Task<IActionResult> ReadBook(Guid id)
         {
             var readerId = ClaimsHelper.GetCustomerId(User);
+            ViewBag.ReaderId = readerId; 
 
             var result = await mediator.Send(
                 new GetBookForReading.GetBookForReadingQuery(
@@ -392,17 +411,10 @@ namespace Host.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateProgress(
-    UpdateReadingProgress.UpdateReadingProgressCommand command)
+        public async Task<IActionResult> UpdateProgress([FromBody] UpdateReadingProgress.UpdateReadingProgressCommand command)
         {
-            var readerId = ClaimsHelper.GetCustomerId(User);
-            var result = await mediator.Send(command with { ReaderId = readerId });
-
-            if (!result.Status)
-            {
-                return BadRequest(result.Message);
-            }
-
+            var result = await mediator.Send(command);
+            if (!result.Status) return BadRequest(result.Message);
             return Ok();
         }
 
@@ -440,7 +452,7 @@ namespace Host.Controllers
             string? filter = null,
             CancellationToken cancellationToken = default)
         {
-            var userId = ClaimsHelper.GetUserId(User);
+            var userId = ClaimsHelper.GetCustomerId(User);
             var result = await mediator.Send(
                 new GetCurrentlyReading.GetCurrentlyReadingQuery(userId, page, pageSize, search, sortBy, filter),
                 cancellationToken);
@@ -480,7 +492,7 @@ namespace Host.Controllers
         [HttpPost]
         public async Task<IActionResult> ToggleBookList(Guid bookId, BookListType listType, CancellationToken ct)
         {
-            var readerId = ClaimsHelper.GetUserId(User);
+            var readerId = ClaimsHelper.GetCustomerId(User);
             var isNowInList = await mediator.Send(
                 new ToggleBookListMembershipCommand(readerId, bookId, listType), ct);
 

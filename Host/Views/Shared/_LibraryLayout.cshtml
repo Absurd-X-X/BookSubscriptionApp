@@ -49,7 +49,7 @@
                 }
 
                 <a href="@Url.Action("LibraryDashboard", "Library")"
-                   class="nav-item @(controller == "Library" && action == "LibraryDashboard" ? "active" : "")">
+                   class="nav-item @(controller == "Library" && (action == "LibraryDashboard" || action == "TopPerformingBooks") ? "active" : "")">
                     <img src="~/lib/images/dashbord.png" alt="">DASHBOARD
                 </a>
 

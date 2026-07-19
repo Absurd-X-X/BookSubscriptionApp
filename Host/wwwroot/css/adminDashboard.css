@@ -16,9 +16,14 @@
         border: 1px solid #2d2b72;
     }
 
+main::-webkit-scrollbar {
+    display: none;
+}
+
 .metrics-card-style {
     padding: 20px;
     display: flex;
+    align-self: start;
     flex-direction: column;
     justify-content: space-between;
     background-color: #13122a;

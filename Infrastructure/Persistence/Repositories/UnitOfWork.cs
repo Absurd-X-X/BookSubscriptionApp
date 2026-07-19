@@ -1,7 +1,5 @@
 ﻿using Application.Common.Repositories;
 using Infrastructure.Persistence.Context;
-using Microsoft.EntityFrameworkCore;
-using MySql.Data.MySqlClient;
 
 namespace Infrastructure.Persistence.Repositories
 {

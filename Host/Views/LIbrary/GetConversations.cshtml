@@ -1,9 +1,45 @@
-﻿@using static Application.Queries.GetConversationByUserId;
+﻿@using static Application.Queries.GetConversationByUserId
 @model List<GetConversationByUserIdResponse>
 
 @{
-    Layout = "~/Views/Shared/_LibraryLayout.cshtml";
-    ViewData["Title"] = "Library Messages";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Messages";
+
+    Guid currentUserId = ViewBag.CurrentUserId;
+    Guid? selectedId = ViewBag.SelectedConversationId as Guid?;
+
+    var selected = selectedId is not null
+        ? Model?.FirstOrDefault(c => c.ConversationId == selectedId)
+        : Model?.FirstOrDefault();
+
+    static string InitialsOf(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title)) return "?";
+        var parts = title.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length switch
+        {
+            0 => "?",
+            1 => parts[0][..Math.Min(2, parts[0].Length)].ToUpper(),
+            _ => $"{parts[0][0]}{parts[^1][0]}".ToUpper()
+        };
+    }
+
+    static string AvatarColorClass(string title)
+    {
+        var key = string.IsNullOrWhiteSpace(title) ? "?" : title;
+        var index = (Math.Abs(key.GetHashCode()) % 5) + 1;
+        return $"color-{index}";
+    }
+
+    static string RelativeTime(DateTime? dt)
+    {
+        if (dt is null) return "";
+        var span = DateTime.UtcNow - dt.Value;
+        if (span.TotalMinutes < 1) return "now";
+        if (span.TotalMinutes < 60) return $"{(int)span.TotalMinutes}m ago";
+        if (span.TotalHours < 24) return $"{(int)span.TotalHours}h ago";
+        return $"{(int)span.TotalDays}d ago";
+    }
 }
 
 <link rel="stylesheet" href="~/css/getConversations.css">
@@ -22,143 +58,65 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
                 <input type="text" placeholder="Search conversations..." />
             </div>
-            <button class="filter-btn">
+            <button class="filter-btn" onclick="toggleFilterMenu(event)">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6" /><line x1="8" y1="12" x2="16" y2="12" /><line x1="11" y1="18" x2="13" y2="18" /></svg>
             </button>
         </div>
 
         <div class="conv-list">
 
-            <!-- John Doe — ACTIVE, unread badge 2 -->
-            <div class="conv-item active">
-                <div class="avatar jd">JD</div>
-                <div class="conv-body">
-                    <div class="conv-top">
-                        <span class="conv-name">John Doe</span>
-                        <span class="conv-time">2m ago</span>
-                    </div>
-                    <div class="conv-bottom">
-                        <span class="conv-preview">Hello, I have a question about...</span>
-                        <span class="unread-badge">2</span>
-                    </div>
+            @if (Model is null || !Model.Any())
+            {
+                <div style="padding: 20px; color: var(--text-muted); text-align:center;">
+                    No conversations yet.
                 </div>
-            </div>
+            }
+            else
+            {
+                @foreach (var conv in Model)
+                {
+                    var isActive = selected is not null && conv.ConversationId == selected.ConversationId;
 
-            <!-- Jane Smith — photo, unread dot -->
-            <div class="conv-item">
-                <div class="avatar"><img src="https://i.pravatar.cc/44?img=47" alt="Jane Smith" /></div>
-                <div class="conv-body">
-                    <div class="conv-top">
-                        <span class="conv-name">Jane Smith</span>
-                        <span class="conv-time">1h ago</span>
-                    </div>
-                    <div class="conv-bottom">
-                        <span class="conv-preview">Thank you for the information!</span>
-                        <span class="unread-dot"></span>
-                    </div>
-                </div>
-            </div>
+                    <a href="@Url.Action("GetConversation", "Messages", new { conversationId = conv.ConversationId })"
+                       class="conv-item @(isActive ? "active" : "")" style="text-decoration:none;color:inherit;">
 
-            <!-- Mike Johnson — initials -->
-            <div class="conv-item">
-                <div class="avatar mj">MJ</div>
-                <div class="conv-body">
-                    <div class="conv-top">
-                        <span class="conv-name">Mike Johnson</span>
-                        <span class="conv-time">3h ago</span>
-                    </div>
-                    <div class="conv-bottom">
-                        <span class="conv-preview">When will the new books be...</span>
-                    </div>
-                </div>
-            </div>
+                        <div class="avatar @(conv.ImageUrl == "none" ? AvatarColorClass(conv.Title) : "")">
+                            @if (conv.ImageUrl != "none")
+                            {
+                                <img src="@conv.ImageUrl" alt="@conv.Title" />
+                            }
+                            else
+                            {
+                                @InitialsOf(conv.Title)
+                            }
+                        </div>
 
-            <!-- Sarah Wilson — initials -->
-            <div class="conv-item">
-                <div class="avatar sw">SW</div>
-                <div class="conv-body">
-                    <div class="conv-top">
-                        <span class="conv-name">Sarah Wilson</span>
-                        <span class="conv-time">5h ago</span>
-                    </div>
-                    <div class="conv-bottom">
-                        <span class="conv-preview">I love this platform!</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Robert Brown — photo -->
-            <div class="conv-item">
-                <div class="avatar"><img src="https://i.pravatar.cc/44?img=12" alt="Robert Brown" /></div>
-                <div class="conv-body">
-                    <div class="conv-top">
-                        <span class="conv-name">Robert Brown</span>
-                        <span class="conv-time">1d ago</span>
-                    </div>
-                    <div class="conv-bottom">
-                        <span class="conv-preview">Can you help me with my...</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Emily Davis — initials -->
-            <div class="conv-item">
-                <div class="avatar ed">ED</div>
-                <div class="conv-body">
-                    <div class="conv-top">
-                        <span class="conv-name">Emily Davis</span>
-                        <span class="conv-time">2d ago</span>
-                    </div>
-                    <div class="conv-bottom">
-                        <span class="conv-preview">Great service!</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- David Lee — photo -->
-            <div class="conv-item">
-                <div class="avatar"><img src="https://i.pravatar.cc/44?img=68" alt="David Lee" /></div>
-                <div class="conv-body">
-                    <div class="conv-top">
-                        <span class="conv-name">David Lee</span>
-                        <span class="conv-time">2d ago</span>
-                    </div>
-                    <div class="conv-bottom">
-                        <span class="conv-preview">I found a bug in the system.</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Lisa Anderson — initials -->
-            <div class="conv-item">
-                <div class="avatar la">LA</div>
-                <div class="conv-body">
-                    <div class="conv-top">
-                        <span class="conv-name">Lisa Anderson</span>
-                        <span class="conv-time">3d ago</span>
-                    </div>
-                    <div class="conv-bottom">
-                        <span class="conv-preview">How do I reset my password?</span>
-                    </div>
-                </div>
-            </div>
+                        <div class="conv-body">
+                            <div class="conv-top">
+                                <span class="conv-name">@conv.Title</span>
+                                <span class="conv-time">@RelativeTime(conv.LastMessageAt)</span>
+                            </div>
+                            <div class="conv-bottom">
+                                <span class="conv-preview">@conv.LastMessage</span>
+                                @if (conv.UnreadCount > 1)
+                                {
+                                    <span class="unread-badge">@conv.UnreadCount</span>
+                                }
+                                else if (conv.UnreadCount == 1)
+                                {
+                                    <span class="unread-dot"></span>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                }
+            }
 
         </div>
 
         <div class="msg-panel-footer">
-            <div>Showing 1 to 8 of 24 conversations</div>
-            <div class="pagination">
-                <button class="pg-btn">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-                </button>
-                <button class="pg-btn active">1</button>
-                <button class="pg-btn">2</button>
-                <button class="pg-btn">3</button>
-                <span class="pg-dots">...</span>
-                <button class="pg-btn">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-                </button>
-            </div>
+            <div>Showing @(Model?.Count ?? 0) conversation(s)</div>
+            @* Pagination left static until GetConversationByUserIdQuery supports paging *@
         </div>
 
     </div>
@@ -166,107 +124,114 @@
     <!-- ══ RIGHT: CHAT WINDOW ══ -->
     <div class="chat-panel">
 
-        <!-- Chat header -->
-        <div class="chat-header">
-            <div class="avatar jd" style="width:40px;height:40px;font-size:13px;">JD</div>
-            <div class="chat-header-info">
-                <h3>John Doe</h3>
-                <div class="online-status">
-                    <span class="online-dot"></span>
-                    Online
+        @if (selected is null)
+        {
+            <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);">
+                Select a conversation to start viewing messages.
+            </div>
+        }
+        else
+        {
+            <div class="chat-header">
+                <div class="avatar @(selected.ImageUrl == "none" ? AvatarColorClass(selected.Title) : "")" style="width:40px;height:40px;font-size:13px;">
+                    @if (selected.ImageUrl != "none")
+                    {
+                        <img src="@selected.ImageUrl" alt="@selected.Title" />
+                    }
+                    else
+                    {
+                        @InitialsOf(selected.Title)
+                    }
+                </div>
+                <div class="chat-header-info">
+                    <h3>@selected.Title</h3>
+                    <div class="online-status">
+                        <span class="online-dot"></span>
+                        Online
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="icon-btn">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                    </button>
+                    <button class="icon-btn">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="12" cy="19" r="1" /></svg>
+                    </button>
                 </div>
             </div>
-            <div class="chat-header-actions">
-                <button class="icon-btn">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+
+            <div class="chat-messages">
+
+                @{
+                    DateTime? lastDate = null;
+                    Guid? lastSenderId = null;
+                }
+
+                @foreach (var msg in selected.Messages.OrderBy(m => m.SentAt))
+                {
+                    if (lastDate is null || lastDate.Value.Date != msg.SentAt.Date)
+                    {
+                        <div class="date-divider">@msg.SentAt.ToString("MMMM d")</div>
+                        lastDate = msg.SentAt;
+                        lastSenderId = null; // force sender label to re-show after a date break
+                    }
+
+                    var isSent = msg.SenderId == currentUserId;
+                    var showSenderLabel = !isSent && msg.SenderId != lastSenderId;
+
+                    <div class="msg-row @(isSent ? "sent" : "recv")">
+                        @if (showSenderLabel)
+                        {
+                            <div class="msg-sender">@msg.Sender?.UserName</div>
+                        }
+                        <div class="bubble">
+                            @msg.Content
+                            @if (!string.IsNullOrEmpty(msg.AttachmentUrl))
+                            {
+                                <div><a href="@msg.AttachmentUrl" target="_blank" style="color:inherit;text-decoration:underline;">Attachment</a></div>
+                            }
+                        </div>
+                        <div class="msg-meta">
+                            @msg.SentAt.ToString("h:mm tt")
+                            @if (isSent)
+                            {
+                                <span class="tick">@(msg.IsRead ? "✓✓" : "✓")</span>
+                            }
+                        </div>
+                    </div>
+
+                    lastSenderId = msg.SenderId;
+                }
+
+            </div>
+
+            <div class="chat-input-bar">
+                <input type="text" id="messageInput" placeholder="Type your message..." />
+                <button class="input-icon-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>
                 </button>
-                <button class="icon-btn">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="12" cy="19" r="1" /></svg>
+                <button class="input-icon-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg>
+                </button>
+                <button class="send-btn" data-conversation-id="@selected.ConversationId">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
+                    Send
                 </button>
             </div>
-        </div>
-
-        <!-- Messages -->
-        <div class="chat-messages">
-
-            <div class="date-divider">Today</div>
-
-            <!-- Received -->
-            <div class="msg-row recv">
-                <div class="bubble">Hello, I have a question about borrowing books.</div>
-                <div class="msg-meta">10:30 AM</div>
-            </div>
-
-            <!-- Sent -->
-            <div class="msg-row sent">
-                <div class="bubble">Hello John! How can I help you today?</div>
-                <div class="msg-meta">
-                    10:31 AM
-                    <span class="tick">✓✓</span>
-                </div>
-            </div>
-
-            <!-- Received -->
-            <div class="msg-row recv">
-                <div class="bubble">What is the maximum number of books I can borrow at once?</div>
-                <div class="msg-meta">10:32 AM</div>
-            </div>
-
-            <!-- Sent -->
-            <div class="msg-row sent">
-                <div class="bubble">You can borrow up to 5 books at a time for 14 days.</div>
-                <div class="msg-meta">
-                    10:33 AM
-                    <span class="tick">✓✓</span>
-                </div>
-            </div>
-
-            <!-- Received -->
-            <div class="msg-row recv">
-                <div class="bubble">Thank you! Also, can I renew a book if I need more time?</div>
-                <div class="msg-meta">10:34 AM</div>
-            </div>
-
-            <!-- Sent -->
-            <div class="msg-row sent">
-                <div class="bubble">Yes, you can renew it once if no one else has requested it.</div>
-                <div class="msg-meta">
-                    10:35 AM
-                    <span class="tick">✓✓</span>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Input bar -->
-        <div class="chat-input-bar">
-            <input type="text" placeholder="Type your message..." />
-            <button class="input-icon-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>
-            </button>
-            <button class="input-icon-btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" /></svg>
-            </button>
-            <button class="send-btn">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
-                Send
-            </button>
-        </div>
+        }
 
     </div>
 </div>
 
 <script>
-        function toggleFilterMenu(event) {
+    function toggleFilterMenu(event) {
         event.stopPropagation();
-
         const dropdown = document.getElementById('filterDropdown');
-        dropdown.classList.toggle('show');
+        dropdown?.classList.toggle('show');
     }
 
-    document.addEventListener('click', function (event) {
+    document.addEventListener('click', function(event) {
         const dropdown = document.getElementById('filterDropdown');
-
         if (dropdown && dropdown.classList.contains('show')) {
             if (!dropdown.contains(event.target)) {
                 dropdown.classList.remove('show');
@@ -275,5 +240,97 @@
     });
 </script>
 
+@if (selected is not null)
+{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        (function() {
+            const conversationId = document.querySelector('.send-btn')?.dataset.conversationId;
+            const currentUserId = '@currentUserId';
+            if (!conversationId) return;
 
-    
+            const input = document.getElementById('messageInput');
+            const sendBtn = document.querySelector('.send-btn');
+            const messagesEl = document.querySelector('.chat-messages');
+
+            function appendMessage({ senderId, senderName, content, sentAt, isRead = false }) {
+                const isSent = senderId === currentUserId;
+                const time = new Date(sentAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+                const row = document.createElement('div');
+                row.className = `msg-row ${isSent ? 'sent' : 'recv'}`;
+
+                row.innerHTML = `
+                            ${!isSent ? `<div class="msg-sender">${senderName ?? ''}</div>` : ''}
+                            <div class="bubble"></div>
+                            <div class="msg-meta">
+                                ${time}
+                                ${isSent ? `<span class="tick">${isRead ? '✓✓' : '✓'}</span>` : ''}
+                            </div>
+                        `;
+                row.querySelector('.bubble').textContent = content;
+
+                messagesEl.appendChild(row);
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+
+            async function sendMessage() {
+                const content = input.value.trim();
+                if (!content) return;
+
+                input.value = '';
+                input.disabled = true;
+
+                try {
+                    const res = await fetch('@Url.Action("Send", "Messages")', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({ conversationId, content })
+                    });
+                    const data = await res.json();
+
+                    if (!data.success) {
+                        alert(data.message || 'Failed to send message.');
+                        return;
+                    }
+
+                    appendMessage({
+                        senderId: currentUserId,
+                        content,
+                        sentAt: new Date().toISOString()
+                    });
+                } catch (err) {
+                    alert('Network error sending message.');
+                } finally {
+                    input.disabled = false;
+                    input.focus();
+                }
+            }
+
+            sendBtn?.addEventListener('click', sendMessage);
+            input?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl('/chatHub')
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on('ReceiveMessage', (msg) => {
+                if (msg.senderId === currentUserId) return;
+                appendMessage(msg);
+            });
+
+            connection.start()
+                .then(() => connection.invoke('JoinConversation', conversationId))
+                .catch(err => console.error('SignalR connection failed:', err));
+
+            window.addEventListener('beforeunload', () => {
+                if (connection.state === signalR.HubConnectionState.Connected) {
+                    connection.invoke('LeaveConversation', conversationId).catch(() => { });
+                }
+            });
+        })();
+    </script>
+}

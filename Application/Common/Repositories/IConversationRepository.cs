@@ -8,5 +8,6 @@ namespace Application.Repositories
         Task<Conversation?> GetByIdAsync(Guid id);
         Task<ICollection<Conversation>> GetByUserIdAsync(Guid userId);
         Task<ICollection<Conversation>> GetAllAsync();
+        Task<Conversation?> GetPrivateConversationAsync(Guid senderId, Guid userId);
     }
 }

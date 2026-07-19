@@ -59,7 +59,7 @@ namespace Application.Commands
                     BankCode = request.BankCode,
                     AccountNumber = request.AccountNumber,
                     AccountName = request.AccountName,
-                    RecipientCode = recipientCode,
+                    RecipientCode = recipientCode.Data,
                     IsDefault = request.IsDefault,
                     CreatedBy = user.Id.ToString()
                 });

@@ -5,7 +5,7 @@ using Application.ViewModels;
 using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MySqlX.XDevAPI.Common;
+using Microsoft.AspNetCore.SignalR;
 using Web.Helpers;
 using static Application.Command.AddCategory;
 using static Application.Command.AddLibrary;
@@ -14,6 +14,7 @@ using static Application.Command.UpdateCategory;
 using static Application.Command.UpdateLibraryDetails;
 using static Application.Commands.AddSubscriptionType;
 using static Application.Commands.DeleteCategory;
+using static Application.Commands.SendMessage;
 using static Application.Commands.UploadProfilePIcs;
 using static Application.Queries.GetActivityById;
 using static Application.Queries.GetAdminDashBoardStat;
@@ -25,7 +26,6 @@ using static Application.Queries.GetAllReader;
 using static Application.Queries.GetAuditLog;
 using static Application.Queries.GetBookById;
 using static Application.Queries.GetCategoryById;
-using static Application.Queries.GetConversation;
 using static Application.Queries.GetConversationByUserId;
 using static Application.Queries.GetConversationMessages;
 using static Application.Queries.GetLibraryById;
@@ -44,7 +44,7 @@ using static Application.Queries.GetWalletBalance;
 
 namespace Host.Controllers
 {
-    public class AdminController(IMediator mediator) : Controller
+    public class AdminController(IMediator mediator, IHubContext<Hub> chatHub) : Controller
     {
         public async Task<IActionResult> Index()
         {
@@ -140,19 +140,51 @@ namespace Host.Controllers
                 return View(result.Data);
             }
 
+            ViewBag.CurrentUserId = userId;
             return View(result.Data);
         }
+
         [HttpGet]
-        public async Task<IActionResult> GetConversation(Guid id)
+        public async Task<IActionResult> GetConversation(Guid conversationId)
         {
-            var result = await mediator.Send(new GetConversationQuery(id));
-            if (!result.Status)
+            var userId = ClaimsHelper.GetUserId(User);
+
+            var listResult = await mediator.Send(new GetConversationByUserIdQuery(userId));
+            if (!listResult.Status)
             {
-                TempData["Error"] = result.Message;
-                return RedirectToAction(nameof(GetConversations));
+                TempData["Error"] = listResult.Message;
+                return View(nameof(GetConversations), listResult.Data);
             }
 
-            return View(result.Data);
+            ViewBag.CurrentUserId = userId;
+            ViewBag.SelectedConversationId = conversationId;
+            return View(nameof(GetConversations), listResult.Data);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Send(
+        Guid conversationId, string content)
+        {
+            var userId = ClaimsHelper.GetUserId(User);
+            var fullName = ClaimsHelper.GetFullName(User);
+
+            var result = await mediator.Send(
+                new SendMessageCommand(conversationId, userId, content));
+
+            if (!result.Status)
+                return Json(new { success = false, message = result.Message });
+
+            await chatHub.Clients
+                .Group($"conversation_{conversationId}")
+                .SendAsync("ReceiveMessage", new
+                {
+                    senderId = userId,
+                    senderName = fullName,
+                    content,
+                    sentAt = DateTime.UtcNow,
+                });
+
+            return Json(new { success = true });
         }
 
         [HttpGet]

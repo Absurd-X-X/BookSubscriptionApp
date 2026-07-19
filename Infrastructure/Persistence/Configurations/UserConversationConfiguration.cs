@@ -10,8 +10,6 @@ namespace Infrastructure.Persistence.Configurations
         {
             builder.HasKey(uc => new { uc.UserId, uc.ConversationId });
 
-            builder.Property(uc => uc.IsAdmin)
-                .HasDefaultValue(false);
 
             builder.HasOne(uc => uc.User)
                 .WithMany(u => u.UserConversations)
