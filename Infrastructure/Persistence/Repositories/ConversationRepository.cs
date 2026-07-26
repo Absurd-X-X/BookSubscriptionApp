@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using MimeKit;
 
 namespace Infrastructure.Persistence.Repositories
 {
@@ -22,6 +23,7 @@ namespace Infrastructure.Persistence.Repositories
             => await context.Conversations
                 .Include(c => c.Messages)
                 .Include(c => c.UserConversations)
+                .ThenInclude(q => q.User)
                 .Where(c => c.UserConversations
                     .Any(uc => uc.UserId == userId) && !c.IsDeleted)
                 .OrderByDescending(c => c.LastMessageAt)
@@ -44,6 +46,15 @@ namespace Infrastructure.Persistence.Repositories
                             c.UserConversations.Any(uc => uc.UserId == userId) &&
                             !c.IsDeleted)
                 .FirstOrDefaultAsync();
+        }
+
+        public Task<Conversation?> GetGroupAsync(Guid adminId)
+        {
+            return context.Conversations
+                .Include(c => c.UserConversations)
+                .Where(c => c.UserConversations.Any(uc => uc.UserId == adminId) &&
+                            !c.IsDeleted)
+                .FirstOrDefaultAsync(x => x.Title == "Soulshelf Group Chat");
         }
     }
 }

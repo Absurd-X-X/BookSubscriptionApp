@@ -14,6 +14,7 @@ using static Application.Command.UpdateCategory;
 using static Application.Command.UpdateLibraryDetails;
 using static Application.Commands.AddSubscriptionType;
 using static Application.Commands.DeleteCategory;
+using static Application.Commands.MarkConversationAsRead;
 using static Application.Commands.SendMessage;
 using static Application.Commands.UploadProfilePIcs;
 using static Application.Queries.GetActivityById;
@@ -148,6 +149,8 @@ namespace Host.Controllers
         public async Task<IActionResult> GetConversation(Guid conversationId)
         {
             var userId = ClaimsHelper.GetUserId(User);
+
+            await mediator.Send(new MarkConversationAsReadCommand(conversationId, userId));
 
             var listResult = await mediator.Send(new GetConversationByUserIdQuery(userId));
             if (!listResult.Status)

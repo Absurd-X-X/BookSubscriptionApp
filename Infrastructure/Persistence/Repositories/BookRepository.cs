@@ -214,30 +214,25 @@ namespace Infrastructure.Persistence.Repositories
         }
 
         public async Task<List<Book>> GetRecommendedForReaderAsync(
-    Guid readerId,
-    List<Guid>? excludeBookIds,
-    int take)
+        Guid readerId,
+        List<Guid>? excludeBookIds,
+        int take)
         {
             excludeBookIds ??= new List<Guid>();
-
-            var readerCategoryIds = await context.ReadingProgresses
-                .Where(x => x.ReaderId == readerId)
-                .Select(x => x.Book.CategoryId)
-                .Distinct()
-                .ToListAsync();
 
             var query = context.Books
                 .Where(x => !x.IsDeleted && x.IsPublished);
 
-            if (excludeBookIds.Any())
-            {
-                query = query.Where(x => !excludeBookIds.Contains(x.Id));
-            }
+            query = query.Where(book =>
+            context.ReadingProgresses.Any(progress =>
+            progress.ReaderId == readerId &&
+            progress.Book.CategoryId == book.CategoryId));
 
-            if (readerCategoryIds.Any())
-            {
-                query = query.Where(x => readerCategoryIds.Contains(x.CategoryId));
-            }
+            query = query.Where(book =>
+            !context.ReadingProgresses.Any(progress =>
+            progress.ReaderId == readerId &&
+            progress.BookId == book.Id));
+
 
             return await query
                 .Include(x => x.Category)

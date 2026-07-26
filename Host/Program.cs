@@ -7,12 +7,14 @@ using Infrastructure.Persistence.Context;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
 using Infrastructure.Settings;
+using Mapster;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Repositories;
 using static Application.Command.AddBook;
+using static Application.Queries.GetCategoryBooks;
 
 
 public partial class Program
@@ -103,7 +105,15 @@ public partial class Program
             app.UseHsts();
         }
 
-        app.UseHttpsRedirection(); 
+        app.UseHttpsRedirection();
+
+
+        // Mapster - custom mappings
+        TypeAdapterConfig<Book, BookDto>.NewConfig()
+            .Map(dest => dest.AverageRating, src => src.Reviews.Any()
+                ? src.Reviews.Average(r => r.Rating)
+                : 0.0)
+            .Map(dest => dest.ReviewCount, src => src.Reviews.Count);
 
         var provider = new FileExtensionContentTypeProvider();
         provider.Mappings[".epub"] = "application/epub+zip";

@@ -5,6 +5,7 @@ using Application.Features.ReaderBooks.Queries.GetReaderBooksPage;
 using Application.Features.ReaderEngagement.Commands.DeleteReview;
 using Application.Features.ReaderEngagement.Queries.GetReaderEngagementDashboard;
 using Application.Queries;
+using Application.ViewModels;
 using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,10 @@ using static Application.Commands.MarkNotificationRead;
 using static Application.Commands.UploadProfilePIcs;
 using static Application.Commands.VerifyFunding;
 using static Application.Queries.GetAllBook;
+using static Application.Queries.GetAllNotificationByUserId;
 using static Application.Queries.GetBookById;
+using static Application.Queries.GetCategoryBooks;
+using static Application.Queries.GetReaderActivities;
 using static Application.Queries.GetReaderDetails;
 using static Application.Queries.GetSubscriptionById;
 using static Application.Queries.GetSubscriptionByUserId;
@@ -273,8 +277,15 @@ namespace Host.Controllers
         [HttpGet]
         public async Task<IActionResult> ReaderEngagement(string range = "8w", CancellationToken ct = default)
         {
+            var userId = ClaimsHelper.GetCustomerId(User);
+
             var readerId = ClaimsHelper.GetCustomerId(User);
-            var vm = await mediator.Send(new GetReaderEngagementDashboardQuery(readerId, range), ct);
+
+            var vm = await mediator.Send(new GetReaderEngagementDashboardQuery(readerId, userId, range), ct);
+
+            var reviewableBooksResult = await mediator.Send(new GetReviewableBooks.GetReviewableBooksQuery(readerId), ct);
+            ViewBag.ReviewableBooks = reviewableBooksResult.Data;
+
             return View(vm);
         }
 
@@ -394,11 +405,13 @@ namespace Host.Controllers
         public async Task<IActionResult> ReadBook(Guid id)
         {
             var readerId = ClaimsHelper.GetCustomerId(User);
+            var userId = ClaimsHelper.GetUserId(User);
             ViewBag.ReaderId = readerId; 
 
             var result = await mediator.Send(
                 new GetBookForReading.GetBookForReadingQuery(
                     readerId,
+                    userId,
                     id));
 
             if (!result.Status)
@@ -472,6 +485,7 @@ namespace Host.Controllers
             return View(vm);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
 
         public async Task<IActionResult> ChangePassword(string initialPassword, string newPassword)
@@ -512,13 +526,6 @@ namespace Host.Controllers
             }
 
             return View(result.Data);
-        }
-
-        [HttpGet]
-
-        public async Task<IActionResult> ReaderActivities()
-        {
-            return View();
         }
 
         [HttpGet]
@@ -581,6 +588,81 @@ namespace Host.Controllers
             }
             TempData["Success"] = result.Message;
             return View(result.Data);
+        }
+
+        public async Task<IActionResult> GetCategoryBooks(Guid categoryId)
+        {
+            var result = await mediator.Send(new GetCategoryBooksQuery(categoryId));
+
+            if (!result.Status) 
+                return RedirectToAction(nameof(ReaderBooks));
+
+            return View(result.Data);
+        }
+
+
+            [HttpGet]
+            public async Task<IActionResult> ReaderActivities(
+                int page = 1,
+                int pageSize = 10,
+                string? search = null,
+                string? type = null,
+                DateTime? from = null,
+                DateTime? to = null)
+            {
+
+
+            var userId = ClaimsHelper.GetUserId(User);
+            var auditResult = await mediator.Send(new GetReaderActivitiesQuery(
+                    page,
+                    pageSize,
+                    userId,
+                    search,
+                    string.IsNullOrEmpty(type) || type == "all" ? null : type,
+                    from,
+                    to));
+
+
+            var notifResult = await mediator.Send(new GetAllNotificationQuery(userId));
+
+                var model = new ActivityViewModel
+                {
+                    AuditLogs = auditResult.Data ?? new()
+                    {
+                        Page = page,
+                        PageSize = pageSize
+                    },
+                    Notifications = notifResult.Data ?? new(0, 0, 0, 0, 0, [], []),
+                    Search = search,
+                    ActionType = type,
+                    DateFrom = from,
+                    DateTo = to
+                };
+
+                return View(model);
+            }
+
+            [HttpPost]
+            [IgnoreAntiforgeryToken] 
+            public async Task<IActionResult> MarkNotificationRead(Guid id)
+            {
+                var userId = ClaimsHelper.GetUserId(User);
+            var result = await mediator.Send(new MarkNotificationReadCommand(id, userId, true));
+                return Json(new { success = result.Status, message = result.Message });
+            }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddReview([FromBody] AddReview.AddReviewCommand command)
+        {
+            var readerId = ClaimsHelper.GetCustomerId(User);
+
+            var result = await mediator.Send(command with {ReaderId = readerId });
+
+            if (!result.Status)
+                return Json(new { success = false, message = result.Message });
+
+            return Json(new { success = true, message = result.Message });
         }
     }
 }

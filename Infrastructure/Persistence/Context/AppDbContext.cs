@@ -1,6 +1,8 @@
 ﻿using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System.Text.RegularExpressions;
 
 namespace Infrastructure.Persistence.Context
 {
@@ -59,8 +61,25 @@ namespace Infrastructure.Persistence.Context
                 Balance = 0,
             };
 
+            var conversationId = Guid.Parse("b235f2ed-bb4e-4bd2-a03d-0e3c17aaf2e2");
+
+            var conversation = new Conversation
+            {
+                Id = conversationId,
+                Title = "Soulshelf Group Chat",
+                CreatedBy = user.Id.ToString()
+            };
+
+            var userConversation = new UserConversation
+            {
+                ConversationId = conversationId,
+                UserId = user.Id
+            };
+
             modelBuilder.Entity<User>().HasData(user);
             modelBuilder.Entity<Wallet>().HasData(wallet);
+            modelBuilder.Entity<Conversation>().HasData(conversation);
+            modelBuilder.Entity<UserConversation>().HasData(userConversation);
         }
     }
 }

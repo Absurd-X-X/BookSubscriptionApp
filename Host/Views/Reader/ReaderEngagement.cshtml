@@ -7,6 +7,7 @@
     Layout = "~/Views/Shared/_ReaderLayout.cshtml";
 
     var chartJson = JsonSerializer.Serialize(Model.Analytics.Chart);
+    var reviewableBooks = (List<Application.Queries.GetReviewableBooks.GetReviewableBooksResponse>)(ViewBag.ReviewableBooks ?? new List<Application.Queries.GetReviewableBooks.GetReviewableBooksResponse>());
 }
 
 @functions {
@@ -27,6 +28,8 @@
 }
 
 <link href="~/css/readerEngagement.css" rel="stylesheet" />
+
+@Html.AntiForgeryToken()
 
 <!-- TOPBAR -->
 <header class="eg-topbar">
@@ -78,7 +81,7 @@
             <div class="eg-avd" id="egAVD">
                 <div class="eg-avd-top"><div class="avn">Alex Reader</div><div class="ave">alex@soulshelf.app</div></div>
                 <a href="@Url.Action("ReaderPersonal", "Reader")"><i class="ti ti-user"></i> Profile</a>
-                <a href="@Url.Action("ReaderPersonal", "Reader")><i class="ti ti-settings"></i> Settings</a>
+                <a href="@Url.Action("ReaderPersonal", "Reader")"><i class="ti ti-settings"></i> Settings</a>
                 <div class="eg-avd-div"></div>
                 <a class="out"><i class="ti ti-logout"></i> Logout</a>
             </div>
@@ -331,7 +334,18 @@
         <div class="eg-mhdr"><h3>Write a Review</h3><i class="ti ti-x eg-mclose" id="closeRev"></i></div>
         <label>Book</label>
         <select id="revBook">
-            <!-- TODO: populate from reader's currently-reading / completed list once that endpoint is confirmed -->
+            <option value="" disabled selected>Choose a book…</option>
+            @if (!reviewableBooks.Any())
+            {
+                <option value="" disabled>No books available to review</option>
+            }
+            else
+            {
+                @foreach (var b in reviewableBooks)
+                {
+                    <option value="@b.BookId">@b.Title — @b.Author</option>
+                }
+            }
         </select>
         <label>Rating</label>
         <div class="eg-mstars" id="mStars">
@@ -349,42 +363,45 @@
 </div>
 
 <script>
-    (function () {
+    (function() {
         'use strict';
         function gi(id) { return document.getElementById(id); }
 
         const CHART_DATA = @Html.Raw(chartJson); // [{ label, hours }]
 
+        var tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+        window.ANTIFORGERY_TOKEN = tokenInput ? tokenInput.value : '';
+
         function closeAll(except) {
-            [gi('egND'), gi('egAVD'), gi('egSD'), gi('pdDrop')].forEach(function (d) { if (d && d !== except) d.classList.remove('open'); });
+            [gi('egND'), gi('egAVD'), gi('egSD'), gi('pdDrop')].forEach(function(d) { if (d && d !== except) d.classList.remove('open'); });
             var pb = gi('pdBtn'); if (pb && gi('pdDrop') !== except) pb.classList.remove('open');
-            document.querySelectorAll('.kb-m').forEach(function (m) { if (m !== except) m.classList.remove('open'); });
+            document.querySelectorAll('.kb-m').forEach(function(m) { if (m !== except) m.classList.remove('open'); });
         }
-        document.addEventListener('click', function () { closeAll(null); });
+        document.addEventListener('click', function() { closeAll(null); });
 
         /* Bell */
         var bell = gi('egBell'), nd = gi('egND'), bdot = gi('egBDot');
-        if (bell) bell.addEventListener('click', function (e) { e.stopPropagation(); var o = nd.classList.contains('open'); closeAll(null); if (!o) nd.classList.add('open'); });
+        if (bell) bell.addEventListener('click', function(e) { e.stopPropagation(); var o = nd.classList.contains('open'); closeAll(null); if (!o) nd.classList.add('open'); });
 
         var ma = gi('egMA');
-        if (ma) ma.addEventListener('click', async function () {
+        if (ma) ma.addEventListener('click', async function() {
             await fetch('/Reader/MarkAllNotificationsRead', { method: 'POST' });
-            document.querySelectorAll('.eg-nd-item.unread').forEach(function (el) { el.classList.remove('unread'); });
-            document.querySelectorAll('.eg-nd-dot').forEach(function (el) { el.remove(); });
+            document.querySelectorAll('.eg-nd-item.unread').forEach(function(el) { el.classList.remove('unread'); });
+            document.querySelectorAll('.eg-nd-dot').forEach(function(el) { el.remove(); });
             if (bdot) bdot.style.display = 'none';
         });
 
         var msr = gi('markSecRead');
-        if (msr) msr.addEventListener('click', async function (e) {
+        if (msr) msr.addEventListener('click', async function(e) {
             e.preventDefault();
             await fetch('/Reader/MarkAllNotificationsRead', { method: 'POST' });
-            document.querySelectorAll('.notif-row .ndot').forEach(function (el) { el.remove(); });
+            document.querySelectorAll('.notif-row .ndot').forEach(function(el) { el.remove(); });
             if (bdot) bdot.style.display = 'none';
         });
 
         /* Individual notification click → mark read */
-        document.querySelectorAll('.notif-row, .eg-nd-item').forEach(function (row) {
-            row.addEventListener('click', async function () {
+        document.querySelectorAll('.notif-row, .eg-nd-item').forEach(function(row) {
+            row.addEventListener('click', async function() {
                 var id = row.dataset.notifId;
                 if (!id) return;
                 await fetch('/Reader/MarkNotificationRead?id=' + id, { method: 'POST' });
@@ -396,11 +413,11 @@
 
         /* Avatar */
         var av = gi('egAV'), avd = gi('egAVD');
-        if (av) av.addEventListener('click', function (e) { e.stopPropagation(); var o = avd.classList.contains('open'); closeAll(null); if (!o) avd.classList.add('open'); });
+        if (av) av.addEventListener('click', function(e) { e.stopPropagation(); var o = avd.classList.contains('open'); closeAll(null); if (!o) avd.classList.add('open'); });
 
         /* Kebabs */
-        document.querySelectorAll('.kb').forEach(function (k) {
-            k.addEventListener('click', function (e) {
+        document.querySelectorAll('.kb').forEach(function(k) {
+            k.addEventListener('click', function(e) {
                 e.stopPropagation();
                 var m = this.nextElementSibling;
                 var o = m.classList.contains('open');
@@ -411,12 +428,12 @@
 
         /* Analytics tabs */
         var panels = { overview: gi('anOverview'), reading: gi('anReading'), activity: gi('anActivity'), streaks: gi('anStreaks') };
-        document.querySelectorAll('.an-tab').forEach(function (tab) {
-            tab.addEventListener('click', function () {
-                document.querySelectorAll('.an-tab').forEach(function (t) { t.classList.remove('active'); });
+        document.querySelectorAll('.an-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.an-tab').forEach(function(t) { t.classList.remove('active'); });
                 this.classList.add('active');
                 var k = this.getAttribute('data-tab');
-                Object.keys(panels).forEach(function (p) { if (panels[p]) panels[p].style.display = (p === k) ? '' : 'none'; });
+                Object.keys(panels).forEach(function(p) { if (panels[p]) panels[p].style.display = (p === k) ? '' : 'none'; });
             });
         });
 
@@ -429,11 +446,11 @@
                 if (yax) yax.innerHTML = '';
                 return;
             }
-            var mx = Math.max.apply(null, data.map(function (d) { return d.hours; })) || 1;
+            var mx = Math.max.apply(null, data.map(function(d) { return d.hours; })) || 1;
 
             if (yax) {
                 yax.innerHTML = '';
-                [1, 0.75, 0.5, 0.25, 0].forEach(function (f) {
+                [1, 0.75, 0.5, 0.25, 0].forEach(function(f) {
                     var s = document.createElement('span');
                     s.textContent = Math.round(mx * f) + 'h';
                     yax.appendChild(s);
@@ -441,7 +458,7 @@
             }
 
             bars.innerHTML = ''; xl.innerHTML = '';
-            data.forEach(function (d) {
+            data.forEach(function(d) {
                 var b = document.createElement('div');
                 b.className = 'an-bar' + (d.hours === mx ? ' hi' : '');
                 b.style.height = Math.round((d.hours / mx) * 100) + '%';
@@ -460,45 +477,84 @@
 
         var pb = gi('pdBtn'), pdrop = gi('pdDrop'), pl = gi('pdLabel');
         if (pb) {
-            pb.addEventListener('click', function (e) {
+            pb.addEventListener('click', function(e) {
                 e.stopPropagation();
                 var o = pdrop.classList.contains('open');
                 closeAll(null);
                 if (!o) { pdrop.classList.add('open'); pb.classList.add('open'); }
             });
-            pdrop.querySelectorAll('a[data-p]').forEach(function (a) {
-                a.addEventListener('click', function (e) {
+            pdrop.querySelectorAll('a[data-p]').forEach(function(a) {
+                a.addEventListener('click', function(e) {
                     e.stopPropagation();
                     window.location.href = '/Reader/Engagement?range=' + this.getAttribute('data-p') + '#section-analytics';
                 });
             });
         }
 
-        /* Modal (submit still unwired — no create-review endpoint yet) */
+        /* Modal */
         var modal = gi('revModal'); var rating = 0;
         function openM() { modal.classList.add('open'); }
         function closeM() { modal.classList.remove('open'); }
-        [gi('writeBtn1'), gi('writeBtn2')].forEach(function (b) { if (b) b.addEventListener('click', openM); });
+        [gi('writeBtn1'), gi('writeBtn2')].forEach(function(b) { if (b) b.addEventListener('click', openM); });
         if (gi('closeRev')) gi('closeRev').addEventListener('click', closeM);
         if (gi('cancelRev')) gi('cancelRev').addEventListener('click', closeM);
-        if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) closeM(); });
+        if (modal) modal.addEventListener('click', function(e) { if (e.target === modal) closeM(); });
+
         var mstars = document.querySelectorAll('#mStars i');
-        mstars.forEach(function (s, i) {
-            s.addEventListener('mouseover', function () { mstars.forEach(function (x, j) { x.className = j <= i ? 'ti ti-star-filled lit' : 'ti ti-star'; }); });
-            s.addEventListener('click', function () { rating = i + 1; });
+        mstars.forEach(function(s, i) {
+            s.addEventListener('mouseover', function() { mstars.forEach(function(x, j) { x.className = j <= i ? 'ti ti-star-filled lit' : 'ti ti-star'; }); });
+            s.addEventListener('click', function() { rating = i + 1; });
         });
         var ms = gi('mStars');
-        if (ms) ms.addEventListener('mouseleave', function () { mstars.forEach(function (s, i) { s.className = i < rating ? 'ti ti-star-filled lit' : 'ti ti-star'; }); });
-        if (gi('submitRev')) gi('submitRev').addEventListener('click', function () {
-            alert('TODO: wire to a CreateReview command — no such endpoint exists yet.');
-            closeM();
+        if (ms) ms.addEventListener('mouseleave', function() { mstars.forEach(function(s, i) { s.className = i < rating ? 'ti ti-star-filled lit' : 'ti ti-star'; }); });
+
+        /* Submit review — wired to AddReview command */
+        if (gi('submitRev')) gi('submitRev').addEventListener('click', async function() {
+            var bookSelect = gi('revBook');
+            var bookId = bookSelect ? bookSelect.value : null;
+            var comment = gi('revText').value.trim();
+
+            if (!bookId) { alert('Please select a book.'); return; }
+            if (!rating) { alert('Please select a rating.'); return; }
+            if (!comment) { alert('Please write a short review.'); return; }
+
+            var btn = this;
+            btn.disabled = true;
+
+            try {
+                var res = await fetch('/Reader/AddReview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': window.ANTIFORGERY_TOKEN
+                    },
+                    body: JSON.stringify({ rating: rating, comment: comment, bookId: bookId })
+                });
+                var data = await res.json();
+
+                if (!data.success) {
+                    alert(data.message || 'Could not submit review.');
+                    return;
+                }
+
+                closeM();
+                gi('revText').value = '';
+                rating = 0;
+                mstars.forEach(function(s) { s.className = 'ti ti-star'; });
+                if (bookSelect) bookSelect.selectedIndex = 0;
+                window.location.reload();
+            } catch (err) {
+                alert('Something went wrong submitting your review.');
+            } finally {
+                btn.disabled = false;
+            }
         });
 
         /* Scrollspy */
         var smap = [{ label: 'Reviews', id: 'section-reviews' }, { label: 'Notifications', id: 'section-notifications' }, { label: 'Analytics', id: 'section-analytics' }, { label: 'Support', id: 'section-notifications' }];
-        document.querySelectorAll('.nav-subitem').forEach(function (link) {
+        document.querySelectorAll('.nav-subitem').forEach(function(link) {
             var txt = link.textContent.trim();
-            smap.forEach(function (m) { if (txt === m.label) { link.setAttribute('href', '#' + m.id); link.classList.add('scrollspy-link'); } });
+            smap.forEach(function(m) { if (txt === m.label) { link.setAttribute('href', '#' + m.id); link.classList.add('scrollspy-link'); } });
         });
 
         /* Init */

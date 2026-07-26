@@ -35,7 +35,6 @@ namespace Application.Features.ReaderBooks.Commands.ToggleBookListMembership
                 return true;
             }
 
-            // Favorite
             var existingFav = await favoriteRepository.GetAsync(request.ReaderId, request.BookId);
             if (existingFav is not null)
             {

@@ -47,7 +47,6 @@ namespace Application.Commands
                     return Result<FundWalletResponse>.Failure(
                         $"Could not initialize payment due to {paystackResponse.Message}");
 
-                wallet.Balance += request.Amount;
 
                 await walletTransactionRepository.AddAsync(new WalletTransaction
                 {
@@ -57,8 +56,6 @@ namespace Application.Commands
                     Status = WalletTransactionStatus.Pending,
                     PaystackReference = reference,
                     Description = "Wallet Funding",
-                    BalanceBefore = wallet.Balance,
-                    BalanceAfter = wallet.Balance += request.Amount,
                     CreatedBy = customer.Email
                 });
 

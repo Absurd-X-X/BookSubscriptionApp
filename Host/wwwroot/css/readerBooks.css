@@ -276,12 +276,12 @@ body::-webkit-scrollbar-thumb {
     background-color: #13122a;
     border: 1px solid #2d2b72;
     border-radius: 5px;
-    padding: 14px 18px;
+    padding: 14px 12px;
     cursor: pointer;
     text-decoration: none;
-    width: 18%;
+    flex-shrink: 0;
+    width: 170px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: 100px;
 }
 
     .cat-pill:hover {
@@ -307,7 +307,13 @@ body::-webkit-scrollbar-thumb {
     font-weight: 500;
     color: #fff;
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+    min-height: 2.6em;
 }
 
 .cat-pill-count {

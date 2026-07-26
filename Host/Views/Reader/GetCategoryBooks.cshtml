@@ -1,0 +1,245 @@
+﻿@using Application.Queries
+@model GetCategoryBooks.GetCategoryBooksResponse
+@{
+    ViewData["Title"] = Model.Name;
+    Layout = "~/Views/Shared/_ReaderLayout.cshtml";
+}
+
+<link href="~/css/getCategoryBooks.css" rel="stylesheet" />
+
+@* ── BACK ── *@
+<a href="@Url.Action("ReaderDasboard", "Reader")" class="back-link">
+    <i class="ti ti-arrow-left"></i> Back
+</a>
+
+@* ── PAGE HEADER ── *@
+<div class="page-title">@Model.Name</div>
+<div class="page-meta">
+    @Model.Books.Count() books &middot; @Model.Description
+</div>
+
+@* ── TOOLBAR ── *@
+<div class="toolbar">
+    <div class="search-bar">
+        <i class="ti ti-search"></i>
+        <input type="text" id="bookSearch" placeholder="Search books..." />
+    </div>
+
+    <select class="toolbar-select" id="pricingFilter">
+        <option value="">All Books</option>
+        <option value="Free">Free</option>
+        <option value="Premium">Premium</option>
+    </select>
+
+    <select class="toolbar-select" id="sortSelect">
+        <option value="popular">Sort by: Popular</option>
+        <option value="rating">Sort by: Rating</option>
+        <option value="title">Sort by: Title A–Z</option>
+    </select>
+
+    <button class="btn-filters">
+        <i class="ti ti-adjustments-horizontal"></i> Filters
+    </button>
+
+    <div class="view-toggle">
+        <button class="view-btn active" id="gridViewBtn" onclick="setView('grid')">
+            <i class="ti ti-layout-grid"></i>
+        </button>
+        <button class="view-btn" id="listViewBtn" onclick="setView('list')">
+            <i class="ti ti-list"></i>
+        </button>
+    </div>
+</div>
+
+@* ── BOOKS GRID ── *@
+<div class="books-grid" id="booksGrid">
+    @if (!Model.Books.Any())
+    {
+        <div class="empty-state">
+            <i class="ti ti-books"></i>
+            <p>No books found in this category yet.</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var book in Model.Books)
+        {
+            <div class="book-card"
+                 data-title="@book.Title.ToLower()"
+                 data-author="@book.Author.ToLower()"
+                 data-pricing="@book.PricingType"
+                 data-rating="@book.AverageRating"
+                 data-reads="@book.NoOfTimeReadByPeople">
+
+                <div class="book-cover">
+                    @if (!string.IsNullOrEmpty(book.BookCoverUrl))
+                    {
+                        <img src="@book.BookCoverUrl" alt="@book.Title" />
+                    }
+                    else
+                    {
+                        <div class="book-cover-ph"><i class="ti ti-book"></i></div>
+                    }
+
+                    @if (book.PricingType == "Free")
+                    {
+                        <span class="badge-free">Free</span>
+                    }
+                    else if (book.PricingType == "Premium")
+                    {
+                        <span class="badge-premium">Premium</span>
+                    }
+
+                    <button class="btn-bookmark" data-book-id="@book.Id">
+                        <i class="ti ti-bookmark"></i>
+                    </button>
+                </div>
+
+                <div class="book-info">
+                    <div class="book-title">@book.Title</div>
+                    <div class="book-author">@book.Author</div>
+                    <div class="book-rating">
+                        @{
+                            var fullStars = (int)Math.Floor(book.AverageRating);
+                            var halfStar = (book.AverageRating - fullStars) >= 0.5;
+                            var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+                        }
+                        <span class="stars">
+                            @for (int s = 0; s < fullStars; s++)
+                            {
+                                <text>★</text>
+                            }
+                            @if (halfStar)
+                            {
+                                <text>½</text>
+                            }
+                            @for (int e = 0; e < emptyStars; e++)
+                            {
+                                <text>☆</text>
+                            }
+                        </span>
+                        <span class="val">@book.AverageRating.ToString("F1")</span>
+                        <span class="cnt">(@book.ReviewCount)</span>
+                    </div>
+                </div>
+
+                <div class="book-footer">
+                    <button class="btn-add" data-book-id="@book.Id">
+                        <i class="ti ti-plus"></i> Add to List
+                    </button>
+                    <button class="btn-more">
+                        <i class="ti ti-dots"></i>
+                    </button>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@* ── PAGINATION ── *@
+@{
+    var totalBooks = Model.Books.Count();
+    var perPage = 20;
+    var totalPages = (int)Math.Ceiling((double)totalBooks / perPage);
+}
+<div class="pagination-bar">
+    <div class="pagination-info">
+        Showing 1 to @Math.Min(perPage, totalBooks) of @totalBooks books
+    </div>
+    <div class="pagination-controls">
+        <button class="page-btn disabled"><i class="ti ti-chevrons-left"></i></button>
+        @for (int p = 1; p <= Math.Min(totalPages, 5); p++)
+        {
+            <button class="page-btn @(p == 1 ? "active" : "")">@p</button>
+        }
+        <button class="page-btn @(totalPages <= 1 ? "disabled" : "")">
+            <i class="ti ti-chevrons-right"></i>
+        </button>
+    </div>
+    <div style="font-size:13px;color:#8A94A6;">20 per page</div>
+</div>
+
+@* ── FOOTER BANNER ── *@
+<div class="footer-banner">
+    <div class="footer-banner-left">
+        <div class="banner-icon"><i class="ti ti-star"></i></div>
+        <div>
+            <div class="banner-text-title">Keep growing. Keep going.</div>
+            <div class="banner-text-sub">Discover more books and build a better you every day.</div>
+        </div>
+    </div>
+    <a href="@Url.Action("Index", "Library")" class="btn-explore">
+        Explore More Books <i class="ti ti-arrow-right"></i>
+    </a>
+</div>
+
+@section Scripts {
+    <script>
+        // ── VIEW TOGGLE ────────────────────────────────────────────────
+        function setView(type) {
+            var grid    = document.getElementById('booksGrid');
+            var gridBtn = document.getElementById('gridViewBtn');
+            var listBtn = document.getElementById('listViewBtn');
+            if (type === 'grid') {
+                grid.style.gridTemplateColumns = 'repeat(5, 1fr)';
+                gridBtn.classList.add('active');
+                listBtn.classList.remove('active');
+            } else {
+                grid.style.gridTemplateColumns = '1fr';
+                gridBtn.classList.remove('active');
+                listBtn.classList.add('active');
+            }
+        }
+
+        // ── SEARCH + FILTER + SORT ─────────────────────────────────────
+        var cards = Array.from(document.querySelectorAll('.book-card'));
+
+        function applyFilters() {
+            var query   = document.getElementById('bookSearch').value.toLowerCase();
+            var pricing = document.getElementById('pricingFilter').value;
+            var sort    = document.getElementById('sortSelect').value;
+
+            var filtered = cards.filter(function (c) {
+                var matchText    = c.dataset.title.includes(query) || c.dataset.author.includes(query);
+                var matchPricing = !pricing || c.dataset.pricing === pricing;
+                return matchText && matchPricing;
+            });
+
+            filtered.sort(function (a, b) {
+                if (sort === 'rating')  return parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating);
+                if (sort === 'popular') return parseInt(b.dataset.reads)    - parseInt(a.dataset.reads);
+                if (sort === 'title')   return a.dataset.title.localeCompare(b.dataset.title);
+                return 0;
+            });
+
+            var grid = document.getElementById('booksGrid');
+            cards.forEach(function (c) { c.style.display = 'none'; });
+            filtered.forEach(function (c) { c.style.display = 'flex'; grid.appendChild(c); });
+        }
+
+        document.getElementById('bookSearch').addEventListener('input', applyFilters);
+        document.getElementById('pricingFilter').addEventListener('change', applyFilters);
+        document.getElementById('sortSelect').addEventListener('change', applyFilters);
+
+        // ── BOOKMARK TOGGLE ────────────────────────────────────────────
+        document.querySelectorAll('.btn-bookmark').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var icon = this.querySelector('i');
+                var saved = icon.classList.contains('ti-bookmark-filled');
+                icon.className = saved ? 'ti ti-bookmark' : 'ti ti-bookmark-filled';
+                this.style.color = saved ? '' : '#1EA7C4';
+            });
+        });
+
+        // ── PAGINATION ─────────────────────────────────────────────────
+        document.querySelectorAll('.page-btn:not(.disabled)').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (!this.querySelector('i')) {
+                    document.querySelectorAll('.page-btn').forEach(function (b) { b.classList.remove('active'); });
+                    this.classList.add('active');
+                }
+            });
+        });
+    </script>
+}

@@ -331,6 +331,10 @@
     margin-bottom: 12px
 }
 
+a{
+    text-decoration: none;
+}
+
 .date-preset {
     display: flex;
     align-items: center;

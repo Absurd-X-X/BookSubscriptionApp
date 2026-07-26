@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SoulShelf Library</title>
     <link rel="preconnect" href="googleapis.com">
-    <link rel="preconnect" href="gstatic.com" crossorigin>
+    <link rel="preconnect" href="gstatic.com" crossoriging>
     <link href="googleapis.com" rel="stylesheet">
 
     <link rel="stylesheet"
@@ -74,7 +74,7 @@
                 </a>
 
                 <a href="@Url.Action("GetConversations", "Library")"
-                   class="nav-item @(controller == "Library" && action == "GetConversations" ? "active" : "")">
+                   class="nav-item @(controller == "Library" && (action == "GetConversations" || action == "GetConversation") ? "active" : "")">
                     <img src="~/lib/images/view message.png" alt="">MESSAGES
                 </a>
 

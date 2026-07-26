@@ -293,7 +293,7 @@
         <div class="goal-card">
             <div class="goal-header">
                 <h3>Reading Goal</h3>
-                <a href="@Url.Action("ReaderDashBoard", "Reader")" class="edit-goal">Edit Goal</a>
+                <a class="edit-goal" href="#" id="editGoalBtn">Edit Goal</a>
             </div>
             <div class="on-track">@(Model.GoalIsOnTrack ? "You're on track!" : "Keep going!")</div>
             <div class="goal-count">@Model.GoalBooksCompleted of @Model.GoalTargetBooks books</div>
@@ -339,5 +339,8 @@
 
     </div>
 </div>
+
+<script>
+</script>
 
 <!-- keep your existing scrollspy <script> block unchanged at the bottom -->

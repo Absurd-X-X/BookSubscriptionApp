@@ -9,8 +9,8 @@
     Guid? selectedId = ViewBag.SelectedConversationId as Guid?;
 
     var selected = selectedId is not null
-        ? Model?.FirstOrDefault(c => c.ConversationId == selectedId)
-        : Model?.FirstOrDefault();
+    ? Model?.FirstOrDefault(c => c.ConversationId == selectedId)
+    : null;
 
     static string InitialsOf(string title)
     {
@@ -77,7 +77,7 @@
                 {
                     var isActive = selected is not null && conv.ConversationId == selected.ConversationId;
 
-                    <a href="@Url.Action("GetConversation", "Messages", new { conversationId = conv.ConversationId })"
+                    <a href="@Url.Action("GetConversation", "Admin", new { conversationId = conv.ConversationId })"
                        class="conv-item @(isActive ? "active" : "")" style="text-decoration:none;color:inherit;">
 
                         <div class="avatar @(conv.ImageUrl == "none" ? AvatarColorClass(conv.Title) : "")">
@@ -87,7 +87,7 @@
                             }
                             else
                             {
-                                @InitialsOf(conv.Title)
+                                <img src="~/lib/images/mypics.jpg" alt="@conv.Title" />
                             }
                         </div>
 
@@ -282,7 +282,7 @@
                 input.disabled = true;
 
                 try {
-                    const res = await fetch('@Url.Action("Send", "Messages")', {
+                    const res = await fetch('@Url.Action("Send", "Admin")', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: new URLSearchParams({ conversationId, content })

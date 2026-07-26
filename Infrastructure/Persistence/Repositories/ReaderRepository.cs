@@ -16,6 +16,8 @@ namespace Infrastructure.Persistence.Repositories
         public async Task<Reader?> GetByIdAsync(Guid id)
 
             => await context.Readers
+                .Include(c => c.Reviews)
+                .Include(c => c.User)
                 .Include(r => r.Subscriptions)
                 .FirstOrDefaultAsync(r => r.Id == id);
 

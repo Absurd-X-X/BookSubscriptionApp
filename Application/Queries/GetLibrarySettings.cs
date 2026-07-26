@@ -1,7 +1,6 @@
 ﻿using Application.Common.Dtos;
 using Application.Common.Repositories;
 using MediatR;
-using static Application.Queries.GetLibrarySettings;
 
 namespace Application.Queries
 {

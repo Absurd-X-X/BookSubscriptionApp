@@ -423,16 +423,19 @@
             <h3>Change Password</h3>
             <i class="ti ti-x pn-mclose" id="closePwModal"></i>
         </div>
-        <label>Current Password</label>
-        <input type="password" placeholder="Enter current password" class="pn-minput" />
-        <label>New Password</label>
-        <input type="password" placeholder="Enter new password" class="pn-minput" id="newPwInput" />
-        <label>Confirm New Password</label>
-        <input type="password" placeholder="Confirm new password" class="pn-minput" id="confirmPwInput" />
-        <div class="pn-mfoot">
-            <button class="pn-mcancel" id="cancelPwModal">Cancel</button>
-            <button class="pn-btn-primary" id="savePwBtn">Update Password</button>
-        </div>
+        <form id="pwForm" asp-controller="Reader" asp-action="ChangePassword" method="post">
+            @Html.AntiForgeryToken()
+            <label>Current Password</label>
+            <input type="password" placeholder="Enter current password" class="pn-minput" name="initialPassword" id="initialPwInput" />
+            <label>New Password</label>
+            <input type="password" placeholder="Enter new password" class="pn-minput" name="newPassword" id="newPwInput" />
+            <label>Confirm New Password</label>
+            <input type="password" placeholder="Confirm new password" class="pn-minput" id="confirmPwInput" />
+            <div class="pn-mfoot">
+                <button type="button" class="pn-mcancel" id="cancelPwModal">Cancel</button>
+                <button type="submit" class="pn-btn-primary" id="savePwBtn">Update Password</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -456,303 +459,317 @@
 </div>
 
 <!-- TOAST -->
-<div class="pn-toast" id="pnToast"></div>
+<div class="pn-toast" id="pnToast" data-success="@TempData["Success"]" data-error="@TempData["Error"]"></div>
 
 <script>
-        /* readerPersonal.js — all interactions for the Personal page */
-    (function () {
-      'use strict';
+    /* readerPersonal.js — all interactions for the Personal page */
+    (function() {
+        'use strict';
 
-      function gi(id) { return document.getElementById(id); }
+        function gi(id) { return document.getElementById(id); }
 
-      /* ── Toast ────────────────────────────────────────────────── */
-      var toastTimer;
-      function showToast(msg, type) {
-        var t = gi('pnToast');
-        if (!t) return;
-        t.textContent = msg;
-        t.className = 'pn-toast show ' + (type || '');
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(function () {
-          t.className = 'pn-toast';
-        }, 3000);
-      }
-
-      /* ── Close-all dropdowns helper ───────────────────────────── */
-      function closeAllDrops(except) {
-        document.querySelectorAll('.pd-drop').forEach(function (d) {
-          if (d !== except) d.classList.remove('open');
-        });
-        document.querySelectorAll('.pd-btn').forEach(function (b) {
-          if (b.nextElementSibling !== except) b.classList.remove('open');
-        });
-      }
-      document.addEventListener('click', function () { closeAllDrops(null); });
-
-      /* ── Profile picture preview (upload happens on Save) ─────── */
-      var fileInput = gi('piFileInput');
-      if (fileInput) {
-        fileInput.addEventListener('change', function () {
-          var file = this.files[0];
-          if (!file) return;
-          var reader = new FileReader();
-          reader.onload = function (e) {
-            var img = gi('piAvatar');
-            var fb  = img && img.nextElementSibling;
-            if (img) {
-              img.src = e.target.result;
-              img.style.display = '';
-              if (fb) fb.style.display = 'none';
-            }
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-      /* ── Bio character counter ────────────────────────────────── */
-      var bioTA    = gi('piBio');
-      var bioCount = gi('piBioCount');
-      if (bioTA && bioCount) {
-        function updateCount() {
-          bioCount.textContent = bioTA.value.length;
+        /* ── Toast ────────────────────────────────────────────────── */
+        var toastTimer;
+        function showToast(msg, type) {
+            var t = gi('pnToast');
+            if (!t) return;
+            t.textContent = msg;
+            t.className = 'pn-toast show ' + (type || '');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function() {
+                t.className = 'pn-toast';
+            }, 3000);
         }
-        bioTA.addEventListener('input', updateCount);
-        updateCount();
-      }
 
-      /* ── Save Changes (real submit) ───────────────────────────── */
-      var piForm = gi('piForm');
-      if (piForm) {
-        piForm.addEventListener('submit', function (e) {
-          e.preventDefault();
+        /* ── Close-all dropdowns helper ───────────────────────────── */
+        function closeAllDrops(except) {
+            document.querySelectorAll('.pd-drop').forEach(function(d) {
+                if (d !== except) d.classList.remove('open');
+            });
+            document.querySelectorAll('.pd-btn').forEach(function(b) {
+                if (b.nextElementSibling !== except) b.classList.remove('open');
+            });
+        }
+        document.addEventListener('click', function() { closeAllDrops(null); });
 
-          var name = gi('piFullName') ? gi('piFullName').value.trim() : '';
-          if (!name) { showToast('Full name cannot be empty', 'error'); return; }
+        /* ── Profile picture preview (upload happens on Save) ─────── */
+        var fileInput = gi('piFileInput');
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                var file = this.files[0];
+                if (!file) return;
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var img = gi('piAvatar');
+                    var fb = img && img.nextElementSibling;
+                    if (img) {
+                        img.src = e.target.result;
+                        img.style.display = '';
+                        if (fb) fb.style.display = 'none';
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
 
-          var formData = new FormData(piForm);
-          if (fileInput && fileInput.files[0]) {
-            formData.set('AvatarFile', fileInput.files[0]);
-          }
-
-          var saveBtn = gi('saveChangesBtn');
-          if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
-
-          fetch('@Url.Action("UpdateProfile", "Reader")', {
-            method: 'POST',
-            body: formData,
-            headers: {
-              'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        /* ── Bio character counter ────────────────────────────────── */
+        var bioTA = gi('piBio');
+        var bioCount = gi('piBioCount');
+        if (bioTA && bioCount) {
+            function updateCount() {
+                bioCount.textContent = bioTA.value.length;
             }
-          })
-            .then(function (res) { return res.json(); })
-            .then(function (result) {
-              if (result.success) {
-                var nameEl = document.querySelector('.pi-name');
-                if (nameEl) nameEl.textContent = name;
-                if (result.avatarUrl) {
-                  var avatarImg = gi('piAvatar');
-                  if (avatarImg) avatarImg.src = result.avatarUrl;
+            bioTA.addEventListener('input', updateCount);
+            updateCount();
+        }
+
+        /* ── Save Changes (real submit) ───────────────────────────── */
+        var piForm = gi('piForm');
+        if (piForm) {
+            piForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                var name = gi('piFullName') ? gi('piFullName').value.trim() : '';
+                if (!name) { showToast('Full name cannot be empty', 'error'); return; }
+
+                var formData = new FormData(piForm);
+                if (fileInput && fileInput.files[0]) {
+                    formData.set('AvatarFile', fileInput.files[0]);
                 }
-                showToast(result.message || 'Changes saved successfully', 'success');
-              } else {
-                showToast(result.message || 'Could not save changes', 'error');
-              }
-            })
-            .catch(function () {
-              showToast('Something went wrong. Please try again.', 'error');
-            })
-            .finally(function () {
-              if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Changes'; }
+
+                var saveBtn = gi('saveChangesBtn');
+                if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
+
+                fetch('@Url.Action("UpdateProfile", "Reader")', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                })
+                    .then(function(res) { return res.json(); })
+                    .then(function(result) {
+                        if (result.success) {
+                            var nameEl = document.querySelector('.pi-name');
+                            if (nameEl) nameEl.textContent = name;
+                            if (result.avatarUrl) {
+                                var avatarImg = gi('piAvatar');
+                                if (avatarImg) avatarImg.src = result.avatarUrl;
+                            }
+                            showToast(result.message || 'Changes saved successfully', 'success');
+                        } else {
+                            showToast(result.message || 'Could not save changes', 'error');
+                        }
+                    })
+                    .catch(function() {
+                        showToast('Something went wrong. Please try again.', 'error');
+                    })
+                    .finally(function() {
+                        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Changes'; }
+                    });
+            });
+        }
+
+        /* ── Change Password Modal ────────────────────────────────── */
+        var pwModal = gi('pwModal');
+        function openPwModal() { if (pwModal) pwModal.classList.add('open'); }
+        function closePwModal() { if (pwModal) pwModal.classList.remove('open'); }
+
+        var changePwBtn = gi('changePwBtn');
+        if (changePwBtn) changePwBtn.addEventListener('click', openPwModal);
+        if (gi('closePwModal')) gi('closePwModal').addEventListener('click', closePwModal);
+        if (gi('cancelPwModal')) gi('cancelPwModal').addEventListener('click', closePwModal);
+        if (pwModal) pwModal.addEventListener('click', function(e) { if (e.target === pwModal) closePwModal(); });
+
+        var pwForm = gi('pwForm');
+        if (pwForm) {
+            pwForm.addEventListener('submit', function(e) {
+                var ip = gi('initialPwInput') ? gi('initialPwInput').value : '';
+                var np = gi('newPwInput') ? gi('newPwInput').value : '';
+                var cp = gi('confirmPwInput') ? gi('confirmPwInput').value : '';
+
+                if (!ip) { e.preventDefault(); showToast('Please enter your current password', 'error'); return; }
+                if (!np) { e.preventDefault(); showToast('Please enter a new password', 'error'); return; }
+                if (np.length < 8) { e.preventDefault(); showToast('Password must be at least 8 characters', 'error'); return; }
+                if (np !== cp) { e.preventDefault(); showToast('Passwords do not match', 'error'); return; }
+
+                var saveBtn = gi('savePwBtn');
+                if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Updating…'; }
+                // no preventDefault here — form submits for real, page redirects to ChangePassword action
+            });
+        }
+
+        /* ── 2FA & Sessions rows ──────────────────────────────────── */
+        var twoFaRow = gi('twoFaRow');
+        if (twoFaRow) {
+            twoFaRow.addEventListener('click', function() {
+                var s = gi('twoFaStatus');
+                if (!s) return;
+                var isEnabled = s.textContent.trim() === 'Enabled';
+                s.textContent = isEnabled ? 'Disabled' : 'Enabled';
+                s.style.color = isEnabled ? 'var(--red)' : 'var(--green)';
+                showToast('Two-factor authentication ' + (isEnabled ? 'disabled' : 'enabled'), isEnabled ? 'error' : 'success');
+            });
+        }
+        var sessionsRow = gi('sessionsRow');
+        if (sessionsRow) {
+            sessionsRow.addEventListener('click', function() {
+                showToast('Active sessions panel coming soon', '');
+            });
+        }
+
+        /* ── Preference dropdowns (theme, language, view) ─────────── */
+        var themeSelect = gi('themeSelect');
+        if (themeSelect) {
+            themeSelect.addEventListener('change', function() {
+                showToast('Theme changed to ' + this.options[this.selectedIndex].text, 'success');
+            });
+        }
+        var langSelect = gi('langSelect');
+        if (langSelect) {
+            langSelect.addEventListener('change', function() {
+                showToast('Language changed to ' + this.options[this.selectedIndex].text, 'success');
+            });
+        }
+        var viewSelect = gi('viewSelect');
+        if (viewSelect) {
+            viewSelect.addEventListener('change', function() {
+                showToast('Default view changed to ' + this.options[this.selectedIndex].text, 'success');
+            });
+        }
+
+        /* ── Edit Goals ───────────────────────────────────────────── */
+        var editGoalsBtn = gi('editGoalsBtn');
+        if (editGoalsBtn) {
+            editGoalsBtn.addEventListener('click', function() {
+                showToast('Reading goals editor coming soon', '');
+            });
+        }
+
+        /* ── Notification toggles ─────────────────────────────────── */
+        document.querySelectorAll('.pn-toggle input[data-notif]').forEach(function(chk) {
+            chk.addEventListener('change', function() {
+                var label = this.getAttribute('data-notif');
+                var labels = {
+                    email: 'Email notifications',
+                    push: 'Push notifications',
+                    newbooks: 'New book alerts',
+                    reminders: 'Reading reminders'
+                };
+                var txt = labels[label] || label;
+                showToast(txt + ' ' + (this.checked ? 'enabled' : 'disabled'), this.checked ? 'success' : '');
             });
         });
-      }
 
-      /* ── Change Password Modal ────────────────────────────────── */
-      var pwModal  = gi('pwModal');
-      function openPwModal()  { if (pwModal) pwModal.classList.add('open'); }
-      function closePwModal() { if (pwModal) pwModal.classList.remove('open'); }
-
-      var changePwBtn = gi('changePwBtn');
-      if (changePwBtn) changePwBtn.addEventListener('click', openPwModal);
-      if (gi('closePwModal'))  gi('closePwModal').addEventListener('click', closePwModal);
-      if (gi('cancelPwModal')) gi('cancelPwModal').addEventListener('click', closePwModal);
-      if (pwModal) pwModal.addEventListener('click', function (e) { if (e.target === pwModal) closePwModal(); });
-
-      var savePwBtn = gi('savePwBtn');
-      if (savePwBtn) {
-        savePwBtn.addEventListener('click', function () {
-          var np = gi('newPwInput')   ? gi('newPwInput').value   : '';
-          var cp = gi('confirmPwInput') ? gi('confirmPwInput').value : '';
-          if (!np) { showToast('Please enter a new password', 'error'); return; }
-          if (np !== cp) { showToast('Passwords do not match', 'error'); return; }
-          if (np.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
-          closePwModal();
-          showToast('Password updated successfully', 'success');
+        /* ── Quick Actions ────────────────────────────────────────── */
+        var qaActions = {
+            qaDownload: 'Preparing your data download…',
+            qaPrivacy: 'Privacy settings coming soon',
+            qaBlocked: 'Blocked users panel coming soon',
+            qaClose: 'Account deactivation coming soon'
+        };
+        Object.keys(qaActions).forEach(function(id) {
+            var el = gi(id);
+            if (el) el.addEventListener('click', function() { showToast(qaActions[id], ''); });
         });
-      }
 
-      /* ── 2FA & Sessions rows ──────────────────────────────────── */
-      var twoFaRow = gi('twoFaRow');
-      if (twoFaRow) {
-        twoFaRow.addEventListener('click', function () {
-          var s = gi('twoFaStatus');
-          if (!s) return;
-          var isEnabled = s.textContent.trim() === 'Enabled';
-          s.textContent = isEnabled ? 'Disabled' : 'Enabled';
-          s.style.color  = isEnabled ? 'var(--red)' : 'var(--green)';
-          showToast('Two-factor authentication ' + (isEnabled ? 'disabled' : 'enabled'), isEnabled ? 'error' : 'success');
-        });
-      }
-      var sessionsRow = gi('sessionsRow');
-      if (sessionsRow) {
-        sessionsRow.addEventListener('click', function () {
-          showToast('Active sessions panel coming soon', '');
-        });
-      }
+        /* ── Reading Stats period selector ───────────────────────── */
+        var statPeriodBtn = gi('statPeriodBtn');
+        var statPeriodDrop = gi('statPeriodDrop');
+        var statPeriodLbl = gi('statPeriodLabel');
 
-      /* ── Preference dropdowns (theme, language, view) ─────────── */
-      var themeSelect = gi('themeSelect');
-      if (themeSelect) {
-        themeSelect.addEventListener('change', function () {
-          showToast('Theme changed to ' + this.options[this.selectedIndex].text, 'success');
-        });
-      }
-      var langSelect = gi('langSelect');
-      if (langSelect) {
-        langSelect.addEventListener('change', function () {
-          showToast('Language changed to ' + this.options[this.selectedIndex].text, 'success');
-        });
-      }
-      var viewSelect = gi('viewSelect');
-      if (viewSelect) {
-        viewSelect.addEventListener('change', function () {
-          showToast('Default view changed to ' + this.options[this.selectedIndex].text, 'success');
-        });
-      }
+        var STAT_DATA = {
+            year: { pct: 68, goal: '35 books', read: '24 books', left: '11 books' },
+            month: { pct: 42, goal: '4 books', read: '2 books', left: '2 books' },
+            week: { pct: 80, goal: '1 book', read: '1 book', left: '0 books' },
+            all: { pct: 55, goal: '100 books', read: '55 books', left: '45 books' }
+        };
 
-      /* ── Edit Goals ───────────────────────────────────────────── */
-      var editGoalsBtn = gi('editGoalsBtn');
-      if (editGoalsBtn) {
-        editGoalsBtn.addEventListener('click', function () {
-          showToast('Reading goals editor coming soon', '');
-        });
-      }
+        function updateStats(key) {
+            var d = STAT_DATA[key] || STAT_DATA.year;
+            var arc = gi('rsDonutArc');
+            var pctTxt = gi('rsDonutPct');
+            if (arc) {
+                var circumference = 314.16;
+                var dashArray = (d.pct / 100) * circumference;
+                arc.setAttribute('stroke-dasharray', dashArray.toFixed(2) + ' ' + circumference);
+            }
+            if (pctTxt) pctTxt.textContent = d.pct + '%';
 
-      /* ── Notification toggles ─────────────────────────────────── */
-      document.querySelectorAll('.pn-toggle input[data-notif]').forEach(function (chk) {
-        chk.addEventListener('change', function () {
-          var label = this.getAttribute('data-notif');
-          var labels = {
-            email:    'Email notifications',
-            push:     'Push notifications',
-            newbooks: 'New book alerts',
-            reminders:'Reading reminders'
-          };
-          var txt = labels[label] || label;
-          showToast(txt + ' ' + (this.checked ? 'enabled' : 'disabled'), this.checked ? 'success' : '');
-        });
-      });
-
-      /* ── Quick Actions ────────────────────────────────────────── */
-      var qaActions = {
-        qaDownload: 'Preparing your data download…',
-        qaPrivacy:  'Privacy settings coming soon',
-        qaBlocked:  'Blocked users panel coming soon',
-        qaClose:    'Account deactivation coming soon'
-      };
-      Object.keys(qaActions).forEach(function (id) {
-        var el = gi(id);
-        if (el) el.addEventListener('click', function () { showToast(qaActions[id], ''); });
-      });
-
-      /* ── Reading Stats period selector ───────────────────────── */
-      var statPeriodBtn  = gi('statPeriodBtn');
-      var statPeriodDrop = gi('statPeriodDrop');
-      var statPeriodLbl  = gi('statPeriodLabel');
-
-      var STAT_DATA = {
-        year:  { pct: 68, goal: '35 books', read: '24 books', left: '11 books' },
-        month: { pct: 42, goal: '4 books',  read: '2 books',  left: '2 books'  },
-        week:  { pct: 80, goal: '1 book',   read: '1 book',   left: '0 books'  },
-        all:   { pct: 55, goal: '100 books',read: '55 books', left: '45 books' }
-      };
-
-      function updateStats(key) {
-        var d = STAT_DATA[key] || STAT_DATA.year;
-        var arc = gi('rsDonutArc');
-        var pctTxt = gi('rsDonutPct');
-        if (arc) {
-          var circumference = 314.16;
-          var dashArray = (d.pct / 100) * circumference;
-          arc.setAttribute('stroke-dasharray', dashArray.toFixed(2) + ' ' + circumference);
+            var rows = document.querySelectorAll('.rs-stat-v');
+            if (rows[0]) rows[0].textContent = d.goal;
+            if (rows[1]) rows[1].textContent = d.read;
+            if (rows[2]) rows[2].textContent = d.left;
         }
-        if (pctTxt) pctTxt.textContent = d.pct + '%';
 
-        var rows = document.querySelectorAll('.rs-stat-v');
-        if (rows[0]) rows[0].textContent = d.goal;
-        if (rows[1]) rows[1].textContent = d.read;
-        if (rows[2]) rows[2].textContent = d.left;
-      }
+        if (statPeriodBtn) {
+            statPeriodBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var isOpen = statPeriodDrop.classList.contains('open');
+                closeAllDrops(null);
+                if (!isOpen) {
+                    statPeriodDrop.classList.add('open');
+                    statPeriodBtn.classList.add('open');
+                }
+            });
+            statPeriodDrop.querySelectorAll('a[data-p]').forEach(function(a) {
+                a.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    statPeriodDrop.querySelectorAll('a').forEach(function(x) { x.classList.remove('active'); });
+                    this.classList.add('active');
+                    statPeriodLbl.textContent = this.textContent;
+                    updateStats(this.getAttribute('data-p'));
+                    statPeriodDrop.classList.remove('open');
+                    statPeriodBtn.classList.remove('open');
+                });
+            });
+        }
 
-      if (statPeriodBtn) {
-        statPeriodBtn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          var isOpen = statPeriodDrop.classList.contains('open');
-          closeAllDrops(null);
-          if (!isOpen) {
-            statPeriodDrop.classList.add('open');
-            statPeriodBtn.classList.add('open');
-          }
-        });
-        statPeriodDrop.querySelectorAll('a[data-p]').forEach(function (a) {
-          a.addEventListener('click', function (e) {
-            e.stopPropagation();
-            statPeriodDrop.querySelectorAll('a').forEach(function (x) { x.classList.remove('active'); });
-            this.classList.add('active');
-            statPeriodLbl.textContent = this.textContent;
-            updateStats(this.getAttribute('data-p'));
-            statPeriodDrop.classList.remove('open');
-            statPeriodBtn.classList.remove('open');
-          });
-        });
-      }
+        /* ── Delete Account Modal ─────────────────────────────────── */
+        var deleteModal = gi('deleteModal');
+        var deleteConfirm = gi('deleteConfirmInput');
+        var confirmDelBtn = gi('confirmDeleteBtn');
 
-      /* ── Delete Account Modal ─────────────────────────────────── */
-      var deleteModal   = gi('deleteModal');
-      var deleteConfirm = gi('deleteConfirmInput');
-      var confirmDelBtn = gi('confirmDeleteBtn');
+        function openDeleteModal() { if (deleteModal) deleteModal.classList.add('open'); }
+        function closeDeleteModal() { if (deleteModal) deleteModal.classList.remove('open'); if (deleteConfirm) deleteConfirm.value = ''; if (confirmDelBtn) confirmDelBtn.disabled = true; }
 
-      function openDeleteModal()  { if (deleteModal) deleteModal.classList.add('open'); }
-      function closeDeleteModal() { if (deleteModal) deleteModal.classList.remove('open'); if (deleteConfirm) deleteConfirm.value = ''; if (confirmDelBtn) confirmDelBtn.disabled = true; }
+        var deleteAccBtn = gi('deleteAccBtn');
+        if (deleteAccBtn) deleteAccBtn.addEventListener('click', openDeleteModal);
+        if (gi('closeDeleteModal')) gi('closeDeleteModal').addEventListener('click', closeDeleteModal);
+        if (gi('cancelDeleteModal')) gi('cancelDeleteModal').addEventListener('click', closeDeleteModal);
+        if (deleteModal) deleteModal.addEventListener('click', function(e) { if (e.target === deleteModal) closeDeleteModal(); });
 
-      var deleteAccBtn = gi('deleteAccBtn');
-      if (deleteAccBtn) deleteAccBtn.addEventListener('click', openDeleteModal);
-      if (gi('closeDeleteModal'))  gi('closeDeleteModal').addEventListener('click', closeDeleteModal);
-      if (gi('cancelDeleteModal')) gi('cancelDeleteModal').addEventListener('click', closeDeleteModal);
-      if (deleteModal) deleteModal.addEventListener('click', function (e) { if (e.target === deleteModal) closeDeleteModal(); });
+        if (deleteConfirm && confirmDelBtn) {
+            deleteConfirm.addEventListener('input', function() {
+                confirmDelBtn.disabled = this.value.trim() !== 'DELETE';
+            });
+        }
+        if (confirmDelBtn) {
+            confirmDelBtn.addEventListener('click', function() {
+                showToast('Account deletion requested. You will receive a confirmation email.', 'error');
+                closeDeleteModal();
+            });
+        }
 
-      if (deleteConfirm && confirmDelBtn) {
-        deleteConfirm.addEventListener('input', function () {
-          confirmDelBtn.disabled = this.value.trim() !== 'DELETE';
-        });
-      }
-      if (confirmDelBtn) {
-        confirmDelBtn.addEventListener('click', function () {
-          showToast('Account deletion requested. You will receive a confirmation email.', 'error');
-          closeDeleteModal();
-        });
-      }
+        /* ── View Full Stats button ───────────────────────────────── */
+        var vfsBtn = document.querySelector('.pn-btn-full-outline');
+        if (vfsBtn) {
+            vfsBtn.addEventListener('click', function() {
+                showToast('Full stats page coming soon', '');
+            });
+        }
 
-      /* ── View Full Stats button ───────────────────────────────── */
-      var vfsBtn = document.querySelector('.pn-btn-full-outline');
-      if (vfsBtn) {
-        vfsBtn.addEventListener('click', function () {
-          showToast('Full stats page coming soon', '');
-        });
-      }
+        /* ── Show server result after Change Password redirect ────── */
+        var successMsg = gi('pnToast') ? gi('pnToast').getAttribute('data-success') : '';
+        var errorMsg = gi('pnToast') ? gi('pnToast').getAttribute('data-error') : '';
+        if (successMsg) showToast(successMsg, 'success');
+        if (errorMsg) {
+            showToast(errorMsg, 'error');
+            openPwModal();
+        }
 
-      /* ── Init ─────────────────────────────────────────────────── */
-      updateStats('year');
+        /* ── Init ─────────────────────────────────────────────────── */
+        updateStats('year');
 
     })();
 </script>

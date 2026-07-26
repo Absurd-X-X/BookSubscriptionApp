@@ -2,15 +2,15 @@
 @model List<GetConversationByUserIdResponse>
 
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Views/Shared/_LibraryLayout.cshtml";
     ViewData["Title"] = "Messages";
 
     Guid currentUserId = ViewBag.CurrentUserId;
     Guid? selectedId = ViewBag.SelectedConversationId as Guid?;
 
     var selected = selectedId is not null
-        ? Model?.FirstOrDefault(c => c.ConversationId == selectedId)
-        : Model?.FirstOrDefault();
+    ? Model?.FirstOrDefault(c => c.ConversationId == selectedId)
+    : null;
 
     static string InitialsOf(string title)
     {
@@ -77,7 +77,7 @@
                 {
                     var isActive = selected is not null && conv.ConversationId == selected.ConversationId;
 
-                    <a href="@Url.Action("GetConversation", "Messages", new { conversationId = conv.ConversationId })"
+                    <a href="@Url.Action("GetConversation", "Library", new { conversationId = conv.ConversationId })"
                        class="conv-item @(isActive ? "active" : "")" style="text-decoration:none;color:inherit;">
 
                         <div class="avatar @(conv.ImageUrl == "none" ? AvatarColorClass(conv.Title) : "")">
@@ -282,7 +282,7 @@
                 input.disabled = true;
 
                 try {
-                    const res = await fetch('@Url.Action("Send", "Messages")', {
+                    const res = await fetch('@Url.Action("Send", "Library")', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: new URLSearchParams({ conversationId, content })

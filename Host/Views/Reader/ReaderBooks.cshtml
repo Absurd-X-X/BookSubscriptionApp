@@ -121,17 +121,22 @@
 <div class="page-section" id="section-categories">
     <div class="lib-section-header">
         <span class="lib-section-title">Categories</span>
-        <a href="/Reader/Categories" class="lib-view-all">View all</a>
+        <a href="#" class="lib-view-all">View all</a>
     </div>
-    <div class="categories-row">
-        @foreach (var cat in Model.Categories)
-        {
-            <a href="/Reader/Books?categoryId=@cat.Id" class="cat-pill">
-                <div class="cat-pill-icon"><i class="@GetCategoryIcon(cat.Name)"></i></div>
-                <span class="cat-pill-name">@cat.Name</span>
-                <span class="cat-pill-count">@cat.BookCount books</span>
-            </a>
-        }
+    <div class="row-wrapper">
+        <div class="categories-row" id="categoriesRow">
+            @foreach (var cat in Model.Categories)
+            {
+                <a href="@Url.Action("GetCategoryBooks", "Reader", new { categoryId = cat.Id })" class="cat-pill">
+                    <div class="cat-pill-icon"><i class="@GetCategoryIcon(cat.Name)"></i></div>
+                    <span class="cat-pill-name">@cat.Name</span>
+                    <span class="cat-pill-count">@cat.BookCount books</span>
+                </a>
+            }
+        </div>
+        <button class="scroll-arrow right categories-arrow" onclick="scrollRow('categoriesRow',1)">
+            <i class="ti ti-chevron-right"></i>
+        </button>
     </div>
 </div>
 

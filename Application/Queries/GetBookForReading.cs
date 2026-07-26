@@ -9,6 +9,7 @@ namespace Application.Queries
     {
         public record GetBookForReadingQuery(
             Guid ReaderId,
+            Guid UserId,
             Guid BookId)
             : IRequest<Result<GetBookForReadingResponse>>;
 
@@ -26,13 +27,21 @@ namespace Application.Queries
             {
                 var book = await bookRepository.GetByIdAsync(request.BookId);
 
-                //if (user.Role.Equals("reader", StringComparison.CurrentCultureIgnoreCase))
-                //{
-                //    var isSubActive = await subscriptionRepository.GetByReaderIdAsync(request.ReaderId, true);
+                var user = await userRepository.GetAsync(request.UserId);
 
-                //    if (isSubActive is null)
-                //        return Result<GetBookForReadingResponse>.Failure("You must subscribe to read book");
-                //}
+                if (user is null)
+                {
+                    return Result<GetBookForReadingResponse>
+                        .Failure("User not found.");
+                }
+
+                if (user.Role.Equals("reader", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    var isSubActive = await subscriptionRepository.GetByReaderIdAsync(request.ReaderId, true);
+
+                    if (isSubActive is null)
+                        return Result<GetBookForReadingResponse>.Failure("You must subscribe to read book");
+                }
 
                 if (book == null)
                 {

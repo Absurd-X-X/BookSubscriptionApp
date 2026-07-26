@@ -34,7 +34,7 @@ namespace Application.Queries
                     return Result<GetReaderDashboardResponse>.Failure("Reader not found");
                 }
 
-                var readerId = user.Id;
+                var readerId = user.Reader.Id;
 
                 var allProgress = await readingProgressRepository.GetByReaderAsync(readerId);
                 var completedBooks = await readingProgressRepository.GetCompletedBooksAsync(readerId);
@@ -58,7 +58,7 @@ namespace Application.Queries
                 var unreadCount = await notificationRepository.GetUnreadCountAsync(userId);
 
                 var activityPage = new PageRequest { Page = 1, PageSize = 4 };
-                var recentActivity = await auditLogRepository.GetAsync(userId, activityPage, usePaging: true);
+                var recentActivity = await auditLogRepository.GetAsync(userId, activityPage, usePaging: false);
 
                 var streakDays = CalculateStreak(
                     allProgress
@@ -122,12 +122,12 @@ namespace Application.Queries
                         x.NoOfTimeReadByPeople
                     )).ToList(),
 
-                    recentActivity.Items.Select(x => new ActivityResponse(
+                    [.. recentActivity.Items.Select(x => new ActivityResponse(
                         x.ActionType,
                         x.Icon,
                         x.Description,
                         x.Timestamp
-                    )).ToList(),
+                    ))],
 
                     subscription == null ? "Free Plan" : subscription.Types.TypeName,
                     subscription == null ? 0m : subscription.Types.Cost,

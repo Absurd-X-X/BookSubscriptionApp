@@ -1,5 +1,4 @@
-﻿
-@media (max-width: 640px) {
+﻿@media (max-width: 640px) {
     body {
         padding: 16px;
     }
@@ -158,54 +157,6 @@
     opacity: .5;
     cursor: not-allowed;
 }
-
-/* ---------- Tabs ---------- */
-.ah-settings-tabs {
-    display: flex;
-    gap: 4px;
-    border-bottom: 1px solid var(--ah-border);
-    overflow-x: auto;
-    scrollbar-width: thin;
-}
-
-    .ah-settings-tabs::-webkit-scrollbar {
-        height: 4px;
-    }
-
-    .ah-settings-tabs::-webkit-scrollbar-thumb {
-        background: var(--ah-border-strong);
-        border-radius: 4px;
-    }
-
-.ah-tab-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    color: var(--ah-text-dim);
-    font-size: 14px;
-    font-weight: 500;
-    padding: 12px 16px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: color .15s ease;
-}
-
-    .ah-tab-btn:hover {
-        color: var(--ah-text);
-    }
-
-    .ah-tab-btn.ah-active {
-        color: var(--ah-accent-light);
-        border-bottom-color: var(--ah-accent);
-    }
-
-    .ah-tab-btn svg {
-        width: 16px;
-        height: 16px;
-    }
 
 /* ---------- Body grid ---------- */
 .ah-settings-body {
@@ -639,227 +590,6 @@
     color: var(--ah-text-dim);
 }
 
-/* ---------- Stat rows (usage summary etc) ---------- */
-.ah-stat-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-}
-
-@media (max-width: 900px) {
-    .ah-stat-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 480px) {
-    .ah-stat-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-.ah-stat-item {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.ah-stat-item-top {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--ah-text-dim);
-    font-size: 13px;
-}
-
-    .ah-stat-item-top svg {
-        width: 16px;
-        height: 16px;
-        color: var(--ah-accent-light);
-    }
-
-.ah-stat-value {
-    font-size: 16px;
-    font-weight: 700;
-}
-
-    .ah-stat-value small {
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--ah-text-faint);
-    }
-
-.ah-progress-bar {
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.07);
-    overflow: hidden;
-}
-
-.ah-progress-bar-fill {
-    height: 100%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, var(--ah-accent-dark), var(--ah-accent-light));
-}
-
-.ah-progress-label {
-    font-size: 12px;
-    color: var(--ah-text-faint);
-}
-
-/* ---------- Tables ---------- */
-.ah-table-wrap {
-    overflow-x: auto;
-}
-
-table.ah-data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-
-    table.ah-data-table th {
-        text-align: left;
-        color: var(--ah-text-faint);
-        font-weight: 600;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: .02em;
-        padding: 0 14px 10px 0;
-        border-bottom: 1px solid var(--ah-border);
-    }
-
-    table.ah-data-table td {
-        padding: 14px 14px 14px 0;
-        border-bottom: 1px solid var(--ah-border);
-        color: var(--ah-text);
-        vertical-align: middle;
-    }
-
-    table.ah-data-table tr:last-child td {
-        border-bottom: none;
-    }
-
-.ah-cell-sub {
-    display: block;
-    font-size: 12px;
-    color: var(--ah-text-faint);
-    margin-top: 2px;
-}
-
-.ah-cell-with-icon {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.ah-cell-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.05);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--ah-text-dim);
-}
-
-.ah-icon-btn {
-    background: none;
-    border: none;
-    color: var(--ah-text-faint);
-    cursor: pointer;
-    padding: 4px;
-}
-
-    .ah-icon-btn:hover {
-        color: var(--ah-text);
-    }
-
-/* ---------- Notification matrix ---------- */
-.ah-notif-matrix {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-}
-
-    .ah-notif-matrix thead th {
-        text-align: center;
-        font-size: 13px;
-        color: var(--ah-text-dim);
-        font-weight: 600;
-        padding-bottom: 14px;
-        width: 70px;
-    }
-
-        .ah-notif-matrix thead th:first-child {
-            text-align: left;
-            width: auto;
-        }
-
-    .ah-notif-matrix tbody tr {
-        border-top: 1px solid var(--ah-border);
-    }
-
-    .ah-notif-matrix tbody td {
-        padding: 14px 0;
-        text-align: center;
-    }
-
-        .ah-notif-matrix tbody td:first-child {
-            text-align: left;
-        }
-
-.ah-notif-row-label {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-    .ah-notif-row-label strong {
-        display: block;
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .ah-notif-row-label span {
-        display: block;
-        font-size: 12.5px;
-        color: var(--ah-text-dim);
-        margin-top: 2px;
-    }
-
-input[type="checkbox"].ah-chk {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--ah-accent);
-    cursor: pointer;
-}
-
-input[type="radio"].ah-rad {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--ah-accent);
-    cursor: pointer;
-}
-
-.ah-radio-row {
-    display: flex;
-    gap: 22px;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--ah-border);
-}
-
-    .ah-radio-row label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        color: var(--ah-text-dim);
-        cursor: pointer;
-    }
-
 /* ---------- Quick actions / info list ---------- */
 .ah-quick-actions {
     list-style: none;
@@ -1010,279 +740,55 @@ input[type="radio"].ah-rad {
         font-weight: 400;
     }
 
-.ah-big-number-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.ah-big-number-circle {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: var(--ah-accent-soft);
-    color: var(--ah-accent-light);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-    .ah-big-number-circle svg {
-        width: 28px;
-        height: 28px;
-    }
-
-.ah-big-number {
-    font-size: 28px;
-    font-weight: 800;
-    line-height: 1;
-}
-
-.ah-big-number-label {
-    font-size: 13px;
-    color: var(--ah-text-dim);
-    margin-top: 4px;
-}
-
-.ah-ring-progress {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    margin: 0 auto 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    background: conic-gradient(var(--ah-accent) calc(var(--p,85) * 1%), rgba(255,255,255,0.08) 0);
-}
-
-    .ah-ring-progress::before {
-        content: "";
-        position: absolute;
-        inset: 8px;
-        border-radius: 50%;
-        background: var(--ah-bg-card);
-    }
-
-    .ah-ring-progress span {
-        position: relative;
-        font-size: 22px;
-        font-weight: 800;
-    }
-
 .ah-divider {
     height: 1px;
     background: var(--ah-border);
     margin: 4px 0;
 }
 
-.ah-tip-row {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-}
-
-    .ah-tip-row .ah-row-icon {
-        background: var(--ah-accent-soft);
-        color: var(--ah-accent-light);
-    }
-
-    .ah-tip-row strong {
-        display: block;
-        font-size: 13.5px;
-        font-weight: 600;
-        margin-bottom: 2px;
-    }
-
-    .ah-tip-row span {
-        font-size: 12.5px;
-        color: var(--ah-text-dim);
-    }
-
-.ah-activity-item {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-    .ah-activity-item .ah-row-icon {
-        width: 30px;
-        height: 30px;
-    }
-
-.ah-activity-left {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-}
-
-    .ah-activity-left strong {
-        display: block;
-        font-size: 13.5px;
-        font-weight: 600;
-    }
-
-    .ah-activity-left span {
-        display: block;
-        font-size: 12.5px;
-        color: var(--ah-text-dim);
-        margin-top: 2px;
-    }
-
-.ah-activity-right {
-    text-align: right;
-    flex-shrink: 0;
-}
-
-    .ah-activity-right .ah-time {
-        display: block;
-        font-size: 11.5px;
-        color: var(--ah-text-faint);
-        margin-top: 4px;
-    }
-
-.ah-channel-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 11px 0;
-}
-
-    .ah-channel-row + .ah-channel-row {
-        border-top: 1px solid var(--ah-border);
-    }
-
-.ah-channel-left {
-    display: flex;
-    gap: 10px;
-}
-
-    .ah-channel-left strong {
-        display: block;
-        font-size: 13.5px;
-        font-weight: 600;
-    }
-
-    .ah-channel-left span {
-        display: block;
-        font-size: 12.5px;
-        color: var(--ah-text-dim);
-        margin-top: 2px;
-    }
-
-/* help banner */
-.ah-help-banner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.ah-help-banner-left {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-}
-
-.ah-help-banner h4 {
-    margin: 0 0 2px;
-    font-size: 14.5px;
-    font-weight: 600;
-}
-
-.ah-help-banner p {
-    margin: 0;
-    font-size: 13px;
-    color: var(--ah-text-dim);
-}
-
-/* sticky save footer (library settings tab) */
 .ah-form-actions {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
 }
 
-/* danger zone */
-.ah-danger-zone {
-    border: 1px solid rgba(248,113,113,0.3);
-    background: rgba(248,113,113,0.05);
-}
-
-.ah-danger-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-    padding: 12px 0;
-}
-
-    .ah-danger-row + .ah-danger-row {
-        border-top: 1px solid rgba(248,113,113,0.18);
-    }
-
-    .ah-danger-row strong {
-        display: block;
-        font-size: 14px;
-    }
-
-    .ah-danger-row span {
-        display: block;
-        font-size: 12.5px;
-        color: var(--ah-text-dim);
-        margin-top: 2px;
-    }
-
-/* integrations grid */
-.ah-integration-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.ah-integration-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    border: 1px solid var(--ah-border);
-    border-radius: var(--ah-radius-sm);
-    padding: 14px;
-}
-
-    .ah-integration-row .ah-cell-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-    }
-
-.ah-integration-info {
-    flex: 1;
-    min-width: 0;
-}
-
-    .ah-integration-info strong {
-        display: block;
-        font-size: 14px;
-        font-weight: 600;
-    }
-
-    .ah-integration-info span {
-        display: block;
-        font-size: 12.5px;
-        color: var(--ah-text-dim);
-        margin-top: 2px;
-    }
-
 .ah-avatar-upload .ah-avatar-wrap-square img {
     border-radius: var(--ah-radius-sm);
 }
 
-/* responsive tweaks */
+.ah-avatar-upload .ah-avatar-placeholder {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: var(--ah-accent-soft);
+    color: var(--ah-accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ah-avatar-upload .ah-avatar-wrap-square .ah-avatar-placeholder {
+    border-radius: var(--ah-radius-sm);
+}
+
+.ah-hidden {
+    display: none !important;
+}
+
+/* ---------- Hero logo avatar (sidebar) — sized to match its image, camera aligns correctly ---------- */
+.ah-hero-avatar-upload .ah-avatar-wrap.ah-hero-icon-circle {
+    width: 96px;
+    height: 96px;
+    background: none;
+    box-shadow: 0 0 0 4px var(--ah-accent-soft);
+}
+
+    .ah-hero-avatar-upload .ah-avatar-wrap.ah-hero-icon-circle .ah-avatar-placeholder {
+        width: 96px;
+        height: 96px;
+    }
+
+
 @media (max-width: 640px) {
     .ah-settings-header {
         flex-direction: column;
@@ -1295,14 +801,4 @@ input[type="radio"].ah-rad {
     .ah-date-range-btn {
         flex: 1;
     }
-
-    .ah-help-banner {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    table.ah-data-table {
-        font-size: 12.5px;
-    }
 }
-

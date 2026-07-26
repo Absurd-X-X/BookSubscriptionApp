@@ -13,6 +13,7 @@ using Web.Helpers;
 using static Application.Command.AddBook;
 using static Application.Commands.ArchiveBook;
 using static Application.Commands.MarkAllNotificationsRead;
+using static Application.Commands.MarkConversationAsRead;
 using static Application.Commands.MarkNotificationRead;
 using static Application.Commands.SendMessage;
 using static Application.Commands.UploadProfilePIcs;
@@ -222,20 +223,20 @@ namespace Host.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProfile(
-            string fullName, string email, string username, string? bio, IFormFile? avatarFile)
+        public async Task<IActionResult> UpdateLibrarySettings(
+        string name, string email, string phoneNumber, string address, string website, string description, IFormFile? logoFile)
         {
             var userId = ClaimsHelper.GetUserId(User);
 
-            Stream? avatarStream = avatarFile != null ? avatarFile.OpenReadStream() : null;
+            Stream? logoStream = logoFile != null ? logoFile.OpenReadStream() : null;
 
-            var command = new UpdatePersonalSettings.UpdatePersonalSettingsCommand(
-                userId, fullName, email, username, bio,
-                avatarFile?.FileName, avatarStream);
+            var command = new UpdateLibrarySettings.UpdateLibrarySettingsCommand(
+                userId, name, email, phoneNumber, address, website, description,
+                logoFile?.FileName, logoStream);
 
             var result = await mediator.Send(command);
 
-            return Json(new { success = result.Status, message = result.Message, avatarUrl = result.Data });
+            return Json(new { success = result.Status, message = result.Message, logoUrl = result.Data });
         }
 
         [HttpGet]
@@ -689,6 +690,8 @@ namespace Host.Controllers
         public async Task<IActionResult> GetConversation(Guid conversationId)
         {
             var userId = ClaimsHelper.GetUserId(User);
+
+            await mediator.Send(new MarkConversationAsReadCommand(conversationId, userId));
 
             var listResult = await mediator.Send(new GetConversationByUserIdQuery(userId));
             if (!listResult.Status)

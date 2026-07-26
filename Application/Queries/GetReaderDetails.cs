@@ -87,7 +87,7 @@ namespace Application.Queries
                         currentlyReadingList.Count,
                         completedCount + currentlyReadingList.Count
                     ),
-                    auditLogs.Items.Take(5).Select(x => new ActivityItemDto(
+                    auditLogs.Items.Select(x => new ActivityItemDto(
                         x.ActionType,
                         x.Icon,
                         x.Description,

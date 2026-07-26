@@ -402,6 +402,17 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Conversations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b235f2ed-bb4e-4bd2-a03d-0e3c17aaf2e2"),
+                            CreatedBy = "c117635d-96e0-409b-9fae-72976ec9c42a",
+                            DateCreated = new DateTime(2026, 7, 19, 22, 21, 37, 47, DateTimeKind.Utc).AddTicks(6276),
+                            DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Title = "Soulshelf Group Chat"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Favorite", b =>
@@ -918,10 +929,10 @@ namespace Infrastructure.Migrations
                         {
                             Id = new Guid("c117635d-96e0-409b-9fae-72976ec9c42a"),
                             CreatedBy = "system",
-                            DateCreated = new DateTime(2026, 7, 19, 8, 33, 22, 554, DateTimeKind.Utc).AddTicks(2633),
+                            DateCreated = new DateTime(2026, 7, 19, 22, 21, 36, 965, DateTimeKind.Utc).AddTicks(9590),
                             DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
-                            HashPassword = "AQAAAAIAAYagAAAAEIpWXQwzsWgMEaIWc2lH7gqR7/uYJJnShp9C3dHUSvM8iv2U7G6XCoarZqszkCn71w==",
+                            HashPassword = "AQAAAAIAAYagAAAAEHaPPOH/SklTp9J6kzhJxdp8/VTAkDg9x+/hJUQVwONInIm6LdQge2AZgBjWzQnRHA==",
                             IsDeleted = false,
                             IsVerified = true,
                             Role = "admin",
@@ -942,6 +953,13 @@ namespace Infrastructure.Migrations
                     b.HasIndex("ConversationId");
 
                     b.ToTable("UserConversations");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("c117635d-96e0-409b-9fae-72976ec9c42a"),
+                            ConversationId = new Guid("b235f2ed-bb4e-4bd2-a03d-0e3c17aaf2e2")
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Wallet", b =>
@@ -982,10 +1000,10 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("3ec20f1b-13d8-4ff0-9784-de8af7b23cde"),
+                            Id = new Guid("7526dc11-4739-4015-a773-bde0b26cc4f1"),
                             Balance = 0m,
                             CreatedBy = "admin@gmail.com",
-                            DateCreated = new DateTime(2026, 7, 19, 8, 33, 22, 629, DateTimeKind.Utc).AddTicks(9874),
+                            DateCreated = new DateTime(2026, 7, 19, 22, 21, 37, 47, DateTimeKind.Utc).AddTicks(2089),
                             DateModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
                             LastPayoutDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),

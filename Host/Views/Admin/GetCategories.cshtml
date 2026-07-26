@@ -224,12 +224,12 @@
 
             <div class="table-pagination-container">
 
-                <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="1" asp-route-pageSize="@Model.PageSize"
+                <a asp-controller="Admin" asp-action="GetCategories" asp-route-page="1" asp-route-pageSize="@Model.PageSize"
                    class="page-item page-icon @isFirstDisabled">
                     &#124;&lt;
                 </a>
 
-                <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="@(Model.Page - 1)" asp-route-pageSize="@Model.PageSize"
+                <a asp-controller="Admin" asp-action="GetCategories" asp-route-page="@(Model.Page - 1)" asp-route-pageSize="@Model.PageSize"
                    class="page-item page-icon @isFirstDisabled">
                     &lt;
                 </a>
@@ -238,18 +238,18 @@
                 {
                     string isActive = (i == Model.Page) ? "active" : "";
 
-                    <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="@i" asp-route-pageSize="@Model.PageSize"
+                    <a asp-controller="Admin" asp-action="GetCategories" asp-route-page="@i" asp-route-pageSize="@Model.PageSize"
                        class="page-item page-number @isActive">
                         @i
                     </a>
                 }
 
-                <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="@(Model.Page + 1)" asp-route-pageSize="@Model.PageSize"
+                <a asp-controller="Admin" asp-action="GetCategories" asp-route-page="@(Model.Page + 1)" asp-route-pageSize="@Model.PageSize"
                    class="page-item page-icon @isLastDisabled">
                     &gt;
                 </a>
 
-                <a asp-controller="Admin" asp-action="GetUsers" asp-route-page="@Model.PageCount" asp-route-pageSize="@Model.PageSize"
+                <a asp-controller="Admin" asp-action="GetCategories" asp-route-page="@Model.PageCount" asp-route-pageSize="@Model.PageSize"
                    class="page-item page-icon @isLastDisabled">
                     &gt;&#124;
                 </a>

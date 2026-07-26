@@ -97,13 +97,25 @@ namespace Application.Command
                 if (admin is null)
                     return Result<AddLibraryResponse>.Failure("Something weny wrong");
 
+                var getGroupConversation = await conversationRepository.GetGroupAsync(admin.Id);
+
+                if (getGroupConversation != null)
+                {
+                    getGroupConversation.UserConversations.Add(
+                        new UserConversation
+                        {
+                            UserId = user.Id
+                        });
+                }
+
+
                 var checkConversation = await conversationRepository.GetPrivateConversationAsync(user.Id, admin.Id);
 
                 if (checkConversation is null)
                 {
                     var conversation = new Conversation
                     {
-                        Title = "Private chart",
+                        Title = request.UserName ?? request.Name,
                         CreatedBy = admin.Id.ToString(),
                         LastMessageAt = null,
                         UserConversations = new List<UserConversation>

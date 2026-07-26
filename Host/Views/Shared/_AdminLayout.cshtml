@@ -60,12 +60,12 @@
                 </a>
 
                 <a href="@Url.Action("GetConversations", "Admin")"
-                   class="nav-item @(controller == "Admin" && action == "GetConversations" ? "active" : "")">
+                   class="nav-item @(controller == "Admin" && (action == "GetConversations" || action == "GetConversation") ? "active" : "")">
                     <img src="~/lib/images/view message.png" alt="">MESSAGES
                 </a>
 
                 <a href="@Url.Action("ActivityLogs", "Admin")" 
-                   class="nav-item @(controller == "Admin" && action == "ActivityLogs" ? "active" : "")">
+                   class="nav-item @(controller == "Admin" && (action == "ActivityLogs" || action == "GetActivity") ? "active" : "")">
                     <img src="~/lib/images/report.png" alt="">ACTIVITY
                 </a>
 

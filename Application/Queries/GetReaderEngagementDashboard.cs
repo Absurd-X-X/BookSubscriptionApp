@@ -1,14 +1,11 @@
 ﻿using Application.Common.Repositories;
-using Domain.Entities;
 using MediatR;
 
 namespace Application.Features.ReaderEngagement.Queries.GetReaderEngagementDashboard
 {
-    // ── Query ──────────────────────────────────────────────
-    public sealed record GetReaderEngagementDashboardQuery(Guid ReaderId, string ChartRange = "8w")
+    public sealed record GetReaderEngagementDashboardQuery(Guid ReaderId, Guid UserId, string ChartRange = "8w")
         : IRequest<ReaderEngagementVm>;
 
-    // ── View Models ────────────────────────────────────────
     public sealed class ReaderEngagementVm
     {
         public ReviewSummaryVm ReviewSummary { get; init; } = new();
@@ -50,8 +47,6 @@ namespace Application.Features.ReaderEngagement.Queries.GetReaderEngagementDashb
         public string Message { get; init; } = default!;
         public bool IsRead { get; init; }
         public DateTime DateCreated { get; init; }
-        // TODO: expose Type/RefType here once NotificationType is confirmed,
-        // so the view can map to a real icon instead of a static bell.
     }
 
     public sealed class TrendVm
@@ -80,7 +75,6 @@ namespace Application.Features.ReaderEngagement.Queries.GetReaderEngagementDashb
         public double Hours { get; init; }
     }
 
-    // ── Handler ────────────────────────────────────────────
     public sealed class GetReaderEngagementDashboardQueryHandler(
         IReviewRepository reviewRepository,
         INotificationRepository notificationRepository,
@@ -117,7 +111,7 @@ namespace Application.Features.ReaderEngagement.Queries.GetReaderEngagementDashb
             }).ToList();
 
             // ── Notifications ──
-            var notifications = await notificationRepository.GetAllNotificationtAsync(request.ReaderId);
+            var notifications = await notificationRepository.GetAllNotificationtAsync(request.UserId);
             var notificationVms = notifications
                 .Where(n => !n.IsDeleted && !n.IsArchived)
                 .OrderByDescending(n => n.DateCreated)
@@ -132,7 +126,7 @@ namespace Application.Features.ReaderEngagement.Queries.GetReaderEngagementDashb
                 })
                 .ToList();
 
-            var unreadCount = await notificationRepository.GetUnreadCountAsync(request.ReaderId);
+            var unreadCount = await notificationRepository.GetUnreadCountAsync(request.UserId);
 
             // ── Analytics: current totals ──
             var totalPages = await readingProgressRepository.GetTotalPagesReadAsync(request.ReaderId);

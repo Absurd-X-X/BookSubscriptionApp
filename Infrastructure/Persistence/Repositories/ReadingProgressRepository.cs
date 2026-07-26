@@ -237,10 +237,6 @@ namespace Persistence.Repositories
         {
             var start = DateTime.UtcNow.Date.AddDays(-(days - 1));
 
-            // NOTE: TotalMinutesRead is a running total per ReadingProgress row,
-            // not a per-day log, so this buckets by LastReadDate only.
-            // For an accurate day-by-day minutes chart, a ReadingSession log
-            // table (readerId, bookId, date, minutes) would be needed.
             return await context.ReadingProgresses
                 .Where(x => x.ReaderId == readerId &&
                             !x.IsDeleted &&
@@ -327,5 +323,6 @@ namespace Persistence.Repositories
             progress.IsDeleted = true;
             progress.DateModified = DateTime.UtcNow;
         }
+
     }
 }

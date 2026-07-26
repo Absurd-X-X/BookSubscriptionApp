@@ -1,5 +1,6 @@
 ﻿using Application.Common.Pagenation;
 using Domain.Entities;
+using static Application.Queries.GetReaderActivities;
 
 namespace Application.Common.Repositories
 {
@@ -11,5 +12,6 @@ namespace Application.Common.Repositories
         Task<PagenatedList<AuditLog>> GetAllAsync(PageRequest request, bool usePaging);
         Task<PagenatedList<AuditLog>> GetByActionTypeAsync(string actionType, PageRequest request, bool usePaging);
         Task<PagenatedList<AuditLog>> GetByUserRoleAsync(string role, PageRequest request, bool usePaging);
+        Task<PagenatedList<AuditLog>> GetAllByUserIdAsync(PageRequest request, bool track, AuditLogFilter? filter, Guid userId);
     }
 }

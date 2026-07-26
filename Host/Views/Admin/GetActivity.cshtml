@@ -49,9 +49,9 @@
             <div class="adl-overview-label">Log Overview</div>
             <div class="adl-overview-title-row">
                 <h2>Updated book &ldquo;Atomic Habits&rdquo; (Price)</h2>
-                <span class="action-badge action-badge--update">UPDATE</span>
+                <span class="action-badge action-badge--update">@Model.ActionType</span>
             </div>
-            <div class="adl-overview-desc">The book price was updated from $12.99 to $14.99.</div>
+            <div class="adl-overview-desc">@Model.Description</div>
         </div>
     </div>
 
@@ -134,7 +134,7 @@
             <div class="adl-detail-label">New Value</div>
             <div class="adl-detail-value">Not Set Either</div>
         </div>
-        <div class="adl-detail-row">
+        @* <div class="adl-detail-row">
             <div class="adl-detail-label">Changes</div>
             <div class="adl-detail-value">
                 <div class="adl-diff-block">
@@ -142,7 +142,7 @@
                     <div class="adl-diff-line adl-diff-line--added">+ "price": "14.99"</div>
                 </div>
             </div>
-        </div>
+        </div> *@
         <div class="adl-detail-row">
             <div class="adl-detail-label">IP Address</div>
             <div class="adl-detail-value">197.159.112.45</div>

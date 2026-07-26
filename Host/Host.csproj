@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="..\..\..\Downloads\Jesus-in-India-img.jpg" Link="wwwroot\lib\images\Jesus-in-India-img.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\css\settings.css" />
   </ItemGroup>
 

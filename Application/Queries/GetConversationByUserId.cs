@@ -29,6 +29,7 @@ namespace Application.Queries
 
                 var conversations = await conversationRepository
                     .GetByUserIdAsync(request.UserId);
+               
 
                 var response = conversations.Select(c =>
                 {
